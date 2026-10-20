@@ -1,0 +1,9 @@
+# Blank issues stay enabled: the app's Feedback button opens a prefilled blank issue (title, body and label in the link).
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and discussion
+    url: https://github.com/sohitqwer-del/beta-cutting-room/discussions
+    about: Ask a question, share how you use BETA Cutting Room, or talk about ideas.
+  - name: Security problem
+    url: https://github.com/sohitqwer-del/beta-cutting-room/security/policy
+    about: Please report security problems privately, as described in SECURITY.md.

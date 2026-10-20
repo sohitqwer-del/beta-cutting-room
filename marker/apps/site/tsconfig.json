@@ -6,5 +6,5 @@
     "verbatimModuleSyntax": true,
     "types": ["node"]
   },
-  "include": ["src"]
+  "include": ["src", "scripts/*.ts"]
 }

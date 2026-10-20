@@ -76,7 +76,9 @@ export async function runPatternTraceChecks(){
   const image=document.createElement('canvas');image.width=400;image.height=300;const ctx=image.getContext('2d');ctx.fillStyle='#e7e3d6';ctx.fillRect(0,0,400,300);ctx.strokeStyle='#5a665a';ctx.strokeRect(20,20,100,200);
   const blob=await new Promise(r=>image.toBlob(r,'image/png')),files=new DataTransfer();files.items.add(new File([blob],'original-trace-test.png',{type:'image/png'}));get('#pd-trace-file').files=files.files;get('#pd-trace-file').dispatchEvent(new Event('change',{bubbles:true}));await wait(()=>!get('#pattern-workbench').hasAttribute('aria-busy'));
   fill('#pd-known-distance','200');await click('#pd-calibrate');const svg=get('#pd-canvas');for(const [x,y]of [[20,-20],[120,-20]]){const p=svg.createSVGPoint();p.x=x;p.y=y;const screen=p.matrixTransform(svg.getScreenCTM());svg.dispatchEvent(new PointerEvent('pointerdown',{clientX:screen.x,clientY:screen.y,button:0,bubbles:true}));await wait(()=>!get('#pattern-workbench').hasAttribute('aria-busy'));}
-  const trace=saved().meta.trace_image;const result={group,traceCalibrated:trace.calibrated,scale:trace.scale,offlineImage:trace.data.startsWith('data:image/png;base64,')};if(!group||!result.traceCalibrated||result.scale!==2)throw new Error('Group or trace calibration failed');return result;
+  // SVG screen transforms use floating-point coordinates; sub-pixel round-off
+  // must not fail an otherwise correct 200 mm / 100 pixel calibration.
+  const trace=saved().meta.trace_image;const result={group,traceCalibrated:trace.calibrated,scale:trace.scale,offlineImage:trace.data.startsWith('data:image/png;base64,')};if(!group||!result.traceCalibrated||Math.abs(result.scale-2)>1e-5)throw new Error('Group or trace calibration failed');return result;
 }
 export async function benchmarkPattern(){
   const core=await loadPatternCore(),doc=core.starter(),times=[];

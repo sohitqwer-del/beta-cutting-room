@@ -1,12 +1,11 @@
 # Security reporting and deployment
 
-**Private reporting contact: [TO BE ADDED BEFORE PUBLIC LAUNCH].**
-
-This launch candidate has no public security contact or response-time promise
-yet. Before publication, maintainers must replace the placeholder with a
-monitored private address and test that it works. Until then, use the existing
-private project coordination channel. Do not publish factory data, tokens or a
-working exploit in a public issue.
+**Report security problems privately.** Use GitHub's private reporting
+("Report a vulnerability" on the repository's Security tab) or email
+sohitqwer@gmail.com with "BETA security" in the subject. Do not open a public
+issue for a security problem. Do not publish factory data, tokens or a working
+exploit. This is a small volunteer project: we will reply as soon as we can,
+but there is no guaranteed response time.
 
 Include the BETA version/source commit, OS, affected command/route, impact,
 steps to reproduce and a minimal synthetic input. Remove real credentials,

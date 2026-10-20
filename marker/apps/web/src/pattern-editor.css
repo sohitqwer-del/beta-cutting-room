@@ -59,3 +59,14 @@
 #pattern-workbench[data-pattern-mode=measurements] .pd-history,
 #pattern-workbench[data-pattern-mode=guide] .pd-history { display:none; }
 #pattern-workbench:is([data-pattern-mode=measurements],[data-pattern-mode=guide]) .pd-layout {grid-template-columns:minmax(0,1fr);}
+
+#pattern-workbench[data-pattern-mode=checks] :is(#pd-canvas,.pd-canvas-foot,.pd-history) { display:none; }
+#pattern-workbench[data-pattern-mode=checks] .pd-layout { grid-template-columns:minmax(0,1fr); }
+.pp-panel { border-top:1px solid var(--line); margin-top:1.3rem; padding-top:1rem; }
+.pp-panel summary { font-weight:650; cursor:pointer; }
+.pp-edge-key { display:flex; flex-wrap:wrap; gap:1.5rem; margin:.8rem 0; }
+.pp-edge-key ol { font-size:.85rem; }
+#pp-seam-preview svg { display:block; width:100%; height:260px; background:var(--paper); border:1px solid var(--line); margin-top:1rem; }
+#pp-rule-preview { margin:1rem 0; }
+#pp-report { margin-top:1.3rem; }
+#pd-canvas,#pp-report,.pp-panel { scroll-margin-top:76px; }

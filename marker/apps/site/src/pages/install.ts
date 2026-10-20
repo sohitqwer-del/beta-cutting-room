@@ -1,16 +1,17 @@
 import { html, type Raw } from '../html.ts';
 import { ext, pageHead, section } from '../layout.ts';
 import { site } from '../config.ts';
-import { downloadButton } from './home.ts';
+import { downloadButton, helpSection } from './home.ts';
 
 export function installPage(): Raw {
   const win = site.downloads.windows;
+  const port = site.downloads.portable;
   return html`
 ${pageHead('Install and self-host', 'BETA Cutting Room runs on computers you control. Install the desktop app on a Windows PC, or run the server on your own machine. No account, no cloud and no internet connection are needed for daily work.', 'Self-hosting')}
 
 <div class="wrap">
   <nav class="toc" aria-label="On this page"><ul>
-    <li><a href="#windows">Windows desktop app</a></li><li><a href="#server">Server</a></li><li><a href="#requirements">System requirements</a></li><li><a href="#privacy">Privacy</a></li><li><a href="#offline">Offline use</a></li>
+    <li><a href="#windows">Windows desktop app</a></li><li><a href="#portable">Portable ZIP</a></li><li><a href="#server">Server</a></li><li><a href="#requirements">System requirements</a></li><li><a href="#privacy">Privacy</a></li><li><a href="#offline">Offline use</a></li>
   </ul></nav>
 </div>
 
@@ -31,6 +32,18 @@ ${section('windows', 'Windows desktop app', html`
   </aside>
 </div>`)}
 
+${section('portable', 'Portable ZIP (no installation)', html`
+<div class="prose">
+  <p>The portable package runs the same app in your web browser, without installing anything. It suits a PC where you cannot install programs.</p>
+  <ol>
+    <li>Download <code>${port.file}</code> (${port.size}).${port.url ? html` ${downloadButton(port.url, 'Download portable ZIP', 'btn btn-secondary btn-small')}` : ''}</li>
+    <li>Check the file: <code>Get-FileHash -Algorithm SHA256 '.\\${port.file}'</code>. The result must be${port.sha256 ? html` <code class="break">${port.sha256}</code>` : html` <span class="placeholder-text">the published checksum</span>`}.</li>
+    <li>Extract the ZIP to a folder you can write to, for example in Documents.</li>
+    <li>Run <code>start-server.cmd</code>, then open <code>http://127.0.0.1:7878</code> in your browser. Leave the console window open; <kbd>Ctrl</kbd>+<kbd>C</kbd> stops it.</li>
+  </ol>
+  <p class="small muted">Browser drafts belong to the browser profile. Export your work before you clear browser data.</p>
+</div>`, { cls: 'section-alt' })}
+
 ${section('server', 'Server: beta-marker serve', html`
 <div class="prose">
   <p>The <code>beta-marker</code> command runs nesting, checks and exports, and can serve the full app to a web browser. Use it on a Linux or Windows machine where you prefer a browser to the desktop app, or for batch work and benchmarks.</p>
@@ -49,7 +62,7 @@ cargo run --release -p beta-marker-cli -- serve --port 7878</code></pre>
   <p>Open the address the server prints (for example <code>http://127.0.0.1:7878</code>) in a browser on the same computer. Stop it with <kbd>Ctrl</kbd>+<kbd>C</kbd>. Full details: <code>marker/apps/web/README.md</code>.</p>
   <h3>Command-line work</h3>
   <p>Run <code>beta-marker --help</code> to see every command: import, nest, validate, export, plan, roll, cutroom, batch and bench. Each command also has its own <code>--help</code>.</p>
-</div>`, { cls: 'section-alt' })}
+</div>`)}
 
 ${section('requirements', 'System requirements', html`
 <div class="table-wrap" tabindex="0" role="region" aria-label="System requirements"><table class="data-table">
@@ -63,7 +76,7 @@ ${section('requirements', 'System requirements', html`
 <tr><th scope="row">Other</th><td>Microsoft WebView2 runtime (built into Windows 11)</td><td>Rust and Node.js to build from source</td></tr>
 <tr><th scope="row">Internet</th><td>Not needed</td><td>Not needed after the build</td></tr>
 </tbody></table></div>
-<p class="small muted">Memory and processor values are suggestions, not tested minimums. We tested the installer on Windows 11. A clean Windows 10 PC has not been tested yet.</p>`)}
+<p class="small muted">Memory and processor values are suggestions, not tested minimums. We tested the installer on Windows 11. A clean Windows 10 PC has not been tested yet.</p>`, { cls: 'section-alt' })}
 
 ${section('privacy', 'Privacy', html`
 <div class="prose">
@@ -75,12 +88,14 @@ ${section('privacy', 'Privacy', html`
     <li>This website has no trackers or cookies and loads nothing from other servers.</li>
   </ul>
   <p>If you send us sample markers for a comparison, we keep them private and never publish them without your written permission.</p>
-</div>`, { cls: 'section-alt' })}
+</div>`)}
 
 ${section('offline', 'Offline use', html`
 <div class="prose">
   <p>Everything the app needs is inside the installer: screens, help, fonts and the Rust engine. Daily work needs no internet connection. You can install and update from a USB drive. Help pages are included, and this website also works when opened from a folder on disk.</p>
   <p>For the WebView2 runtime on Windows 10, see ${ext('https://developer.microsoft.com/microsoft-edge/webview2/', 'Microsoft’s WebView2 page')}.</p>
-</div>`)}
+</div>`, { cls: 'section-alt' })}
+
+${helpSection()}
 `;
 }

@@ -94,7 +94,18 @@ pub fn export_dxf(doc: &Document, sizes: &[String], tolerance: f64) -> Result<St
         let mut point_map = BTreeMap::new();
         for (p, g) in doc.pieces.iter().zip(graded) {
             point_map.insert(p.id.clone(), g.points);
-            pieces.push(g.piece);
+            let mut piece = g.piece;
+            // Layer 6 denotes a half pattern in our reader. This is already a
+            // full piece, so retain the fold as an internal guide instead of
+            // asking downstream readers to unfold the outline a second time.
+            if let Some(axis) = piece.fold_line {
+                piece.marks.push(beta_marker_core::Mark {
+                    kind: beta_marker_core::MarkKind::Line,
+                    points: axis.to_vec(),
+                    text: Some("fold line (full symmetric piece)".into()),
+                });
+            }
+            pieces.push(piece);
         }
         table.points.insert(size.clone(), point_map);
     }

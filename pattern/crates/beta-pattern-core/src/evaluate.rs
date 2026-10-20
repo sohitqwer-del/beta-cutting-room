@@ -846,6 +846,7 @@ fn grade_piece(
     for a in &p.annotations {
         if let Annotation::SeamIntersections {
             path,
+            edges,
             depth,
             width,
             shape,
@@ -854,7 +855,16 @@ fn grade_piece(
             let guide = e.path(path)?;
             let guide: Vec<_> = guide.into_iter().map(move_p).collect();
             let mut seen = vec![];
-            for path in &paths {
+            if let Some(edges) = edges {
+                ensure!(
+                    edges.iter().all(|i| *i < paths.len()),
+                    "crossing-notch edge index out of range"
+                );
+            }
+            for (index, path) in paths.iter().enumerate() {
+                if edges.as_ref().is_some_and(|edges| !edges.contains(&index)) {
+                    continue;
+                }
                 let path: Vec<_> = path.iter().copied().map(move_p).collect();
                 for w in path.windows(2) {
                     for q in intersections(w, &guide) {
@@ -1042,6 +1052,10 @@ fn grade_piece(
         }
     }
     Ok(GradedPiece {
+        seam_edges: paths
+            .iter()
+            .map(|path| path.iter().copied().map(move_p).collect())
+            .collect(),
         piece,
         seam: graded_seam,
         points,
@@ -1070,6 +1084,7 @@ fn translate(p: &mut GradedPiece, d: Pt) {
     for q in p
         .seam
         .iter_mut()
+        .chain(p.seam_edges.iter_mut().flatten())
         .chain(p.piece.outline.iter_mut())
         .chain(p.points.values_mut())
         .chain(p.piece.grain.iter_mut().flatten())

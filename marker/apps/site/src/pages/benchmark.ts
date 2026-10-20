@@ -158,7 +158,7 @@ function lectraSummary(l60: Run | undefined, lm: Run | undefined): Raw {
 }
 
 /** Picks the best run with an id for the summary tiles: final, then sample, then provisional. */
-function pick(runs: Run[], id: string): Run | undefined {
+export function pick(runs: Run[], id: string): Run | undefined {
   const rank = { final: 0, sample: 1, provisional: 2 } as const;
   return runs.filter((r) => r.id === id).sort((a, b) => rank[a.status] - rank[b.status])[0];
 }

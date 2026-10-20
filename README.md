@@ -12,6 +12,18 @@ no cloud, no licence fee. Your patterns never leave your factory.
 - Benchmark: [marker/docs/benchmarks.md](marker/docs/benchmarks.md)
 - Contact: sohitqwer@gmail.com
 
+> **A fun project, built with the help of modern AI tools.** BETA is young and
+> not perfect yet. **We need your help to improve it.** If something is wrong,
+> confusing or missing, please tell us: every report helps factories like yours.
+>
+> - [Report a bug](https://github.com/sohitqwer-del/beta-cutting-room/issues/new?template=bug_report.yml)
+> - [Tell us what is missing](https://github.com/sohitqwer-del/beta-cutting-room/issues/new?template=missing_feature.yml)
+> - [Share feedback or an idea](https://github.com/sohitqwer-del/beta-cutting-room/issues/new?template=feedback.yml)
+> - [Join the discussion](https://github.com/sohitqwer-del/beta-cutting-room/discussions)
+>
+> Please do not attach factory patterns unless you agree to make them public.
+> The app also has a **Feedback** button on every screen; it never sends anything by itself.
+
 ## What is inside
 
 | Folder | What it is |
@@ -59,4 +71,4 @@ cd ../pattern && cargo test --workspace
 ## Licence
 
 Code: Apache-2.0 ([LICENSE](LICENSE)). Data: CC BY 4.0 where stated.
-Third-party notices: [NOTICE](NOTICE). Security reports: [marker/SECURITY.md](marker/SECURITY.md).
+Third-party notices: [NOTICE](NOTICE). Security reports: [SECURITY.md](SECURITY.md) (private, not public issues).

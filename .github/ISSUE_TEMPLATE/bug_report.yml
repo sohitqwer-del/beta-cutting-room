@@ -1,0 +1,63 @@
+name: Report a bug
+description: Something is wrong or does not work in BETA Cutting Room.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to tell us. BETA Cutting Room is a young project, made by a small team with the help of modern AI tools. It is not perfect yet, and every report helps us improve it.
+
+        **Privacy:** this issue is public. Do not attach factory patterns, markers, job files or photos unless you agree to make them public. For private feedback, email sohitqwer@gmail.com instead. Remove customer, buyer and factory names from text and screenshots.
+
+        Tip: the **Feedback** button in the app fills in the version and platform for you.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened? What did you expect?
+      description: Tell us in a few sentences. Short and plain is fine.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to repeat the problem
+      description: Which screen were you on, and what did you click or type?
+      placeholder: |
+        1. Open the Marker editor
+        2. Choose Load demo
+        3. Choose Nest marker
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Shown in About. For example 0.4.0.
+    validations:
+      required: false
+  - type: dropdown
+    id: platform
+    attributes:
+      label: How do you use BETA Cutting Room?
+      options:
+        - Desktop app (Windows)
+        - Browser with a BETA server (beta-marker serve)
+        - Browser only (viewer mode)
+        - Not sure
+    validations:
+      required: false
+  - type: textarea
+    id: numbers
+    attributes:
+      label: Anonymous marker numbers (optional)
+      description: For nesting problems only. Piece count, efficiency and time limit help us. Please do not paste piece shapes or coordinates.
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed customer, buyer and factory names, and I only attached files I agree to make public.
+          required: true

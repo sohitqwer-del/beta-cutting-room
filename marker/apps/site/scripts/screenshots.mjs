@@ -1,4 +1,5 @@
-// Headless full-page screenshots of dist/ at desktop and mobile widths, light and dark.
+// Headless full-page screenshots of dist/ at desktop and mobile widths (light theme), plus the
+// home page with prefers-reduced-motion. Each page is scrolled first so scroll reveals run.
 // Also reports console errors and any request that is not a local file (there should be none).
 // Usage: node scripts/screenshots.mjs [--out <dir>] [--browser <chrome-or-edge.exe>]
 // Uses Chrome DevTools Protocol over Node's built-in WebSocket; no npm dependencies.
@@ -29,8 +30,8 @@ const views = [
   { name: 'mobile', width: 390, height: 844, mobile: true },
 ];
 const shots = [];
-for (const p of pages) for (const v of views) shots.push({ page: p, view: v, theme: 'light' });
-for (const p of ['index', 'benchmark', 'compare']) for (const v of views) shots.push({ page: p, view: v, theme: 'dark' });
+for (const p of pages) for (const v of views) shots.push({ page: p, view: v, motion: 'motion' });
+for (const v of views) shots.push({ page: 'index', view: v, motion: 'reduced' });
 
 const profile = mkdtempSync(join(tmpdir(), 'beta-site-shots-'));
 const proc = spawn(browser, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', '--hide-scrollbars', '--force-color-profile=srgb', 'about:blank'], { stdio: 'ignore' });
@@ -67,18 +68,25 @@ try {
   await send('Page.enable'); await send('Network.enable'); await send('Runtime.enable');
   for (const s of shots) {
     await send('Emulation.setDeviceMetricsOverride', { width: s.view.width, height: s.view.height, deviceScaleFactor: 1, mobile: s.view.mobile });
-    await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: s.theme }] });
+    await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }, { name: 'prefers-reduced-motion', value: s.motion === 'reduced' ? 'reduce' : 'no-preference' }] });
     const loaded = once('Page.loadEventFired');
     await send('Page.navigate', { url: pathToFileURL(join(dist, `${s.page}.html`)).href });
-    await loaded; await sleep(250);
+    await loaded; await sleep(300);
+    // Scroll down in steps so every scroll reveal and counter runs, then wait for them to finish.
+    const total = (await send('Runtime.evaluate', { expression: 'document.documentElement.scrollHeight', returnByValue: true })).result.value;
+    for (let y = 0; y < total; y += Math.round(s.view.height * 0.7)) { await send('Runtime.evaluate', { expression: `window.scrollTo({ top: ${y}, behavior: 'instant' })` }); await sleep(180); }
+    await sleep(1800);
+    await send('Runtime.evaluate', { expression: 'window.scrollTo({ top: 0, behavior: "instant" })' });
+    await sleep(2200);
+    const hidden = await send('Runtime.evaluate', { expression: `Array.from(document.querySelectorAll('[data-reveal]')).filter((e) => getComputedStyle(e).opacity !== '1').length`, returnByValue: true });
     const { cssContentSize } = await send('Page.getLayoutMetrics');
     const height = Math.ceil(cssContentSize.height);
     const overflow = await send('Runtime.evaluate', { expression: 'document.documentElement.scrollWidth > window.innerWidth', returnByValue: true });
     const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip: { x: 0, y: 0, width: s.view.width, height, scale: 1 } });
-    const file = join(out, `${s.page}-${s.view.name}-${s.theme}.png`);
+    const file = join(out, `${s.page}-${s.view.width}${s.motion === 'reduced' ? '-reduced-motion' : ''}.png`);
     writeFileSync(file, Buffer.from(shot.data, 'base64'));
-    report.shots.push({ file, width: s.view.width, height, horizontalOverflow: overflow.result.value });
-    console.log(`${file}  ${s.view.width}x${height}${overflow.result.value ? '  (page scrolls sideways!)' : ''}`);
+    report.shots.push({ file, width: s.view.width, height, horizontalOverflow: overflow.result.value, hiddenReveals: hidden.result.value });
+    console.log(`${file}  ${s.view.width}x${height}${overflow.result.value ? '  (page scrolls sideways!)' : ''}${hidden.result.value ? `  (${hidden.result.value} sections still hidden!)` : ''}`);
   }
 } finally {
   try { ws?.close(); } catch {}

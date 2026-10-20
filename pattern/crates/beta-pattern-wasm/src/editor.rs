@@ -34,13 +34,30 @@ pub fn inspect(doc: &Document, size: &str) -> Result<Json, String> {
         };
         objects.insert(item.id, object);
     }
-    let pieces:Vec<_>=doc.pieces.iter().map(|piece|{
-        if let Some(error)=evaluated.piece_errors.get(&piece.id){return json!({"id":piece.id,"ok":false,"error":error});}
-        let id=format!("{}-{size}",piece.id);
-        let graded=evaluated.pieces.iter().find(|g|g.piece.id==id);
-        let edges:Vec<_>=piece.edges.iter().map(|e|json!({"object":e.object,"length_mm":lengths.get(&e.object).copied().unwrap_or(0.)})).collect();
-        json!({"id":piece.id,"ok":true,"graded":graded,"edges":edges})
-    }).collect();
+    let pieces: Vec<_> = doc
+        .pieces
+        .iter()
+        .map(|piece| {
+            if let Some(error) = evaluated.piece_errors.get(&piece.id) {
+                return json!({"id":piece.id,"ok":false,"error":error});
+            }
+            let id = format!("{}-{size}", piece.id);
+            let graded = evaluated.pieces.iter().find(|g| g.piece.id == id);
+            let edges: Vec<_> = piece
+                .edges
+                .iter()
+                .enumerate()
+                .map(|(i, edge)| {
+                    let length = graded
+                        .and_then(|g| g.seam_edges.get(i))
+                        .map(|path| beta_pattern_core::geometry::length(path))
+                        .unwrap_or_else(|| lengths.get(&edge.object).copied().unwrap_or(0.));
+                    json!({"object":edge.object,"length_mm":length})
+                })
+                .collect();
+            json!({"id":piece.id,"ok":true,"graded":graded,"edges":edges})
+        })
+        .collect();
     Ok(json!({"objects":objects,"pieces":pieces}))
 }
 
@@ -191,6 +208,43 @@ pub fn measurement_csv(doc: &Document) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn piece_lengths_use_factory_grades_while_draft_objects_keep_their_coordinates() {
+        use beta_pattern_core::{GradeMode, GradeRule, tools};
+        use std::collections::BTreeMap;
+        let mut doc = Document {
+            sizes: vec!["M".into(), "L".into()],
+            ..Default::default()
+        };
+        tools::insert_polygon(
+            &mut doc,
+            "panel",
+            "Panel",
+            &[[0., 0.], [100., 0.], [100., 200.], [0., 200.]],
+        )
+        .unwrap();
+        for (name, delta) in [("fixed", [0., 0.]), ("grow", [20., 0.])] {
+            doc.rules.insert(
+                name.into(),
+                GradeRule {
+                    mode: GradeMode::Relative,
+                    deltas: BTreeMap::from([("L".into(), delta)]),
+                },
+            );
+        }
+        for i in 0..4 {
+            doc.pieces[0].grade_points.insert(
+                format!("panel.p{i}"),
+                if i == 1 || i == 2 { "grow" } else { "fixed" }.into(),
+            );
+        }
+        let result = inspect(&doc, "L").unwrap();
+        assert_eq!(result["pieces"][0]["edges"][0]["length_mm"], 120.);
+        assert_eq!(
+            result["objects"]["panel.p1"]["points"][0],
+            json!([100., 0.])
+        );
+    }
     #[test]
     fn unfinished_objects_and_formula_errors_are_checked() {
         let mut d = Document::default();

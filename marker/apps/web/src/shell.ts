@@ -1,6 +1,7 @@
 import { CREDITS, logo, PRODUCT, VERSION } from './brand';
 import { isDesktop, serverToken, setServerToken } from './transport';
 import type { DocumentState } from './state';
+import { installFeedback } from './feedback';
 
 /** App frame: sidebar navigation, top bar, workflow steps, Home, Reports, About, theme, language and server token.
  * It moves the existing screens into one layout and never changes their behaviour. */
@@ -387,6 +388,9 @@ export function installShell(host: ShellHost) {
     '#spread-result': 'No allocation yet. Inspect rolls, then allocate a group to the cut plan.',
   };
   for (const [selector, text] of Object.entries(empty)) document.querySelector(selector)?.setAttribute('data-empty', text);
+
+  // ----- Feedback button, screen links, welcome and one-time ask (self-contained module) -----
+  installFeedback({ state: host.state, message: host.message });
 
   // ----- First screen: the address (#/pattern) or Home -----
   const fromHash = SCREENS.find(s => `#/${s.hash}` === location.hash);

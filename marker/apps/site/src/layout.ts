@@ -1,5 +1,6 @@
 import { html, raw, type Part, type Raw } from './html.ts';
-import { site } from './config.ts';
+import { feedbackLinks, site } from './config.ts';
+import { markSvg } from './brand.ts';
 
 export interface PageMeta {
   file: string;
@@ -17,24 +18,29 @@ export const pages: PageMeta[] = [
   { file: 'open-source.html', navLabel: 'Open source', title: 'Open source, licences and credits | BETA Cutting Room', description: 'Licence, credits for the open-source projects BETA builds on, how to contribute and how to contact us.' },
 ];
 
-// Runs before paint so a saved theme choice does not flash.
-const themeBoot = `(function(){try{var t=localStorage.getItem('beta-site-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
+// Runs before first paint. Turns on motion styles only when the visitor allows motion.
+// If assets/site.js does not run within 2.5 s, motion is turned off again, so content is never hidden.
+const motionBoot = `(function(){var r=document.documentElement;try{if(window.matchMedia&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){r.classList.add('motion');setTimeout(function(){if(!r.classList.contains('motion-ready'))r.classList.remove('motion');},2500);}}catch(e){}})();`;
 
-// Cycles Auto -> Light -> Dark. Works from file:// (no modules, no fetch).
-const themeToggle = `(function(){var b=document.getElementById('theme-toggle');if(!b)return;var root=document.documentElement;var order=['auto','light','dark'];var names={auto:'Automatic',light:'Light',dark:'Dark'};
-function current(){return root.getAttribute('data-theme')||'auto';}
-function show(){var c=current();b.querySelector('[data-theme-label]').textContent=names[c];b.setAttribute('aria-label','Colour theme: '+names[c]+'. Change theme');}
-b.addEventListener('click',function(){var n=order[(order.indexOf(current())+1)%3];if(n==='auto'){root.removeAttribute('data-theme');try{localStorage.removeItem('beta-site-theme');}catch(e){}}else{root.setAttribute('data-theme',n);try{localStorage.setItem('beta-site-theme',n);}catch(e){}}show();});
-b.hidden=false;show();})();`;
+/** The brand mark for headers and footers (decorative; the name is next to it). */
+export const logo = raw(markSvg({ size: 34, className: 'logo-mark' }));
 
-export const logo = raw(`<svg class="logo-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M10 8h7.2c3.3 0 5.4 1.7 5.4 4.3 0 1.8-1 3-2.5 3.6 2 .5 3.3 1.9 3.3 4 0 2.9-2.3 4.6-5.9 4.6H10z M13.3 11v4h3.4c1.5 0 2.4-.8 2.4-2s-.9-2-2.4-2z M13.3 17.9v4.2h3.9c1.6 0 2.6-.8 2.6-2.1s-1-2.1-2.6-2.1z" fill="var(--logo-ink)" fill-rule="evenodd"/></svg>`);
+/** "BETA Cutting Room" as styled text beside the mark. */
+const brandName = html`<span class="brand-name"><b>BETA</b> Cutting Room</span>`;
 
 function navLinks(current: string, cls: string): Raw {
   return html`<ul class="${cls}">${pages.map((p) => html`<li><a href="${p.file}"${p.file === current ? raw(' aria-current="page"') : ''}>${p.navLabel}</a></li>`)}</ul>`;
 }
 
+function absolute(path: string): string | null {
+  return site.siteUrl ? `${site.siteUrl.replace(/\/?$/, '/')}${path}` : null;
+}
+
 /** Wraps page content in the shared header, navigation and footer. */
 export function layout(meta: PageMeta, main: Part): string {
+  const ogImage = absolute('assets/brand/social-preview.png');
+  const pageUrl = absolute(meta.file === 'index.html' ? '' : meta.file);
+  const feedback = feedbackLinks();
   const doc = html`<!doctype html>
 <html lang="en">
 <head>
@@ -42,23 +48,35 @@ export function layout(meta: PageMeta, main: Part): string {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${meta.title}</title>
 <meta name="description" content="${meta.description}">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#fbfaf6">
 <meta name="referrer" content="no-referrer">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="${site.name}">
+<meta property="og:title" content="${meta.title}">
+<meta property="og:description" content="${meta.description}">
+${pageUrl ? html`<meta property="og:url" content="${pageUrl}">` : ''}
+${ogImage ? html`<meta property="og:image" content="${ogImage}">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="BETA Cutting Room logo with garment pieces nested on fabric">
+<meta name="twitter:card" content="summary_large_image">` : ''}
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/brand/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/site.css">
-<script>${raw(themeBoot)}</script>
+<script>${raw(motionBoot)}</script>
+<script src="assets/site.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="brand" href="index.html">${logo}<span>${site.name}</span></a>
+    <a class="brand" href="index.html">${logo}${brandName}</a>
     <nav class="nav-desktop" aria-label="Main">${navLinks(meta.file, 'nav-list')}</nav>
     <div class="header-tools">
-      <button type="button" id="theme-toggle" class="theme-toggle" hidden>
-        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"/></svg>
-        <span data-theme-label>Automatic</span>
-      </button>
+      <a class="btn btn-primary btn-small header-cta" href="index.html#download">Download</a>
       <details class="nav-mobile">
         <summary><span class="sr-only">Menu</span><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary>
         <nav aria-label="Main (small screens)">${navLinks(meta.file, 'nav-list-mobile')}</nav>
@@ -71,15 +89,24 @@ ${main}
 </main>
 <footer class="site-footer">
   <div class="wrap footer-inner">
-    <div>
-      <p class="footer-brand">${logo}<span>${site.name} ${site.version}</span></p>
-      <p>Open source under the Apache License 2.0. Self-hosted. Your patterns stay in your factory.</p>
-      <p class="muted">This website has no trackers, no cookies and loads nothing from other servers.</p>
+    <div class="footer-about">
+      <p class="footer-brand">${logo}${brandName}</p>
+      <p>Open-source cutting-room software for garment factories. Version ${site.version}. Self-hosted: your patterns stay in your factory.</p>
+      <p class="footer-fun"><span aria-hidden="true">✦</span> A fun project, built with the help of modern AI tools.</p>
+      <p class="muted small">This website has no trackers and no cookies, and it loads nothing from other servers.</p>
     </div>
-    <nav aria-label="Footer">${navLinks(meta.file, 'footer-list')}</nav>
+    <nav class="footer-col" aria-label="Pages"><h2 class="footer-h">Pages</h2>${navLinks(meta.file, 'footer-list')}</nav>
+    <div class="footer-col"><h2 class="footer-h">Help us improve</h2><ul class="footer-list">
+      ${feedback.map((f) => html`<li><a href="${f.url}" rel="noopener noreferrer external">${f.label}<span class="sr-only"> (GitHub, external site)</span></a></li>`)}
+      ${site.feedback.email ? html`<li><a href="${site.feedback.email}">Email us</a></li>` : ''}
+    </ul></div>
+    <div class="footer-col"><h2 class="footer-h">Project</h2><ul class="footer-list">
+      ${site.repoUrl ? html`<li><a href="${site.repoUrl}" rel="noopener noreferrer external">Source code on GitHub<span class="sr-only"> (external site)</span></a></li>` : ''}
+      <li><a href="open-source.html#licence">Licence: Apache-2.0</a></li>
+      ${site.contactEmail ? html`<li><a href="${`mailto:${site.contactEmail}`}">${site.contactEmail}</a></li>` : ''}
+    </ul></div>
   </div>
 </footer>
-<script>${raw(themeToggle)}</script>
 </body>
 </html>
 `;
@@ -90,9 +117,11 @@ ${main}
 export function section(id: string, title: string, body: Part, opts: { lead?: string; cls?: string; eyebrow?: string } = {}): Raw {
   return html`<section class="section ${opts.cls ?? ''}" id="${id}" aria-labelledby="${id}-title">
   <div class="wrap">
-    ${opts.eyebrow ? html`<p class="eyebrow">${opts.eyebrow}</p>` : ''}
-    <h2 id="${id}-title">${title}</h2>
-    ${opts.lead ? html`<p class="lead">${opts.lead}</p>` : ''}
+    <div class="section-head" data-reveal>
+      ${opts.eyebrow ? html`<p class="eyebrow">${opts.eyebrow}</p>` : ''}
+      <h2 id="${id}-title">${title}</h2>
+      ${opts.lead ? html`<p class="lead">${opts.lead}</p>` : ''}
+    </div>
     ${body}
   </div>
 </section>`;
@@ -104,7 +133,7 @@ export function pageHead(title: string, lead: Part, eyebrow?: string): Raw {
   ${eyebrow ? html`<p class="eyebrow">${eyebrow}</p>` : ''}
   <h1>${title}</h1>
   <p class="lead">${lead}</p>
-</div></div>`;
+</div><div class="page-head-art" aria-hidden="true"><span></span><span></span><span></span></div></div>`;
 }
 
 /** External link that opens normally and leaks no referrer. */

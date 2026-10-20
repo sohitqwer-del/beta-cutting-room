@@ -1,0 +1,31 @@
+name: General feedback or idea
+description: Ideas, praise, or something that was confusing.
+title: "[Idea] "
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping. Every comment, good or bad, helps factories like yours. If something was confusing, that is our problem to fix, not yours.
+
+        **Privacy:** this issue is public. Do not attach factory patterns, markers, job files or photos unless you agree to make them public. For private feedback, email sohitqwer@gmail.com instead.
+  - type: textarea
+    id: feedback
+    attributes:
+      label: What would you like to tell us?
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example (optional)
+      description: A screen, a step or a short story from your cutting room.
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Shown in About. For example 0.4.0.
+    validations:
+      required: false

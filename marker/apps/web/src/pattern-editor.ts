@@ -3,6 +3,7 @@ import type { PatternCore, PatternDocument, PatternInspection, PatternToolSpec, 
 import { PatternHistory, appendPieceEdge, blankPattern, constructionOrder, deleteConstruction, dependencyDelete, formulaOptions, insertFormula, rememberObject, value } from './pattern-state';
 import { csvRows } from './cutting-room-data';
 import './pattern-editor.css';
+import { productionTools, type ProductionResult } from './pattern-production';
 const esc = (v: unknown): string => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 const err = (e: unknown): string => e instanceof Error ? e.message : String(e);
 const colour = [0, 1, 2, 3, 4, 5].map(i => `var(--size-${i})`);
@@ -28,7 +29,7 @@ interface Trace {
     opacity: number;
     calibrated: boolean;
 }
-type Mode = 'draft' | 'measurements' | 'piece' | 'grading' | 'output' | 'guide';
+type Mode = 'draft' | 'measurements' | 'piece' | 'grading' | 'checks' | 'output' | 'guide';
 /** Catalog-driven drafting surface. Rust owns formula, construction and piece geometry. */
 export function installPatternEditor(root: HTMLElement, host: Host) {
     let doc = host.get(), history = new PatternHistory(doc), inspection: PatternInspection | undefined, catalog: PatternToolSpec[] = [];
@@ -44,7 +45,7 @@ export function installPatternEditor(root: HTMLElement, host: Host) {
     } | undefined;
     let lastMs = 0, renderGeneration = 0;
     root.innerHTML = `<div class="pd-toolbar"><button id="pd-new">New draft</button><button id="pd-undo" title="Undo (Ctrl+Z)">Undo</button><button id="pd-redo" title="Redo (Ctrl+Shift+Z)">Redo</button><label>View size<select id="pd-size"></select></label><label>Grid<select id="pd-grid"><option value="10">1 cm</option><option value="5">5 mm</option><option value="1">1 mm</option><option value="0">Off</option></select></label><label class="check"><input type="checkbox" id="pd-snap-points" checked>Snap points</label><label class="check"><input type="checkbox" id="pd-snap-lines" checked>Snap lines</label><button id="pd-fit">Fit</button><button id="pd-minus" aria-label="Zoom draft out">−</button><button id="pd-plus" aria-label="Zoom draft in">+</button><button id="pd-pan" aria-pressed="false">Pan</button><button id="pd-labels" aria-pressed="true">Labels</button></div>
-  <nav class="pd-modes" aria-label="Pattern modes">${(['draft', 'measurements', 'piece', 'grading', 'output', 'guide'] as Mode[]).map(m => `<button data-mode="${m}" aria-pressed="${m === 'draft'}">${({ draft: 'Draft', measurements: 'Measurements', piece: 'Piece', grading: 'Grading', output: 'Output', guide: 'First shirt guide' })[m]}</button>`).join('')}</nav>
+  <nav class="pd-modes" aria-label="Pattern modes">${(['draft', 'measurements', 'piece', 'grading', 'checks', 'output', 'guide'] as Mode[]).map(m => `<button data-mode="${m}" aria-pressed="${m === 'draft'}">${({ draft: 'Draft', measurements: 'Measurements', piece: 'Piece', grading: 'Grading', checks: 'Seam checks', output: 'Output', guide: 'First shirt guide' })[m]}</button>`).join('')}</nav>
   <p id="pd-status" role="status" aria-live="polite">Loading local draft tools…</p>
   <div class="pd-layout"><aside class="pd-palette" aria-label="Drafting tools"><h2>Draft tools</h2><input id="pd-search" type="search" aria-label="Find a drafting tool" placeholder="Find a tool"><div id="pd-tools"></div></aside>
   <section class="pd-stage"><div class="pd-canvas-heading"><strong id="pd-title"></strong><span id="pd-engine"></span></div><svg id="pd-canvas" tabindex="0" role="group" aria-label="Pattern drafting canvas. Tab to objects. Enter selects. Drag numeric free points. Shift-drag pans. Wheel zooms."></svg><div class="pd-canvas-foot"><span id="pd-cursor">Millimetres · y points up</span><span>Wheel: zoom · Shift-drag: pan · Esc: cancel</span></div><div id="pd-controls"></div></section>
@@ -69,6 +70,11 @@ export function installPatternEditor(root: HTMLElement, host: Host) {
         root.removeAttribute('aria-busy');
     } }
     async function inspect(next: PatternDocument, currentSize = size): Promise<PatternInspection> { return host.core()?.inspect(next, currentSize) ?? host.call('pattern/inspect', { document: next, size: currentSize }); }
+    const production = productionTools(root, {
+        get: () => doc, commit, run, status, download: host.download,
+        action: async request => (host.core()?.piece_action(doc, request) as ProductionResult | undefined)
+            ?? host.call<ProductionResult>('pattern/piece-action', { ...request, document: doc }),
+    });
     async function commit(next: PatternDocument, record = true) {
         const start = performance.now();
         for (const s of next.sizes)
@@ -200,7 +206,7 @@ export function installPatternEditor(root: HTMLElement, host: Host) {
         }
         else {
             if (mode === 'piece')
-                html += (inspection?.pieces ?? []).map(p => p.graded ? `<g><polygon points="${path(p.graded.piece.outline)}" style="fill:var(--draw-fill);stroke:var(--size-0)" stroke-width="${unit * 1.7}"/><polygon points="${path(p.graded.seam)}" fill="none" style="stroke:var(--draw-seam)" stroke-dasharray="${5 * unit} ${3 * unit}"/>${p.graded.piece.grain ? `<polyline points="${path(p.graded.piece.grain)}" fill="none" style="stroke:var(--draw-grain)" stroke-width="${unit * 2}"/>` : ''}${(p.graded.piece.marks ?? []).map(m => `<polyline points="${path(m.points)}" fill="none" style="stroke:var(--draw-mark)" stroke-width="${unit * 3}"/>`).join('')}</g>` : '').join('');
+                html += (inspection?.pieces ?? []).map(p => p.graded ? `<g><polygon points="${path(p.graded.piece.outline)}" style="fill:var(--draw-fill);stroke:var(--size-0)" stroke-width="${unit * 1.7}"/><polygon points="${path(p.graded.seam)}" fill="none" style="stroke:var(--draw-seam)" stroke-dasharray="${5 * unit} ${3 * unit}"/>${p.graded.piece.grain ? `<polyline points="${path(p.graded.piece.grain)}" fill="none" style="stroke:var(--draw-grain)" stroke-width="${unit * 2}"/>` : ''}${p.graded.piece.fold_line ? `<polyline points="${path(p.graded.piece.fold_line)}" fill="none" style="stroke:var(--draw-grain)" stroke-width="${unit * 2}" stroke-dasharray="${6 * unit} ${4 * unit}"><title>Fold line</title></polyline>` : ''}${(p.graded.piece.marks ?? []).map(m => m.points.length === 1 ? `<circle cx="${m.points[0]![0]}" cy="${-m.points[0]![1]}" r="${unit * 3}" style="fill:var(--draw-mark)"><title>${esc(m.text ?? m.kind)}</title></circle>` : `<polyline points="${path(m.points)}" fill="none" style="stroke:var(--draw-mark)" stroke-width="${unit * 3}"><title>${esc(m.text ?? m.kind)}</title></polyline>`).join('')}</g>` : '').join('');
             const hidden = new Set(Object.values(doc.groups ?? {}).filter(g => g.visible === false).flatMap(g => g.objects));
             const objects = Object.entries(inspection?.objects ?? {}).filter(([id]) => !hidden.has(id)).sort((a, b) => Number(a[1].kind === 'point') - Number(b[1].kind === 'point'));
             html += objects.map(([id, o]) => {
@@ -236,14 +242,21 @@ export function installPatternEditor(root: HTMLElement, host: Host) {
             renderPiece(p);
             if (p)
                 $('#pd-controls').insertAdjacentHTML('beforeend', pieceMenu());
+            if (p)
+                $('#pd-controls').insertAdjacentHTML('beforeend', production.marks(p.id));
         }
+        if (mode === 'checks')
+            $('#pd-controls').innerHTML = production.checks();
         if (mode === 'grading')
             renderGrading(p);
+        if (mode === 'grading')
+            $('#pd-controls').insertAdjacentHTML('beforeend', production.rules());
         if (mode === 'output')
             $('#pd-controls').innerHTML = `<h2>Save and cut</h2><p>Save pattern JSON above to keep formulas, rules, measurements and the trace photo.</p><div class="pd-actions"><button id="pd-export-dxf">DXF-AAMA / ASTM-style</button><label>PDF paper<select id="pd-paper"><option>A4</option><option>A3</option></select></label><button id="pd-export-pdf">Tiled 1:1 PDF</button><button id="pd-export-plt">Plotter PLT</button><button id="pd-send-marker" class="primary">Send sizes to marker</button><button id="pd-import">Import from Seamly2D</button></div><p>DXF includes all sizes and BETA's public grade-rule comments. Other CAD systems may read the outlines without importing native grade rules. PDF uses physical A4/A3 pages and a separate 100 mm test-square page and 10 mm overlaps between tiles. Print at Actual size / 100%.</p><div id="pd-output-ratios" class="fields">${doc.sizes.map(s => field(`pd-ratio-${doc.sizes.indexOf(s)}`, `${esc(s)} garments`, s === doc.base_size ? 1 : 0, 'number', 'min="0" max="100000" step="1"')).join('')}</div>`;
         if (mode === 'guide')
             $('#pd-controls').innerHTML = `<h2>Draft your first shirt block in BETA</h2><p>This teaching block explains the workflow. Fit-test a sample before production.</p><ol class="pd-guide"><li><strong>Set measurements.</strong> Open Measurements. Enter chest, waist, back length, neck, shoulder and arm depth for each size, in mm. Add an ease variable for room around the body.</li><li><strong>Place the origin.</strong> In Draft choose Absolute point. Name it A and use x = 0, y = 0.</li><li><strong>Mark the waist and chest.</strong> Add B at x = (m.waist+v.ease)/4, y = 0. Add C at x = (m.chest+v.ease)/4, y = m.back_length-m.arm_depth.</li><li><strong>Mark the shoulder and neck.</strong> Add D at x = m.neck/6+m.shoulder, y = m.back_length-25. Add E at x = m.neck/6, y = m.back_length. Add F at x = 0, y = m.back_length-m.neck/6-10.</li><li><strong>Connect the block.</strong> Use Line for A–B, B–C, D–E and F–A. Add control points and use Cubic curve for C–D (armhole) and E–F (neck). The four point inputs are start, two controls and end.</li><li><strong>Make a piece.</strong> Open Piece, start a path, then click the six edges in order. Reverse an edge if its direction opposes the path. Finish only when the path closes.</li><li><strong>Add cutting details.</strong> Set 10 mm seam allowance, grain, quantity and pairs. Add side-seam notches and a name label.</li><li><strong>Grade.</strong> Choose a second size and compare the nest. Attach factory dx/dy rules only when measurement-based grading is not suitable.</li><li><strong>Check and export.</strong> Read the inline piece checks. Save JSON, export a DXF or print a 1:1 PDF. Check the 100 mm square with a ruler. Send a size ratio to Marker.</li></ol><button id="pd-teaching">Load the teaching bodice</button>`;
         bindControls();
+        production.bind();
     }
     function renderMeasurements() {
         const keys = [...new Set(Object.values(doc.measurements).flatMap(r => Object.keys(r)))];
@@ -420,7 +433,7 @@ export function installPatternEditor(root: HTMLElement, host: Host) {
         click('#pd-clear-rules', async () => { const next = structuredClone(doc); const p = next.pieces.find(p => p.id === pieceId); if (p)
             p.grade_points = {}; await commit(next); await setMode('grading'); });
         change('#pd-rule-select', () => { const id = text('#pd-rule-select'); input('#pd-rule-id').value = id; input('#pd-rule-mode').value = doc.rules?.[id]?.mode ?? 'relative'; renderDeltas(id); });
-        click('#pd-rule-save', async () => { const id = text('#pd-rule-id').trim(); validId(id); const next = structuredClone(doc); next.rules ??= {}; next.rules[id] = { mode: text('#pd-rule-mode') as 'relative' | 'incremental', deltas: Object.fromEntries(doc.sizes.map((s, i) => [s, [finite(`#pd-dx-${i}`), finite(`#pd-dy-${i}`)]])) }; await commit(next); await setMode('grading'); });
+        click('#pd-rule-save', async () => { const id = text('#pd-rule-id').trim(); if (!/^[A-Za-z0-9_][A-Za-z0-9_.-]*$/.test(id)) throw new Error('Rule IDs use letters, numbers, dots, hyphens and underscores.'); const next = structuredClone(doc); next.rules ??= {}; next.rules[id] = { mode: text('#pd-rule-mode') as 'relative' | 'incremental', deltas: Object.fromEntries(doc.sizes.map((s, i) => [s, [finite(`#pd-dx-${i}`), finite(`#pd-dy-${i}`)]])) }; await commit(next); await setMode('grading'); });
         click('#pd-rule-remove', async () => { const id = text('#pd-rule-select'); if (!id)
             return; const next = structuredClone(doc); delete next.rules?.[id]; for (const p of next.pieces)
             for (const [point, rule] of Object.entries(p.grade_points ?? {}))
@@ -468,7 +481,7 @@ export function installPatternEditor(root: HTMLElement, host: Host) {
             return; calibrating = []; status('Click the first then second known-distance point on the image.'); });
         click('#pd-trace-clear', async () => { trace = undefined; await saveTrace(); });
     }
-    function pieceMenu(): string { return `<h3>Piece tools</h3><p>These actions create a new piece at the current size and keep the source. The new outline has fixed coordinates.</p><form id="pd-piece-action"><div class="fields">${select('pd-action', 'Action', ['dart', 'dart_transfer', 'dart_close', 'slash_spread', 'pleat', 'split', 'mirror', 'walk', 'true_seam'])}${field('pd-action-id', 'New piece / path ID', 'result_' + (doc.pieces.length + 1))}${select('pd-action-a', 'First line point / first seam', ['', ...pointIds(), ...pathIds()])}${select('pd-action-b', 'Second line point / second seam', ['', ...pointIds(), ...pathIds()])}${select('pd-action-apex', 'Dart apex', pointIds())}${field('pd-action-edge', 'Dart / transfer edge (starts at 1)', 1, 'number', 'min="1" step="1"')}${field('pd-action-center', 'Dart mouth distance on edge (mm)', 100)}${field('pd-action-width', 'Dart mouth width (mm)', 20)}${field('pd-action-vertex', 'Closure cut vertex (starts at 1)', 3, 'number', 'min="1" step="1"')}${field('pd-action-angle', 'Spread angle (degrees)', 15)}${field('pd-action-depth', 'Pleat folded depth (mm)', 20)}${select('pd-action-pleat-kind', 'Pleat type', ['knife', 'box'])}${field('pd-action-target', 'True seam length (mm)', 100)}</div><button class="primary" type="submit">Apply piece tool</button></form>`; }
+    function pieceMenu(): string { return `<h3>Piece tools</h3><p>Mirror and unfold keep links to source geometry. Unfold needs a straight fold edge with zero allowance and measurement grading. Other shape tools create fixed outlines at the current size. Sources are retained; set both source quantities to zero if it is only a template.</p><form id="pd-piece-action"><div class="fields">${select('pd-action', 'Action', ['dart', 'dart_transfer', 'dart_close', 'slash_spread', 'pleat', 'split', 'mirror', 'unfold', 'walk', 'true_seam'])}${field('pd-action-id', 'New piece / path ID', 'result_' + (doc.pieces.length + 1))}${select('pd-action-a', 'First line point / first seam', ['', ...pointIds(), ...pathIds()])}${select('pd-action-b', 'Second line point / second seam', ['', ...pointIds(), ...pathIds()])}${select('pd-action-apex', 'Dart apex', pointIds())}${field('pd-action-edge', 'Dart / transfer / fold edge (starts at 1)', 1, 'number', 'min="1" step="1"')}${field('pd-action-center', 'Dart mouth distance on edge (mm)', 100)}${field('pd-action-width', 'Dart mouth width (mm)', 20)}${field('pd-action-vertex', 'Closure cut vertex (starts at 1)', 3, 'number', 'min="1" step="1"')}${field('pd-action-angle', 'Spread angle (degrees)', 15)}${field('pd-action-depth', 'Pleat folded depth (mm)', 20)}${select('pd-action-pleat-kind', 'Pleat type', ['knife', 'box'])}${field('pd-action-target', 'True seam length (mm)', 100)}</div><button class="primary" type="submit">Apply piece tool</button></form>`; }
     function bindPieceMenu() {
         const form = root.querySelector<HTMLFormElement>('#pd-piece-action');
         if (!form)
@@ -484,6 +497,7 @@ export function installPatternEditor(root: HTMLElement, host: Host) {
                     document: PatternDocument;
                     message?: string;
                 }>('pattern/piece-action', { ...request, document: doc });
+                if (result.document.pieces.some(p => p.id === request.id)) pieceId = String(request.id);
                 await commit(result.document);
                 status(result.message ?? 'Piece tool applied.');
             });

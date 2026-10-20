@@ -94,6 +94,7 @@ fn pieces(doc: &Document, sizes: &[String], tolerance: f64) -> Result<Vec<Piece>
 fn bounds(p: &Piece) -> Result<[f64; 4]> {
     let mut points = p.outline.clone();
     points.extend(p.grain.into_iter().flatten());
+    points.extend(p.fold_line.into_iter().flatten());
     points.extend(p.marks.iter().flat_map(|m| m.points.iter().copied()));
     for mark in &p.marks {
         if mark.kind == MarkKind::Text
@@ -219,6 +220,11 @@ fn piece_content(p: &Piece) -> Result<String> {
                 false,
             )?;
         }
+    }
+    if let Some(fold) = p.fold_line {
+        out.push_str("0.15 w [3 2] 0 d\n");
+        path(&mut out, &fold, false)?;
+        out.push_str("[] 0 d\n");
     }
     for m in &p.marks {
         if m.kind == MarkKind::Text {
@@ -478,6 +484,9 @@ pub fn plotter_plt(doc: &Document, sizes: &[String], tolerance: f64) -> Result<S
         out.push_str("SP2;\n");
         if let Some(g) = p.grain {
             plot_path(&mut out, &g, false, offset)?;
+        }
+        if let Some(fold) = p.fold_line {
+            plot_path(&mut out, &fold, false, offset)?;
         }
         for m in &p.marks {
             if m.kind == MarkKind::Text {

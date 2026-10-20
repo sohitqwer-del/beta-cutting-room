@@ -1,6 +1,7 @@
 import { html, type Raw } from '../html.ts';
 import { ext, pageHead, section } from '../layout.ts';
 import { repoLink } from '../config.ts';
+import { helpSection } from './home.ts';
 
 const technical: [string, string, string][] = [
   ['marker/README.md', 'BETA Marker overview', 'What the marker engine does, how it is built and where each part lives.'],
@@ -55,5 +56,7 @@ ${section('faq', 'Common questions', html`
 <div class="faq">
   ${faq.map(([q, a]) => html`<details class="disclosure"><summary>${q}</summary><p>${a}</p></details>`)}
 </div>`)}
+
+${helpSection('section-alt')}
 `;
 }

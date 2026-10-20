@@ -4,6 +4,7 @@ import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, write
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadRuns } from './benchmark.ts';
+import { clientScript, usesNetwork } from './client-build.ts';
 import { layout, pages } from './layout.ts';
 import type { Raw } from './html.ts';
 import type { BuildContext } from './pages/context.ts';
@@ -36,6 +37,7 @@ rmSync(dist, { recursive: true, force: true });
 mkdirSync(join(dist, 'assets'), { recursive: true });
 cpSync(publicDir, dist, { recursive: true, filter: (src) => !src.endsWith('README.md') });
 writeFileSync(join(dist, 'assets', 'site.css'), readFileSync(join(root, 'src', 'style.css')));
+writeFileSync(join(dist, 'assets', 'site.js'), clientScript(readFileSync(join(root, 'src', 'client.ts'), 'utf8')));
 const hasManual = existsSync(manualSrc);
 if (hasManual) {
   mkdirSync(join(dist, 'docs'), { recursive: true });
@@ -63,9 +65,10 @@ const cssRemote = /url\(\s*["']?(?:https?:)?\/\//i;
 const problems: string[] = [];
 const walk = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? walk(join(dir, d.name)) : [join(dir, d.name)]));
 for (const file of walk(dist)) {
-  if (!/\.(html|css|svg)$/.test(file)) continue;
+  if (!/\.(html|css|svg|js)$/.test(file)) continue;
   const text = readFileSync(file, 'utf8');
   if (remote.test(text) || cssRemote.test(text) || /@import\s/.test(text)) problems.push(file);
+  if (file.endsWith('.js') && usesNetwork(text)) problems.push(file);
 }
 if (problems.length) {
   console.error(`These files load remote resources:\n  ${problems.join('\n  ')}`);

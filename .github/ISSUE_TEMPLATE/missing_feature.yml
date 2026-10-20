@@ -1,0 +1,39 @@
+name: Something is missing
+description: A tool, report, file format or setting you need for your work.
+title: "[Missing] "
+labels: ["missing-feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. We are a small team and we cannot build everything at once, but we read every request. Knowing what your cutting room needs helps us choose what to build next.
+
+        **Privacy:** this issue is public. Do not attach factory patterns, markers, job files or photos unless you agree to make them public. For private feedback, email sohitqwer@gmail.com instead.
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you need, and why?
+      description: Describe the work you are trying to do. Plain words are best.
+    validations:
+      required: true
+  - type: textarea
+    id: use
+    attributes:
+      label: How would you use it?
+      description: "Which screen would it be on? Who would use it: pattern maker, marker planner, cutting master or floor staff?"
+    validations:
+      required: false
+  - type: textarea
+    id: today
+    attributes:
+      label: How do you do this today?
+      description: For example, another CAD system, a spreadsheet or paper. Please do not upload vendor files or manuals.
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Shown in About. For example 0.4.0.
+    validations:
+      required: false

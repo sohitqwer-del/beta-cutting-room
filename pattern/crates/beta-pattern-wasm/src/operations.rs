@@ -6,10 +6,16 @@ use beta_pattern_core::{
 };
 use serde_json::{Value as Json, json};
 
-/// Apply a piece menu action. New geometry is inserted as an editable fixed outline.
+/// Apply a piece menu or production command. Mirror/unfold preserve references;
+/// other shape tools create fixed outlines. Read-only reports retain the document.
 pub fn apply(doc: &Document, request: &Json) -> Result<Json, String> {
     let s = |key: &str| request[key].as_str().ok_or_else(|| format!("Choose {key}"));
     let action = s("action")?;
+    // Production commands share this existing native/WASM transport. They do
+    // not need a selected piece unless their typed Rust request requires one.
+    if let Some(result) = production_action(doc, request, action) {
+        return result;
+    }
     let size = request["size"].as_str().unwrap_or(&doc.base_size);
     let source = s("piece")?;
     let piece = doc
@@ -30,7 +36,7 @@ pub fn apply(doc: &Document, request: &Json) -> Result<Json, String> {
             let b = e.path(s("b")?).map_err(|e| format!("{e:#}"))?;
             let difference = tools::walk(&a, &b).map_err(|e| format!("{e:#}"))?;
             return Ok(
-                json!({"document":doc,"message":format!("First seam minus second: {difference:.3} mm"),"difference_mm":difference}),
+                json!({"document":doc,"message":format!("Draft-path difference (before factory grading): {difference:.3} mm. Use Seam checks for all graded sizes."),"difference_mm":difference}),
             );
         }
         let path = tools::true_seam(&a, number("target")?).map_err(|e| format!("{e:#}"))?;
@@ -87,7 +93,6 @@ pub fn apply(doc: &Document, request: &Json) -> Result<Json, String> {
     let mut dart = None;
     let mut folds = vec![];
     let result = match action {
-        "mirror" => tools::mirror(poly, point("a")?, point("b")?),
         "split" => {
             let parts =
                 tools::split(poly, point("a")?, point("b")?).map_err(|e| format!("{e:#}"))?;
@@ -197,6 +202,77 @@ pub fn apply(doc: &Document, request: &Json) -> Result<Json, String> {
     )
 }
 
+fn production_action(doc: &Document, request: &Json, action: &str) -> Option<Result<Json, String>> {
+    use beta_pattern_core::{production, rule_exchange, symmetry};
+    let command = || -> anyhow::Result<Json> {
+        let text = |key: &str| {
+            request[key]
+                .as_str()
+                .ok_or_else(|| anyhow::anyhow!("Choose {key}"))
+        };
+        match action {
+            "seam_report" => {
+                let check = serde_json::from_value(request["check"].clone())?;
+                let report = production::check_seams(doc, &check, 0.05)?;
+                Ok(json!({"document":doc,"csv":production::seam_csv(&report),"report":report}))
+            }
+            "rule_export" => Ok(
+                json!({"document":doc,"source":rule_exchange::write(doc,text("name")?,text("format")?)?}),
+            ),
+            "rule_preview" | "rule_import" => {
+                let parsed = rule_exchange::read(text("source")?, text("format")?)?;
+                let next = rule_exchange::install(
+                    doc,
+                    &parsed.library,
+                    request["replace"].as_bool().unwrap_or(false),
+                )?;
+                Ok(
+                    json!({"document":if action=="rule_import" {&next} else {doc},"library":parsed.library,"warnings":parsed.warnings}),
+                )
+            }
+            "mark_row" => Ok(
+                json!({"document":production::add_mark_row(doc,&serde_json::from_value(request["row"].clone())?)?,"message":"Production marks added. Included in Marker, DXF and plot output."}),
+            ),
+            "mirror" | "unfold" => {
+                let next = if action == "mirror" {
+                    symmetry::mirror_piece(
+                        doc,
+                        text("piece")?,
+                        text("id")?,
+                        [text("a")?.into(), text("b")?.into()],
+                    )?
+                } else {
+                    let edge = request["edge"]
+                        .as_u64()
+                        .and_then(|i| i.checked_sub(1))
+                        .ok_or_else(|| anyhow::anyhow!("Choose a fold edge starting at 1"))?;
+                    symmetry::unfold_piece(
+                        doc,
+                        text("piece")?,
+                        text("id")?,
+                        usize::try_from(edge)?,
+                    )?
+                };
+                Ok(
+                    json!({"document":next,"message":"Linked piece added with marks, allowances and cutting details. Source retained; set both source quantities to zero if it is only a construction template."}),
+                )
+            }
+            _ => unreachable!(),
+        }
+    };
+    matches!(
+        action,
+        "seam_report"
+            | "rule_export"
+            | "rule_preview"
+            | "rule_import"
+            | "mark_row"
+            | "mirror"
+            | "unfold"
+    )
+    .then(|| command().map_err(|e| format!("{e:#}")))
+}
+
 fn anyhow_error(message: String) -> std::io::Error {
     std::io::Error::other(message)
 }
@@ -229,6 +305,60 @@ mod tests {
             );
         }
         d
+    }
+    #[test]
+    fn production_commands_use_existing_transport_and_validate_before_mutating() {
+        let d = square();
+        let request = json!({"action":"seam_report","check":{
+            "name":"Opposite edges","a":{"piece":"square","edges":[0]},
+            "b":{"piece":"square","edges":[2],"reversed":true},"ease_mm":0,"tolerance_mm":0.5
+        }});
+        let report = apply(&d, &request).unwrap();
+        assert_eq!(report["report"]["rows"][0]["pass"], true);
+        assert!(report["csv"].as_str().unwrap().contains("PASS"));
+        assert_eq!(report["document"], serde_json::to_value(&d).unwrap());
+        let rul = "UNITS: MM\nMODE: CUMULATIVE\nSIZES: M\nBASE: M\nRULE: 1 0 0\nEND\n";
+        let preview = apply(
+            &d,
+            &json!({"action":"rule_preview","source":rul,"format":"rul"}),
+        )
+        .unwrap();
+        assert!(preview["document"]["rules"].as_object().unwrap().is_empty());
+        let result = apply(
+            &d,
+            &json!({"action":"rule_import","source":rul,"format":"rul"}),
+        )
+        .unwrap();
+        let next: Document = serde_json::from_value(result["document"].clone()).unwrap();
+        assert!(next.rules.contains_key("1"));
+        assert!(
+            apply(
+                &next,
+                &json!({"action":"rule_import","source":rul,"format":"rul"})
+            )
+            .is_err()
+        );
+        let export = apply(
+            &next,
+            &json!({"action":"rule_export","name":"Test","format":"rul"}),
+        )
+        .unwrap();
+        assert!(export["source"].as_str().unwrap().contains("RULE: 1 0 0"));
+        assert!(
+            apply(
+                &d,
+                &json!({"action":"unfold","piece":"square","id":"full","edge":4})
+            )
+            .is_ok()
+        );
+        assert!(
+            apply(
+                &d,
+                &json!({"action":"unfold","piece":"square","id":"full","edge":0})
+            )
+            .is_err()
+        );
+        assert!(apply(&d,&json!({"action":"mark_row","row":{"piece":"square","id":"row","origin":"apex","count":2,"spacing":10,"direction":90,"kind":"buttonhole","length":12,"angle":0}})).is_ok());
     }
     #[test]
     fn menu_operations_retain_sources_and_reject_bad_fields() {

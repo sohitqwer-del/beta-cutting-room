@@ -423,6 +423,7 @@ fn internal_paths_labels_grain_and_four_notch_shapes() {
     }
     p.annotations.push(Annotation::SeamIntersections {
         path: "guide".into(),
+        edges: None,
         depth: 3.0.into(),
         width: 4.0.into(),
         shape: NotchType::V,

@@ -1,7 +1,7 @@
 import { html, type Raw } from '../html.ts';
 import { ext, pageHead, section } from '../layout.ts';
 import { repoLink, site } from '../config.ts';
-import { contactLine } from './home.ts';
+import { contactLine, helpSection } from './home.ts';
 
 const credits: [string, string, string, string][] = [
   ['sparrow', 'MIT', 'https://github.com/JeroenGar/sparrow', 'The nesting search BETA uses (version 0.3.0). By Jeroen Gardeyn and co-authors.'],
@@ -59,6 +59,9 @@ ${section('contact', 'Contact', html`
 <div class="prose">
   <p>Questions, factory trials and sample markers: ${contactLine()}.</p>
   <p>We read every message. We answer in English; Hindi and Tamil support is planned.</p>
+  <p>BETA Cutting Room is a fun project, built with the help of modern AI tools. Every marker is still checked by an independent validator, and every claim on this site comes with its source.</p>
 </div>`, { cls: 'section-alt' })}
+
+${helpSection()}
 `;
 }

@@ -206,10 +206,6 @@ dialog h2 { font-size: var(--fs-xl); margin: 0; }
 .brand strong { display: block; font-size: var(--fs-l); font-weight: 700; letter-spacing: -.2px; line-height: 1.2; text-align: left; }
 .brand small { display: block; font-size: var(--fs-xs); color: var(--sidebar-muted); font-weight: 500; text-align: left; }
 .logo { flex: none; display: block; }
-.logo-tile, .logo-notch { fill: #1f5f4a; }
-.sidebar .logo-tile, .sidebar .logo-notch { fill: #2a7a5e; }
-.logo-letter { fill: #fff; }
-.logo-cut { fill: none; stroke: #f0b357; stroke-width: 1.6; }
 .skip-link { position: absolute; left: var(--sp-3); top: -60px; z-index: 100; padding: var(--sp-2) var(--sp-4); background: var(--surface); color: var(--text); border: 2px solid var(--focus); border-radius: var(--r); font-weight: 650; }
 .skip-link:focus { top: var(--sp-3); }
 .recent-list button { min-height: 44px; }

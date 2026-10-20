@@ -504,6 +504,10 @@ pub enum Annotation {
     SeamIntersections {
         /// Drawing path ID.
         path: String,
+        /// Optional piece-edge filter. Used to keep a mirrored guide on its
+        /// own half after unfolding; absent means every edge.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edges: Option<Vec<usize>>,
         /// Notch depth.
         depth: Value,
         /// Notch width.
@@ -586,6 +590,10 @@ pub enum GradeMode {
 /// Flattened and graded output.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GradedPiece {
+    /// Directed stitch paths after grading, in piece-edge order.
+    /// These exclude seam allowance and support assembly length checks.
+    #[serde(default)]
+    pub seam_edges: Vec<Vec<Pt>>,
     /// Marker-ready cut piece.
     pub piece: beta_marker_core::Piece,
     /// Stitch outline before allowance.

@@ -1,0 +1,73 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/beta-marker-core",
+    "crates/beta-marker-dxf",
+    "crates/beta-marker-nest",
+    "crates/beta-marker-export",
+    "crates/beta-marker-wasm",
+    "crates/beta-marker-match",
+    "crates/beta-marker-plan",
+    "crates/beta-marker-roll",
+    "crates/beta-marker-cutroom",
+    "crates/beta-marker-edit",
+    "crates/beta-marker-queue",
+    "crates/beta-marker-learn",
+    "crates/beta-marker-cluster",
+    "crates/beta-marker-floor",
+    "crates/beta-marker-cli",
+    "apps/desktop/src-tauri",
+    "apps/desktop/src-tauri/permissive/dom-query",
+    "apps/desktop/src-tauri/permissive/option-ext",
+]
+
+[workspace.package]
+version = "0.4.0"
+edition = "2024"
+license = "Apache-2.0"
+repository = "https://github.com/sohitqwer-del/beta-cutting-room"
+rust-version = "1.90"
+
+[workspace.dependencies]
+beta-marker-core = { path = "crates/beta-marker-core" }
+beta-marker-dxf = { path = "crates/beta-marker-dxf" }
+beta-marker-nest = { path = "crates/beta-marker-nest" }
+beta-marker-export = { path = "crates/beta-marker-export" }
+beta-marker-match = { path = "crates/beta-marker-match" }
+beta-marker-plan = { path = "crates/beta-marker-plan" }
+beta-marker-roll = { path = "crates/beta-marker-roll" }
+beta-marker-cutroom = { path = "crates/beta-marker-cutroom" }
+beta-marker-edit = { path = "crates/beta-marker-edit" }
+beta-marker-queue = { path = "crates/beta-marker-queue" }
+beta-marker-learn = { path = "crates/beta-marker-learn" }
+beta-marker-cluster = { path = "crates/beta-marker-cluster" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "2.0"
+
+# Nesting engine. sparrow is MIT. Its dependency jagua-rs is MPL-2.0 and is used
+# unmodified as a crates.io dependency. Never vendor or patch jagua-rs sources in this repo.
+sparrow = { git = "https://github.com/JeroenGar/sparrow", tag = "v0.3.0" }
+jagua-rs = { version = "=1.0.0", features = ["spp"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 4
+strip = "debuginfo"
+
+[profile.dev]
+# Keep debug builds quick but make the nesting engine usable in tests.
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+# Original Apache-2.0 replacements for MPL-2.0 transitive crates of the desktop app.
+[patch.crates-io]
+dom_query = { path = "apps/desktop/src-tauri/permissive/dom-query" }
+option-ext = { path = "apps/desktop/src-tauri/permissive/option-ext" }
+
+[profile.release.package.beta-cutting-room]
+strip = true

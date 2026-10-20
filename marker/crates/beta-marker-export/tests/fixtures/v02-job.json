@@ -1,0 +1,34 @@
+{
+  "format": "beta-marker.job/v1",
+  "name": "qa2-output-smoke",
+  "fabric": {
+    "width": 160,
+    "layout": "tubular",
+    "nap": "one_way_per_bundle",
+    "defects": [{"id":"flaw","polygon":[[130,70],[140,70],[140,80],[130,80]]}],
+    "shade": {"axis":"width","band_mm":100},
+    "repeat": {"period_x":20,"period_y":20,"offset_x":13,"offset_y":12},
+    "shrinkage": {"length_pct":10,"width_pct":0}
+  },
+  "pieces": [
+    {
+      "id":"front-M", "name":"Front fusing block", "style":"QA2 shirt", "size":"M",
+      "outline":[[0,0],[100,0],[0,80]], "quantity":1, "mirror_quantity":1,
+      "block_margin":2,
+      "match_points":[{"id":"seam","point":[10,10]}],
+      "marks":[
+        {"kind":"drill","points":[[10,10]]},
+        {"kind":"line","points":[[20,10],[40,10]]},
+        {"kind":"notch","points":[[50,0],[50,1]]}
+      ]
+    },
+    {
+      "id":"back-M", "name":"Back on fold", "style":"QA2 shirt", "size":"M",
+      "outline":[[0,-20],[60,-20],[60,20],[0,20]], "quantity":1,
+      "fold_line":[[0,0],[60,0]],
+      "marks":[{"kind":"drill","points":[[20,10]]}]
+    }
+  ],
+  "order":{"sizes":{"M":1}},
+  "match_rules":[{"a":{"piece_id":"front-M","point_id":"seam"},"axes":"both"}]
+}

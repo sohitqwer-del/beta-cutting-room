@@ -1,0 +1,184 @@
+{
+  "same_demand_width_ranking": {
+    "pairs": 41,
+    "learned_accuracy": 1.0,
+    "constant_accuracy": 1.0,
+    "note": "Adjacent ID pairs within identical shape/count/orientation groups; only test rows, code 0, no extra constraints, different width, implied reference length gap >1%. No independence claim across pairs."
+  },
+  "stopping_diagnostic": {
+    "heldout_pairs": 10,
+    "spearman_gap_vs_longer_gain": 0.43030303030303024,
+    "within_one_pp_of_prediction": 2,
+    "near_prediction_but_longer_gain_above_one_pp": 0,
+    "rows": [
+      {
+        "id": 32890,
+        "predicted_gap_pp": 7.49665686202934,
+        "longer_gain_pp": 5.484763876000002
+      },
+      {
+        "id": 33203,
+        "predicted_gap_pp": 3.3919337970536105,
+        "longer_gain_pp": 0.7080531149999985
+      },
+      {
+        "id": 34287,
+        "predicted_gap_pp": -3.220310187463994,
+        "longer_gain_pp": 0.2851669829999963
+      },
+      {
+        "id": 37664,
+        "predicted_gap_pp": 2.7283915488948054,
+        "longer_gain_pp": 4.106214699000006
+      },
+      {
+        "id": 53410,
+        "predicted_gap_pp": 1.7299172111552394,
+        "longer_gain_pp": 0.8923226059999934
+      },
+      {
+        "id": 60855,
+        "predicted_gap_pp": 2.287204872143306,
+        "longer_gain_pp": 2.761360780000004
+      },
+      {
+        "id": 60895,
+        "predicted_gap_pp": 3.550364110385601,
+        "longer_gain_pp": 0.2457317049999972
+      },
+      {
+        "id": 61412,
+        "predicted_gap_pp": 4.2711855219208985,
+        "longer_gain_pp": 1.1272981970000018
+      },
+      {
+        "id": 75899,
+        "predicted_gap_pp": 12.13850275070564,
+        "longer_gain_pp": 2.652092072000002
+      },
+      {
+        "id": 87574,
+        "predicted_gap_pp": -1.9815778925710248,
+        "longer_gain_pp": 0.26042809800000555
+      }
+    ],
+    "decision": "Do not enable learned stopping: reference efficiency is not a bound; these are separate stochastic runs, not continuation curves."
+  },
+  "strategy_selection": {
+    "arm": "samples-light",
+    "test_pairs": 5,
+    "mean_gain_pp": 0.2526631978000012,
+    "bootstrap95_pp": [
+      -0.020170718399995735,
+      0.7781783537999984
+    ],
+    "decision": "Reject; retain existing default"
+  },
+  "strategy_candidates": [
+    {
+      "arm": "compression30",
+      "counts": [
+        27,
+        7,
+        5
+      ],
+      "rule": [
+        1,
+        85.52319138922489,
+        1
+      ],
+      "invalid_pair_ids": [
+        12127
+      ],
+      "train_mean_gain_pp": 0.041335058259258935,
+      "validation_mean_gain_pp": 0.005443063285714597
+    },
+    {
+      "arm": "compression40",
+      "counts": [
+        27,
+        7,
+        5
+      ],
+      "rule": [
+        1,
+        83.92371146316161,
+        1
+      ],
+      "invalid_pair_ids": [
+        12127
+      ],
+      "train_mean_gain_pp": 0.05208087325925966,
+      "validation_mean_gain_pp": 0.0835809895714265
+    },
+    {
+      "arm": "sequential3",
+      "counts": [
+        27,
+        7,
+        5
+      ],
+      "rule": [
+        0,
+        524,
+        1
+      ],
+      "invalid_pair_ids": [
+        12127
+      ],
+      "train_mean_gain_pp": 0.03163302774074042,
+      "validation_mean_gain_pp": 0.0
+    },
+    {
+      "arm": "race3",
+      "counts": [
+        27,
+        7,
+        5
+      ],
+      "rule": [
+        1,
+        70.5631224189108,
+        -1
+      ],
+      "invalid_pair_ids": [
+        12127
+      ],
+      "train_mean_gain_pp": 0.10964035988888897,
+      "validation_mean_gain_pp": 0.0
+    },
+    {
+      "arm": "samples-light",
+      "counts": [
+        27,
+        7,
+        5
+      ],
+      "rule": [
+        1,
+        83.93683915832294,
+        1
+      ],
+      "invalid_pair_ids": [
+        12127
+      ],
+      "train_mean_gain_pp": 0.12120717944444455,
+      "validation_mean_gain_pp": 0.2940781418571439
+    }
+  ],
+  "source_sha256": {
+    "results/2026-10-18-lectra-round2-60s/results.csv": "af840ac16ee10590c90fb88ec6052ee26465f79f4e335b40123b8beb0c3396cd",
+    "results/2026-10-18-lectra-round2-match/results.csv": "6216fe7763705dba59c07a07f486087bcea04e1e90d20a5c81789edddc1c0953",
+    "quality-v03/paired-compression30/effective/baseline/results.csv": "b6df299b46ff30ef6cb59dad265efe29b642406d76bcdc04bff7b338c45a65c3",
+    "quality-v03/paired-compression30/effective/variant/results.csv": "0ada54278a37a55808f8288f2b680e176ab1290cdc86593a2df57cb14e80bd24",
+    "quality-v03/paired-compression40/effective/baseline/results.csv": "25c7152e4cd82a3048498c5a7e72b5a6abfacba0ea73b5b143b1fc03b565c3ec",
+    "quality-v03/paired-compression40/effective/variant/results.csv": "a166638ef78172af4549a46938831067fdf2eb61ff1f97d613dac1b38a39f207",
+    "quality-v03/paired-sequential3/effective/baseline/results.csv": "30c258df2eea9081633a03e6d315f7816f1584238c2772e085163ab419307d73",
+    "quality-v03/paired-sequential3/effective/variant/results.csv": "7160b141fe068edef1dba7b5d51aaaf19a346bc968cded15ca78496bc91136cd",
+    "quality-v03/paired-race3/effective/baseline/results.csv": "3ac2325ea0c5e18cd17b49e43ba95924dd85ce830a2da6d917217413bf80b902",
+    "quality-v03/paired-race3/effective/variant/results.csv": "a87955e216e1b6a3aa067eccffe89081f2fa9c0e629627d50aedf62bceae8d19",
+    "quality-v03/paired-samples-light/effective/baseline/results.csv": "24f15084468720f4c27e25074ecea3efcd461287716597ebf20a697a8dc773a9",
+    "quality-v03/paired-samples-light/effective/variant/results.csv": "8af579472a1e22e8c19bf0cef435c819d5e60691fb9d7a9d4aac286a668e3562"
+  },
+  "limitations": "Historical development tasks were stratified by target, host was shared, five arms use separate paired baselines, small split counts, no new nesting run or independent factory validation. Do not treat these as 100k strategy labels."
+}

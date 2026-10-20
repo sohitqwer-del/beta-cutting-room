@@ -1,0 +1,4 @@
+# One shared target folder for the whole marker workspace (disk space is limited).
+# Agents working in other worktrees set CARGO_TARGET_DIR to share one folder too.
+[build]
+target-dir = "target"

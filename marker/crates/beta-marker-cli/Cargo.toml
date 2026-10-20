@@ -1,0 +1,36 @@
+[package]
+name = "beta-marker-cli"
+description = "beta-marker command line: import, nest, validate, export, serve, bench"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "beta-marker"
+path = "src/main.rs"
+
+[dependencies]
+beta-marker-core.workspace = true
+beta-marker-dxf.workspace = true
+beta-marker-nest.workspace = true
+beta-marker-export.workspace = true
+beta-marker-match.workspace = true
+beta-marker-plan.workspace = true
+beta-marker-roll.workspace = true
+beta-marker-cutroom.workspace = true
+beta-marker-queue.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+clap = { version = "4.5", features = ["derive"] }
+hyper = { version = "1", features = ["server", "http1"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+http-body-util = "0.1"
+httparse = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "net", "time", "sync", "io-util"] }
+
+# Offline pattern and photo routes owned by serve.
+beta-pattern-core = { path = "../../../pattern/crates/beta-pattern-core" }
+beta-pattern-digitize = { path = "../../../pattern/crates/beta-pattern-digitize" }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+base64 = "0.22"

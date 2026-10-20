@@ -1,0 +1,17 @@
+{
+  "attempted_tasks": 40,
+  "excluded_from_search_selection": {
+    "12127": {
+      "reason": "No feasible cross-width translation at the only permitted angle.",
+      "fabric_width_mm": 1243.0,
+      "pieces": [
+        { "id": "10", "cross_width_span_mm": 1286.0 },
+        { "id": "13", "cross_width_span_mm": 1244.0 }
+      ],
+      "allowed_angle_deg": 0.0,
+      "tilt_deg": 0.0,
+      "flip": false
+    }
+  },
+  "policy": "Frozen before aggregate development scores were computed. Attempt every original task in both arms. Report every failure. Exclude only this independently proved geometry failure from search selection; require all other 39 pairs to be valid. Never replace IDs or exclude a search-dependent failure."
+}

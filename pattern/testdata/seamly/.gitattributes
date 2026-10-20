@@ -1,0 +1,9 @@
+# Preserve the original inputs and exported bytes for provenance hashes.
+*.sm2d -text whitespace=-blank-at-eol,cr-at-eol
+*.smms -text whitespace=-blank-at-eol,cr-at-eol
+*.smis -text whitespace=-blank-at-eol,cr-at-eol
+exports/*.dxf -text whitespace=-blank-at-eol,cr-at-eol
+/expected.json -text whitespace=-blank-at-eol,cr-at-eol
+/LICENSE -text whitespace=-blank-at-eol,cr-at-eol
+/SOURCE_README.md -text whitespace=-blank-at-eol,cr-at-eol
+/make_samples.py -text whitespace=-blank-at-eol,cr-at-eol

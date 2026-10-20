@@ -1,0 +1,20 @@
+{
+  "name": "beta-cutting-room",
+  "version": "0.4.0",
+  "private": true,
+  "description": "BETA Cutting Room: open-source, self-hosted cutting-room software for garment factories (BETA Pattern and BETA Marker).",
+  "license": "Apache-2.0",
+  "repository": { "type": "git", "url": "https://github.com/sohitqwer-del/beta-cutting-room.git" },
+  "workspaces": [
+    "marker/packages/*",
+    "marker/apps/*"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^3.2.0"
+  }
+}

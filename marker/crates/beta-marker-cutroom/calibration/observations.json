@@ -1,0 +1,343 @@
+{
+  "failures": [],
+  "holdout": [
+    {
+      "efficiency": 0.717186422986261,
+      "features": {
+        "convexity_ratio": 0.9501094008456809,
+        "largest_width_ratio": 0.5080938571428572,
+        "mean_piece_area": 0.05955431310816604,
+        "piece_count": 0.47957905455967414,
+        "rotation_freedom": 0.25
+      },
+      "garments": 1,
+      "length_mm": 1162.54345703125,
+      "source": "garmentcode/rand_0B1IDD2JL0",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.7197373008494697,
+      "features": {
+        "convexity_ratio": 0.9501094008456809,
+        "largest_width_ratio": 0.444582125,
+        "mean_piece_area": 0.04559627097343962,
+        "piece_count": 0.47957905455967414,
+        "rotation_freedom": 0.25
+      },
+      "garments": 1,
+      "length_mm": 1013.6202955078124,
+      "source": "garmentcode/rand_0B1IDD2JL0",
+      "width_mm": 1600.0
+    },
+    {
+      "efficiency": 0.7032562201920622,
+      "features": {
+        "convexity_ratio": 0.9501094008456809,
+        "largest_width_ratio": 0.5080938571428572,
+        "mean_piece_area": 0.05955431310816604,
+        "piece_count": 0.6089044875446846,
+        "rotation_freedom": 0.25
+      },
+      "garments": 2,
+      "length_mm": 2371.142578125,
+      "source": "garmentcode/rand_0B1IDD2JL0",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.7360325523927601,
+      "features": {
+        "convexity_ratio": 0.9501094008456809,
+        "largest_width_ratio": 0.444582125,
+        "mean_piece_area": 0.04559627097343962,
+        "piece_count": 0.6089044875446846,
+        "rotation_freedom": 0.25
+      },
+      "garments": 2,
+      "length_mm": 1982.35888671875,
+      "source": "garmentcode/rand_0B1IDD2JL0",
+      "width_mm": 1600.0
+    },
+    {
+      "efficiency": 0.7895728439841756,
+      "features": {
+        "convexity_ratio": 0.8857823412771294,
+        "largest_width_ratio": 0.923,
+        "mean_piece_area": 0.07842773676658166,
+        "piece_count": 0.5666426688112433,
+        "rotation_freedom": 0.0
+      },
+      "garments": 1,
+      "length_mm": 2224.97685546875,
+      "source": "lectra/37729",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.725714119541817,
+      "features": {
+        "convexity_ratio": 0.8857823412771294,
+        "largest_width_ratio": 0.807625,
+        "mean_piece_area": 0.06004623596191408,
+        "piece_count": 0.5666426688112433,
+        "rotation_freedom": 0.0
+      },
+      "garments": 1,
+      "length_mm": 2118.1669189453123,
+      "source": "lectra/37729",
+      "width_mm": 1600.0
+    },
+    {
+      "efficiency": 0.8139331660716429,
+      "features": {
+        "convexity_ratio": 0.8857823412771294,
+        "largest_width_ratio": 0.923,
+        "mean_piece_area": 0.07842773676658166,
+        "piece_count": 0.6993015122932961,
+        "rotation_freedom": 0.0
+      },
+      "garments": 2,
+      "length_mm": 4316.77041015625,
+      "source": "lectra/37729",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.7617216341962604,
+      "features": {
+        "convexity_ratio": 0.8857823412771294,
+        "largest_width_ratio": 0.807625,
+        "mean_piece_area": 0.06004623596191408,
+        "piece_count": 0.6993015122932961,
+        "rotation_freedom": 0.0
+      },
+      "garments": 2,
+      "length_mm": 4036.0771484375,
+      "source": "lectra/37729",
+      "width_mm": 1600.0
+    }
+  ],
+  "train": [
+    {
+      "efficiency": 0.6904369507756429,
+      "features": {
+        "convexity_ratio": 0.9418933826015892,
+        "largest_width_ratio": 0.4139257142857143,
+        "mean_piece_area": 0.10987697422847068,
+        "piece_count": 0.32188758248682003,
+        "rotation_freedom": 0.25
+      },
+      "garments": 1,
+      "length_mm": 891.1907958984375,
+      "source": "freesewing/teagan-M",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.7479022263441975,
+      "features": {
+        "convexity_ratio": 0.9418933826015892,
+        "largest_width_ratio": 0.362185,
+        "mean_piece_area": 0.08412455839367286,
+        "piece_count": 0.32188758248682003,
+        "rotation_freedom": 0.25
+      },
+      "garments": 1,
+      "length_mm": 719.8764153320312,
+      "source": "freesewing/teagan-M",
+      "width_mm": 1600.0
+    },
+    {
+      "efficiency": 0.7151358264407089,
+      "features": {
+        "convexity_ratio": 0.9418933826015892,
+        "largest_width_ratio": 0.4139257142857143,
+        "mean_piece_area": 0.10987697422847068,
+        "piece_count": 0.4394449154672439,
+        "rotation_freedom": 0.25
+      },
+      "garments": 2,
+      "length_mm": 1720.8229064453126,
+      "source": "freesewing/teagan-M",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.6699842675261946,
+      "features": {
+        "convexity_ratio": 0.9418933826015892,
+        "largest_width_ratio": 0.362185,
+        "mean_piece_area": 0.08412455839367286,
+        "piece_count": 0.4394449154672439,
+        "rotation_freedom": 0.25
+      },
+      "garments": 2,
+      "length_mm": 1607.1934814453125,
+      "source": "freesewing/teagan-M",
+      "width_mm": 1600.0
+    },
+    {
+      "efficiency": 0.4875928991953697,
+      "features": {
+        "convexity_ratio": 0.8981820472082278,
+        "largest_width_ratio": 0.30632385714285715,
+        "mean_piece_area": 0.1705872677372551,
+        "piece_count": 0.32188758248682003,
+        "rotation_freedom": 0.25
+      },
+      "garments": 1,
+      "length_mm": 1959.1932140625,
+      "source": "freesewing/titan-M",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.676429310140908,
+      "features": {
+        "convexity_ratio": 0.8981820472082278,
+        "largest_width_ratio": 0.268033375,
+        "mean_piece_area": 0.13060587686133596,
+        "piece_count": 0.32188758248682003,
+        "rotation_freedom": 0.25
+      },
+      "garments": 1,
+      "length_mm": 1235.7205688476563,
+      "source": "freesewing/titan-M",
+      "width_mm": 1600.0
+    },
+    {
+      "efficiency": 0.5514316999681913,
+      "features": {
+        "convexity_ratio": 0.8981820472082278,
+        "largest_width_ratio": 0.30632385714285715,
+        "mean_piece_area": 0.1705872677372551,
+        "piece_count": 0.4394449154672439,
+        "rotation_freedom": 0.25
+      },
+      "garments": 2,
+      "length_mm": 3464.7580085937498,
+      "source": "freesewing/titan-M",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.6849558507422898,
+      "features": {
+        "convexity_ratio": 0.8981820472082278,
+        "largest_width_ratio": 0.268033375,
+        "mean_piece_area": 0.13060587686133596,
+        "piece_count": 0.4394449154672439,
+        "rotation_freedom": 0.25
+      },
+      "garments": 2,
+      "length_mm": 2440.675880078125,
+      "source": "freesewing/titan-M",
+      "width_mm": 1600.0
+    },
+    {
+      "efficiency": 0.6336669594504419,
+      "features": {
+        "convexity_ratio": 0.9791547118718639,
+        "largest_width_ratio": 0.4058835714285714,
+        "mean_piece_area": 0.08822066328796938,
+        "piece_count": 0.4394449154672439,
+        "rotation_freedom": 0.25
+      },
+      "garments": 1,
+      "length_mm": 1559.2913818359375,
+      "source": "garmentcode/rand_07UUJUMCB1",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.6613567604397258,
+      "features": {
+        "convexity_ratio": 0.9791547118718639,
+        "largest_width_ratio": 0.355148125,
+        "mean_piece_area": 0.06754394532985156,
+        "piece_count": 0.4394449154672439,
+        "rotation_freedom": 0.25
+      },
+      "garments": 1,
+      "length_mm": 1307.255859375,
+      "source": "garmentcode/rand_07UUJUMCB1",
+      "width_mm": 1600.0
+    },
+    {
+      "efficiency": 0.6462525714622812,
+      "features": {
+        "convexity_ratio": 0.9791547118718639,
+        "largest_width_ratio": 0.4058835714285714,
+        "mean_piece_area": 0.08822066328796938,
+        "piece_count": 0.5666426688112433,
+        "rotation_freedom": 0.25
+      },
+      "garments": 2,
+      "length_mm": 3057.84912109375,
+      "source": "garmentcode/rand_07UUJUMCB1",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.7414738185598089,
+      "features": {
+        "convexity_ratio": 0.9791547118718639,
+        "largest_width_ratio": 0.355148125,
+        "mean_piece_area": 0.06754394532985156,
+        "piece_count": 0.5666426688112433,
+        "rotation_freedom": 0.25
+      },
+      "garments": 2,
+      "length_mm": 2332.0108642578125,
+      "source": "garmentcode/rand_07UUJUMCB1",
+      "width_mm": 1600.0
+    },
+    {
+      "efficiency": 0.668187443802332,
+      "features": {
+        "convexity_ratio": 0.8375977545273507,
+        "largest_width_ratio": 0.26342857142857146,
+        "mean_piece_area": 0.14096337219387758,
+        "piece_count": 0.6089044875446846,
+        "rotation_freedom": 0.0
+      },
+      "garments": 1,
+      "length_mm": 5906.98681640625,
+      "source": "lectra/53060",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.6134804583536285,
+      "features": {
+        "convexity_ratio": 0.8375977545273507,
+        "largest_width_ratio": 0.2305,
+        "mean_piece_area": 0.10792508183593752,
+        "piece_count": 0.6089044875446846,
+        "rotation_freedom": 0.0
+      },
+      "garments": 1,
+      "length_mm": 5629.5234375,
+      "source": "lectra/53060",
+      "width_mm": 1600.0
+    },
+    {
+      "efficiency": 0.6510869189521215,
+      "features": {
+        "convexity_ratio": 0.8375977545273507,
+        "largest_width_ratio": 0.26342857142857146,
+        "mean_piece_area": 0.14096337219387758,
+        "piece_count": 0.7427144133408616,
+        "rotation_freedom": 0.0
+      },
+      "garments": 2,
+      "length_mm": 12124.2626953125,
+      "source": "lectra/53060",
+      "width_mm": 1400.0
+    },
+    {
+      "efficiency": 0.6515693504073954,
+      "features": {
+        "convexity_ratio": 0.8375977545273507,
+        "largest_width_ratio": 0.2305,
+        "mean_piece_area": 0.10792508183593752,
+        "piece_count": 0.7427144133408616,
+        "rotation_freedom": 0.0
+      },
+      "garments": 2,
+      "length_mm": 10600.875,
+      "source": "lectra/53060",
+      "width_mm": 1600.0
+    }
+  ]
+}

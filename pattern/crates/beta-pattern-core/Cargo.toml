@@ -1,0 +1,18 @@
+[package]
+name = "beta-pattern-core"
+description = "BETA Pattern: parametric drafting, pattern tools, pieces and grading"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+beta-marker-core.workspace = true
+beta-marker-dxf.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+roxmltree = "0.21"
+
+[[bench]]
+name = "evaluate"
+harness = false

@@ -1,0 +1,11 @@
+{
+    "licence":  "Lectra dataset: Zenodo 7030786 version 1.1, CC BY 4.0.",
+    "original_confirmation_300_sha256":  "D93776B94277EB3095D93D08978407E1FCDCE62A360ADB6B0E750A96BB5347B0",
+    "evidence":  "$BETA_DATA_DIR/marker-bench/quality-v03/conversion/",
+    "matched_60_sha256":  "4B7BD76D882C2106C1B821EABC3B452879189E3E82814983CFDE5A270C10436D",
+    "development_40_sha256":  "B31F996FD1E0DFD831980165949EDA8A0EC4537C40FEBC5E0FFE6C1403BCE088",
+    "converter_sha256":  "790C3C708BCA70CD9865EFCBBCDA8763F95CF05FB973B456F01215626D0BDD85",
+    "original_matched_60_sha256":  "CB76643A3A755CBE043C7673B75AD55BABB157931C3805F41902654BFC89EFF2",
+    "audit_cache":  "Reused the round-2 opcode allow-list cache for the same four pinned MD5 files. All four MD5s checked again before restricted unpickling.",
+    "confirmation_300_sha256":  "66EDBAC7FCB1BAA57945147A99113B7449F262D928012D43385847D039849C8C"
+}

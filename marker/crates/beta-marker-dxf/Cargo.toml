@@ -1,0 +1,17 @@
+[package]
+name = "beta-marker-dxf"
+description = "DXF-AAMA / ASTM pattern import and export for BETA Marker"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+beta-marker-core.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+geo = { version = "0.33", default-features = false }
+
+[dev-dependencies]
+beta-marker-export.workspace = true
+beta-marker-nest.workspace = true

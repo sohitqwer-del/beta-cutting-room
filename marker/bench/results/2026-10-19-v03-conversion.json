@@ -1,0 +1,119 @@
+{
+  "tasks": 100000,
+  "comparable": 96747,
+  "sample_size": 300,
+  "requested_sample_size": 300,
+  "seed": 7030786,
+  "tier_a": 95661,
+  "tier_b_including_a": 96747,
+  "tier_b_only": 1086,
+  "excluded": 3253,
+  "sample_tiers": {
+    "A": 296,
+    "B": 4
+  },
+  "verified_hole_tasks": 0,
+  "multi_ring_tasks": 0,
+  "diagnostic_sample_size": 39,
+  "diagnostic_counts": {
+    "2": 20,
+    "3": 19
+  },
+  "diagnostic_candidate_counts": {
+    "2": 403,
+    "3": 19
+  },
+  "population_handicap_tasks": {
+    "optional_mirror": 0,
+    "angles_or_tilt": 1086
+  },
+  "exclusion_reasons_overlapping": {
+    "sheet_type_not_headline": 597,
+    "unsupported_constraint:c1": 71,
+    "unsupported_constraint:c2": 10,
+    "unsupported_constraint:c3": 15,
+    "unsupported_constraint:c4": 9,
+    "unsupported_constraint:c5": 11,
+    "unsupported_constraint:c6": 14,
+    "unsupported_constraint:c7": 2,
+    "unsupported_constraint:c8": 124,
+    "unsupported_constraint:g1": 1100,
+    "unsupported_constraint:g2": 438,
+    "unsupported_constraint:g3": 553,
+    "unsupported_constraint:g4": 307,
+    "unsupported_constraint:t1": 121,
+    "unsupported_constraint:t2": 201
+  },
+  "primary_reasons": {
+    "sheet_type_not_headline": 597,
+    "unsupported_constraint:c1": 71,
+    "unsupported_constraint:c2": 10,
+    "unsupported_constraint:c3": 15,
+    "unsupported_constraint:c4": 1,
+    "unsupported_constraint:c5": 7,
+    "unsupported_constraint:c8": 63,
+    "unsupported_constraint:g1": 1097,
+    "unsupported_constraint:g2": 438,
+    "unsupported_constraint:g3": 548,
+    "unsupported_constraint:g4": 256,
+    "unsupported_constraint:t1": 114,
+    "unsupported_constraint:t2": 36
+  },
+  "constraint_types": {
+    "s1": 7360718,
+    "g2": 15029,
+    "g1": 7303,
+    "g4": 3584,
+    "g3": 2562,
+    "c1": 2205,
+    "c8": 1853,
+    "c3": 348,
+    "c2": 296,
+    "t1": 204,
+    "t2": 201,
+    "c6": 62,
+    "c5": 57,
+    "c7": 32,
+    "c4": 10
+  },
+  "sheet_types": {
+    "0": 99403,
+    "2": 570,
+    "3": 27
+  },
+  "rows": {
+    "tasks": 100000,
+    "parts": 7360718,
+    "constraints": 7394464,
+    "shapes": 399746
+  },
+  "sample_strata": {
+    "pieces:1-25;lectra:75-85": 25,
+    "pieces:1-25;lectra:85+": 25,
+    "pieces:1-25;lectra:<75": 25,
+    "pieces:151+;lectra:75-85": 25,
+    "pieces:151+;lectra:85+": 25,
+    "pieces:151+;lectra:<75": 25,
+    "pieces:26-75;lectra:75-85": 25,
+    "pieces:26-75;lectra:85+": 25,
+    "pieces:26-75;lectra:<75": 25,
+    "pieces:76-150;lectra:75-85": 25,
+    "pieces:76-150;lectra:85+": 25,
+    "pieces:76-150;lectra:<75": 25
+  },
+  "diagnostic_strata": {
+    "pieces:1-25;lectra:75-85": 2,
+    "pieces:1-25;lectra:85+": 3,
+    "pieces:1-25;lectra:<75": 8,
+    "pieces:151+;lectra:75-85": 2,
+    "pieces:151+;lectra:85+": 3,
+    "pieces:151+;lectra:<75": 2,
+    "pieces:26-75;lectra:75-85": 2,
+    "pieces:26-75;lectra:85+": 2,
+    "pieces:26-75;lectra:<75": 4,
+    "pieces:76-150;lectra:75-85": 1,
+    "pieces:76-150;lectra:85+": 9,
+    "pieces:76-150;lectra:<75": 1
+  },
+  "notice": "ASSUMPTION: sheet_type 0 is an ordinary rectangular strip. Tier A is exact conditional on that assumption and flip_x meaning x -> -x. Tier B includes A and uses a subset of orientations; codes 2/3 remain diagnostic only."
+}

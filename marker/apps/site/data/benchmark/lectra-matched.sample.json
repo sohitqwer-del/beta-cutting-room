@@ -1,0 +1,259 @@
+{
+  "schema": "beta-site-benchmark/1",
+  "id": "lectra-matched",
+  "title": "Lectra dataset, Lectra's own time per task",
+  "kind": "lectra",
+  "status": "sample",
+  "status_note": "Sample data copied from the documented round-2 results (marker/docs/benchmarks.md). The benchmark runner's own export replaces this file.",
+  "order": 20,
+  "date": "2026-10-18",
+  "summary_text": "60 tasks chosen before the run. BETA had the same number of seconds that Lectra's record shows for each task (244 to 608 s, median 304 s).",
+  "software": {
+    "beta_version": "0.2 (round 2)",
+    "engine_revision": "3022b1285ff7",
+    "engine": "sparrow 0.3.0 on jagua-rs 1.0 (unmodified), BETA garment rules, independent validator"
+  },
+  "reference": {
+    "name": "Lectra recorded efficiency (Lectra's own nesting engine)",
+    "type": "commercial-engine",
+    "citation": "Lallier, Vezard, Pinaud and Blin (2022), Nesting Tasks Dataset for 2D-Nesting Efficiency Estimation, Zenodo 7030786, version 1.1",
+    "url": "https://doi.org/10.5281/zenodo.7030786",
+    "licence": "CC BY 4.0"
+  },
+  "conditions": {
+    "budget_label": "Lectra's recorded time (244-608 s, median 304 s)",
+    "budget_s": null,
+    "machine": "Shared 16-thread Intel laptop (i9-11900H), other programs running",
+    "jobs": 5,
+    "workers_per_task": 3,
+    "seeds": [
+      1
+    ],
+    "background_load": "not controlled",
+    "notes": "On the same 60 tasks at 60 s the mean was -2.5276 pp. The extra time added 1.4411 pp on average."
+  },
+  "assumptions": [
+    "Sheet type 0 is an ordinary open rectangular strip of the stated width (single layer). There is no public codebook for this code.",
+    "Tier B keeps a subset of the rotations and mirrors that Lectra was allowed. BETA never gets more freedom than Lectra; sometimes it gets less (a handicap for BETA).",
+    "flip_x = 1 is read as a reflection of the x coordinate before rotation.",
+    "Lectra's engine version, hardware and worker count are unknown. Equal seconds do not mean equal computing power.",
+    "The sample balances piece count and Lectra efficiency. Its means describe the sample, not all Lectra customers."
+  ],
+  "groups": [
+    {
+      "label": "Tier B (includes Tier A)",
+      "attempts": 60,
+      "valid": 60,
+      "mean_diff_pp": -1.0865,
+      "median_diff_pp": -1.1278,
+      "win": 20,
+      "tie": 2,
+      "loss": 38,
+      "mean_length_saving_pct": -1.3668,
+      "median_length_saving_pct": -1.6003,
+      "other_failures": 0,
+      "headline": true
+    },
+    {
+      "label": "Tier A (exact orientation sets)",
+      "attempts": 59,
+      "valid": 59,
+      "mean_diff_pp": -1.0788,
+      "median_diff_pp": -1.0672,
+      "win": 20,
+      "tie": 2,
+      "loss": 37,
+      "mean_length_saving_pct": -1.3576,
+      "median_length_saving_pct": -1.5492,
+      "other_failures": 0
+    },
+    {
+      "label": "Same 60 tasks at 60 s",
+      "attempts": 60,
+      "valid": 60,
+      "mean_diff_pp": -2.5276,
+      "median_diff_pp": -2.9054,
+      "win": 18,
+      "tie": 1,
+      "loss": 41,
+      "mean_length_saving_pct": -3.5077,
+      "median_length_saving_pct": -3.6243,
+      "other_failures": 0
+    }
+  ],
+  "strata": [
+    {
+      "label": "pieces:1-25;lectra:<75",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": 1.335,
+      "median_diff_pp": 1.121,
+      "win": 4,
+      "tie": 1,
+      "loss": 0,
+      "mean_length_saving_pct": 2.5453,
+      "median_length_saving_pct": 1.9308,
+      "other_failures": 0
+    },
+    {
+      "label": "pieces:1-25;lectra:75-85",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": 0.7049,
+      "median_diff_pp": 0.6426,
+      "win": 3,
+      "tie": 0,
+      "loss": 2,
+      "mean_length_saving_pct": 0.8071,
+      "median_length_saving_pct": 0.7994,
+      "other_failures": 0
+    },
+    {
+      "label": "pieces:1-25;lectra:85+",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": 0.3317,
+      "median_diff_pp": 0.4585,
+      "win": 3,
+      "tie": 0,
+      "loss": 2,
+      "mean_length_saving_pct": 0.3814,
+      "median_length_saving_pct": 0.5306,
+      "other_failures": 0
+    },
+    {
+      "label": "pieces:26-75;lectra:<75",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": 3.1537,
+      "median_diff_pp": 0.9933,
+      "win": 3,
+      "tie": 0,
+      "loss": 2,
+      "mean_length_saving_pct": 4.8198,
+      "median_length_saving_pct": 1.6849,
+      "other_failures": 0
+    },
+    {
+      "label": "pieces:26-75;lectra:75-85",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": -0.6032,
+      "median_diff_pp": -1.3196,
+      "win": 2,
+      "tie": 0,
+      "loss": 3,
+      "mean_length_saving_pct": -0.768,
+      "median_length_saving_pct": -1.7258,
+      "other_failures": 0
+    },
+    {
+      "label": "pieces:26-75;lectra:85+",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": -2.0005,
+      "median_diff_pp": -2.5339,
+      "win": 0,
+      "tie": 1,
+      "loss": 4,
+      "mean_length_saving_pct": -2.3846,
+      "median_length_saving_pct": -2.9758,
+      "other_failures": 0
+    },
+    {
+      "label": "pieces:76-150;lectra:<75",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": -2.1202,
+      "median_diff_pp": -2.0439,
+      "win": 1,
+      "tie": 0,
+      "loss": 4,
+      "mean_length_saving_pct": -3.2929,
+      "median_length_saving_pct": -3.7114,
+      "other_failures": 0
+    },
+    {
+      "label": "pieces:76-150;lectra:75-85",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": -2.2826,
+      "median_diff_pp": -1.5415,
+      "win": 2,
+      "tie": 0,
+      "loss": 3,
+      "mean_length_saving_pct": -3.5033,
+      "median_length_saving_pct": -1.9072,
+      "other_failures": 0
+    },
+    {
+      "label": "pieces:76-150;lectra:85+",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": -2.2933,
+      "median_diff_pp": -2.6369,
+      "win": 0,
+      "tie": 0,
+      "loss": 5,
+      "mean_length_saving_pct": -2.7029,
+      "median_length_saving_pct": -3.1333,
+      "other_failures": 0
+    },
+    {
+      "label": "pieces:151+;lectra:<75",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": -1.3219,
+      "median_diff_pp": -1.1884,
+      "win": 1,
+      "tie": 0,
+      "loss": 4,
+      "mean_length_saving_pct": -2.032,
+      "median_length_saving_pct": -1.6513,
+      "other_failures": 0
+    },
+    {
+      "label": "pieces:151+;lectra:75-85",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": -4.9176,
+      "median_diff_pp": -3.6367,
+      "win": 0,
+      "tie": 0,
+      "loss": 5,
+      "mean_length_saving_pct": -6.606,
+      "median_length_saving_pct": -4.7544,
+      "other_failures": 0
+    },
+    {
+      "label": "pieces:151+;lectra:85+",
+      "attempts": 5,
+      "valid": 5,
+      "mean_diff_pp": -3.024,
+      "median_diff_pp": -3.9271,
+      "win": 1,
+      "tie": 0,
+      "loss": 4,
+      "mean_length_saving_pct": -3.6655,
+      "median_length_saving_pct": -4.8184,
+      "other_failures": 0
+    }
+  ],
+  "correlation": {
+    "pairs": 60,
+    "pearson": 0.9592,
+    "spearman": 0.9285
+  },
+  "reproduce": {
+    "commands": [
+      "cargo run --release -p beta-marker-cli -- bench lectra --input <data>/lectra/sample-match-60.jsonl --time match --match-cap 10000 --limit 60 --threads-per-task 3 --jobs 5 --out <new-folder>"
+    ],
+    "doc": "marker/docs/benchmarks.md"
+  },
+  "sources": [
+    {
+      "label": "Round-2 matched-duration report",
+      "url": "marker/bench/results/2026-10-18-lectra-match.md"
+    }
+  ]
+}

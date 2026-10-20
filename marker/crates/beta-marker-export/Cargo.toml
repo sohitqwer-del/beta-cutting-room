@@ -1,0 +1,17 @@
+[package]
+name = "beta-marker-export"
+description = "Marker output for BETA Marker: SVG, HPGL/PLT, PDF"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+beta-marker-core.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rust_xlsxwriter = { version = "0.95", default-features = false }
+
+[dev-dependencies]
+beta-marker-dxf.workspace = true
+zip = { version = "7.2", default-features = false, features = ["deflate"] }

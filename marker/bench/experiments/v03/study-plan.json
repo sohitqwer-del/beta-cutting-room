@@ -1,0 +1,5 @@
+{
+  "active": ["compression30", "compression40", "sequential3", "race3", "samples-light"],
+  "deferred": ["shuffle", "adaptive", "shrink-fast"],
+  "reason": "Lead reduced the remaining measurements on 2026-10-19 before the three deferred studies started. Finish completed paired development, run three FreeSewing jobs at 60 seconds, and defer confirmation to a quiet machine."
+}

@@ -1,0 +1,83 @@
+[
+  {
+    "file": "skirt-block.sm2d",
+    "unit": "cm",
+    "sizes": [
+      48,
+      50,
+      52
+    ],
+    "height_cm": 176,
+    "pieces": [
+      {
+        "name": "Skirt-front",
+        "quantity": 2,
+        "intended_mirror_quantity": 1,
+        "material": "cotton",
+        "seam_allowance_mm": 10,
+        "has_dart": true,
+        "curved_segments": 1
+      },
+      {
+        "name": "Skirt-back",
+        "quantity": 2,
+        "intended_mirror_quantity": 1,
+        "material": "cotton",
+        "seam_allowance_mm": 10,
+        "has_dart": true,
+        "curved_segments": 1
+      }
+    ]
+  },
+  {
+    "file": "shirt-front-back.sm2d",
+    "unit": "cm",
+    "sizes": [
+      48,
+      50,
+      52
+    ],
+    "height_cm": 176,
+    "pieces": [
+      {
+        "name": "Shirt-front",
+        "quantity": 2,
+        "intended_mirror_quantity": 1,
+        "material": "cotton",
+        "seam_allowance_mm": 10,
+        "has_dart": true,
+        "curved_segments": 2
+      },
+      {
+        "name": "Shirt-back",
+        "quantity": 2,
+        "intended_mirror_quantity": 1,
+        "material": "cotton",
+        "seam_allowance_mm": 10,
+        "has_dart": true,
+        "curved_segments": 2
+      }
+    ]
+  },
+  {
+    "file": "trouser-front.sm2d",
+    "unit": "cm",
+    "sizes": [
+      48,
+      50,
+      52
+    ],
+    "height_cm": 176,
+    "pieces": [
+      {
+        "name": "Trouser-front",
+        "quantity": 2,
+        "intended_mirror_quantity": 1,
+        "material": "twill",
+        "seam_allowance_mm": 10,
+        "has_dart": true,
+        "curved_segments": 2
+      }
+    ]
+  }
+]

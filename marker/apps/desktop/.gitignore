@@ -1,0 +1,7 @@
+/src-tauri/Cargo.lock
+/src-tauri/target/
+/dist/
+/.qa/
+/*.log
+/src-tauri/gen/
+/*.exit

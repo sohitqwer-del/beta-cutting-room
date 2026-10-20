@@ -1,0 +1,25 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/beta-pattern-core",
+    "crates/beta-pattern-digitize",
+    "crates/beta-pattern-wasm",
+]
+
+[workspace.package]
+version = "0.4.0"
+edition = "2024"
+license = "Apache-2.0"
+rust-version = "1.90"
+
+[workspace.dependencies]
+beta-pattern-core = { path = "crates/beta-pattern-core" }
+# Shared with BETA Marker: piece contract and DXF-AAMA import/export.
+beta-marker-core = { path = "../marker/crates/beta-marker-core" }
+beta-marker-dxf = { path = "../marker/crates/beta-marker-dxf" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+
+[profile.dev.package."*"]
+opt-level = 3

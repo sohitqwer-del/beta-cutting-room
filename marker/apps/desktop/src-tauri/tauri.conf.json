@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "BETA Cutting Room",
+  "version": "0.4.0",
+  "identifier": "org.projectbeta.cuttingroom",
+  "build": {
+    "beforeBuildCommand": "npm run build:wasm -w @beta/marker-wasm && npm run build:pattern-wasm -w @beta/marker-wasm && npm run build -w @beta/marker-web",
+    "beforeDevCommand": "npm run dev -w @beta/marker-web",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../../web/dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "BETA Cutting Room",
+        "width": 1320,
+        "height": 900,
+        "minWidth": 800,
+        "minHeight": 600,
+        "dragDropEnabled": true,
+        "create": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' ipc: http://ipc.localhost; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "publisher": "Project BETA contributors",
+    "copyright": "Copyright 2026 Project BETA contributors",
+    "license": "Apache-2.0",
+    "licenseFile": "../../../../LICENSE",
+    "shortDescription": "Open-source, self-hosted garment cutting-room tools",
+    "longDescription": "BETA Pattern and BETA Marker: drafting, grading, digitizing, checked markers, cutting plans, rolls, bundles and floor tracking. Runs offline on the factory PC.",
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/icon.ico"
+    ],
+    "fileAssociations": [
+      {
+        "ext": [
+          "dxf",
+          "plt",
+          "betajob",
+          "betamarker",
+          "betapattern",
+          "betaproj"
+        ],
+        "name": "BETA Cutting Room document",
+        "role": "Editor"
+      }
+    ],
+    "windows": {
+      "webviewInstallMode": {
+        "type": "skip"
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "compression": "zlib"
+      }
+    },
+    "resources": {
+      "../THIRD_PARTY_NOTICES.txt": "THIRD-PARTY-NOTICES.txt",
+      "../../../../LICENSE": "LICENSE",
+      "../../../NOTICE": "NOTICE",
+      "../../../THIRD-PARTY-LICENSES.md": "THIRD-PARTY-LICENSES.md",
+      "../../../deploy/licenses/MPL-2.0.txt": "deploy/licenses/MPL-2.0.txt",
+      "../../../deploy/licenses/WebView2-SDK-1.0.3800.47.txt": "deploy/licenses/WebView2-SDK-1.0.3800.47.txt"
+    },
+    "useLocalToolsDir": true
+  }
+}

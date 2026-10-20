@@ -1,0 +1,9 @@
+// Same original exercise, adjacent steps ending at each size; entry 0 unused.
+SIZES: S M L
+BASE: M
+UNITS: MM
+MODE: INCREMENTAL
+RULE: 1 0,0 -2,-1 -2,-1
+RULE: 2 0,0 2,-1 2,-1
+RULE: 3 0,0 2,1 2,1
+RULE: 4 0,0 -2,1 -2,1

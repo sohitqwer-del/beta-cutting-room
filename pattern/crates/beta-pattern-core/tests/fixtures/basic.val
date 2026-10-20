@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original BETA fixture, Apache-2.0. Length formulas here use centimetres. -->
+<pattern><version>0.6.0</version><unit>cm</unit><description>BETA Valentina subset fixture</description>
+<draw name="panel"><calculation>
+<point id="1" name="A" type="single" x="0" y="0"/>
+<point id="2" name="B" type="endLine" basePoint="1" angle="0" length="@width"/>
+<point id="3" name="C" type="endLine" basePoint="2" angle="90" length="5"/>
+<point id="4" name="D" type="single" x="0" y="-5"/>
+<spline id="5" name="bottom" type="simple" point1="1" point4="2" angle1="0" angle2="180" length1="@width/3" length2="@width/3"/>
+</calculation><details><detail id="1" name="Panel" seamAllowance="true" width="0.5"><nodes>
+<node idObject="5" type="NodeSpline"/><node idObject="3" type="NodePoint"/><node idObject="4" type="NodePoint"/>
+</nodes></detail></details></draw></pattern>

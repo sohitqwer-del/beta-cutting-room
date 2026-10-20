@@ -1,0 +1,13 @@
+[package]
+name = "beta-open-patterns-check"
+version = "0.4.0"
+edition = "2024"
+license = "Apache-2.0"
+publish = false
+
+# Isolated utility: do not add this data generator to the product workspace.
+[workspace]
+
+[dependencies]
+beta-marker-core = { path = "../../../crates/beta-marker-core" }
+serde_json = "1.0"

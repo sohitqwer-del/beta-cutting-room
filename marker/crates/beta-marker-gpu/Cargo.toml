@@ -1,0 +1,32 @@
+[package]
+name = "beta-marker-gpu"
+version = "0.4.0"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+description = "Experimental headless GPU raster proposals for exact-validated garment nesting"
+
+# The lead can register this crate after reviewing the paired evidence.
+[workspace]
+resolver = "3"
+
+[dependencies]
+anyhow = "1.0"
+beta-marker-core = { path = "../beta-marker-core" }
+beta-marker-nest = { path = "../beta-marker-nest" }
+bytemuck = "1.22"
+geo = { version = "0.33", default-features = false }
+pollster = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+wgpu = { version = "=30.0.1", default-features = false, features = ["std", "parking_lot", "vulkan", "dx12", "wgsl"] }
+
+[profile.release]
+opt-level = 3
+codegen-units = 4
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3

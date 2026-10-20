@@ -1,0 +1,8 @@
+{
+  "format": "beta-marker.result/v1",
+  "job_name": "100 mm calibration square",
+  "width": 100, "length": 100, "piece_area": 10000, "efficiency": 1,
+  "engine": "handmade",
+  "placements": [{ "piece_id": "square-M", "copy": 0, "mirrored": false,
+    "rotation_deg": 0, "translate": [0, 0] }]
+}

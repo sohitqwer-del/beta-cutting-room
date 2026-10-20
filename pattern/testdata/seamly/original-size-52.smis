@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<smis>
+    <version>0.3.4</version>
+    <read-only>false</read-only>
+    <notes>Original derived individual table. Apache-2.0.</notes>
+    <unit>cm</unit>
+    <pm_system>998</pm_system>
+    <personal>
+        <family-name>Synthetic</family-name>
+        <given-name>Test</given-name>
+        <birth-date>1900-01-01</birth-date>
+        <gender>unknown</gender>
+        <email />
+    </personal>
+    <body-measurements>
+        <m name="@waist" value="82.0" full_name="waist" />
+        <m name="@hip" value="104.0" full_name="hip" />
+        <m name="@chest" value="100.0" full_name="chest" />
+        <m name="@skirt_length" value="60.0" full_name="skirt length" />
+        <m name="@shirt_length" value="65.5" full_name="shirt length" />
+        <m name="@trouser_length" value="100.5" full_name="trouser length" />
+        <m name="@crotch_depth" value="27.5" full_name="crotch depth" />
+    </body-measurements>
+</smis>

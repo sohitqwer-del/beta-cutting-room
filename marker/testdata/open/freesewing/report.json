@@ -1,0 +1,225 @@
+{
+  "source_version": "4.10.2",
+  "flatten_tolerance_mm": 0.15,
+  "styles": {
+    "simon": {
+      "measurement_sets": {
+        "S": "cisMaleAdult36",
+        "M": "cisMaleAdult38",
+        "L": "cisMaleAdult40",
+        "XL": "cisMaleAdult42"
+      },
+      "materials": {
+        "fabric": {
+          "S": {
+            "piece_types": 10,
+            "cut_pieces": 19,
+            "area_m2": 1.474948
+          },
+          "M": {
+            "piece_types": 10,
+            "cut_pieces": 19,
+            "area_m2": 1.577737
+          },
+          "L": {
+            "piece_types": 10,
+            "cut_pieces": 19,
+            "area_m2": 1.683976
+          },
+          "XL": {
+            "piece_types": 10,
+            "cut_pieces": 19,
+            "area_m2": 1.794651
+          }
+        },
+        "interfacing": {
+          "S": {
+            "piece_types": 3,
+            "cut_pieces": 6,
+            "area_m2": 0.125753
+          },
+          "M": {
+            "piece_types": 3,
+            "cut_pieces": 6,
+            "area_m2": 0.135097
+          },
+          "L": {
+            "piece_types": 3,
+            "cut_pieces": 6,
+            "area_m2": 0.144793
+          },
+          "XL": {
+            "piece_types": 3,
+            "cut_pieces": 6,
+            "area_m2": 0.154599
+          }
+        }
+      },
+      "assumptions": [
+        "simon.collar: collar and undercollar use the shared full cut envelope; the optional smaller undercollar trim is not applied.",
+        "simon.cuff: no grain macro; use drafted x axis (length of cuff/placket).",
+        "simon.sleeve: resolved self-crossing seam-allowance offset with nonzero polygon union.",
+        "simon.sleevePlacketOverlap: no grain macro; use drafted x axis (length of cuff/placket).",
+        "simon.sleevePlacketUnderlap: no grain macro; use drafted x axis (length of cuff/placket)."
+      ]
+    },
+    "teagan": {
+      "measurement_sets": {
+        "S": "cisMaleAdult36",
+        "M": "cisMaleAdult38",
+        "L": "cisMaleAdult40",
+        "XL": "cisMaleAdult42"
+      },
+      "materials": {
+        "fabric": {
+          "S": {
+            "piece_types": 3,
+            "cut_pieces": 4,
+            "area_m2": 0.794844
+          },
+          "M": {
+            "piece_types": 3,
+            "cut_pieces": 4,
+            "area_m2": 0.861435
+          },
+          "L": {
+            "piece_types": 3,
+            "cut_pieces": 4,
+            "area_m2": 0.930965
+          },
+          "XL": {
+            "piece_types": 3,
+            "cut_pieces": 4,
+            "area_m2": 1.004111
+          }
+        }
+      },
+      "assumptions": []
+    },
+    "titan": {
+      "measurement_sets": {
+        "S": "cisMaleAdult36",
+        "M": "cisMaleAdult38",
+        "L": "cisMaleAdult40",
+        "XL": "cisMaleAdult42"
+      },
+      "materials": {
+        "fabric": {
+          "S": {
+            "piece_types": 2,
+            "cut_pieces": 4,
+            "area_m2": 1.271845
+          },
+          "M": {
+            "piece_types": 2,
+            "cut_pieces": 4,
+            "area_m2": 1.337404
+          },
+          "L": {
+            "piece_types": 2,
+            "cut_pieces": 4,
+            "area_m2": 1.395212
+          },
+          "XL": {
+            "piece_types": 2,
+            "cut_pieces": 4,
+            "area_m2": 1.467851
+          }
+        }
+      },
+      "assumptions": []
+    },
+    "hugo": {
+      "measurement_sets": {
+        "S": "cisMaleAdult36",
+        "M": "cisMaleAdult38",
+        "L": "cisMaleAdult40",
+        "XL": "cisMaleAdult42"
+      },
+      "materials": {
+        "fabric": {
+          "S": {
+            "piece_types": 8,
+            "cut_pieces": 14,
+            "area_m2": 1.249736
+          },
+          "M": {
+            "piece_types": 8,
+            "cut_pieces": 14,
+            "area_m2": 1.336834
+          },
+          "L": {
+            "piece_types": 8,
+            "cut_pieces": 14,
+            "area_m2": 1.42656
+          },
+          "XL": {
+            "piece_types": 8,
+            "cut_pieces": 14,
+            "area_m2": 1.52084
+          }
+        },
+        "ribbing": {
+          "S": {
+            "piece_types": 2,
+            "cut_pieces": 3,
+            "area_m2": 0.192414
+          },
+          "M": {
+            "piece_types": 2,
+            "cut_pieces": 3,
+            "area_m2": 0.2073
+          },
+          "L": {
+            "piece_types": 2,
+            "cut_pieces": 3,
+            "area_m2": 0.222712
+          },
+          "XL": {
+            "piece_types": 2,
+            "cut_pieces": 3,
+            "area_m2": 0.238484
+          }
+        }
+      },
+      "assumptions": [
+        "hugo.pocket: v4.10.2 says cut 2 but draws a half pocket with a fold macro; official Hugo cutting instructions say cut 1 on fold. Use one unfolded pocket."
+      ]
+    },
+    "bella": {
+      "measurement_sets": {
+        "S": "cisFemaleAdult32",
+        "M": "cisFemaleAdult34",
+        "L": "cisFemaleAdult36",
+        "XL": "cisFemaleAdult38"
+      },
+      "materials": {
+        "fabric": {
+          "S": {
+            "piece_types": 3,
+            "cut_pieces": 5,
+            "area_m2": 0.64637
+          },
+          "M": {
+            "piece_types": 3,
+            "cut_pieces": 5,
+            "area_m2": 0.697626
+          },
+          "L": {
+            "piece_types": 3,
+            "cut_pieces": 5,
+            "area_m2": 0.75101
+          },
+          "XL": {
+            "piece_types": 3,
+            "cut_pieces": 5,
+            "area_m2": 0.807339
+          }
+        }
+      },
+      "assumptions": [
+        "bella.back: v4.10.2 onFold=true has no fold macro and a curved centre back; official Bella instructions say cut 2 back parts. Use a mirrored pair."
+      ]
+    }
+  }
+}

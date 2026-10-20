@@ -1,0 +1,27 @@
+{
+  "name": "beta-open-patterns-freesewing",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "node generate.mjs"
+  },
+  "dependencies": {
+    "@freesewing/bella": "4.10.2",
+    "@freesewing/config": "4.10.2",
+    "@freesewing/hugo": "4.10.2",
+    "@freesewing/models": "4.10.2",
+    "@freesewing/plugin-transform": "4.10.2",
+    "@freesewing/simon": "4.10.2",
+    "@freesewing/teagan": "4.10.2",
+    "@freesewing/titan": "4.10.2",
+    "polygon-clipping": "0.14.3"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "overrides": {
+    "splaytree": "3.2.3"
+  }
+}

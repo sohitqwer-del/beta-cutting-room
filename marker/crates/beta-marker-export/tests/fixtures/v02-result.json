@@ -1,0 +1,9 @@
+{
+  "format":"beta-marker.result/v1", "job_name":"qa2-output-smoke",
+  "width":160, "length":186, "piece_area":5720, "efficiency":0.1922043010752688,
+  "engine":"hand-made QA fixture",
+  "placements":[
+    {"piece_id":"front-M","copy":0,"mirrored":false,"rotation_deg":0,"translate":[2,2],"bundle":0},
+    {"piece_id":"back-M","copy":0,"mirrored":false,"rotation_deg":0,"translate":[120,0],"bundle":0,"on_fold":true}
+  ]
+}

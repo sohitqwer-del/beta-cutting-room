@@ -1,0 +1,15 @@
+[package]
+name = "beta-marker-plan"
+description = "Cut order planning and batch markers for BETA Marker"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+beta-marker-roll.workspace = true
+beta-marker-core.workspace = true
+beta-marker-nest.workspace = true
+beta-marker-match.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true

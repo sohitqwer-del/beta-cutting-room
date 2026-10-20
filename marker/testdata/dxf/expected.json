@@ -1,0 +1,520 @@
+{
+  "shirt-aama-mm.dxf": [
+    {
+      "area_mm2": 160877.6547353839,
+      "drills": 2,
+      "name": "Front",
+      "notches": 2,
+      "quantity": 2,
+      "size": "S"
+    },
+    {
+      "area_mm2": 312834.81894421583,
+      "drills": 0,
+      "name": "Back",
+      "notches": 2,
+      "quantity": 1,
+      "size": "S"
+    },
+    {
+      "area_mm2": 65045.28653111457,
+      "drills": 0,
+      "name": "Yoke",
+      "notches": 2,
+      "quantity": 2,
+      "size": "S"
+    },
+    {
+      "area_mm2": 196218.02850887302,
+      "drills": 0,
+      "name": "Sleeve",
+      "notches": 2,
+      "quantity": 2,
+      "size": "S"
+    },
+    {
+      "area_mm2": 26662.5,
+      "drills": 0,
+      "name": "Collar",
+      "notches": 2,
+      "quantity": 2,
+      "size": "S"
+    },
+    {
+      "area_mm2": 12782.138657684327,
+      "drills": 0,
+      "name": "Collar stand",
+      "notches": 2,
+      "quantity": 2,
+      "size": "S"
+    },
+    {
+      "area_mm2": 25850.0,
+      "drills": 0,
+      "name": "Cuff",
+      "notches": 2,
+      "quantity": 4,
+      "size": "S"
+    },
+    {
+      "area_mm2": 18200.0,
+      "drills": 1,
+      "name": "Pocket",
+      "notches": 2,
+      "quantity": 1,
+      "size": "S"
+    },
+    {
+      "area_mm2": 173506.93922548054,
+      "drills": 2,
+      "name": "Front",
+      "notches": 2,
+      "quantity": 2,
+      "size": "M"
+    },
+    {
+      "area_mm2": 337184.19572989945,
+      "drills": 0,
+      "name": "Back",
+      "notches": 2,
+      "quantity": 1,
+      "size": "M"
+    },
+    {
+      "area_mm2": 70186.96156166933,
+      "drills": 0,
+      "name": "Yoke",
+      "notches": 2,
+      "quantity": 2,
+      "size": "M"
+    },
+    {
+      "area_mm2": 204699.4493690995,
+      "drills": 0,
+      "name": "Sleeve",
+      "notches": 2,
+      "quantity": 2,
+      "size": "M"
+    },
+    {
+      "area_mm2": 27337.5,
+      "drills": 0,
+      "name": "Collar",
+      "notches": 2,
+      "quantity": 2,
+      "size": "M"
+    },
+    {
+      "area_mm2": 13101.69212412643,
+      "drills": 0,
+      "name": "Collar stand",
+      "notches": 2,
+      "quantity": 2,
+      "size": "M"
+    },
+    {
+      "area_mm2": 26510.0,
+      "drills": 0,
+      "name": "Cuff",
+      "notches": 2,
+      "quantity": 4,
+      "size": "M"
+    },
+    {
+      "area_mm2": 18200.0,
+      "drills": 1,
+      "name": "Pocket",
+      "notches": 2,
+      "quantity": 1,
+      "size": "M"
+    },
+    {
+      "area_mm2": 186524.81708450307,
+      "drills": 2,
+      "name": "Front",
+      "notches": 2,
+      "quantity": 2,
+      "size": "L"
+    },
+    {
+      "area_mm2": 362280.3222965241,
+      "drills": 0,
+      "name": "Back",
+      "notches": 2,
+      "quantity": 1,
+      "size": "L"
+    },
+    {
+      "area_mm2": 75505.63056917956,
+      "drills": 0,
+      "name": "Yoke",
+      "notches": 2,
+      "quantity": 2,
+      "size": "L"
+    },
+    {
+      "area_mm2": 213336.61169883277,
+      "drills": 0,
+      "name": "Sleeve",
+      "notches": 2,
+      "quantity": 2,
+      "size": "L"
+    },
+    {
+      "area_mm2": 28012.5,
+      "drills": 0,
+      "name": "Collar",
+      "notches": 2,
+      "quantity": 2,
+      "size": "L"
+    },
+    {
+      "area_mm2": 13421.24559056854,
+      "drills": 0,
+      "name": "Collar stand",
+      "notches": 2,
+      "quantity": 2,
+      "size": "L"
+    },
+    {
+      "area_mm2": 27170.0,
+      "drills": 0,
+      "name": "Cuff",
+      "notches": 2,
+      "quantity": 4,
+      "size": "L"
+    },
+    {
+      "area_mm2": 18200.0,
+      "drills": 1,
+      "name": "Pocket",
+      "notches": 2,
+      "quantity": 1,
+      "size": "L"
+    },
+    {
+      "area_mm2": 199931.28831245186,
+      "drills": 2,
+      "name": "Front",
+      "notches": 2,
+      "quantity": 2,
+      "size": "XL"
+    },
+    {
+      "area_mm2": 388123.19864408957,
+      "drills": 0,
+      "name": "Back",
+      "notches": 2,
+      "quantity": 1,
+      "size": "XL"
+    },
+    {
+      "area_mm2": 81001.29355364517,
+      "drills": 0,
+      "name": "Yoke",
+      "notches": 2,
+      "quantity": 2,
+      "size": "XL"
+    },
+    {
+      "area_mm2": 222129.5154980729,
+      "drills": 0,
+      "name": "Sleeve",
+      "notches": 2,
+      "quantity": 2,
+      "size": "XL"
+    },
+    {
+      "area_mm2": 28687.5,
+      "drills": 0,
+      "name": "Collar",
+      "notches": 2,
+      "quantity": 2,
+      "size": "XL"
+    },
+    {
+      "area_mm2": 13740.799057010652,
+      "drills": 0,
+      "name": "Collar stand",
+      "notches": 2,
+      "quantity": 2,
+      "size": "XL"
+    },
+    {
+      "area_mm2": 27830.0,
+      "drills": 0,
+      "name": "Cuff",
+      "notches": 2,
+      "quantity": 4,
+      "size": "XL"
+    },
+    {
+      "area_mm2": 18200.0,
+      "drills": 1,
+      "name": "Pocket",
+      "notches": 2,
+      "quantity": 1,
+      "size": "XL"
+    }
+  ],
+  "tee-astm-mm.dxf": [
+    {
+      "area_mm2": 268589.002256012,
+      "drills": 0,
+      "name": "Front",
+      "notches": 2,
+      "quantity": 1,
+      "size": "S"
+    },
+    {
+      "area_mm2": 276946.3375831604,
+      "drills": 0,
+      "name": "Back",
+      "notches": 2,
+      "quantity": 1,
+      "size": "S"
+    },
+    {
+      "area_mm2": 70083.6612780762,
+      "drills": 0,
+      "name": "Sleeve",
+      "notches": 2,
+      "quantity": 2,
+      "size": "S"
+    },
+    {
+      "area_mm2": 16400.0,
+      "drills": 0,
+      "name": "Neck band",
+      "notches": 2,
+      "quantity": 1,
+      "size": "S"
+    },
+    {
+      "area_mm2": 294156.60920153634,
+      "drills": 0,
+      "name": "Front",
+      "notches": 2,
+      "quantity": 1,
+      "size": "M"
+    },
+    {
+      "area_mm2": 303309.4985646344,
+      "drills": 0,
+      "name": "Back",
+      "notches": 2,
+      "quantity": 1,
+      "size": "M"
+    },
+    {
+      "area_mm2": 76045.63940763474,
+      "drills": 0,
+      "name": "Sleeve",
+      "notches": 2,
+      "quantity": 2,
+      "size": "M"
+    },
+    {
+      "area_mm2": 17000.0,
+      "drills": 0,
+      "name": "Neck band",
+      "notches": 2,
+      "quantity": 1,
+      "size": "M"
+    },
+    {
+      "area_mm2": 320757.2507711219,
+      "drills": 0,
+      "name": "Front",
+      "notches": 2,
+      "quantity": 1,
+      "size": "L"
+    },
+    {
+      "area_mm2": 330737.83776758186,
+      "drills": 0,
+      "name": "Back",
+      "notches": 2,
+      "quantity": 1,
+      "size": "L"
+    },
+    {
+      "area_mm2": 82250.96358329771,
+      "drills": 0,
+      "name": "Sleeve",
+      "notches": 2,
+      "quantity": 2,
+      "size": "L"
+    },
+    {
+      "area_mm2": 17600.0,
+      "drills": 0,
+      "name": "Neck band",
+      "notches": 2,
+      "quantity": 1,
+      "size": "L"
+    }
+  ],
+  "trouser-aama-inch.dxf": [
+    {
+      "area_mm2": 204498.03993049622,
+      "drills": 0,
+      "name": "Front",
+      "notches": 2,
+      "quantity": 2,
+      "size": "30"
+    },
+    {
+      "area_mm2": 241322.2550039289,
+      "drills": 0,
+      "name": "Back",
+      "notches": 2,
+      "quantity": 2,
+      "size": "30"
+    },
+    {
+      "area_mm2": 67150.0,
+      "drills": 0,
+      "name": "Waistband",
+      "notches": 2,
+      "quantity": 1,
+      "size": "30"
+    },
+    {
+      "area_mm2": 56442.279921627036,
+      "drills": 0,
+      "name": "Pocket bag",
+      "notches": 2,
+      "quantity": 2,
+      "size": "30"
+    },
+    {
+      "area_mm2": 12463.547084398262,
+      "drills": 0,
+      "name": "Fly",
+      "notches": 2,
+      "quantity": 1,
+      "size": "30"
+    },
+    {
+      "area_mm2": 214712.7931409202,
+      "drills": 0,
+      "name": "Front",
+      "notches": 2,
+      "quantity": 2,
+      "size": "32"
+    },
+    {
+      "area_mm2": 252174.6013718148,
+      "drills": 0,
+      "name": "Back",
+      "notches": 2,
+      "quantity": 2,
+      "size": "32"
+    },
+    {
+      "area_mm2": 71468.0,
+      "drills": 0,
+      "name": "Waistband",
+      "notches": 2,
+      "quantity": 1,
+      "size": "32"
+    },
+    {
+      "area_mm2": 57669.28600687982,
+      "drills": 0,
+      "name": "Pocket bag",
+      "notches": 2,
+      "quantity": 2,
+      "size": "32"
+    },
+    {
+      "area_mm2": 12463.547084398262,
+      "drills": 0,
+      "name": "Fly",
+      "notches": 2,
+      "quantity": 1,
+      "size": "32"
+    },
+    {
+      "area_mm2": 225059.4805706543,
+      "drills": 0,
+      "name": "Front",
+      "notches": 2,
+      "quantity": 2,
+      "size": "34"
+    },
+    {
+      "area_mm2": 263162.24431393424,
+      "drills": 0,
+      "name": "Back",
+      "notches": 2,
+      "quantity": 2,
+      "size": "34"
+    },
+    {
+      "area_mm2": 75786.0,
+      "drills": 0,
+      "name": "Waistband",
+      "notches": 2,
+      "quantity": 1,
+      "size": "34"
+    },
+    {
+      "area_mm2": 58896.292092132564,
+      "drills": 0,
+      "name": "Pocket bag",
+      "notches": 2,
+      "quantity": 2,
+      "size": "34"
+    },
+    {
+      "area_mm2": 12463.547084398262,
+      "drills": 0,
+      "name": "Fly",
+      "notches": 2,
+      "quantity": 1,
+      "size": "34"
+    },
+    {
+      "area_mm2": 235538.10221969822,
+      "drills": 0,
+      "name": "Front",
+      "notches": 2,
+      "quantity": 2,
+      "size": "36"
+    },
+    {
+      "area_mm2": 274285.1838302877,
+      "drills": 0,
+      "name": "Back",
+      "notches": 2,
+      "quantity": 2,
+      "size": "36"
+    },
+    {
+      "area_mm2": 80104.0,
+      "drills": 0,
+      "name": "Waistband",
+      "notches": 2,
+      "quantity": 1,
+      "size": "36"
+    },
+    {
+      "area_mm2": 60123.298177385324,
+      "drills": 0,
+      "name": "Pocket bag",
+      "notches": 2,
+      "quantity": 2,
+      "size": "36"
+    },
+    {
+      "area_mm2": 12463.547084398262,
+      "drills": 0,
+      "name": "Fly",
+      "notches": 2,
+      "quantity": 1,
+      "size": "36"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "bodice": [
+    {
+      "cut_area_mm2": 90559.89162561,
+      "height_mm": 400.0,
+      "piece": "front-S",
+      "size": "S",
+      "stitch_area_mm2": 78799.91541388548,
+      "width_mm": 240.0
+    },
+    {
+      "cut_area_mm2": 91377.38132733753,
+      "height_mm": 400.0,
+      "piece": "back-S",
+      "size": "S",
+      "stitch_area_mm2": 79470.31135678284,
+      "width_mm": 240.0
+    },
+    {
+      "cut_area_mm2": 96565.9979584831,
+      "height_mm": 410.0,
+      "piece": "front-M",
+      "size": "M",
+      "stitch_area_mm2": 84441.12825927138,
+      "width_mm": 250.0
+    },
+    {
+      "cut_area_mm2": 97432.7393607273,
+      "height_mm": 410.0,
+      "piece": "back-M",
+      "size": "M",
+      "stitch_area_mm2": 85154.30989307165,
+      "width_mm": 250.0
+    },
+    {
+      "cut_area_mm2": 102754.11297437668,
+      "height_mm": 420.0,
+      "piece": "front-L",
+      "size": "L",
+      "stitch_area_mm2": 90264.13632971086,
+      "width_mm": 260.0
+    },
+    {
+      "cut_area_mm2": 103671.64260689878,
+      "height_mm": 420.0,
+      "piece": "back-L",
+      "size": "L",
+      "stitch_area_mm2": 91021.57839811336,
+      "width_mm": 260.0
+    },
+    {
+      "cut_area_mm2": 109124.97635431711,
+      "height_mm": 430.0,
+      "piece": "front-XL",
+      "size": "XL",
+      "stitch_area_mm2": 96269.65309935482,
+      "width_mm": 270.0
+    },
+    {
+      "cut_area_mm2": 110094.12487143347,
+      "height_mm": 430.0,
+      "piece": "back-XL",
+      "size": "XL",
+      "stitch_area_mm2": 97072.18023648854,
+      "width_mm": 270.0
+    }
+  ],
+  "dxf_roundtrip_piece_count": 8,
+  "dxf_warnings": [],
+  "marker_issues": []
+}

@@ -1,0 +1,20 @@
+{
+  "name": "beta-open-patterns-garmentcode",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "convert": "node convert.mjs",
+    "sample": "node sample.mjs"
+  },
+  "dependencies": {
+    "polygon-clipping": "0.14.3"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "overrides": {
+    "splaytree": "3.2.3"
+  }
+}

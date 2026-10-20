@@ -1,0 +1,12 @@
+{
+  "compression_share": 0.3,
+  "exploration_shrink": 0.001,
+  "pool_stddev": 0.25,
+  "container_samples": 50,
+  "focused_samples": 25,
+  "coordinate_descents": 3,
+  "portfolio": "race_then_focus",
+  "construction_order": "input",
+  "adaptive_compression": false,
+  "mirror_variant": 0
+}

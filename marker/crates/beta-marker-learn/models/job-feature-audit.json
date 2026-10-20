@@ -1,0 +1,12 @@
+{
+  "sample_rows": 300,
+  "compared": 271,
+  "skipped": {
+    "model does not support constrained or finite-sheet jobs": 25,
+    "orientation handicap": 4
+  },
+  "max_relative_feature_difference": 1.53866336369301e-15,
+  "threshold": 1e-08,
+  "failures": 0,
+  "source": "quality-v03/conversion/sample-300.jsonl; Tier A supported jobs"
+}

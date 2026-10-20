@@ -1,0 +1,25 @@
+[package]
+name = "beta-marker-floor"
+version = "0.4.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "Offline cutting floor intake, spreading, tracking and sewing issue"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+csv = "1.3"
+calamine = { version = "0.31", default-features = false }
+rust_xlsxwriter = { version = "0.95", default-features = false, features = ["wasm"] }
+zip = { version = "4", default-features = false, features = ["deflate"] }
+quick-xml = "0.38"
+beta-marker-core.workspace = true
+beta-marker-roll.workspace = true
+qrcode = { version = "0.14.1", default-features = false }
+flate2 = { version = "1.1", default-features = false, features = ["zlib-rs"] }
+wasm-bindgen = "0.2"
+

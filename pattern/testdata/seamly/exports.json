@@ -1,0 +1,72 @@
+[
+  {
+    "file": "exports/skirt-block-48.dxf",
+    "source": "results/metadata/skirt-block-48-aama-20/skirt-block-48_pieces.dxf",
+    "sha256": "807f87c3efa62362b6656035c2fbc548b5f2faca901593e8d8f70396526fb520"
+  },
+  {
+    "file": "exports/skirt-block-50.dxf",
+    "source": "results/metadata/skirt-block-50-aama-20/skirt-block-50_pieces.dxf",
+    "sha256": "d12bb191c578367536f663a4fc92a2db61550506b363f52df858d27bffe8cc23"
+  },
+  {
+    "file": "exports/skirt-block-52.dxf",
+    "source": "results/metadata/skirt-block-52-aama-20/skirt-block-52_pieces.dxf",
+    "sha256": "9f79d960383e6b49fd95801dac5cb667b419863ddd60889e6179ca3a98c0be01"
+  },
+  {
+    "file": "exports/shirt-front-back-48.dxf",
+    "source": "results/metadata/shirt-front-back-48-aama-20/shirt-front-back-48_pieces.dxf",
+    "sha256": "1aa218fc0acd1b4fcc9d33bbef053f8ea2e23519fd40fe2ad067c4b82239ae17"
+  },
+  {
+    "file": "exports/shirt-front-back-50.dxf",
+    "source": "results/metadata/shirt-front-back-50-aama-20/shirt-front-back-50_pieces.dxf",
+    "sha256": "76be39dadf9b8fcb7ef4bef2af1b0d3c38667f33e065d5030772d9cd10401e57"
+  },
+  {
+    "file": "exports/shirt-front-back-52.dxf",
+    "source": "results/metadata/shirt-front-back-52-aama-20/shirt-front-back-52_pieces.dxf",
+    "sha256": "60be243bef1b5e6f5d462e127b27e3b98abbab9e4e5ddfa8c391937147dfb1b0"
+  },
+  {
+    "file": "exports/trouser-front-48.dxf",
+    "source": "results/metadata/trouser-front-48-aama-20/trouser-front-48_pieces.dxf",
+    "sha256": "48925279773dc67e4315f6814ab62ea5486d09d84dbda165a3ba1cd7c30088f5"
+  },
+  {
+    "file": "exports/trouser-front-50.dxf",
+    "source": "results/metadata/trouser-front-50-aama-20/trouser-front-50_pieces.dxf",
+    "sha256": "3a20bbdba26cab81022c2f419d8c0f129578e015ef3c295579f843d85900693a"
+  },
+  {
+    "file": "exports/trouser-front-52.dxf",
+    "source": "results/metadata/trouser-front-52-aama-20/trouser-front-52_pieces.dxf",
+    "sha256": "0ef5f714b973c96d479abe07f96a3a032758da624a1832ec9a974a82c21f3dc3"
+  },
+  {
+    "file": "exports/default-labels-shirt-front-back.dxf",
+    "source": "results/metadata-variants/default-labels-shirt-front-back/default-labels-shirt-front-back_pieces.dxf",
+    "sha256": "553745d547a1dfaab965b683a858132889b216cfe4253fe37c09ae99fdc35261"
+  },
+  {
+    "file": "exports/hidden-labels-shirt-front-back.dxf",
+    "source": "results/metadata-variants/hidden-labels-shirt-front-back/hidden-labels-shirt-front-back_pieces.dxf",
+    "sha256": "d8c82b3d12137549ba1db682f875ef7118e76b4f637e265cd4da9d2348f4c4d1"
+  },
+  {
+    "file": "exports/hidden-grain-shirt-front-back.dxf",
+    "source": "results/metadata-variants/hidden-grain-shirt-front-back/hidden-grain-shirt-front-back_pieces.dxf",
+    "sha256": "99695980e714b557a71971e06187cfa23b597d9e1cadab81921ecad038d5713b"
+  },
+  {
+    "file": "exports/baseline-shirt-50.dxf",
+    "source": "results/baseline/shirt-front-back-50-aama-20/shirt-front-back-50_pieces.dxf",
+    "sha256": "7f1d729a70e85273d6fb990b8d165af84b9f936ca01f2c80bb1342003b85661f"
+  },
+  {
+    "file": "exports/shirt-50-r27.dxf",
+    "source": "results/metadata/shirt-front-back-50-aama-27/shirt-front-back-50_pieces.dxf",
+    "sha256": "f78b1d32121a094fbb1a1ce6684f9e5d7fb5b5e505b9fd9313917acd37ab42d3"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "format": "beta-marker.result/v1",
+  "job_name": "100 mm calibration square",
+  "width": 100, "length": 0, "piece_area": 0, "efficiency": 0,
+  "engine": "handmade", "placements": []
+}

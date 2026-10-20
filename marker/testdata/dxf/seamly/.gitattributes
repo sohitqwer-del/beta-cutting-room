@@ -1,0 +1,3 @@
+# Preserve the same exported bytes as pattern/testdata/seamly/exports.
+*.dxf -text whitespace=-blank-at-eol,cr-at-eol
+/LICENSE -text whitespace=-blank-at-eol,cr-at-eol

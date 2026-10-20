@@ -1,0 +1,124 @@
+{
+  "format": "beta-marker.job/v1",
+  "name": "Synthetic trousers with one-way nap",
+  "fabric": {
+    "width": 1500.0,
+    "max_length": null,
+    "nap": "one_way",
+    "allow_flip": false,
+    "tilt_deg": 0.0,
+    "layout": "open",
+    "defects": [],
+    "shade": null,
+    "repeat": null,
+    "shrinkage": {
+      "length_pct": 0.0,
+      "width_pct": 0.0
+    }
+  },
+  "spacing": {
+    "piece_gap": 0.0,
+    "edge_gap": 0.0
+  },
+  "pieces": [
+    {
+      "id": "trouser-front",
+      "name": "trouser-front",
+      "style": "BETA synthetic",
+      "size": null,
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          1030.0,
+          20.0
+        ],
+        [
+          1030.0,
+          220.0
+        ],
+        [
+          470.0,
+          260.0
+        ],
+        [
+          350.0,
+          320.0
+        ],
+        [
+          120.0,
+          300.0
+        ],
+        [
+          0.0,
+          240.0
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    },
+    {
+      "id": "trouser-back",
+      "name": "trouser-back",
+      "style": "BETA synthetic",
+      "size": null,
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          1050.0,
+          10.0
+        ],
+        [
+          1050.0,
+          240.0
+        ],
+        [
+          450.0,
+          290.0
+        ],
+        [
+          290.0,
+          370.0
+        ],
+        [
+          80.0,
+          330.0
+        ],
+        [
+          0.0,
+          260.0
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    }
+  ],
+  "order": null,
+  "match_rules": [],
+  "meta": {}
+}

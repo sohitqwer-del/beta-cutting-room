@@ -1,0 +1,83 @@
+{
+  "schema": "beta-site-benchmark/1",
+  "id": "freesewing-60s",
+  "title": "FreeSewing garments, 60 seconds",
+  "kind": "freesewing",
+  "status": "sample",
+  "status_note": "Sample data copied from marker/bench/results/2026-10-19-v03-freesewing.md. The benchmark runner's own export replaces this file.",
+  "order": 40,
+  "date": "2026-10-19",
+  "summary_text": "Three open-source garment patterns (Simon shirt, Teagan T-shirt, Titan trousers) on open fabric 1500 mm wide. There is no commercial reference for these jobs. They show what BETA reaches on whole garments with garment rules.",
+  "software": {
+    "beta_version": "0.3 (development)",
+    "engine_revision": null,
+    "engine": "sparrow 0.3.0 on jagua-rs 1.0 (unmodified), BETA garment rules, independent validator"
+  },
+  "reference": {
+    "name": "None (BETA results only)",
+    "type": "none"
+  },
+  "conditions": {
+    "budget_label": "60 s per job",
+    "budget_s": 60,
+    "machine": "Shared 16-thread Intel laptop (i9-11900H), other programs running",
+    "jobs": 2,
+    "workers_per_task": 3,
+    "seeds": [
+      1
+    ],
+    "background_load": "CPU shared and saturated"
+  },
+  "assumptions": [
+    "Fabric is open, single layer, 1500 mm wide. Size ratio as in the job files."
+  ],
+  "groups": [
+    {
+      "label": "All three jobs",
+      "headline": true,
+      "attempts": 3,
+      "valid": 3,
+      "mean_diff_pp": null,
+      "median_diff_pp": null,
+      "win": null,
+      "tie": null,
+      "loss": null,
+      "mean_beta_eff_pct": 80.0065
+    }
+  ],
+  "items": [
+    {
+      "id": "simon",
+      "seed": 1,
+      "valid": true,
+      "beta_eff_pct": 88.1897,
+      "runtime_s": 64.2858
+    },
+    {
+      "id": "teagan",
+      "seed": 1,
+      "valid": true,
+      "beta_eff_pct": 76.5062,
+      "runtime_s": 62.2702
+    },
+    {
+      "id": "titan",
+      "seed": 1,
+      "valid": true,
+      "beta_eff_pct": 75.3237,
+      "runtime_s": 62.7144
+    }
+  ],
+  "reproduce": {
+    "commands": [
+      "./bench/tools/quality_confirmation.ps1 -Executable <beta-marker.exe> -EvidenceRoot <new-folder> -Jobs 2 -Workers 3"
+    ],
+    "doc": "marker/bench/results/2026-10-19-v03-handoff.md"
+  },
+  "sources": [
+    {
+      "label": "FreeSewing 60-second report",
+      "url": "marker/bench/results/2026-10-19-v03-freesewing.md"
+    }
+  ]
+}

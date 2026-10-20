@@ -1,0 +1,17 @@
+{
+  "failed_n": 0,
+  "holdout_consumption_mape_pct": 2.420113106904746,
+  "holdout_mape_by_source_pct": {
+    "garmentcode/rand_0B1IDD2JL0": 1.1618997383715661,
+    "lectra/37729": 3.6783264754379266
+  },
+  "holdout_n": 8,
+  "lectra": "2 comparable CC BY 4.0 Lectra tasks; geometry not saved",
+  "limits": "Small exploratory sample; real nests are short-run baselines, not optimal or production-accuracy labels.",
+  "ridge": 0.01,
+  "search_seconds": 1.0,
+  "seed_policy": "7100 + number of successful prior observations",
+  "train_consumption_mape_pct": 6.6266194642456835,
+  "train_n": 16,
+  "workers": 2
+}

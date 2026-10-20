@@ -1,0 +1,180 @@
+{
+  "format": "beta-marker.job/v1",
+  "name": "Synthetic buffered shirt parts",
+  "fabric": {
+    "width": 1200.0,
+    "max_length": null,
+    "nap": "none",
+    "allow_flip": false,
+    "tilt_deg": 0.0,
+    "layout": "open",
+    "defects": [],
+    "shade": null,
+    "repeat": null,
+    "shrinkage": {
+      "length_pct": 0.0,
+      "width_pct": 0.0
+    }
+  },
+  "spacing": {
+    "piece_gap": 4.0,
+    "edge_gap": 10.0
+  },
+  "pieces": [
+    {
+      "id": "front",
+      "name": "front",
+      "style": "BETA synthetic",
+      "size": null,
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          620.0,
+          0.0
+        ],
+        [
+          620.0,
+          235.0
+        ],
+        [
+          290.0,
+          235.0
+        ],
+        [
+          205.0,
+          205.0
+        ],
+        [
+          100.0,
+          205.0
+        ],
+        [
+          30.0,
+          155.0
+        ],
+        [
+          30.0,
+          70.0
+        ],
+        [
+          0.0,
+          55.0
+        ]
+      ],
+      "grain": null,
+      "quantity": 2,
+      "mirror_quantity": 0,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    },
+    {
+      "id": "back",
+      "name": "back",
+      "style": "BETA synthetic",
+      "size": null,
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          640.0,
+          0.0
+        ],
+        [
+          640.0,
+          460.0
+        ],
+        [
+          270.0,
+          460.0
+        ],
+        [
+          190.0,
+          410.0
+        ],
+        [
+          80.0,
+          410.0
+        ],
+        [
+          0.0,
+          300.0
+        ]
+      ],
+      "grain": null,
+      "quantity": 2,
+      "mirror_quantity": 0,
+      "rotation": "inherit",
+      "buffer": 2.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    },
+    {
+      "id": "sleeve",
+      "name": "sleeve",
+      "style": "BETA synthetic",
+      "size": null,
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          380.0,
+          0.0
+        ],
+        [
+          440.0,
+          115.0
+        ],
+        [
+          380.0,
+          230.0
+        ],
+        [
+          0.0,
+          230.0
+        ],
+        [
+          -45.0,
+          150.0
+        ],
+        [
+          -45.0,
+          80.0
+        ]
+      ],
+      "grain": null,
+      "quantity": 2,
+      "mirror_quantity": 0,
+      "rotation": "inherit",
+      "buffer": 4.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    }
+  ],
+  "order": null,
+  "match_rules": [],
+  "meta": {}
+}

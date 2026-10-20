@@ -1,0 +1,78 @@
+{
+  "extra_archive_sha256": "062ae2e0439ccb483c84d6cf11077970eeb1fec6d9c2daae4a521d930dfea72e",
+  "validated_trials": 387,
+  "attribution": "Lectra: Lallier, Vezard, Pinaud and Blin (2022), Zenodo 7030786 v1.1, CC BY 4.0. Sparrow inputs and FreeSewing fixtures: MIT.",
+  "runs": [
+    {
+      "id": "lectra-60s",
+      "site_json_sha256": "af33065901cba8e395d322b50d0ae941278123bed2ae1db24a5b4b29724abd2c",
+      "run_json_sha256": "e541e4e8db74c1eebf69c4d03b277884c850366e9380499ea3b6dddee375c155",
+      "results_csv_sha256": "1ed8c6d3324e2086fb3f9b813ebca494b1a0fb2e89d1708e6cc0b6a0884fd1b6",
+      "valid": 300,
+      "status": "final",
+      "attempts": 300
+    },
+    {
+      "id": "lectra-matched",
+      "site_json_sha256": "b211227897cb623dc2ed2faa932cad8ec6d7c73bb377608bb1180c009f393288",
+      "run_json_sha256": "3a2878857e9875e0acf9f23b987ab8a7cf3a08020b0746660f6a754cc250938c",
+      "results_csv_sha256": "7c6366f52e59e71cf51e56061fb0ef62b7f77eba98e561a12afe23072023cb1a",
+      "valid": 60,
+      "status": "final",
+      "attempts": 60
+    },
+    {
+      "id": "academic-60s",
+      "site_json_sha256": "40bac9e39098783bc1964c02ccad5781c1273b95e5dc1ad9f10a7b659436d1df",
+      "run_json_sha256": "5e89a3dae5e431d865b892a14b1b65da164d52f4fe259c267870ea867e069967",
+      "results_csv_sha256": "e0fb61d3fa2e548b9d116b15e6e0e4011f55f360146e4f7284341a1ba0b74b67",
+      "valid": 21,
+      "status": "final",
+      "attempts": 21
+    },
+    {
+      "id": "freesewing-60s",
+      "site_json_sha256": "f9ccb109a3bbfeab6bf8a73267015c30d7428b6cc70fca69fcad12ed017146a4",
+      "run_json_sha256": "f9f7b81c009fd1305edef058010904916f644ee6f97c5eec374db3e4245d58a0",
+      "results_csv_sha256": "ad3ad89cd2d8ca66e8478105b67f13b2ec3fc4d08db7115bd8e4bdd052d4543b",
+      "valid": 3,
+      "status": "final",
+      "attempts": 3
+    },
+    {
+      "id": "freesewing-300s",
+      "site_json_sha256": "c8476453409ab052428e72f974a90b8a082358b5c524751f3fc93ee898ea36f2",
+      "run_json_sha256": "209a41c62a214911596072cda33eeb7eeb2d2f4a88fa75f40da3dcd0acfe928e",
+      "results_csv_sha256": "d2487c5844912017c590681376228370d7f8c06a73ba0ca6702d1e8cb4f563c2",
+      "valid": 3,
+      "status": "final",
+      "attempts": 3
+    }
+  ],
+  "evidence_location": "$BETA_DATA_DIR/marker-bench/public-2026-10/",
+  "executable_sha256": "84100e4e2dbdbc20f233369029adeba3a6fb53de2badee4230a662c8541efb15",
+  "schema": "beta-public-evidence/1",
+  "lectra_load_sha256": "8c41ca671399bc279898f26af89b74a3a11af2f51adc20c1de0c1d81b27924b2",
+  "input_hashes": {
+    "simon-ratio.job.json": "c1ed829f5848a42e8091c005e3469d51d5feaa2d0f3ddb6c25154ab80cefaf62",
+    "sample-300.jsonl": "66edbac7fcb1baa57945147a99113b7449f262d928012d43385847d039849c8c",
+    "teagan-ratio.job.json": "c53228dc084a523639ec9adce49ff37a1f31a281facb96955e55db59e244d720",
+    "swim.json": "e425ceb1c919398f610a5216c513a624e7acbf2a84772c9cdbe0daba15036694",
+    "sample-match-60.jsonl": "4b7bd76d882c2106c1b821eabc3b452879189e3e82814983cfde5a270c10436d",
+    "albano.json": "a4b5dbe638dc0d5d52b0949e3fe5671ce81a9e6ea60a50fdc4a5b77546be51d5",
+    "marques.json": "bead96cdb36f6637eb5e21aa5df5f78781bd1cddd913b5ff7b0457205c8e3b2d",
+    "mao.json": "cdf3bb8f6b04e15113789bdaef22d3e8e309e6633709f88ba2e097087b74f8e4",
+    "titan-ratio.job.json": "8872cb65819faf46cf3b087a1efd5e9015a70ffa7aaf030f322aa445037c0ee6",
+    "trousers.json": "53af43b0e1f5060660beab75fdc3ac75b5bd786f512e5e235de282c6d141c85c",
+    "shirts.json": "4dfce1f22beaeada3fe5c269fe8c8f01fed323ff28b4a8128738318a59b6bb54",
+    "dagli.json": "0ad314ab1340a1106df7a184507a534d9d6d3dc8f99e47b75409a10c30641b7c",
+    "selected.json": "74a0072f758d789d3df5229fa71de6c20a909770fbdaea129c81a0dad752f565"
+  },
+  "tool_revision": "0ecfd71",
+  "planned_trials": 387,
+  "engine_revision": "a2d5de276e5d679acd00a023476ed84209924c57",
+  "extra_load_sha256": "99a0991775ccda71d24f8f94764b88c4c61342cb1c7765ec44c8521d663cada6",
+  "note": "Only aggregate counts, task IDs and hashes are published. Raw inputs, markers and validator evidence stay outside git.",
+  "source_dirty": false,
+  "lectra_archive_sha256": "c3a6f5315efc802ac5d0843af64813c8e35cb16d60fa0e24e57282d782ec7fa5"
+}

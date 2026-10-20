@@ -1,0 +1,11 @@
+{
+  "identifier": "main",
+  "description": "Local main window events only; filesystem access uses native dialogs.",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:event:default",
+    "core:window:allow-close"
+  ]
+}

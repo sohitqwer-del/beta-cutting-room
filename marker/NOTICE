@@ -1,0 +1,36 @@
+BETA Cutting Room 0.4.0
+Copyright 2026 Project BETA contributors
+Project code is licensed under Apache License 2.0. See ../LICENSE in source,
+or LICENSE in a release package.
+
+This product uses sparrow 0.3.0 by Jeroen Gardeyn and contributors (MIT) and
+the unmodified jagua-rs 1.0.0 dependency (Mozilla Public License 2.0).
+Exact jagua-rs source: https://crates.io/api/v1/crates/jagua-rs/1.0.0/download
+Sparrow source: https://github.com/JeroenGar/sparrow/tree/v0.3.0
+Retain the MPL licence and access to the exact covered source when distributing
+executables. BETA's Apache-2.0 licence does not replace third-party terms.
+
+The Windows desktop includes Tauri and permissive dependencies. Original
+Apache-2.0 dom_query and option-ext compatibility adapters replace otherwise
+MPL-only transitive helper crates. jagua-rs is not patched or vendored.
+The Windows installer uses NSIS with its zlib compressor. It includes
+WebView2Loader.dll 1.0.3800.47 from Microsoft's SDK, under BSD three-clause
+terms. See deploy/licenses/WebView2-SDK-1.0.3800.47.txt and the inventory.
+The WebView2 Runtime is a separate Microsoft prerequisite and is not bundled.
+
+See THIRD-PARTY-LICENSES.md for the resolved package inventory and platform
+scope. Release packages include upstream texts in THIRD-PARTY-NOTICES.txt.
+Review optional Linux desktop/system libraries separately before distribution.
+
+Open data and fixtures have separate terms and are not relicensed as code:
+- FreeSewing designs and generated open fixtures: MIT; see source READMEs.
+- GarmentCodeData and Open+Pattern fixtures: CC BY 4.0; see source READMEs.
+- Lectra nesting dataset: Lallier, Vezard, Pinaud and Blin (2022),
+  Nesting Tasks Dataset for 2D-Nesting Efficiency Estimation, version 1.1,
+  https://doi.org/10.5281/zenodo.7030786, CC BY 4.0. Benchmark-only;
+  source geometry is not bundled with the application.
+- Seamly interoperability fixtures retain the licences and attribution in
+  their adjacent source notices. No Seamly application code is incorporated.
+
+Benchmark references to other products do not imply affiliation or endorsement.
+Private factory data is not part of the release.

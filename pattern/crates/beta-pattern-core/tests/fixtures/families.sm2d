@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!-- Original BETA hand-written format exploration fixture. Apache-2.0. -->
+<pattern><unit>mm</unit><description>BETA construction families</description><draw name="All tools"><calculation>
+<point id="1" name="A" type="single" x="0" y="0"/>
+<point id="2" name="B" type="single" x="6" y="0"/>
+<point id="3" name="C" type="single" x="0" y="-8"/>
+<point id="4" name="E" type="single" x="10" y="0"/>
+<point id="5" name="F" type="single" x="3" y="4"/>
+<point id="6" name="G" type="single" x="3" y="-4"/>
+<point id="7" name="H" type="single" x="2" y="0"/>
+<point id="8" name="I" type="single" x="4" y="0"/>
+<line id="10" name="horizontal" firstPoint="1" secondPoint="2"/>
+<line id="11" name="vertical" firstPoint="5" secondPoint="6"/>
+<arc id="12" name="circleA" center="1" radius="5" angle1="0" angle2="360"/>
+<arc id="13" name="circleB" center="2" radius="5" angle1="0" angle2="360"/>
+<arc id="14" name="quarter" center="1" radius="10" angle1="0" angle2="90"/>
+<arc id="15" name="lengthArc" type="arcWithLength" center="1" radius="10" angle1="0" length="5*pi"/>
+<ellipticalArc id="16" name="ellipse" center="1" radius1="6" radius2="8" rotationAngle="90" angle1="0" angle2="90"/>
+<spline id="17" name="cubic" type="simple" point1="1" point4="2" angle1="0" angle2="180" length1="2" length2="2"/>
+<spline id="18" name="interactive" type="interactive"><pathPoint point="1"/><pathPoint point="2"/><pathPoint point="4"/></spline>
+<path id="19" name="bezierPath" type="bezierPath"><segment point1="1" point2="7" point3="8" point4="2"/></path>
+<path id="20" name="splinePath" type="splinePath"><node point="1"/><node point="2"/><node point="4"/></path>
+<point id="21" name="shoulder" type="shoulder" pShoulder="1" p1Line="1" p2Line="2" length="5" index="0"/>
+<point id="22" name="height" type="height" basePoint="6" p1Line="1" p2Line="2"/>
+<point id="23" name="triangle" type="triangle" firstPoint="2" secondPoint="3" axisP1="5" axisP2="6" index="0"/>
+<point id="24" name="lineAxis" type="lineIntersectAxis" p1Line="1" p2Line="2" basePoint="6" angle="90"/>
+<point id="25" name="curveAxis" type="curveIntersectAxis" curve="17" basePoint="6" angle="270"/>
+<point id="26" name="arcIntersection" type="pointOfIntersectionArcs" firstArc="12" secondArc="13"/>
+<point id="27" name="circleIntersection" type="pointOfIntersectionCircles" center1="1" radius1="5" center2="2" radius2="5"/>
+<point id="28" name="circleTangent" type="pointFromCircleAndTangent" tangent="4" center="1" radius="5"/>
+<point id="29" name="arcTangent" type="pointFromArcAndTangent" tangent="4" arc="12"/>
+<point id="30" name="arcLine" type="pointOfIntersectionArcAndLine" arc="12" p1Line="1" p2Line="2"/>
+<point id="31" name="circleLine" type="pointOfContact" center="1" radius="5" firstPoint="1" secondPoint="2"/>
+<point id="32" name="xy" type="pointOfIntersection" firstPoint="2" secondPoint="3"/>
+<point id="33" name="curveIntersection" type="pointOfIntersectionCurves" curve1="10" curve2="11"/>
+<point id="34" name="cutArc" type="cutArc" arc="14" length="5*pi"/>
+<point id="35" name="cutSpline" type="cutSpline" spline="17" length="3"/>
+<point id="36" name="cutSplinePath" type="cutSplinePath" splinePath="20" length="8"/>
+<point id="37" name="trueDart" type="trueDarts" apex="1" leg="2" other="3"/>
+<operation type="rotation" center="1" angle="90"><source id="100" idObject="2" name="rotated"/></operation>
+<operation type="move" dx="1" dy="-2"><source id="101" idObject="2" name="moved"/></operation>
+<operation type="mirrorByLine" firstPoint="1" secondPoint="3"><source id="102" idObject="2" name="mirroredLine"/></operation>
+<operation type="mirrorByAxis" center="1" axis="horizontal"><source id="103" idObject="3" name="mirroredAxis"/></operation>
+</calculation></draw><groups><group id="g1" name="Tests" visible="false"><item idObject="2"/><item idObject="17"/></group></groups></pattern>

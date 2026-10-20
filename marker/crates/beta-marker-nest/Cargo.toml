@@ -1,0 +1,36 @@
+[package]
+name = "beta-marker-nest"
+description = "Garment nesting for BETA Marker on the sparrow / jagua-rs engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+beta-marker-core.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sparrow.workspace = true
+jagua-rs.workspace = true
+rand = "0.10"
+geo = { version = "0.33", default-features = false }
+
+[[example]]
+name = "generate_jobs"
+path = "../../examples/generate_jobs.rs"
+
+[[example]]
+name = "sanity"
+path = "../../examples/sanity.rs"
+
+[[example]]
+name = "garment_bench"
+path = "../../examples/garment_bench.rs"
+
+[[example]]
+name = "feature_bench"
+path = "../../examples/feature_bench.rs"
+
+[[example]]
+name = "quality_summary"
+path = "../../examples/quality_summary.rs"

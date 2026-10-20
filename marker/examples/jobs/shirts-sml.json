@@ -1,0 +1,490 @@
+{
+  "format": "beta-marker.job/v1",
+  "name": "Synthetic shirt S/M/L",
+  "fabric": {
+    "width": 1500.0,
+    "max_length": null,
+    "nap": "none",
+    "allow_flip": false,
+    "tilt_deg": 0.0,
+    "layout": "open",
+    "defects": [],
+    "shade": null,
+    "repeat": null,
+    "shrinkage": {
+      "length_pct": 0.0,
+      "width_pct": 0.0
+    }
+  },
+  "spacing": {
+    "piece_gap": 0.0,
+    "edge_gap": 0.0
+  },
+  "pieces": [
+    {
+      "id": "front-S",
+      "name": "front-S",
+      "style": "BETA synthetic",
+      "size": "S",
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          582.8,
+          0.0
+        ],
+        [
+          582.8,
+          220.89999999999998
+        ],
+        [
+          272.59999999999997,
+          220.89999999999998
+        ],
+        [
+          192.7,
+          192.7
+        ],
+        [
+          94.0,
+          192.7
+        ],
+        [
+          28.2,
+          145.7
+        ],
+        [
+          28.2,
+          65.8
+        ],
+        [
+          0.0,
+          51.699999999999996
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    },
+    {
+      "id": "back-S",
+      "name": "back-S",
+      "style": "BETA synthetic",
+      "size": "S",
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          601.5999999999999,
+          0.0
+        ],
+        [
+          601.5999999999999,
+          432.4
+        ],
+        [
+          253.79999999999998,
+          432.4
+        ],
+        [
+          178.6,
+          385.4
+        ],
+        [
+          75.19999999999999,
+          385.4
+        ],
+        [
+          0.0,
+          282.0
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 0,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    },
+    {
+      "id": "sleeve-S",
+      "name": "sleeve-S",
+      "style": "BETA synthetic",
+      "size": "S",
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          357.2,
+          0.0
+        ],
+        [
+          413.59999999999997,
+          108.1
+        ],
+        [
+          357.2,
+          216.2
+        ],
+        [
+          0.0,
+          216.2
+        ],
+        [
+          -42.3,
+          141.0
+        ],
+        [
+          -42.3,
+          75.19999999999999
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    },
+    {
+      "id": "front-M",
+      "name": "front-M",
+      "style": "BETA synthetic",
+      "size": "M",
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          620.0,
+          0.0
+        ],
+        [
+          620.0,
+          235.0
+        ],
+        [
+          290.0,
+          235.0
+        ],
+        [
+          205.0,
+          205.0
+        ],
+        [
+          100.0,
+          205.0
+        ],
+        [
+          30.0,
+          155.0
+        ],
+        [
+          30.0,
+          70.0
+        ],
+        [
+          0.0,
+          55.0
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    },
+    {
+      "id": "back-M",
+      "name": "back-M",
+      "style": "BETA synthetic",
+      "size": "M",
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          640.0,
+          0.0
+        ],
+        [
+          640.0,
+          460.0
+        ],
+        [
+          270.0,
+          460.0
+        ],
+        [
+          190.0,
+          410.0
+        ],
+        [
+          80.0,
+          410.0
+        ],
+        [
+          0.0,
+          300.0
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 0,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    },
+    {
+      "id": "sleeve-M",
+      "name": "sleeve-M",
+      "style": "BETA synthetic",
+      "size": "M",
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          380.0,
+          0.0
+        ],
+        [
+          440.0,
+          115.0
+        ],
+        [
+          380.0,
+          230.0
+        ],
+        [
+          0.0,
+          230.0
+        ],
+        [
+          -45.0,
+          150.0
+        ],
+        [
+          -45.0,
+          80.0
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    },
+    {
+      "id": "front-L",
+      "name": "front-L",
+      "style": "BETA synthetic",
+      "size": "L",
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          657.2,
+          0.0
+        ],
+        [
+          657.2,
+          249.10000000000002
+        ],
+        [
+          307.40000000000003,
+          249.10000000000002
+        ],
+        [
+          217.3,
+          217.3
+        ],
+        [
+          106.0,
+          217.3
+        ],
+        [
+          31.8,
+          164.3
+        ],
+        [
+          31.8,
+          74.2
+        ],
+        [
+          0.0,
+          58.300000000000004
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    },
+    {
+      "id": "back-L",
+      "name": "back-L",
+      "style": "BETA synthetic",
+      "size": "L",
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          678.4000000000001,
+          0.0
+        ],
+        [
+          678.4000000000001,
+          487.6
+        ],
+        [
+          286.2,
+          487.6
+        ],
+        [
+          201.4,
+          434.6
+        ],
+        [
+          84.80000000000001,
+          434.6
+        ],
+        [
+          0.0,
+          318.0
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 0,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    },
+    {
+      "id": "sleeve-L",
+      "name": "sleeve-L",
+      "style": "BETA synthetic",
+      "size": "L",
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          402.8,
+          0.0
+        ],
+        [
+          466.40000000000003,
+          121.9
+        ],
+        [
+          402.8,
+          243.8
+        ],
+        [
+          0.0,
+          243.8
+        ],
+        [
+          -47.7,
+          159.0
+        ],
+        [
+          -47.7,
+          84.80000000000001
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    }
+  ],
+  "order": {
+    "sizes": {
+      "L": 1,
+      "M": 2,
+      "S": 1
+    }
+  },
+  "match_rules": [],
+  "meta": {}
+}

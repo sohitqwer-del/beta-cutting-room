@@ -1,0 +1,465 @@
+{
+  "format": "beta-pattern.doc/v1",
+  "name": "BETA original basic bodice",
+  "sizes": [
+    "S",
+    "M",
+    "L",
+    "XL"
+  ],
+  "base_size": "M",
+  "measurements": {
+    "L": {
+      "arm_depth": 200.0,
+      "back_length": 420.0,
+      "chest": 960.0,
+      "neck": 370.0,
+      "shoulder": 125.0,
+      "waist": 760.0
+    },
+    "M": {
+      "arm_depth": 195.0,
+      "back_length": 410.0,
+      "chest": 920.0,
+      "neck": 360.0,
+      "shoulder": 120.0,
+      "waist": 720.0
+    },
+    "S": {
+      "arm_depth": 190.0,
+      "back_length": 400.0,
+      "chest": 880.0,
+      "neck": 350.0,
+      "shoulder": 115.0,
+      "waist": 680.0
+    },
+    "XL": {
+      "arm_depth": 205.0,
+      "back_length": 430.0,
+      "chest": 1000.0,
+      "neck": 380.0,
+      "shoulder": 130.0,
+      "waist": 800.0
+    }
+  },
+  "variables": {
+    "ease": 80.0,
+    "neck_width": "m.neck/6",
+    "waist_width": "(m.waist+v.ease)/4",
+    "width": "(m.chest+v.ease)/4"
+  },
+  "drawing": {
+    "back.A": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "0",
+        "y": "0"
+      }
+    },
+    "back.B": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.waist_width",
+        "y": "0"
+      }
+    },
+    "back.C": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.width",
+        "y": "m.back_length-m.arm_depth"
+      }
+    },
+    "back.D": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.neck_width+m.shoulder",
+        "y": "m.back_length-25"
+      }
+    },
+    "back.E": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.neck_width",
+        "y": "m.back_length"
+      }
+    },
+    "back.F": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "0",
+        "y": "m.back_length-(20)"
+      }
+    },
+    "back.arm": {
+      "kind": "cubic",
+      "points": [
+        "back.C",
+        "back.arm1",
+        "back.arm2",
+        "back.D"
+      ]
+    },
+    "back.arm1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.width-30",
+        "y": "m.back_length-m.arm_depth+20"
+      }
+    },
+    "back.arm2": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.neck_width+m.shoulder-15",
+        "y": "m.back_length-65"
+      }
+    },
+    "back.center": {
+      "kind": "line",
+      "from": "back.F",
+      "to": "back.A"
+    },
+    "back.grain0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.width/2",
+        "y": "80"
+      }
+    },
+    "back.grain1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.width/2",
+        "y": "m.back_length-100"
+      }
+    },
+    "back.neck": {
+      "kind": "cubic",
+      "points": [
+        "back.E",
+        "back.neck1",
+        "back.neck2",
+        "back.F"
+      ]
+    },
+    "back.neck1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.neck_width*0.45",
+        "y": "m.back_length"
+      }
+    },
+    "back.neck2": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "0",
+        "y": "m.back_length-(20)*0.55"
+      }
+    },
+    "back.shoulder": {
+      "kind": "line",
+      "from": "back.D",
+      "to": "back.E"
+    },
+    "back.side": {
+      "kind": "line",
+      "from": "back.B",
+      "to": "back.C"
+    },
+    "back.waist": {
+      "kind": "line",
+      "from": "back.A",
+      "to": "back.B"
+    },
+    "front.A": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "0",
+        "y": "0"
+      }
+    },
+    "front.B": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.waist_width",
+        "y": "0"
+      }
+    },
+    "front.C": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.width",
+        "y": "m.back_length-m.arm_depth"
+      }
+    },
+    "front.D": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.neck_width+m.shoulder",
+        "y": "m.back_length-25"
+      }
+    },
+    "front.E": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.neck_width",
+        "y": "m.back_length"
+      }
+    },
+    "front.F": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "0",
+        "y": "m.back_length-(v.neck_width+10)"
+      }
+    },
+    "front.arm": {
+      "kind": "cubic",
+      "points": [
+        "front.C",
+        "front.arm1",
+        "front.arm2",
+        "front.D"
+      ]
+    },
+    "front.arm1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.width-30",
+        "y": "m.back_length-m.arm_depth+20"
+      }
+    },
+    "front.arm2": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.neck_width+m.shoulder-15",
+        "y": "m.back_length-65"
+      }
+    },
+    "front.center": {
+      "kind": "line",
+      "from": "front.F",
+      "to": "front.A"
+    },
+    "front.grain0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.width/2",
+        "y": "80"
+      }
+    },
+    "front.grain1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.width/2",
+        "y": "m.back_length-100"
+      }
+    },
+    "front.neck": {
+      "kind": "cubic",
+      "points": [
+        "front.E",
+        "front.neck1",
+        "front.neck2",
+        "front.F"
+      ]
+    },
+    "front.neck1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "v.neck_width*0.45",
+        "y": "m.back_length"
+      }
+    },
+    "front.neck2": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": "0",
+        "y": "m.back_length-(v.neck_width+10)*0.55"
+      }
+    },
+    "front.shoulder": {
+      "kind": "line",
+      "from": "front.D",
+      "to": "front.E"
+    },
+    "front.side": {
+      "kind": "line",
+      "from": "front.B",
+      "to": "front.C"
+    },
+    "front.waist": {
+      "kind": "line",
+      "from": "front.A",
+      "to": "front.B"
+    }
+  },
+  "pieces": [
+    {
+      "id": "front",
+      "name": "Bodice front",
+      "edges": [
+        {
+          "object": "front.waist",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        },
+        {
+          "object": "front.side",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        },
+        {
+          "object": "front.arm",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        },
+        {
+          "object": "front.shoulder",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        },
+        {
+          "object": "front.neck",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        },
+        {
+          "object": "front.center",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        }
+      ],
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "material": "fabric",
+      "grain": [
+        "front.grain0",
+        "front.grain1"
+      ],
+      "fold_line": null,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "annotations": [
+        {
+          "kind": "notch",
+          "edge": 1,
+          "distance": "length(front.side)/2",
+          "depth": 3.0
+        },
+        {
+          "kind": "points",
+          "mark": "text",
+          "points": [
+            "front.grain0"
+          ],
+          "text": "BETA front - cut one pair"
+        }
+      ],
+      "grade_points": {}
+    },
+    {
+      "id": "back",
+      "name": "Bodice back",
+      "edges": [
+        {
+          "object": "back.waist",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        },
+        {
+          "object": "back.side",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        },
+        {
+          "object": "back.arm",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        },
+        {
+          "object": "back.shoulder",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        },
+        {
+          "object": "back.neck",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        },
+        {
+          "object": "back.center",
+          "reversed": false,
+          "allowance": 10.0,
+          "corner": "miter"
+        }
+      ],
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "material": "fabric",
+      "grain": [
+        "back.grain0",
+        "back.grain1"
+      ],
+      "fold_line": null,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "annotations": [
+        {
+          "kind": "notch",
+          "edge": 1,
+          "distance": "length(back.side)/2",
+          "depth": 3.0
+        },
+        {
+          "kind": "points",
+          "mark": "text",
+          "points": [
+            "back.grain0"
+          ],
+          "text": "BETA back - cut one pair"
+        }
+      ],
+      "grade_points": {}
+    }
+  ],
+  "rules": {},
+  "meta": {
+    "drafting": "Original BETA teaching formulas; not a fit-certified production block. See README."
+  }
+}

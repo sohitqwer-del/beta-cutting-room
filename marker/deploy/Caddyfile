@@ -1,0 +1,19 @@
+# Replace this hostname. Caddy manages the HTTPS certificate.
+# Keep the backend on loopback. The browser sends Authorization: Bearer <token>.
+{
+    servers {
+        max_header_size 16KB
+        timeouts {
+            read_header 10s
+            read_body 30s
+            idle 30s
+        }
+    }
+}
+
+cutting.example.com {
+    request_body {
+        max_size 60MB
+    }
+    reverse_proxy 127.0.0.1:7878
+}

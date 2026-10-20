@@ -1,0 +1,144 @@
+{
+  "job": {
+    "format": "beta-marker.job/v1",
+    "name": "UI contract square",
+    "fabric": {
+      "width": 100
+    },
+    "pieces": [
+      {
+        "id": "front",
+        "name": "Front",
+        "size": "M",
+        "outline": [
+          [
+            0,
+            0
+          ],
+          [
+            20,
+            0
+          ],
+          [
+            20,
+            20
+          ],
+          [
+            0,
+            20
+          ]
+        ],
+        "quantity": 1
+      }
+    ],
+    "order": {
+      "sizes": {
+        "M": 1
+      }
+    }
+  },
+  "result": {
+    "format": "beta-marker.result/v1",
+    "job_name": "UI contract square",
+    "width": 100,
+    "length": 21,
+    "piece_area": 400,
+    "efficiency": 0.19047619047619047,
+    "engine": "fixture",
+    "placements": [
+      {
+        "piece_id": "front",
+        "copy": 0,
+        "mirrored": false,
+        "rotation_deg": 0,
+        "translate": [
+          1,
+          1
+        ],
+        "bundle": 0
+      }
+    ]
+  },
+  "register": {
+    "rolls": [
+      {
+        "id": "R1",
+        "lot": "LOT1",
+        "dye_lot": "DYE1",
+        "shade_group": "A",
+        "ticket_length_m": 100,
+        "measured_length_m": 100,
+        "usable_width_mm": 1500,
+        "shrinkage": {
+          "length_pct": 0,
+          "width_pct": 0
+        },
+        "defects": [
+          {
+            "id": "D1",
+            "along_m": 1,
+            "across_mm": 50,
+            "length_mm": 10,
+            "width_mm": 10,
+            "points": 4,
+            "defect_type": "Hole",
+            "action": "cut_around"
+          }
+        ]
+      }
+    ]
+  },
+  "lay": {
+    "id": "LAY-01",
+    "style": "UI contract square",
+    "order": "ORDER-01",
+    "colour": "Blue",
+    "plies": [
+      {
+        "first": 1,
+        "last": 2,
+        "shade_group": "A"
+      }
+    ],
+    "parts": [
+      {
+        "piece_id": "front",
+        "size": "M",
+        "garment": 0,
+        "slot": 0,
+        "mirrored": false
+      }
+    ]
+  },
+  "lays": [
+    {
+      "id": "LAY-01",
+      "marker_length_m": 6,
+      "plies": 2,
+      "fabric_width_mm": 1500,
+      "shade_rule": {
+        "mode": "same_group"
+      },
+      "allow_splicing": false
+    }
+  ],
+  "actuals": {
+    "lay": "LAY-01",
+    "order": "ORDER-01",
+    "width_mm": 100,
+    "marker_length_mm": 21,
+    "plies": 2,
+    "end_allowance_per_ply_mm": 0,
+    "piece_area_per_ply_mm2": 400,
+    "pieces_per_ply": 1,
+    "actual_piece_area_mm2": 800,
+    "actual_pieces": 2,
+    "recut_count": 0,
+    "spreading": [
+      {
+        "issued_mm": 50,
+        "end_bits_mm": 8
+      }
+    ]
+  }
+}

@@ -1,0 +1,2664 @@
+{
+  "format": "beta-pattern.doc/v1",
+  "name": "titan M1",
+  "sizes": [
+    "M"
+  ],
+  "base_size": "M",
+  "measurements": {},
+  "variables": {},
+  "drawing": {
+    "TITAN-BACK-M.e0": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p0",
+      "to": "TITAN-BACK-M.p1"
+    },
+    "TITAN-BACK-M.e1": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p1",
+      "to": "TITAN-BACK-M.p2"
+    },
+    "TITAN-BACK-M.e10": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p10",
+      "to": "TITAN-BACK-M.p11"
+    },
+    "TITAN-BACK-M.e11": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p11",
+      "to": "TITAN-BACK-M.p12"
+    },
+    "TITAN-BACK-M.e12": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p12",
+      "to": "TITAN-BACK-M.p13"
+    },
+    "TITAN-BACK-M.e13": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p13",
+      "to": "TITAN-BACK-M.p14"
+    },
+    "TITAN-BACK-M.e14": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p14",
+      "to": "TITAN-BACK-M.p15"
+    },
+    "TITAN-BACK-M.e15": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p15",
+      "to": "TITAN-BACK-M.p16"
+    },
+    "TITAN-BACK-M.e16": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p16",
+      "to": "TITAN-BACK-M.p17"
+    },
+    "TITAN-BACK-M.e17": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p17",
+      "to": "TITAN-BACK-M.p18"
+    },
+    "TITAN-BACK-M.e18": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p18",
+      "to": "TITAN-BACK-M.p19"
+    },
+    "TITAN-BACK-M.e19": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p19",
+      "to": "TITAN-BACK-M.p20"
+    },
+    "TITAN-BACK-M.e2": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p2",
+      "to": "TITAN-BACK-M.p3"
+    },
+    "TITAN-BACK-M.e20": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p20",
+      "to": "TITAN-BACK-M.p21"
+    },
+    "TITAN-BACK-M.e21": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p21",
+      "to": "TITAN-BACK-M.p22"
+    },
+    "TITAN-BACK-M.e22": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p22",
+      "to": "TITAN-BACK-M.p23"
+    },
+    "TITAN-BACK-M.e23": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p23",
+      "to": "TITAN-BACK-M.p24"
+    },
+    "TITAN-BACK-M.e24": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p24",
+      "to": "TITAN-BACK-M.p25"
+    },
+    "TITAN-BACK-M.e25": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p25",
+      "to": "TITAN-BACK-M.p26"
+    },
+    "TITAN-BACK-M.e26": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p26",
+      "to": "TITAN-BACK-M.p27"
+    },
+    "TITAN-BACK-M.e27": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p27",
+      "to": "TITAN-BACK-M.p28"
+    },
+    "TITAN-BACK-M.e28": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p28",
+      "to": "TITAN-BACK-M.p29"
+    },
+    "TITAN-BACK-M.e29": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p29",
+      "to": "TITAN-BACK-M.p30"
+    },
+    "TITAN-BACK-M.e3": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p3",
+      "to": "TITAN-BACK-M.p4"
+    },
+    "TITAN-BACK-M.e30": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p30",
+      "to": "TITAN-BACK-M.p31"
+    },
+    "TITAN-BACK-M.e31": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p31",
+      "to": "TITAN-BACK-M.p32"
+    },
+    "TITAN-BACK-M.e32": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p32",
+      "to": "TITAN-BACK-M.p33"
+    },
+    "TITAN-BACK-M.e33": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p33",
+      "to": "TITAN-BACK-M.p34"
+    },
+    "TITAN-BACK-M.e34": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p34",
+      "to": "TITAN-BACK-M.p35"
+    },
+    "TITAN-BACK-M.e35": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p35",
+      "to": "TITAN-BACK-M.p36"
+    },
+    "TITAN-BACK-M.e36": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p36",
+      "to": "TITAN-BACK-M.p37"
+    },
+    "TITAN-BACK-M.e37": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p37",
+      "to": "TITAN-BACK-M.p38"
+    },
+    "TITAN-BACK-M.e38": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p38",
+      "to": "TITAN-BACK-M.p39"
+    },
+    "TITAN-BACK-M.e39": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p39",
+      "to": "TITAN-BACK-M.p40"
+    },
+    "TITAN-BACK-M.e4": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p4",
+      "to": "TITAN-BACK-M.p5"
+    },
+    "TITAN-BACK-M.e40": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p40",
+      "to": "TITAN-BACK-M.p41"
+    },
+    "TITAN-BACK-M.e41": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p41",
+      "to": "TITAN-BACK-M.p42"
+    },
+    "TITAN-BACK-M.e42": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p42",
+      "to": "TITAN-BACK-M.p43"
+    },
+    "TITAN-BACK-M.e43": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p43",
+      "to": "TITAN-BACK-M.p44"
+    },
+    "TITAN-BACK-M.e44": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p44",
+      "to": "TITAN-BACK-M.p45"
+    },
+    "TITAN-BACK-M.e45": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p45",
+      "to": "TITAN-BACK-M.p46"
+    },
+    "TITAN-BACK-M.e46": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p46",
+      "to": "TITAN-BACK-M.p47"
+    },
+    "TITAN-BACK-M.e47": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p47",
+      "to": "TITAN-BACK-M.p48"
+    },
+    "TITAN-BACK-M.e48": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p48",
+      "to": "TITAN-BACK-M.p49"
+    },
+    "TITAN-BACK-M.e49": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p49",
+      "to": "TITAN-BACK-M.p50"
+    },
+    "TITAN-BACK-M.e5": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p5",
+      "to": "TITAN-BACK-M.p6"
+    },
+    "TITAN-BACK-M.e50": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p50",
+      "to": "TITAN-BACK-M.p51"
+    },
+    "TITAN-BACK-M.e51": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p51",
+      "to": "TITAN-BACK-M.p52"
+    },
+    "TITAN-BACK-M.e52": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p52",
+      "to": "TITAN-BACK-M.p53"
+    },
+    "TITAN-BACK-M.e53": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p53",
+      "to": "TITAN-BACK-M.p54"
+    },
+    "TITAN-BACK-M.e54": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p54",
+      "to": "TITAN-BACK-M.p55"
+    },
+    "TITAN-BACK-M.e55": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p55",
+      "to": "TITAN-BACK-M.p56"
+    },
+    "TITAN-BACK-M.e56": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p56",
+      "to": "TITAN-BACK-M.p57"
+    },
+    "TITAN-BACK-M.e57": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p57",
+      "to": "TITAN-BACK-M.p58"
+    },
+    "TITAN-BACK-M.e58": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p58",
+      "to": "TITAN-BACK-M.p59"
+    },
+    "TITAN-BACK-M.e59": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p59",
+      "to": "TITAN-BACK-M.p60"
+    },
+    "TITAN-BACK-M.e6": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p6",
+      "to": "TITAN-BACK-M.p7"
+    },
+    "TITAN-BACK-M.e60": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p60",
+      "to": "TITAN-BACK-M.p61"
+    },
+    "TITAN-BACK-M.e61": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p61",
+      "to": "TITAN-BACK-M.p62"
+    },
+    "TITAN-BACK-M.e62": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p62",
+      "to": "TITAN-BACK-M.p63"
+    },
+    "TITAN-BACK-M.e63": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p63",
+      "to": "TITAN-BACK-M.p64"
+    },
+    "TITAN-BACK-M.e64": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p64",
+      "to": "TITAN-BACK-M.p65"
+    },
+    "TITAN-BACK-M.e65": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p65",
+      "to": "TITAN-BACK-M.p66"
+    },
+    "TITAN-BACK-M.e66": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p66",
+      "to": "TITAN-BACK-M.p67"
+    },
+    "TITAN-BACK-M.e67": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p67",
+      "to": "TITAN-BACK-M.p68"
+    },
+    "TITAN-BACK-M.e68": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p68",
+      "to": "TITAN-BACK-M.p0"
+    },
+    "TITAN-BACK-M.e7": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p7",
+      "to": "TITAN-BACK-M.p8"
+    },
+    "TITAN-BACK-M.e8": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p8",
+      "to": "TITAN-BACK-M.p9"
+    },
+    "TITAN-BACK-M.e9": {
+      "kind": "line",
+      "from": "TITAN-BACK-M.p9",
+      "to": "TITAN-BACK-M.p10"
+    },
+    "TITAN-BACK-M.grain0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -160.65,
+        "y": -86.7399
+      }
+    },
+    "TITAN-BACK-M.grain1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -160.65,
+        "y": -1125.4916
+      }
+    },
+    "TITAN-BACK-M.mark0.0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -160.65,
+        "y": -86.7399
+      }
+    },
+    "TITAN-BACK-M.p0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -398.5765,
+        "y": -353.8844
+      }
+    },
+    "TITAN-BACK-M.p1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -396.9482,
+        "y": -359.5284
+      }
+    },
+    "TITAN-BACK-M.p10": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -351.6545,
+        "y": -523.1108
+      }
+    },
+    "TITAN-BACK-M.p11": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -347.3517,
+        "y": -545.202
+      }
+    },
+    "TITAN-BACK-M.p12": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -343.0801,
+        "y": -569.0185
+      }
+    },
+    "TITAN-BACK-M.p13": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -338.8693,
+        "y": -594.6335
+      }
+    },
+    "TITAN-BACK-M.p14": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -334.749,
+        "y": -622.1206
+      }
+    },
+    "TITAN-BACK-M.p15": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -330.7488,
+        "y": -651.5531
+      }
+    },
+    "TITAN-BACK-M.p16": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -326.8983,
+        "y": -683.0045
+      }
+    },
+    "TITAN-BACK-M.p17": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -323.2271,
+        "y": -716.548
+      }
+    },
+    "TITAN-BACK-M.p18": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -319.765,
+        "y": -752.2571
+      }
+    },
+    "TITAN-BACK-M.p19": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -316.5415,
+        "y": -790.2051
+      }
+    },
+    "TITAN-BACK-M.p2": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -392.5703,
+        "y": -372.9831
+      }
+    },
+    "TITAN-BACK-M.p20": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -313.5863,
+        "y": -830.4656
+      }
+    },
+    "TITAN-BACK-M.p21": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -310.9289,
+        "y": -873.1118
+      }
+    },
+    "TITAN-BACK-M.p22": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -308.5991,
+        "y": -918.2172
+      }
+    },
+    "TITAN-BACK-M.p23": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -306.6265,
+        "y": -965.8551
+      }
+    },
+    "TITAN-BACK-M.p24": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -305.0406,
+        "y": -1016.0989
+      }
+    },
+    "TITAN-BACK-M.p25": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -303.8711,
+        "y": -1069.0221
+      }
+    },
+    "TITAN-BACK-M.p26": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -303.1477,
+        "y": -1124.698
+      }
+    },
+    "TITAN-BACK-M.p27": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -302.9,
+        "y": -1183.2
+      }
+    },
+    "TITAN-BACK-M.p28": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -292.9,
+        "y": -1213.2
+      }
+    },
+    "TITAN-BACK-M.p29": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -28.4,
+        "y": -1213.2
+      }
+    },
+    "TITAN-BACK-M.p3": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -386.8948,
+        "y": -389.8159
+      }
+    },
+    "TITAN-BACK-M.p30": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -18.4,
+        "y": -1183.2
+      }
+    },
+    "TITAN-BACK-M.p31": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -18.2153,
+        "y": -1095.1699
+      }
+    },
+    "TITAN-BACK-M.p32": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -17.677,
+        "y": -1011.8268
+      }
+    },
+    "TITAN-BACK-M.p33": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -16.8086,
+        "y": -932.9598
+      }
+    },
+    "TITAN-BACK-M.p34": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -15.6336,
+        "y": -858.3578
+      }
+    },
+    "TITAN-BACK-M.p35": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -14.1757,
+        "y": -787.8099
+      }
+    },
+    "TITAN-BACK-M.p36": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -12.4585,
+        "y": -721.105
+      }
+    },
+    "TITAN-BACK-M.p37": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -10.5055,
+        "y": -658.0321
+      }
+    },
+    "TITAN-BACK-M.p38": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -8.3402,
+        "y": -598.3802
+      }
+    },
+    "TITAN-BACK-M.p39": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -5.9862,
+        "y": -541.9384
+      }
+    },
+    "TITAN-BACK-M.p4": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -380.1589,
+        "y": -410.6141
+      }
+    },
+    "TITAN-BACK-M.p40": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -3.4672,
+        "y": -488.4956
+      }
+    },
+    "TITAN-BACK-M.p41": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -0.8067,
+        "y": -437.8409
+      }
+    },
+    "TITAN-BACK-M.p42": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 1.9718,
+        "y": -389.7631
+      }
+    },
+    "TITAN-BACK-M.p43": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 7.7883,
+        "y": -300.4948
+      }
+    },
+    "TITAN-BACK-M.p44": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 13.7938,
+        "y": -219.0025
+      }
+    },
+    "TITAN-BACK-M.p45": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 20.5552,
+        "y": -134.3388
+      }
+    },
+    "TITAN-BACK-M.p46": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 27.0466,
+        "y": -54.9924
+      }
+    },
+    "TITAN-BACK-M.p47": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 29.0618,
+        "y": -29.8375
+      }
+    },
+    "TITAN-BACK-M.p48": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 21.0029,
+        "y": -19.2153
+      }
+    },
+    "TITAN-BACK-M.p49": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -191.2132,
+        "y": 22.0444
+      }
+    },
+    "TITAN-BACK-M.p5": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -372.5996,
+        "y": -435.9646
+      }
+    },
+    "TITAN-BACK-M.p50": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -202.6246,
+        "y": 15.342
+      }
+    },
+    "TITAN-BACK-M.p51": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -279.8276,
+        "y": -220.2686
+      }
+    },
+    "TITAN-BACK-M.p52": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -284.6351,
+        "y": -233.8878
+      }
+    },
+    "TITAN-BACK-M.p53": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -289.7902,
+        "y": -246.5074
+      }
+    },
+    "TITAN-BACK-M.p54": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -295.2813,
+        "y": -258.1609
+      }
+    },
+    "TITAN-BACK-M.p55": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -301.0971,
+        "y": -268.882
+      }
+    },
+    "TITAN-BACK-M.p56": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -307.2264,
+        "y": -278.7041
+      }
+    },
+    "TITAN-BACK-M.p57": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -313.6577,
+        "y": -287.6609
+      }
+    },
+    "TITAN-BACK-M.p58": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -320.3797,
+        "y": -295.7859
+      }
+    },
+    "TITAN-BACK-M.p59": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -327.381,
+        "y": -303.1127
+      }
+    },
+    "TITAN-BACK-M.p6": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -368.5852,
+        "y": -450.5305
+      }
+    },
+    "TITAN-BACK-M.p60": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -334.6504,
+        "y": -309.6749
+      }
+    },
+    "TITAN-BACK-M.p61": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -342.1764,
+        "y": -315.5059
+      }
+    },
+    "TITAN-BACK-M.p62": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -349.9476,
+        "y": -320.6394
+      }
+    },
+    "TITAN-BACK-M.p63": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -357.9529,
+        "y": -325.1089
+      }
+    },
+    "TITAN-BACK-M.p64": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -366.1807,
+        "y": -328.948
+      }
+    },
+    "TITAN-BACK-M.p65": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -374.6197,
+        "y": -332.1903
+      }
+    },
+    "TITAN-BACK-M.p66": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -383.2587,
+        "y": -334.8693
+      }
+    },
+    "TITAN-BACK-M.p67": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -392.0862,
+        "y": -337.0185
+      }
+    },
+    "TITAN-BACK-M.p68": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -399.7916,
+        "y": -348.8647
+      }
+    },
+    "TITAN-BACK-M.p7": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -364.4539,
+        "y": -466.4547
+      }
+    },
+    "TITAN-BACK-M.p8": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -360.2353,
+        "y": -483.8105
+      }
+    },
+    "TITAN-BACK-M.p9": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -355.9589,
+        "y": -502.6714
+      }
+    },
+    "TITAN-FRONT-M.e0": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p0",
+      "to": "TITAN-FRONT-M.p1"
+    },
+    "TITAN-FRONT-M.e1": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p1",
+      "to": "TITAN-FRONT-M.p2"
+    },
+    "TITAN-FRONT-M.e10": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p10",
+      "to": "TITAN-FRONT-M.p11"
+    },
+    "TITAN-FRONT-M.e11": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p11",
+      "to": "TITAN-FRONT-M.p12"
+    },
+    "TITAN-FRONT-M.e12": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p12",
+      "to": "TITAN-FRONT-M.p13"
+    },
+    "TITAN-FRONT-M.e13": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p13",
+      "to": "TITAN-FRONT-M.p14"
+    },
+    "TITAN-FRONT-M.e14": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p14",
+      "to": "TITAN-FRONT-M.p15"
+    },
+    "TITAN-FRONT-M.e15": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p15",
+      "to": "TITAN-FRONT-M.p16"
+    },
+    "TITAN-FRONT-M.e16": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p16",
+      "to": "TITAN-FRONT-M.p17"
+    },
+    "TITAN-FRONT-M.e17": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p17",
+      "to": "TITAN-FRONT-M.p18"
+    },
+    "TITAN-FRONT-M.e18": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p18",
+      "to": "TITAN-FRONT-M.p19"
+    },
+    "TITAN-FRONT-M.e19": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p19",
+      "to": "TITAN-FRONT-M.p20"
+    },
+    "TITAN-FRONT-M.e2": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p2",
+      "to": "TITAN-FRONT-M.p3"
+    },
+    "TITAN-FRONT-M.e20": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p20",
+      "to": "TITAN-FRONT-M.p21"
+    },
+    "TITAN-FRONT-M.e21": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p21",
+      "to": "TITAN-FRONT-M.p22"
+    },
+    "TITAN-FRONT-M.e22": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p22",
+      "to": "TITAN-FRONT-M.p23"
+    },
+    "TITAN-FRONT-M.e23": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p23",
+      "to": "TITAN-FRONT-M.p24"
+    },
+    "TITAN-FRONT-M.e24": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p24",
+      "to": "TITAN-FRONT-M.p25"
+    },
+    "TITAN-FRONT-M.e25": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p25",
+      "to": "TITAN-FRONT-M.p26"
+    },
+    "TITAN-FRONT-M.e26": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p26",
+      "to": "TITAN-FRONT-M.p27"
+    },
+    "TITAN-FRONT-M.e27": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p27",
+      "to": "TITAN-FRONT-M.p28"
+    },
+    "TITAN-FRONT-M.e28": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p28",
+      "to": "TITAN-FRONT-M.p29"
+    },
+    "TITAN-FRONT-M.e29": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p29",
+      "to": "TITAN-FRONT-M.p30"
+    },
+    "TITAN-FRONT-M.e3": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p3",
+      "to": "TITAN-FRONT-M.p4"
+    },
+    "TITAN-FRONT-M.e30": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p30",
+      "to": "TITAN-FRONT-M.p31"
+    },
+    "TITAN-FRONT-M.e31": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p31",
+      "to": "TITAN-FRONT-M.p32"
+    },
+    "TITAN-FRONT-M.e32": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p32",
+      "to": "TITAN-FRONT-M.p33"
+    },
+    "TITAN-FRONT-M.e33": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p33",
+      "to": "TITAN-FRONT-M.p34"
+    },
+    "TITAN-FRONT-M.e34": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p34",
+      "to": "TITAN-FRONT-M.p35"
+    },
+    "TITAN-FRONT-M.e35": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p35",
+      "to": "TITAN-FRONT-M.p36"
+    },
+    "TITAN-FRONT-M.e36": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p36",
+      "to": "TITAN-FRONT-M.p37"
+    },
+    "TITAN-FRONT-M.e37": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p37",
+      "to": "TITAN-FRONT-M.p38"
+    },
+    "TITAN-FRONT-M.e38": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p38",
+      "to": "TITAN-FRONT-M.p39"
+    },
+    "TITAN-FRONT-M.e39": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p39",
+      "to": "TITAN-FRONT-M.p40"
+    },
+    "TITAN-FRONT-M.e4": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p4",
+      "to": "TITAN-FRONT-M.p5"
+    },
+    "TITAN-FRONT-M.e40": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p40",
+      "to": "TITAN-FRONT-M.p41"
+    },
+    "TITAN-FRONT-M.e41": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p41",
+      "to": "TITAN-FRONT-M.p42"
+    },
+    "TITAN-FRONT-M.e42": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p42",
+      "to": "TITAN-FRONT-M.p43"
+    },
+    "TITAN-FRONT-M.e43": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p43",
+      "to": "TITAN-FRONT-M.p44"
+    },
+    "TITAN-FRONT-M.e44": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p44",
+      "to": "TITAN-FRONT-M.p45"
+    },
+    "TITAN-FRONT-M.e45": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p45",
+      "to": "TITAN-FRONT-M.p46"
+    },
+    "TITAN-FRONT-M.e46": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p46",
+      "to": "TITAN-FRONT-M.p47"
+    },
+    "TITAN-FRONT-M.e47": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p47",
+      "to": "TITAN-FRONT-M.p48"
+    },
+    "TITAN-FRONT-M.e48": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p48",
+      "to": "TITAN-FRONT-M.p49"
+    },
+    "TITAN-FRONT-M.e49": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p49",
+      "to": "TITAN-FRONT-M.p50"
+    },
+    "TITAN-FRONT-M.e5": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p5",
+      "to": "TITAN-FRONT-M.p6"
+    },
+    "TITAN-FRONT-M.e50": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p50",
+      "to": "TITAN-FRONT-M.p51"
+    },
+    "TITAN-FRONT-M.e51": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p51",
+      "to": "TITAN-FRONT-M.p52"
+    },
+    "TITAN-FRONT-M.e52": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p52",
+      "to": "TITAN-FRONT-M.p53"
+    },
+    "TITAN-FRONT-M.e53": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p53",
+      "to": "TITAN-FRONT-M.p54"
+    },
+    "TITAN-FRONT-M.e54": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p54",
+      "to": "TITAN-FRONT-M.p55"
+    },
+    "TITAN-FRONT-M.e55": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p55",
+      "to": "TITAN-FRONT-M.p56"
+    },
+    "TITAN-FRONT-M.e56": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p56",
+      "to": "TITAN-FRONT-M.p57"
+    },
+    "TITAN-FRONT-M.e57": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p57",
+      "to": "TITAN-FRONT-M.p58"
+    },
+    "TITAN-FRONT-M.e58": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p58",
+      "to": "TITAN-FRONT-M.p59"
+    },
+    "TITAN-FRONT-M.e59": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p59",
+      "to": "TITAN-FRONT-M.p60"
+    },
+    "TITAN-FRONT-M.e6": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p6",
+      "to": "TITAN-FRONT-M.p7"
+    },
+    "TITAN-FRONT-M.e60": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p60",
+      "to": "TITAN-FRONT-M.p61"
+    },
+    "TITAN-FRONT-M.e61": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p61",
+      "to": "TITAN-FRONT-M.p62"
+    },
+    "TITAN-FRONT-M.e62": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p62",
+      "to": "TITAN-FRONT-M.p63"
+    },
+    "TITAN-FRONT-M.e63": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p63",
+      "to": "TITAN-FRONT-M.p0"
+    },
+    "TITAN-FRONT-M.e7": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p7",
+      "to": "TITAN-FRONT-M.p8"
+    },
+    "TITAN-FRONT-M.e8": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p8",
+      "to": "TITAN-FRONT-M.p9"
+    },
+    "TITAN-FRONT-M.e9": {
+      "kind": "line",
+      "from": "TITAN-FRONT-M.p9",
+      "to": "TITAN-FRONT-M.p10"
+    },
+    "TITAN-FRONT-M.grain0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 131.9625,
+        "y": -65.2157
+      }
+    },
+    "TITAN-FRONT-M.grain1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 131.9625,
+        "y": -1125.1561
+      }
+    },
+    "TITAN-FRONT-M.mark0.0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 131.9625,
+        "y": -65.2157
+      }
+    },
+    "TITAN-FRONT-M.p0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -18.4432,
+        "y": -75.6041
+      }
+    },
+    "TITAN-FRONT-M.p1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -15.7061,
+        "y": -122.377
+      }
+    },
+    "TITAN-FRONT-M.p10": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 20.9851,
+        "y": -860.227
+      }
+    },
+    "TITAN-FRONT-M.p11": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 22.7217,
+        "y": -960.3654
+      }
+    },
+    "TITAN-FRONT-M.p12": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 23.8257,
+        "y": -1068.1401
+      }
+    },
+    "TITAN-FRONT-M.p13": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 24.2125,
+        "y": -1184.0417
+      }
+    },
+    "TITAN-FRONT-M.p14": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 34.2125,
+        "y": -1214.0417
+      }
+    },
+    "TITAN-FRONT-M.p15": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 229.7125,
+        "y": -1214.0417
+      }
+    },
+    "TITAN-FRONT-M.p16": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 239.7125,
+        "y": -1184.0417
+      }
+    },
+    "TITAN-FRONT-M.p17": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 239.9726,
+        "y": -1112.5125
+      }
+    },
+    "TITAN-FRONT-M.p18": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 240.7307,
+        "y": -1045.2035
+      }
+    },
+    "TITAN-FRONT-M.p19": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 241.9539,
+        "y": -981.9814
+      }
+    },
+    "TITAN-FRONT-M.p2": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -9.172,
+        "y": -221.6592
+      }
+    },
+    "TITAN-FRONT-M.p20": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 243.6089,
+        "y": -922.7127
+      }
+    },
+    "TITAN-FRONT-M.p21": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 245.6627,
+        "y": -867.2639
+      }
+    },
+    "TITAN-FRONT-M.p22": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 248.0823,
+        "y": -815.5017
+      }
+    },
+    "TITAN-FRONT-M.p23": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 250.8344,
+        "y": -767.2925
+      }
+    },
+    "TITAN-FRONT-M.p24": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 253.8861,
+        "y": -722.5031
+      }
+    },
+    "TITAN-FRONT-M.p25": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 257.2042,
+        "y": -680.9998
+      }
+    },
+    "TITAN-FRONT-M.p26": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 260.7556,
+        "y": -642.6494
+      }
+    },
+    "TITAN-FRONT-M.p27": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 264.5073,
+        "y": -607.3183
+      }
+    },
+    "TITAN-FRONT-M.p28": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 268.4261,
+        "y": -574.8731
+      }
+    },
+    "TITAN-FRONT-M.p29": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 272.4789,
+        "y": -545.1805
+      }
+    },
+    "TITAN-FRONT-M.p3": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -1.7883,
+        "y": -331.8609
+      }
+    },
+    "TITAN-FRONT-M.p30": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 276.6328,
+        "y": -518.1068
+      }
+    },
+    "TITAN-FRONT-M.p31": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 280.8545,
+        "y": -493.5188
+      }
+    },
+    "TITAN-FRONT-M.p32": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 285.1109,
+        "y": -471.283
+      }
+    },
+    "TITAN-FRONT-M.p33": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 290.3549,
+        "y": -446.9274
+      }
+    },
+    "TITAN-FRONT-M.p34": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 295.5309,
+        "y": -425.7395
+      }
+    },
+    "TITAN-FRONT-M.p35": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 300.5757,
+        "y": -407.4615
+      }
+    },
+    "TITAN-FRONT-M.p36": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 305.4259,
+        "y": -391.8355
+      }
+    },
+    "TITAN-FRONT-M.p37": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 310.0183,
+        "y": -378.6037
+      }
+    },
+    "TITAN-FRONT-M.p38": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 314.2897,
+        "y": -367.5081
+      }
+    },
+    "TITAN-FRONT-M.p39": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 318.1767,
+        "y": -358.2911
+      }
+    },
+    "TITAN-FRONT-M.p4": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 2.011,
+        "y": -392.2832
+      }
+    },
+    "TITAN-FRONT-M.p40": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 321.6161,
+        "y": -350.6946
+      }
+    },
+    "TITAN-FRONT-M.p41": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 316.7648,
+        "y": -337.4119
+      }
+    },
+    "TITAN-FRONT-M.p42": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 305.9748,
+        "y": -332.4457
+      }
+    },
+    "TITAN-FRONT-M.p43": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 297.1699,
+        "y": -328.3174
+      }
+    },
+    "TITAN-FRONT-M.p44": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 291.2316,
+        "y": -325.3266
+      }
+    },
+    "TITAN-FRONT-M.p45": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 285.6673,
+        "y": -322.2077
+      }
+    },
+    "TITAN-FRONT-M.p46": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 280.4567,
+        "y": -318.8616
+      }
+    },
+    "TITAN-FRONT-M.p47": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 275.5794,
+        "y": -315.1893
+      }
+    },
+    "TITAN-FRONT-M.p48": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 271.0153,
+        "y": -311.0919
+      }
+    },
+    "TITAN-FRONT-M.p49": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 266.744,
+        "y": -306.4705
+      }
+    },
+    "TITAN-FRONT-M.p5": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 5.7691,
+        "y": -456.9072
+      }
+    },
+    "TITAN-FRONT-M.p50": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 262.7452,
+        "y": -301.2259
+      }
+    },
+    "TITAN-FRONT-M.p51": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 258.9988,
+        "y": -295.2594
+      }
+    },
+    "TITAN-FRONT-M.p52": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 255.4844,
+        "y": -288.4718
+      }
+    },
+    "TITAN-FRONT-M.p53": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 252.1817,
+        "y": -280.7642
+      }
+    },
+    "TITAN-FRONT-M.p54": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 249.0705,
+        "y": -272.0377
+      }
+    },
+    "TITAN-FRONT-M.p55": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 246.1306,
+        "y": -262.1933
+      }
+    },
+    "TITAN-FRONT-M.p56": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 243.3415,
+        "y": -251.132
+      }
+    },
+    "TITAN-FRONT-M.p57": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 240.6832,
+        "y": -238.7548
+      }
+    },
+    "TITAN-FRONT-M.p58": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 238.1352,
+        "y": -224.9627
+      }
+    },
+    "TITAN-FRONT-M.p59": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 235.6773,
+        "y": -209.6569
+      }
+    },
+    "TITAN-FRONT-M.p6": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 9.4016,
+        "y": -526.2237
+      }
+    },
+    "TITAN-FRONT-M.p60": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 204.8893,
+        "y": -4.8436
+      }
+    },
+    "TITAN-FRONT-M.p61": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 193.8743,
+        "y": 3.6063
+      }
+    },
+    "TITAN-FRONT-M.p62": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -11.8503,
+        "y": -19.707
+      }
+    },
+    "TITAN-FRONT-M.p63": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -20.7144,
+        "y": -30.0891
+      }
+    },
+    "TITAN-FRONT-M.p7": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 12.8239,
+        "y": -600.7233
+      }
+    },
+    "TITAN-FRONT-M.p8": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 15.9516,
+        "y": -680.8967
+      }
+    },
+    "TITAN-FRONT-M.p9": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 18.7002,
+        "y": -767.2343
+      }
+    }
+  },
+  "pieces": [
+    {
+      "id": "TITAN-BACK-M",
+      "name": "back",
+      "edges": [
+        {
+          "object": "TITAN-BACK-M.e0",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e1",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e2",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e3",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e4",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e5",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e6",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e7",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e8",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e9",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e10",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e11",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e12",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e13",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e14",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e15",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e16",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e17",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e18",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e19",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e20",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e21",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e22",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e23",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e24",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e25",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e26",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e27",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e28",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e29",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e30",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e31",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e32",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e33",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e34",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e35",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e36",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e37",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e38",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e39",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e40",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e41",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e42",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e43",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e44",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e45",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e46",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e47",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e48",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e49",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e50",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e51",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e52",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e53",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e54",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e55",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e56",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e57",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e58",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e59",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e60",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e61",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e62",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e63",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e64",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e65",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e66",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e67",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-BACK-M.e68",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        }
+      ],
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "material": "fabric",
+      "grain": [
+        "TITAN-BACK-M.grain0",
+        "TITAN-BACK-M.grain1"
+      ],
+      "fold_line": null,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "annotations": [
+        {
+          "kind": "points",
+          "mark": "text",
+          "points": [
+            "TITAN-BACK-M.mark0.0"
+          ],
+          "text": "titan back M"
+        }
+      ],
+      "grade_points": {}
+    },
+    {
+      "id": "TITAN-FRONT-M",
+      "name": "front",
+      "edges": [
+        {
+          "object": "TITAN-FRONT-M.e0",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e1",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e2",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e3",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e4",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e5",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e6",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e7",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e8",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e9",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e10",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e11",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e12",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e13",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e14",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e15",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e16",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e17",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e18",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e19",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e20",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e21",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e22",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e23",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e24",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e25",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e26",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e27",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e28",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e29",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e30",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e31",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e32",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e33",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e34",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e35",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e36",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e37",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e38",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e39",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e40",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e41",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e42",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e43",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e44",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e45",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e46",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e47",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e48",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e49",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e50",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e51",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e52",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e53",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e54",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e55",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e56",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e57",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e58",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e59",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e60",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e61",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e62",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TITAN-FRONT-M.e63",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        }
+      ],
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "material": "fabric",
+      "grain": [
+        "TITAN-FRONT-M.grain0",
+        "TITAN-FRONT-M.grain1"
+      ],
+      "fold_line": null,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "annotations": [
+        {
+          "kind": "points",
+          "mark": "text",
+          "points": [
+            "TITAN-FRONT-M.mark0.0"
+          ],
+          "text": "titan front M"
+        }
+      ],
+      "grade_points": {}
+    }
+  ],
+  "rules": {},
+  "meta": {
+    "assumptions": [],
+    "attribution": "FreeSewing 4.10.2, copyright Joost De Cock and FreeSewing contributors, MIT. See LICENSE.FreeSewing.MIT.",
+    "copyright": "Joost De Cock and FreeSewing contributors",
+    "cut_line": "FreeSewing seam allowance paths; design-specific hems and flat-felled allowances retained",
+    "flatten_tolerance_mm": 0.15,
+    "license": "MIT",
+    "measurement_sets": {
+      "L": "cisMaleAdult40",
+      "M": "cisMaleAdult38",
+      "S": "cisMaleAdult36",
+      "XL": "cisMaleAdult42"
+    },
+    "seam_allowance_mm": 10,
+    "source": "FreeSewing",
+    "source_url": "https://freesewing.eu/docs/designs/titan/",
+    "unfolded": true,
+    "units": "mm",
+    "version": "4.10.2"
+  }
+}

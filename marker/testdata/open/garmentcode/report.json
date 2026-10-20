@@ -1,0 +1,80 @@
+{
+  "sample_count": 300,
+  "converted": 299,
+  "rejected": [
+    {
+      "file": "rand_JCCGDD3H4U_specification_shifted.json",
+      "error": "offset panel: self intersection at 116,118"
+    }
+  ],
+  "curve_types": [
+    "circle",
+    "cubic",
+    "quadratic"
+  ],
+  "seam_allowance_mm": 10,
+  "garments": [
+    {
+      "id": "rand_07UUJUMCB1",
+      "piece_types": 8,
+      "cut_pieces": 8,
+      "area_m2": 1.3833
+    },
+    {
+      "id": "rand_0B1IDD2JL0",
+      "piece_types": 10,
+      "cut_pieces": 10,
+      "area_m2": 1.167265
+    },
+    {
+      "id": "rand_0C4F68606B",
+      "piece_types": 14,
+      "cut_pieces": 14,
+      "area_m2": 0.906703
+    },
+    {
+      "id": "rand_0E9JS7307I",
+      "piece_types": 2,
+      "cut_pieces": 2,
+      "area_m2": 0.34153
+    },
+    {
+      "id": "rand_0J0B80KRWK",
+      "piece_types": 18,
+      "cut_pieces": 18,
+      "area_m2": 0.999258
+    },
+    {
+      "id": "rand_0SZOL0ZI99",
+      "piece_types": 4,
+      "cut_pieces": 4,
+      "area_m2": 0.188861
+    },
+    {
+      "id": "rand_0XTT7C4PC0",
+      "piece_types": 4,
+      "cut_pieces": 4,
+      "area_m2": 0.152669
+    },
+    {
+      "id": "rand_14LPYAPYDY",
+      "piece_types": 8,
+      "cut_pieces": 8,
+      "area_m2": 1.131553
+    },
+    {
+      "id": "rand_16M4M86OOS",
+      "piece_types": 2,
+      "cut_pieces": 2,
+      "area_m2": 0.886616
+    },
+    {
+      "id": "rand_1B6BU0JTB4",
+      "piece_types": 18,
+      "cut_pieces": 18,
+      "area_m2": 3.109957
+    }
+  ],
+  "source_archive_bytes": 251722049,
+  "specification_bytes": 8715725
+}

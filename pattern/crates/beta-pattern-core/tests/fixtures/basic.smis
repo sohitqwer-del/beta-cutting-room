@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original BETA individual-measurement fixture, Apache-2.0. -->
+<vit><version>0.3.3</version><unit>mm</unit><body-measurements><m name="width" value="100"/></body-measurements></vit>

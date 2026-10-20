@@ -1,0 +1,16 @@
+[package]
+name = "beta-marker-learn"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Offline Lectra efficiency estimation with Rust features and inference"
+
+[dependencies]
+beta-marker-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+
+[[bin]]
+name = "marker-learn"
+path = "src/main.rs"

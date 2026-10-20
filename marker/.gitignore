@@ -1,0 +1,18 @@
+# Build output
+target/
+pkg/
+node_modules/
+dist/
+
+# Third-party clones and large datasets: never commit
+vendor/
+bench/data/
+bench/out/
+
+# User-supplied factory patterns and markers stay private by default
+private-patterns/
+*.private.*
+
+# Local outputs
+out/
+*.log

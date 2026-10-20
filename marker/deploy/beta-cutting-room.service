@@ -1,0 +1,21 @@
+# Example systemd USER unit. Review paths before enabling it.
+# Save as ~/.config/systemd/user/beta-cutting-room.service.
+[Unit]
+Description=BETA Cutting Room local HTTP API
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/share/beta-cutting-room
+EnvironmentFile=%h/.config/beta-cutting-room/server.env
+ExecStart=%h/.local/share/beta-cutting-room/beta-marker serve --bind 127.0.0.1 --port 7878 --web-dir %h/.local/share/beta-cutting-room/web
+Restart=on-failure
+RestartSec=5
+Nice=10
+UMask=0077
+NoNewPrivileges=true
+KillMode=control-group
+TimeoutStopSec=20
+
+[Install]
+WantedBy=default.target

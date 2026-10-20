@@ -1,0 +1,208 @@
+{
+  "assumptions": [
+    "Search budgets exclude construction, repair and final validation overhead.",
+    "Shared hardware and wall-clock cutoffs can change results despite fixed seeds.",
+    "Generated tailoring drafts on open 1500 mm fabric, S1 M2 L2 XL1, no nap and zero gap. No commercial reference is available."
+  ],
+  "conditions": {
+    "background_load": "Shared machine; see archived load.log and conditions.json. No claim of exclusive CPU use.",
+    "budget_label": "300 s",
+    "budget_s": 300.0,
+    "jobs": 4,
+    "machine": "Shared Linux server, AMD Ryzen 9 9900X3D, 12 cores / 24 logical CPUs",
+    "notes": "Equal seconds do not imply equal compute. Runtime measures the whole nesting call and evidence I/O; validation is also timed separately.",
+    "seeds": [
+      1
+    ],
+    "workers_per_task": 3
+  },
+  "date": "2026-10-20",
+  "groups": [
+    {
+      "attempts": 3,
+      "headline": true,
+      "label": "All",
+      "loss": null,
+      "mean_beta_eff_pct": 82.08534496333334,
+      "mean_diff_pp": null,
+      "mean_length_saving_pct": null,
+      "mean_reference_eff_pct": null,
+      "median_diff_pp": null,
+      "median_length_saving_pct": null,
+      "other_failures": 0,
+      "task_ids": [
+        "simon-ratio-as-is",
+        "teagan-ratio-as-is",
+        "titan-ratio-as-is"
+      ],
+      "tie": null,
+      "too_long_losses": 0,
+      "valid": 3,
+      "win": null,
+      "x_runtime": {
+        "mean_s": 300.73511284000006
+      }
+    }
+  ],
+  "id": "freesewing-300s",
+  "kind": "freesewing",
+  "order": 70,
+  "reference": {
+    "licence": "MIT (FreeSewing fixtures)",
+    "name": "BETA results only",
+    "type": "none"
+  },
+  "reproduce": {
+    "commands": [
+      "cargo run --release --manifest-path bench/public/Cargo.toml -- --out <fresh-output-directory>"
+    ],
+    "doc": "marker/bench/public/README.md"
+  },
+  "schema": "beta-site-benchmark/1",
+  "software": {
+    "beta_version": "0.1.0",
+    "engine": "sparrow 0.3.0 on jagua-rs 1.0.0 (unmodified)",
+    "engine_revision": "a2d5de276e5d679acd00a023476ed84209924c57"
+  },
+  "sources": [
+    {
+      "label": "Method and results",
+      "url": "marker/bench/results/2026-10-20-public.md"
+    }
+  ],
+  "status": "final",
+  "strata": [
+    {
+      "attempts": 1,
+      "headline": false,
+      "label": "simon-ratio-as-is",
+      "loss": null,
+      "mean_beta_eff_pct": 89.567512572,
+      "mean_diff_pp": null,
+      "mean_length_saving_pct": null,
+      "mean_reference_eff_pct": null,
+      "median_diff_pp": null,
+      "median_length_saving_pct": null,
+      "other_failures": 0,
+      "task_ids": [
+        "simon-ratio-as-is"
+      ],
+      "tie": null,
+      "too_long_losses": 0,
+      "valid": 1,
+      "win": null,
+      "x_runtime": {
+        "mean_s": 301.169689816
+      }
+    },
+    {
+      "attempts": 1,
+      "headline": false,
+      "label": "teagan-ratio-as-is",
+      "loss": null,
+      "mean_beta_eff_pct": 79.030593425,
+      "mean_diff_pp": null,
+      "mean_length_saving_pct": null,
+      "mean_reference_eff_pct": null,
+      "median_diff_pp": null,
+      "median_length_saving_pct": null,
+      "other_failures": 0,
+      "task_ids": [
+        "teagan-ratio-as-is"
+      ],
+      "tie": null,
+      "too_long_losses": 0,
+      "valid": 1,
+      "win": null,
+      "x_runtime": {
+        "mean_s": 300.323192385
+      }
+    },
+    {
+      "attempts": 1,
+      "headline": false,
+      "label": "titan-ratio-as-is",
+      "loss": null,
+      "mean_beta_eff_pct": 77.657928893,
+      "mean_diff_pp": null,
+      "mean_length_saving_pct": null,
+      "mean_reference_eff_pct": null,
+      "median_diff_pp": null,
+      "median_length_saving_pct": null,
+      "other_failures": 0,
+      "task_ids": [
+        "titan-ratio-as-is"
+      ],
+      "tie": null,
+      "too_long_losses": 0,
+      "valid": 1,
+      "win": null,
+      "x_runtime": {
+        "mean_s": 300.712456319
+      }
+    }
+  ],
+  "summary_text": "One fixed suite, with every scored marker independently validated. See the assumptions before comparing results.",
+  "task_ids": [
+    "simon-ratio-as-is",
+    "teagan-ratio-as-is",
+    "titan-ratio-as-is"
+  ],
+  "title": "FreeSewing: 300 seconds",
+  "x_provenance": {
+    "inputs": {
+      "albano.json": "a4b5dbe638dc0d5d52b0949e3fe5671ce81a9e6ea60a50fdc4a5b77546be51d5",
+      "dagli.json": "0ad314ab1340a1106df7a184507a534d9d6d3dc8f99e47b75409a10c30641b7c",
+      "mao.json": "cdf3bb8f6b04e15113789bdaef22d3e8e309e6633709f88ba2e097087b74f8e4",
+      "marques.json": "bead96cdb36f6637eb5e21aa5df5f78781bd1cddd913b5ff7b0457205c8e3b2d",
+      "sample-300.jsonl": "66edbac7fcb1baa57945147a99113b7449f262d928012d43385847d039849c8c",
+      "sample-match-60.jsonl": "4b7bd76d882c2106c1b821eabc3b452879189e3e82814983cfde5a270c10436d",
+      "selected.json": "74a0072f758d789d3df5229fa71de6c20a909770fbdaea129c81a0dad752f565",
+      "shirts.json": "4dfce1f22beaeada3fe5c269fe8c8f01fed323ff28b4a8128738318a59b6bb54",
+      "simon-ratio.job.json": "c1ed829f5848a42e8091c005e3469d51d5feaa2d0f3ddb6c25154ab80cefaf62",
+      "swim.json": "e425ceb1c919398f610a5216c513a624e7acbf2a84772c9cdbe0daba15036694",
+      "teagan-ratio.job.json": "c53228dc084a523639ec9adce49ff37a1f31a281facb96955e55db59e244d720",
+      "titan-ratio.job.json": "8872cb65819faf46cf3b087a1efd5e9015a70ffa7aaf030f322aa445037c0ee6",
+      "trousers.json": "53af43b0e1f5060660beab75fdc3ac75b5bd786f512e5e235de282c6d141c85c"
+    },
+    "results_csv_sha256": "d2487c5844912017c590681376228370d7f8c06a73ba0ca6702d1e8cb4f563c2",
+    "run_json_sha256": "209a41c62a214911596072cda33eeb7eeb2d2f4a88fa75f40da3dcd0acfe928e",
+    "search": {
+      "ignore_rules": false,
+      "runs": 1,
+      "shade_attempts": 1,
+      "tuning": {
+        "adaptive_compression": false,
+        "compression_share": 0.2,
+        "construction_order": "input",
+        "container_samples": 50,
+        "coordinate_descents": 3,
+        "exploration_shrink": 0.001,
+        "focused_samples": 25,
+        "mirror_variant": 0,
+        "pool_stddev": 0.25,
+        "portfolio": "parallel"
+      }
+    },
+    "source_dirty": false
+  },
+  "x_runtime": {
+    "budget_max_s": 300.0,
+    "budget_median_s": 300.0,
+    "budget_min_s": 300.0,
+    "finished_unix_ms": 1792466857598.0,
+    "max_s": 301.169689816,
+    "mean_s": 300.73511284000006,
+    "median_s": 300.712456319,
+    "runner_wall_s": 301.184,
+    "started_unix_ms": 1792466556414.0,
+    "sum_s": 902.2053385200002,
+    "validation_sum_s": 0.033989511
+  },
+  "x_validation": {
+    "failed": 0,
+    "failed_before_validator": 0,
+    "reports_checked": 3,
+    "valid": 3
+  }
+}

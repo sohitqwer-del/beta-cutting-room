@@ -1,0 +1,6725 @@
+{
+  "format": "beta-pattern.doc/v1",
+  "name": "teagan M1",
+  "sizes": [
+    "M"
+  ],
+  "base_size": "M",
+  "measurements": {},
+  "variables": {},
+  "drawing": {
+    "TEAGAN-BACK-M.e0": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p0",
+      "to": "TEAGAN-BACK-M.p1"
+    },
+    "TEAGAN-BACK-M.e1": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p1",
+      "to": "TEAGAN-BACK-M.p2"
+    },
+    "TEAGAN-BACK-M.e10": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p10",
+      "to": "TEAGAN-BACK-M.p11"
+    },
+    "TEAGAN-BACK-M.e100": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p100",
+      "to": "TEAGAN-BACK-M.p101"
+    },
+    "TEAGAN-BACK-M.e101": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p101",
+      "to": "TEAGAN-BACK-M.p102"
+    },
+    "TEAGAN-BACK-M.e102": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p102",
+      "to": "TEAGAN-BACK-M.p103"
+    },
+    "TEAGAN-BACK-M.e103": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p103",
+      "to": "TEAGAN-BACK-M.p104"
+    },
+    "TEAGAN-BACK-M.e104": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p104",
+      "to": "TEAGAN-BACK-M.p105"
+    },
+    "TEAGAN-BACK-M.e105": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p105",
+      "to": "TEAGAN-BACK-M.p106"
+    },
+    "TEAGAN-BACK-M.e106": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p106",
+      "to": "TEAGAN-BACK-M.p107"
+    },
+    "TEAGAN-BACK-M.e107": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p107",
+      "to": "TEAGAN-BACK-M.p108"
+    },
+    "TEAGAN-BACK-M.e108": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p108",
+      "to": "TEAGAN-BACK-M.p109"
+    },
+    "TEAGAN-BACK-M.e109": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p109",
+      "to": "TEAGAN-BACK-M.p110"
+    },
+    "TEAGAN-BACK-M.e11": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p11",
+      "to": "TEAGAN-BACK-M.p12"
+    },
+    "TEAGAN-BACK-M.e110": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p110",
+      "to": "TEAGAN-BACK-M.p111"
+    },
+    "TEAGAN-BACK-M.e111": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p111",
+      "to": "TEAGAN-BACK-M.p112"
+    },
+    "TEAGAN-BACK-M.e112": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p112",
+      "to": "TEAGAN-BACK-M.p113"
+    },
+    "TEAGAN-BACK-M.e113": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p113",
+      "to": "TEAGAN-BACK-M.p114"
+    },
+    "TEAGAN-BACK-M.e114": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p114",
+      "to": "TEAGAN-BACK-M.p115"
+    },
+    "TEAGAN-BACK-M.e115": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p115",
+      "to": "TEAGAN-BACK-M.p116"
+    },
+    "TEAGAN-BACK-M.e116": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p116",
+      "to": "TEAGAN-BACK-M.p117"
+    },
+    "TEAGAN-BACK-M.e117": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p117",
+      "to": "TEAGAN-BACK-M.p118"
+    },
+    "TEAGAN-BACK-M.e118": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p118",
+      "to": "TEAGAN-BACK-M.p119"
+    },
+    "TEAGAN-BACK-M.e119": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p119",
+      "to": "TEAGAN-BACK-M.p120"
+    },
+    "TEAGAN-BACK-M.e12": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p12",
+      "to": "TEAGAN-BACK-M.p13"
+    },
+    "TEAGAN-BACK-M.e120": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p120",
+      "to": "TEAGAN-BACK-M.p121"
+    },
+    "TEAGAN-BACK-M.e121": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p121",
+      "to": "TEAGAN-BACK-M.p122"
+    },
+    "TEAGAN-BACK-M.e122": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p122",
+      "to": "TEAGAN-BACK-M.p123"
+    },
+    "TEAGAN-BACK-M.e123": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p123",
+      "to": "TEAGAN-BACK-M.p124"
+    },
+    "TEAGAN-BACK-M.e124": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p124",
+      "to": "TEAGAN-BACK-M.p125"
+    },
+    "TEAGAN-BACK-M.e125": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p125",
+      "to": "TEAGAN-BACK-M.p126"
+    },
+    "TEAGAN-BACK-M.e126": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p126",
+      "to": "TEAGAN-BACK-M.p0"
+    },
+    "TEAGAN-BACK-M.e13": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p13",
+      "to": "TEAGAN-BACK-M.p14"
+    },
+    "TEAGAN-BACK-M.e14": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p14",
+      "to": "TEAGAN-BACK-M.p15"
+    },
+    "TEAGAN-BACK-M.e15": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p15",
+      "to": "TEAGAN-BACK-M.p16"
+    },
+    "TEAGAN-BACK-M.e16": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p16",
+      "to": "TEAGAN-BACK-M.p17"
+    },
+    "TEAGAN-BACK-M.e17": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p17",
+      "to": "TEAGAN-BACK-M.p18"
+    },
+    "TEAGAN-BACK-M.e18": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p18",
+      "to": "TEAGAN-BACK-M.p19"
+    },
+    "TEAGAN-BACK-M.e19": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p19",
+      "to": "TEAGAN-BACK-M.p20"
+    },
+    "TEAGAN-BACK-M.e2": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p2",
+      "to": "TEAGAN-BACK-M.p3"
+    },
+    "TEAGAN-BACK-M.e20": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p20",
+      "to": "TEAGAN-BACK-M.p21"
+    },
+    "TEAGAN-BACK-M.e21": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p21",
+      "to": "TEAGAN-BACK-M.p22"
+    },
+    "TEAGAN-BACK-M.e22": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p22",
+      "to": "TEAGAN-BACK-M.p23"
+    },
+    "TEAGAN-BACK-M.e23": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p23",
+      "to": "TEAGAN-BACK-M.p24"
+    },
+    "TEAGAN-BACK-M.e24": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p24",
+      "to": "TEAGAN-BACK-M.p25"
+    },
+    "TEAGAN-BACK-M.e25": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p25",
+      "to": "TEAGAN-BACK-M.p26"
+    },
+    "TEAGAN-BACK-M.e26": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p26",
+      "to": "TEAGAN-BACK-M.p27"
+    },
+    "TEAGAN-BACK-M.e27": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p27",
+      "to": "TEAGAN-BACK-M.p28"
+    },
+    "TEAGAN-BACK-M.e28": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p28",
+      "to": "TEAGAN-BACK-M.p29"
+    },
+    "TEAGAN-BACK-M.e29": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p29",
+      "to": "TEAGAN-BACK-M.p30"
+    },
+    "TEAGAN-BACK-M.e3": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p3",
+      "to": "TEAGAN-BACK-M.p4"
+    },
+    "TEAGAN-BACK-M.e30": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p30",
+      "to": "TEAGAN-BACK-M.p31"
+    },
+    "TEAGAN-BACK-M.e31": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p31",
+      "to": "TEAGAN-BACK-M.p32"
+    },
+    "TEAGAN-BACK-M.e32": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p32",
+      "to": "TEAGAN-BACK-M.p33"
+    },
+    "TEAGAN-BACK-M.e33": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p33",
+      "to": "TEAGAN-BACK-M.p34"
+    },
+    "TEAGAN-BACK-M.e34": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p34",
+      "to": "TEAGAN-BACK-M.p35"
+    },
+    "TEAGAN-BACK-M.e35": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p35",
+      "to": "TEAGAN-BACK-M.p36"
+    },
+    "TEAGAN-BACK-M.e36": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p36",
+      "to": "TEAGAN-BACK-M.p37"
+    },
+    "TEAGAN-BACK-M.e37": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p37",
+      "to": "TEAGAN-BACK-M.p38"
+    },
+    "TEAGAN-BACK-M.e38": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p38",
+      "to": "TEAGAN-BACK-M.p39"
+    },
+    "TEAGAN-BACK-M.e39": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p39",
+      "to": "TEAGAN-BACK-M.p40"
+    },
+    "TEAGAN-BACK-M.e4": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p4",
+      "to": "TEAGAN-BACK-M.p5"
+    },
+    "TEAGAN-BACK-M.e40": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p40",
+      "to": "TEAGAN-BACK-M.p41"
+    },
+    "TEAGAN-BACK-M.e41": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p41",
+      "to": "TEAGAN-BACK-M.p42"
+    },
+    "TEAGAN-BACK-M.e42": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p42",
+      "to": "TEAGAN-BACK-M.p43"
+    },
+    "TEAGAN-BACK-M.e43": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p43",
+      "to": "TEAGAN-BACK-M.p44"
+    },
+    "TEAGAN-BACK-M.e44": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p44",
+      "to": "TEAGAN-BACK-M.p45"
+    },
+    "TEAGAN-BACK-M.e45": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p45",
+      "to": "TEAGAN-BACK-M.p46"
+    },
+    "TEAGAN-BACK-M.e46": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p46",
+      "to": "TEAGAN-BACK-M.p47"
+    },
+    "TEAGAN-BACK-M.e47": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p47",
+      "to": "TEAGAN-BACK-M.p48"
+    },
+    "TEAGAN-BACK-M.e48": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p48",
+      "to": "TEAGAN-BACK-M.p49"
+    },
+    "TEAGAN-BACK-M.e49": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p49",
+      "to": "TEAGAN-BACK-M.p50"
+    },
+    "TEAGAN-BACK-M.e5": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p5",
+      "to": "TEAGAN-BACK-M.p6"
+    },
+    "TEAGAN-BACK-M.e50": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p50",
+      "to": "TEAGAN-BACK-M.p51"
+    },
+    "TEAGAN-BACK-M.e51": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p51",
+      "to": "TEAGAN-BACK-M.p52"
+    },
+    "TEAGAN-BACK-M.e52": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p52",
+      "to": "TEAGAN-BACK-M.p53"
+    },
+    "TEAGAN-BACK-M.e53": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p53",
+      "to": "TEAGAN-BACK-M.p54"
+    },
+    "TEAGAN-BACK-M.e54": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p54",
+      "to": "TEAGAN-BACK-M.p55"
+    },
+    "TEAGAN-BACK-M.e55": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p55",
+      "to": "TEAGAN-BACK-M.p56"
+    },
+    "TEAGAN-BACK-M.e56": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p56",
+      "to": "TEAGAN-BACK-M.p57"
+    },
+    "TEAGAN-BACK-M.e57": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p57",
+      "to": "TEAGAN-BACK-M.p58"
+    },
+    "TEAGAN-BACK-M.e58": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p58",
+      "to": "TEAGAN-BACK-M.p59"
+    },
+    "TEAGAN-BACK-M.e59": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p59",
+      "to": "TEAGAN-BACK-M.p60"
+    },
+    "TEAGAN-BACK-M.e6": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p6",
+      "to": "TEAGAN-BACK-M.p7"
+    },
+    "TEAGAN-BACK-M.e60": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p60",
+      "to": "TEAGAN-BACK-M.p61"
+    },
+    "TEAGAN-BACK-M.e61": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p61",
+      "to": "TEAGAN-BACK-M.p62"
+    },
+    "TEAGAN-BACK-M.e62": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p62",
+      "to": "TEAGAN-BACK-M.p63"
+    },
+    "TEAGAN-BACK-M.e63": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p63",
+      "to": "TEAGAN-BACK-M.p64"
+    },
+    "TEAGAN-BACK-M.e64": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p64",
+      "to": "TEAGAN-BACK-M.p65"
+    },
+    "TEAGAN-BACK-M.e65": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p65",
+      "to": "TEAGAN-BACK-M.p66"
+    },
+    "TEAGAN-BACK-M.e66": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p66",
+      "to": "TEAGAN-BACK-M.p67"
+    },
+    "TEAGAN-BACK-M.e67": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p67",
+      "to": "TEAGAN-BACK-M.p68"
+    },
+    "TEAGAN-BACK-M.e68": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p68",
+      "to": "TEAGAN-BACK-M.p69"
+    },
+    "TEAGAN-BACK-M.e69": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p69",
+      "to": "TEAGAN-BACK-M.p70"
+    },
+    "TEAGAN-BACK-M.e7": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p7",
+      "to": "TEAGAN-BACK-M.p8"
+    },
+    "TEAGAN-BACK-M.e70": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p70",
+      "to": "TEAGAN-BACK-M.p71"
+    },
+    "TEAGAN-BACK-M.e71": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p71",
+      "to": "TEAGAN-BACK-M.p72"
+    },
+    "TEAGAN-BACK-M.e72": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p72",
+      "to": "TEAGAN-BACK-M.p73"
+    },
+    "TEAGAN-BACK-M.e73": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p73",
+      "to": "TEAGAN-BACK-M.p74"
+    },
+    "TEAGAN-BACK-M.e74": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p74",
+      "to": "TEAGAN-BACK-M.p75"
+    },
+    "TEAGAN-BACK-M.e75": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p75",
+      "to": "TEAGAN-BACK-M.p76"
+    },
+    "TEAGAN-BACK-M.e76": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p76",
+      "to": "TEAGAN-BACK-M.p77"
+    },
+    "TEAGAN-BACK-M.e77": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p77",
+      "to": "TEAGAN-BACK-M.p78"
+    },
+    "TEAGAN-BACK-M.e78": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p78",
+      "to": "TEAGAN-BACK-M.p79"
+    },
+    "TEAGAN-BACK-M.e79": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p79",
+      "to": "TEAGAN-BACK-M.p80"
+    },
+    "TEAGAN-BACK-M.e8": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p8",
+      "to": "TEAGAN-BACK-M.p9"
+    },
+    "TEAGAN-BACK-M.e80": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p80",
+      "to": "TEAGAN-BACK-M.p81"
+    },
+    "TEAGAN-BACK-M.e81": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p81",
+      "to": "TEAGAN-BACK-M.p82"
+    },
+    "TEAGAN-BACK-M.e82": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p82",
+      "to": "TEAGAN-BACK-M.p83"
+    },
+    "TEAGAN-BACK-M.e83": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p83",
+      "to": "TEAGAN-BACK-M.p84"
+    },
+    "TEAGAN-BACK-M.e84": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p84",
+      "to": "TEAGAN-BACK-M.p85"
+    },
+    "TEAGAN-BACK-M.e85": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p85",
+      "to": "TEAGAN-BACK-M.p86"
+    },
+    "TEAGAN-BACK-M.e86": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p86",
+      "to": "TEAGAN-BACK-M.p87"
+    },
+    "TEAGAN-BACK-M.e87": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p87",
+      "to": "TEAGAN-BACK-M.p88"
+    },
+    "TEAGAN-BACK-M.e88": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p88",
+      "to": "TEAGAN-BACK-M.p89"
+    },
+    "TEAGAN-BACK-M.e89": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p89",
+      "to": "TEAGAN-BACK-M.p90"
+    },
+    "TEAGAN-BACK-M.e9": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p9",
+      "to": "TEAGAN-BACK-M.p10"
+    },
+    "TEAGAN-BACK-M.e90": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p90",
+      "to": "TEAGAN-BACK-M.p91"
+    },
+    "TEAGAN-BACK-M.e91": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p91",
+      "to": "TEAGAN-BACK-M.p92"
+    },
+    "TEAGAN-BACK-M.e92": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p92",
+      "to": "TEAGAN-BACK-M.p93"
+    },
+    "TEAGAN-BACK-M.e93": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p93",
+      "to": "TEAGAN-BACK-M.p94"
+    },
+    "TEAGAN-BACK-M.e94": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p94",
+      "to": "TEAGAN-BACK-M.p95"
+    },
+    "TEAGAN-BACK-M.e95": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p95",
+      "to": "TEAGAN-BACK-M.p96"
+    },
+    "TEAGAN-BACK-M.e96": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p96",
+      "to": "TEAGAN-BACK-M.p97"
+    },
+    "TEAGAN-BACK-M.e97": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p97",
+      "to": "TEAGAN-BACK-M.p98"
+    },
+    "TEAGAN-BACK-M.e98": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p98",
+      "to": "TEAGAN-BACK-M.p99"
+    },
+    "TEAGAN-BACK-M.e99": {
+      "kind": "line",
+      "from": "TEAGAN-BACK-M.p99",
+      "to": "TEAGAN-BACK-M.p100"
+    },
+    "TEAGAN-BACK-M.grain0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 0.0,
+        "y": -117.5
+      }
+    },
+    "TEAGAN-BACK-M.grain1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 0.0,
+        "y": -690.0
+      }
+    },
+    "TEAGAN-BACK-M.mark0.0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 217.4244,
+        "y": -165.9122
+      }
+    },
+    "TEAGAN-BACK-M.mark1.0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -217.4244,
+        "y": -165.9122
+      }
+    },
+    "TEAGAN-BACK-M.mark2.0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 0.0,
+        "y": -117.5
+      }
+    },
+    "TEAGAN-BACK-M.p0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -288.2729,
+        "y": -278.3859
+      }
+    },
+    "TEAGAN-BACK-M.p1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -284.6539,
+        "y": -297.2464
+      }
+    },
+    "TEAGAN-BACK-M.p10": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -260.7584,
+        "y": -544.4518
+      }
+    },
+    "TEAGAN-BACK-M.p100": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -228.5467,
+        "y": -71.6372
+      }
+    },
+    "TEAGAN-BACK-M.p101": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -227.2632,
+        "y": -83.7358
+      }
+    },
+    "TEAGAN-BACK-M.p102": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -226.4734,
+        "y": -93.7684
+      }
+    },
+    "TEAGAN-BACK-M.p103": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -225.9215,
+        "y": -103.7685
+      }
+    },
+    "TEAGAN-BACK-M.p104": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -225.4921,
+        "y": -123.5411
+      }
+    },
+    "TEAGAN-BACK-M.p105": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -225.9177,
+        "y": -144.239
+      }
+    },
+    "TEAGAN-BACK-M.p106": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -227.1464,
+        "y": -164.0354
+      }
+    },
+    "TEAGAN-BACK-M.p107": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -229.1061,
+        "y": -182.5503
+      }
+    },
+    "TEAGAN-BACK-M.p108": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -230.3375,
+        "y": -191.2085
+      }
+    },
+    "TEAGAN-BACK-M.p109": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -231.7245,
+        "y": -199.4038
+      }
+    },
+    "TEAGAN-BACK-M.p11": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -259.1774,
+        "y": -589.3568
+      }
+    },
+    "TEAGAN-BACK-M.p110": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -233.2582,
+        "y": -207.0889
+      }
+    },
+    "TEAGAN-BACK-M.p111": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -234.9296,
+        "y": -214.2162
+      }
+    },
+    "TEAGAN-BACK-M.p112": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -236.7295,
+        "y": -220.7382
+      }
+    },
+    "TEAGAN-BACK-M.p113": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -238.649,
+        "y": -226.6075
+      }
+    },
+    "TEAGAN-BACK-M.p114": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -240.6791,
+        "y": -231.7766
+      }
+    },
+    "TEAGAN-BACK-M.p115": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -242.8107,
+        "y": -236.1979
+      }
+    },
+    "TEAGAN-BACK-M.p116": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -245.0348,
+        "y": -239.8241
+      }
+    },
+    "TEAGAN-BACK-M.p117": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -247.3424,
+        "y": -242.6076
+      }
+    },
+    "TEAGAN-BACK-M.p118": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -250.7953,
+        "y": -245.7136
+      }
+    },
+    "TEAGAN-BACK-M.p119": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -255.3398,
+        "y": -249.182
+      }
+    },
+    "TEAGAN-BACK-M.p12": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -258.16,
+        "y": -637.8603
+      }
+    },
+    "TEAGAN-BACK-M.p120": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -259.3357,
+        "y": -251.8439
+      }
+    },
+    "TEAGAN-BACK-M.p121": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -263.6812,
+        "y": -254.3591
+      }
+    },
+    "TEAGAN-BACK-M.p122": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -268.2636,
+        "y": -256.5589
+      }
+    },
+    "TEAGAN-BACK-M.p123": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -272.9704,
+        "y": -258.2743
+      }
+    },
+    "TEAGAN-BACK-M.p124": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -276.5207,
+        "y": -259.129
+      }
+    },
+    "TEAGAN-BACK-M.p125": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -280.0,
+        "y": -259.45
+      }
+    },
+    "TEAGAN-BACK-M.p126": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -289.748,
+        "y": -271.6808
+      }
+    },
+    "TEAGAN-BACK-M.p13": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -257.8,
+        "y": -690.0
+      }
+    },
+    "TEAGAN-BACK-M.p14": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -247.8,
+        "y": -720.0
+      }
+    },
+    "TEAGAN-BACK-M.p15": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 247.8,
+        "y": -720.0
+      }
+    },
+    "TEAGAN-BACK-M.p16": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 257.8,
+        "y": -690.0
+      }
+    },
+    "TEAGAN-BACK-M.p17": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 258.16,
+        "y": -637.8603
+      }
+    },
+    "TEAGAN-BACK-M.p18": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 259.1774,
+        "y": -589.3568
+      }
+    },
+    "TEAGAN-BACK-M.p19": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 260.7584,
+        "y": -544.4518
+      }
+    },
+    "TEAGAN-BACK-M.p2": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -282.2631,
+        "y": -311.3245
+      }
+    },
+    "TEAGAN-BACK-M.p20": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 262.8093,
+        "y": -503.1074
+      }
+    },
+    "TEAGAN-BACK-M.p21": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 265.2362,
+        "y": -465.2858
+      }
+    },
+    "TEAGAN-BACK-M.p22": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 267.9453,
+        "y": -430.9494
+      }
+    },
+    "TEAGAN-BACK-M.p23": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 270.8429,
+        "y": -400.0604
+      }
+    },
+    "TEAGAN-BACK-M.p24": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 273.835,
+        "y": -372.581
+      }
+    },
+    "TEAGAN-BACK-M.p25": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 276.7646,
+        "y": -348.956
+      }
+    },
+    "TEAGAN-BACK-M.p26": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 279.6037,
+        "y": -328.5491
+      }
+    },
+    "TEAGAN-BACK-M.p27": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 282.2631,
+        "y": -311.3245
+      }
+    },
+    "TEAGAN-BACK-M.p28": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 284.6539,
+        "y": -297.2464
+      }
+    },
+    "TEAGAN-BACK-M.p29": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 288.2729,
+        "y": -278.3859
+      }
+    },
+    "TEAGAN-BACK-M.p3": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -279.6037,
+        "y": -328.5491
+      }
+    },
+    "TEAGAN-BACK-M.p30": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 289.748,
+        "y": -271.6808
+      }
+    },
+    "TEAGAN-BACK-M.p31": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 280.0,
+        "y": -259.45
+      }
+    },
+    "TEAGAN-BACK-M.p32": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 276.5207,
+        "y": -259.129
+      }
+    },
+    "TEAGAN-BACK-M.p33": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 272.9704,
+        "y": -258.2743
+      }
+    },
+    "TEAGAN-BACK-M.p34": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 268.2636,
+        "y": -256.5589
+      }
+    },
+    "TEAGAN-BACK-M.p35": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 263.6812,
+        "y": -254.3591
+      }
+    },
+    "TEAGAN-BACK-M.p36": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 259.3357,
+        "y": -251.8439
+      }
+    },
+    "TEAGAN-BACK-M.p37": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 255.3398,
+        "y": -249.182
+      }
+    },
+    "TEAGAN-BACK-M.p38": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 250.7953,
+        "y": -245.7136
+      }
+    },
+    "TEAGAN-BACK-M.p39": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 247.3424,
+        "y": -242.6076
+      }
+    },
+    "TEAGAN-BACK-M.p4": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -276.7646,
+        "y": -348.956
+      }
+    },
+    "TEAGAN-BACK-M.p40": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 245.0348,
+        "y": -239.8241
+      }
+    },
+    "TEAGAN-BACK-M.p41": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 242.8107,
+        "y": -236.1979
+      }
+    },
+    "TEAGAN-BACK-M.p42": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 240.6791,
+        "y": -231.7766
+      }
+    },
+    "TEAGAN-BACK-M.p43": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 238.649,
+        "y": -226.6075
+      }
+    },
+    "TEAGAN-BACK-M.p44": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 236.7295,
+        "y": -220.7382
+      }
+    },
+    "TEAGAN-BACK-M.p45": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 234.9296,
+        "y": -214.2162
+      }
+    },
+    "TEAGAN-BACK-M.p46": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 233.2582,
+        "y": -207.0889
+      }
+    },
+    "TEAGAN-BACK-M.p47": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 231.7245,
+        "y": -199.4038
+      }
+    },
+    "TEAGAN-BACK-M.p48": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 230.3375,
+        "y": -191.2085
+      }
+    },
+    "TEAGAN-BACK-M.p49": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 229.1061,
+        "y": -182.5503
+      }
+    },
+    "TEAGAN-BACK-M.p5": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -273.835,
+        "y": -372.581
+      }
+    },
+    "TEAGAN-BACK-M.p50": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 227.1464,
+        "y": -164.0354
+      }
+    },
+    "TEAGAN-BACK-M.p51": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 225.9177,
+        "y": -144.239
+      }
+    },
+    "TEAGAN-BACK-M.p52": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 225.4921,
+        "y": -123.5411
+      }
+    },
+    "TEAGAN-BACK-M.p53": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 225.9215,
+        "y": -103.7685
+      }
+    },
+    "TEAGAN-BACK-M.p54": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 226.4734,
+        "y": -93.7684
+      }
+    },
+    "TEAGAN-BACK-M.p55": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 227.2632,
+        "y": -83.7358
+      }
+    },
+    "TEAGAN-BACK-M.p56": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 228.5467,
+        "y": -71.6372
+      }
+    },
+    "TEAGAN-BACK-M.p57": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 230.2091,
+        "y": -59.5961
+      }
+    },
+    "TEAGAN-BACK-M.p58": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 232.2687,
+        "y": -47.6704
+      }
+    },
+    "TEAGAN-BACK-M.p59": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 234.7437,
+        "y": -35.9178
+      }
+    },
+    "TEAGAN-BACK-M.p6": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -270.8429,
+        "y": -400.0604
+      }
+    },
+    "TEAGAN-BACK-M.p60": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 227.2495,
+        "y": -23.9246
+      }
+    },
+    "TEAGAN-BACK-M.p61": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 125.1662,
+        "y": -0.3568
+      }
+    },
+    "TEAGAN-BACK-M.p62": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 113.173,
+        "y": -7.851
+      }
+    },
+    "TEAGAN-BACK-M.p63": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 112.1947,
+        "y": -10.7878
+      }
+    },
+    "TEAGAN-BACK-M.p64": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 110.7279,
+        "y": -13.382
+      }
+    },
+    "TEAGAN-BACK-M.p65": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 108.8147,
+        "y": -15.6661
+      }
+    },
+    "TEAGAN-BACK-M.p66": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 106.4971,
+        "y": -17.6728
+      }
+    },
+    "TEAGAN-BACK-M.p67": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 103.817,
+        "y": -19.4347
+      }
+    },
+    "TEAGAN-BACK-M.p68": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 100.8164,
+        "y": -20.9846
+      }
+    },
+    "TEAGAN-BACK-M.p69": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 97.5374,
+        "y": -22.3551
+      }
+    },
+    "TEAGAN-BACK-M.p7": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -267.9453,
+        "y": -430.9494
+      }
+    },
+    "TEAGAN-BACK-M.p70": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 94.0218,
+        "y": -23.5788
+      }
+    },
+    "TEAGAN-BACK-M.p71": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 89.6922,
+        "y": -24.8376
+      }
+    },
+    "TEAGAN-BACK-M.p72": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 85.0907,
+        "y": -25.9339
+      }
+    },
+    "TEAGAN-BACK-M.p73": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 75.1281,
+        "y": -27.6838
+      }
+    },
+    "TEAGAN-BACK-M.p74": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 64.2466,
+        "y": -28.9183
+      }
+    },
+    "TEAGAN-BACK-M.p75": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 52.5589,
+        "y": -29.7272
+      }
+    },
+    "TEAGAN-BACK-M.p76": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 40.1777,
+        "y": -30.2001
+      }
+    },
+    "TEAGAN-BACK-M.p77": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 27.2157,
+        "y": -30.4268
+      }
+    },
+    "TEAGAN-BACK-M.p78": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 0.0,
+        "y": -30.5005
+      }
+    },
+    "TEAGAN-BACK-M.p79": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -27.2157,
+        "y": -30.4268
+      }
+    },
+    "TEAGAN-BACK-M.p8": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -265.2362,
+        "y": -465.2858
+      }
+    },
+    "TEAGAN-BACK-M.p80": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -40.1777,
+        "y": -30.2001
+      }
+    },
+    "TEAGAN-BACK-M.p81": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -52.5589,
+        "y": -29.7272
+      }
+    },
+    "TEAGAN-BACK-M.p82": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -64.2466,
+        "y": -28.9183
+      }
+    },
+    "TEAGAN-BACK-M.p83": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -75.1281,
+        "y": -27.6838
+      }
+    },
+    "TEAGAN-BACK-M.p84": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -85.0907,
+        "y": -25.9339
+      }
+    },
+    "TEAGAN-BACK-M.p85": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -89.6922,
+        "y": -24.8376
+      }
+    },
+    "TEAGAN-BACK-M.p86": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -94.0218,
+        "y": -23.5788
+      }
+    },
+    "TEAGAN-BACK-M.p87": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -97.5374,
+        "y": -22.3551
+      }
+    },
+    "TEAGAN-BACK-M.p88": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -100.8164,
+        "y": -20.9846
+      }
+    },
+    "TEAGAN-BACK-M.p89": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -103.817,
+        "y": -19.4347
+      }
+    },
+    "TEAGAN-BACK-M.p9": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -262.8093,
+        "y": -503.1074
+      }
+    },
+    "TEAGAN-BACK-M.p90": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -106.4971,
+        "y": -17.6728
+      }
+    },
+    "TEAGAN-BACK-M.p91": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -108.8147,
+        "y": -15.6661
+      }
+    },
+    "TEAGAN-BACK-M.p92": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -110.7279,
+        "y": -13.382
+      }
+    },
+    "TEAGAN-BACK-M.p93": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -112.1947,
+        "y": -10.7878
+      }
+    },
+    "TEAGAN-BACK-M.p94": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -113.173,
+        "y": -7.851
+      }
+    },
+    "TEAGAN-BACK-M.p95": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -125.1662,
+        "y": -0.3568
+      }
+    },
+    "TEAGAN-BACK-M.p96": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -227.2495,
+        "y": -23.9246
+      }
+    },
+    "TEAGAN-BACK-M.p97": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -234.7437,
+        "y": -35.9178
+      }
+    },
+    "TEAGAN-BACK-M.p98": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -232.2687,
+        "y": -47.6704
+      }
+    },
+    "TEAGAN-BACK-M.p99": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -230.2091,
+        "y": -59.5961
+      }
+    },
+    "TEAGAN-FRONT-M.e0": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p0",
+      "to": "TEAGAN-FRONT-M.p1"
+    },
+    "TEAGAN-FRONT-M.e1": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p1",
+      "to": "TEAGAN-FRONT-M.p2"
+    },
+    "TEAGAN-FRONT-M.e10": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p10",
+      "to": "TEAGAN-FRONT-M.p11"
+    },
+    "TEAGAN-FRONT-M.e100": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p100",
+      "to": "TEAGAN-FRONT-M.p101"
+    },
+    "TEAGAN-FRONT-M.e101": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p101",
+      "to": "TEAGAN-FRONT-M.p102"
+    },
+    "TEAGAN-FRONT-M.e102": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p102",
+      "to": "TEAGAN-FRONT-M.p103"
+    },
+    "TEAGAN-FRONT-M.e103": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p103",
+      "to": "TEAGAN-FRONT-M.p104"
+    },
+    "TEAGAN-FRONT-M.e104": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p104",
+      "to": "TEAGAN-FRONT-M.p105"
+    },
+    "TEAGAN-FRONT-M.e105": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p105",
+      "to": "TEAGAN-FRONT-M.p106"
+    },
+    "TEAGAN-FRONT-M.e106": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p106",
+      "to": "TEAGAN-FRONT-M.p107"
+    },
+    "TEAGAN-FRONT-M.e107": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p107",
+      "to": "TEAGAN-FRONT-M.p108"
+    },
+    "TEAGAN-FRONT-M.e108": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p108",
+      "to": "TEAGAN-FRONT-M.p109"
+    },
+    "TEAGAN-FRONT-M.e109": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p109",
+      "to": "TEAGAN-FRONT-M.p110"
+    },
+    "TEAGAN-FRONT-M.e11": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p11",
+      "to": "TEAGAN-FRONT-M.p12"
+    },
+    "TEAGAN-FRONT-M.e110": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p110",
+      "to": "TEAGAN-FRONT-M.p111"
+    },
+    "TEAGAN-FRONT-M.e111": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p111",
+      "to": "TEAGAN-FRONT-M.p112"
+    },
+    "TEAGAN-FRONT-M.e112": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p112",
+      "to": "TEAGAN-FRONT-M.p113"
+    },
+    "TEAGAN-FRONT-M.e113": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p113",
+      "to": "TEAGAN-FRONT-M.p114"
+    },
+    "TEAGAN-FRONT-M.e114": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p114",
+      "to": "TEAGAN-FRONT-M.p115"
+    },
+    "TEAGAN-FRONT-M.e115": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p115",
+      "to": "TEAGAN-FRONT-M.p116"
+    },
+    "TEAGAN-FRONT-M.e116": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p116",
+      "to": "TEAGAN-FRONT-M.p117"
+    },
+    "TEAGAN-FRONT-M.e117": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p117",
+      "to": "TEAGAN-FRONT-M.p118"
+    },
+    "TEAGAN-FRONT-M.e118": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p118",
+      "to": "TEAGAN-FRONT-M.p119"
+    },
+    "TEAGAN-FRONT-M.e119": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p119",
+      "to": "TEAGAN-FRONT-M.p120"
+    },
+    "TEAGAN-FRONT-M.e12": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p12",
+      "to": "TEAGAN-FRONT-M.p13"
+    },
+    "TEAGAN-FRONT-M.e120": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p120",
+      "to": "TEAGAN-FRONT-M.p121"
+    },
+    "TEAGAN-FRONT-M.e121": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p121",
+      "to": "TEAGAN-FRONT-M.p122"
+    },
+    "TEAGAN-FRONT-M.e122": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p122",
+      "to": "TEAGAN-FRONT-M.p123"
+    },
+    "TEAGAN-FRONT-M.e123": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p123",
+      "to": "TEAGAN-FRONT-M.p124"
+    },
+    "TEAGAN-FRONT-M.e124": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p124",
+      "to": "TEAGAN-FRONT-M.p125"
+    },
+    "TEAGAN-FRONT-M.e125": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p125",
+      "to": "TEAGAN-FRONT-M.p126"
+    },
+    "TEAGAN-FRONT-M.e126": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p126",
+      "to": "TEAGAN-FRONT-M.p127"
+    },
+    "TEAGAN-FRONT-M.e127": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p127",
+      "to": "TEAGAN-FRONT-M.p128"
+    },
+    "TEAGAN-FRONT-M.e128": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p128",
+      "to": "TEAGAN-FRONT-M.p129"
+    },
+    "TEAGAN-FRONT-M.e129": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p129",
+      "to": "TEAGAN-FRONT-M.p130"
+    },
+    "TEAGAN-FRONT-M.e13": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p13",
+      "to": "TEAGAN-FRONT-M.p14"
+    },
+    "TEAGAN-FRONT-M.e130": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p130",
+      "to": "TEAGAN-FRONT-M.p131"
+    },
+    "TEAGAN-FRONT-M.e131": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p131",
+      "to": "TEAGAN-FRONT-M.p132"
+    },
+    "TEAGAN-FRONT-M.e132": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p132",
+      "to": "TEAGAN-FRONT-M.p133"
+    },
+    "TEAGAN-FRONT-M.e133": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p133",
+      "to": "TEAGAN-FRONT-M.p134"
+    },
+    "TEAGAN-FRONT-M.e134": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p134",
+      "to": "TEAGAN-FRONT-M.p135"
+    },
+    "TEAGAN-FRONT-M.e135": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p135",
+      "to": "TEAGAN-FRONT-M.p136"
+    },
+    "TEAGAN-FRONT-M.e136": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p136",
+      "to": "TEAGAN-FRONT-M.p137"
+    },
+    "TEAGAN-FRONT-M.e137": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p137",
+      "to": "TEAGAN-FRONT-M.p138"
+    },
+    "TEAGAN-FRONT-M.e138": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p138",
+      "to": "TEAGAN-FRONT-M.p139"
+    },
+    "TEAGAN-FRONT-M.e139": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p139",
+      "to": "TEAGAN-FRONT-M.p140"
+    },
+    "TEAGAN-FRONT-M.e14": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p14",
+      "to": "TEAGAN-FRONT-M.p15"
+    },
+    "TEAGAN-FRONT-M.e140": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p140",
+      "to": "TEAGAN-FRONT-M.p141"
+    },
+    "TEAGAN-FRONT-M.e141": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p141",
+      "to": "TEAGAN-FRONT-M.p142"
+    },
+    "TEAGAN-FRONT-M.e142": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p142",
+      "to": "TEAGAN-FRONT-M.p143"
+    },
+    "TEAGAN-FRONT-M.e143": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p143",
+      "to": "TEAGAN-FRONT-M.p144"
+    },
+    "TEAGAN-FRONT-M.e144": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p144",
+      "to": "TEAGAN-FRONT-M.p0"
+    },
+    "TEAGAN-FRONT-M.e15": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p15",
+      "to": "TEAGAN-FRONT-M.p16"
+    },
+    "TEAGAN-FRONT-M.e16": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p16",
+      "to": "TEAGAN-FRONT-M.p17"
+    },
+    "TEAGAN-FRONT-M.e17": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p17",
+      "to": "TEAGAN-FRONT-M.p18"
+    },
+    "TEAGAN-FRONT-M.e18": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p18",
+      "to": "TEAGAN-FRONT-M.p19"
+    },
+    "TEAGAN-FRONT-M.e19": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p19",
+      "to": "TEAGAN-FRONT-M.p20"
+    },
+    "TEAGAN-FRONT-M.e2": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p2",
+      "to": "TEAGAN-FRONT-M.p3"
+    },
+    "TEAGAN-FRONT-M.e20": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p20",
+      "to": "TEAGAN-FRONT-M.p21"
+    },
+    "TEAGAN-FRONT-M.e21": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p21",
+      "to": "TEAGAN-FRONT-M.p22"
+    },
+    "TEAGAN-FRONT-M.e22": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p22",
+      "to": "TEAGAN-FRONT-M.p23"
+    },
+    "TEAGAN-FRONT-M.e23": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p23",
+      "to": "TEAGAN-FRONT-M.p24"
+    },
+    "TEAGAN-FRONT-M.e24": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p24",
+      "to": "TEAGAN-FRONT-M.p25"
+    },
+    "TEAGAN-FRONT-M.e25": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p25",
+      "to": "TEAGAN-FRONT-M.p26"
+    },
+    "TEAGAN-FRONT-M.e26": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p26",
+      "to": "TEAGAN-FRONT-M.p27"
+    },
+    "TEAGAN-FRONT-M.e27": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p27",
+      "to": "TEAGAN-FRONT-M.p28"
+    },
+    "TEAGAN-FRONT-M.e28": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p28",
+      "to": "TEAGAN-FRONT-M.p29"
+    },
+    "TEAGAN-FRONT-M.e29": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p29",
+      "to": "TEAGAN-FRONT-M.p30"
+    },
+    "TEAGAN-FRONT-M.e3": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p3",
+      "to": "TEAGAN-FRONT-M.p4"
+    },
+    "TEAGAN-FRONT-M.e30": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p30",
+      "to": "TEAGAN-FRONT-M.p31"
+    },
+    "TEAGAN-FRONT-M.e31": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p31",
+      "to": "TEAGAN-FRONT-M.p32"
+    },
+    "TEAGAN-FRONT-M.e32": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p32",
+      "to": "TEAGAN-FRONT-M.p33"
+    },
+    "TEAGAN-FRONT-M.e33": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p33",
+      "to": "TEAGAN-FRONT-M.p34"
+    },
+    "TEAGAN-FRONT-M.e34": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p34",
+      "to": "TEAGAN-FRONT-M.p35"
+    },
+    "TEAGAN-FRONT-M.e35": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p35",
+      "to": "TEAGAN-FRONT-M.p36"
+    },
+    "TEAGAN-FRONT-M.e36": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p36",
+      "to": "TEAGAN-FRONT-M.p37"
+    },
+    "TEAGAN-FRONT-M.e37": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p37",
+      "to": "TEAGAN-FRONT-M.p38"
+    },
+    "TEAGAN-FRONT-M.e38": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p38",
+      "to": "TEAGAN-FRONT-M.p39"
+    },
+    "TEAGAN-FRONT-M.e39": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p39",
+      "to": "TEAGAN-FRONT-M.p40"
+    },
+    "TEAGAN-FRONT-M.e4": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p4",
+      "to": "TEAGAN-FRONT-M.p5"
+    },
+    "TEAGAN-FRONT-M.e40": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p40",
+      "to": "TEAGAN-FRONT-M.p41"
+    },
+    "TEAGAN-FRONT-M.e41": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p41",
+      "to": "TEAGAN-FRONT-M.p42"
+    },
+    "TEAGAN-FRONT-M.e42": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p42",
+      "to": "TEAGAN-FRONT-M.p43"
+    },
+    "TEAGAN-FRONT-M.e43": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p43",
+      "to": "TEAGAN-FRONT-M.p44"
+    },
+    "TEAGAN-FRONT-M.e44": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p44",
+      "to": "TEAGAN-FRONT-M.p45"
+    },
+    "TEAGAN-FRONT-M.e45": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p45",
+      "to": "TEAGAN-FRONT-M.p46"
+    },
+    "TEAGAN-FRONT-M.e46": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p46",
+      "to": "TEAGAN-FRONT-M.p47"
+    },
+    "TEAGAN-FRONT-M.e47": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p47",
+      "to": "TEAGAN-FRONT-M.p48"
+    },
+    "TEAGAN-FRONT-M.e48": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p48",
+      "to": "TEAGAN-FRONT-M.p49"
+    },
+    "TEAGAN-FRONT-M.e49": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p49",
+      "to": "TEAGAN-FRONT-M.p50"
+    },
+    "TEAGAN-FRONT-M.e5": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p5",
+      "to": "TEAGAN-FRONT-M.p6"
+    },
+    "TEAGAN-FRONT-M.e50": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p50",
+      "to": "TEAGAN-FRONT-M.p51"
+    },
+    "TEAGAN-FRONT-M.e51": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p51",
+      "to": "TEAGAN-FRONT-M.p52"
+    },
+    "TEAGAN-FRONT-M.e52": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p52",
+      "to": "TEAGAN-FRONT-M.p53"
+    },
+    "TEAGAN-FRONT-M.e53": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p53",
+      "to": "TEAGAN-FRONT-M.p54"
+    },
+    "TEAGAN-FRONT-M.e54": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p54",
+      "to": "TEAGAN-FRONT-M.p55"
+    },
+    "TEAGAN-FRONT-M.e55": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p55",
+      "to": "TEAGAN-FRONT-M.p56"
+    },
+    "TEAGAN-FRONT-M.e56": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p56",
+      "to": "TEAGAN-FRONT-M.p57"
+    },
+    "TEAGAN-FRONT-M.e57": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p57",
+      "to": "TEAGAN-FRONT-M.p58"
+    },
+    "TEAGAN-FRONT-M.e58": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p58",
+      "to": "TEAGAN-FRONT-M.p59"
+    },
+    "TEAGAN-FRONT-M.e59": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p59",
+      "to": "TEAGAN-FRONT-M.p60"
+    },
+    "TEAGAN-FRONT-M.e6": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p6",
+      "to": "TEAGAN-FRONT-M.p7"
+    },
+    "TEAGAN-FRONT-M.e60": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p60",
+      "to": "TEAGAN-FRONT-M.p61"
+    },
+    "TEAGAN-FRONT-M.e61": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p61",
+      "to": "TEAGAN-FRONT-M.p62"
+    },
+    "TEAGAN-FRONT-M.e62": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p62",
+      "to": "TEAGAN-FRONT-M.p63"
+    },
+    "TEAGAN-FRONT-M.e63": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p63",
+      "to": "TEAGAN-FRONT-M.p64"
+    },
+    "TEAGAN-FRONT-M.e64": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p64",
+      "to": "TEAGAN-FRONT-M.p65"
+    },
+    "TEAGAN-FRONT-M.e65": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p65",
+      "to": "TEAGAN-FRONT-M.p66"
+    },
+    "TEAGAN-FRONT-M.e66": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p66",
+      "to": "TEAGAN-FRONT-M.p67"
+    },
+    "TEAGAN-FRONT-M.e67": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p67",
+      "to": "TEAGAN-FRONT-M.p68"
+    },
+    "TEAGAN-FRONT-M.e68": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p68",
+      "to": "TEAGAN-FRONT-M.p69"
+    },
+    "TEAGAN-FRONT-M.e69": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p69",
+      "to": "TEAGAN-FRONT-M.p70"
+    },
+    "TEAGAN-FRONT-M.e7": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p7",
+      "to": "TEAGAN-FRONT-M.p8"
+    },
+    "TEAGAN-FRONT-M.e70": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p70",
+      "to": "TEAGAN-FRONT-M.p71"
+    },
+    "TEAGAN-FRONT-M.e71": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p71",
+      "to": "TEAGAN-FRONT-M.p72"
+    },
+    "TEAGAN-FRONT-M.e72": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p72",
+      "to": "TEAGAN-FRONT-M.p73"
+    },
+    "TEAGAN-FRONT-M.e73": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p73",
+      "to": "TEAGAN-FRONT-M.p74"
+    },
+    "TEAGAN-FRONT-M.e74": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p74",
+      "to": "TEAGAN-FRONT-M.p75"
+    },
+    "TEAGAN-FRONT-M.e75": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p75",
+      "to": "TEAGAN-FRONT-M.p76"
+    },
+    "TEAGAN-FRONT-M.e76": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p76",
+      "to": "TEAGAN-FRONT-M.p77"
+    },
+    "TEAGAN-FRONT-M.e77": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p77",
+      "to": "TEAGAN-FRONT-M.p78"
+    },
+    "TEAGAN-FRONT-M.e78": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p78",
+      "to": "TEAGAN-FRONT-M.p79"
+    },
+    "TEAGAN-FRONT-M.e79": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p79",
+      "to": "TEAGAN-FRONT-M.p80"
+    },
+    "TEAGAN-FRONT-M.e8": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p8",
+      "to": "TEAGAN-FRONT-M.p9"
+    },
+    "TEAGAN-FRONT-M.e80": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p80",
+      "to": "TEAGAN-FRONT-M.p81"
+    },
+    "TEAGAN-FRONT-M.e81": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p81",
+      "to": "TEAGAN-FRONT-M.p82"
+    },
+    "TEAGAN-FRONT-M.e82": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p82",
+      "to": "TEAGAN-FRONT-M.p83"
+    },
+    "TEAGAN-FRONT-M.e83": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p83",
+      "to": "TEAGAN-FRONT-M.p84"
+    },
+    "TEAGAN-FRONT-M.e84": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p84",
+      "to": "TEAGAN-FRONT-M.p85"
+    },
+    "TEAGAN-FRONT-M.e85": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p85",
+      "to": "TEAGAN-FRONT-M.p86"
+    },
+    "TEAGAN-FRONT-M.e86": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p86",
+      "to": "TEAGAN-FRONT-M.p87"
+    },
+    "TEAGAN-FRONT-M.e87": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p87",
+      "to": "TEAGAN-FRONT-M.p88"
+    },
+    "TEAGAN-FRONT-M.e88": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p88",
+      "to": "TEAGAN-FRONT-M.p89"
+    },
+    "TEAGAN-FRONT-M.e89": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p89",
+      "to": "TEAGAN-FRONT-M.p90"
+    },
+    "TEAGAN-FRONT-M.e9": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p9",
+      "to": "TEAGAN-FRONT-M.p10"
+    },
+    "TEAGAN-FRONT-M.e90": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p90",
+      "to": "TEAGAN-FRONT-M.p91"
+    },
+    "TEAGAN-FRONT-M.e91": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p91",
+      "to": "TEAGAN-FRONT-M.p92"
+    },
+    "TEAGAN-FRONT-M.e92": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p92",
+      "to": "TEAGAN-FRONT-M.p93"
+    },
+    "TEAGAN-FRONT-M.e93": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p93",
+      "to": "TEAGAN-FRONT-M.p94"
+    },
+    "TEAGAN-FRONT-M.e94": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p94",
+      "to": "TEAGAN-FRONT-M.p95"
+    },
+    "TEAGAN-FRONT-M.e95": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p95",
+      "to": "TEAGAN-FRONT-M.p96"
+    },
+    "TEAGAN-FRONT-M.e96": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p96",
+      "to": "TEAGAN-FRONT-M.p97"
+    },
+    "TEAGAN-FRONT-M.e97": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p97",
+      "to": "TEAGAN-FRONT-M.p98"
+    },
+    "TEAGAN-FRONT-M.e98": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p98",
+      "to": "TEAGAN-FRONT-M.p99"
+    },
+    "TEAGAN-FRONT-M.e99": {
+      "kind": "line",
+      "from": "TEAGAN-FRONT-M.p99",
+      "to": "TEAGAN-FRONT-M.p100"
+    },
+    "TEAGAN-FRONT-M.grain0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 0.0,
+        "y": -117.5
+      }
+    },
+    "TEAGAN-FRONT-M.grain1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 0.0,
+        "y": -690.0
+      }
+    },
+    "TEAGAN-FRONT-M.mark0.0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 213.7236,
+        "y": -166.5039
+      }
+    },
+    "TEAGAN-FRONT-M.mark1.0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -213.7236,
+        "y": -166.5039
+      }
+    },
+    "TEAGAN-FRONT-M.mark2.0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 0.0,
+        "y": -117.5
+      }
+    },
+    "TEAGAN-FRONT-M.p0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -288.2729,
+        "y": -278.3859
+      }
+    },
+    "TEAGAN-FRONT-M.p1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -284.6539,
+        "y": -297.2464
+      }
+    },
+    "TEAGAN-FRONT-M.p10": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -260.7584,
+        "y": -544.4518
+      }
+    },
+    "TEAGAN-FRONT-M.p100": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -84.2855,
+        "y": -60.0961
+      }
+    },
+    "TEAGAN-FRONT-M.p101": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -90.0906,
+        "y": -53.1267
+      }
+    },
+    "TEAGAN-FRONT-M.p102": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -95.4287,
+        "y": -45.9145
+      }
+    },
+    "TEAGAN-FRONT-M.p103": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -100.2444,
+        "y": -38.5061
+      }
+    },
+    "TEAGAN-FRONT-M.p104": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -104.4821,
+        "y": -30.9487
+      }
+    },
+    "TEAGAN-FRONT-M.p105": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -108.0865,
+        "y": -23.2891
+      }
+    },
+    "TEAGAN-FRONT-M.p106": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -111.0019,
+        "y": -15.5742
+      }
+    },
+    "TEAGAN-FRONT-M.p107": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -113.173,
+        "y": -7.851
+      }
+    },
+    "TEAGAN-FRONT-M.p108": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -125.1662,
+        "y": -0.3568
+      }
+    },
+    "TEAGAN-FRONT-M.p109": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -227.2495,
+        "y": -23.9246
+      }
+    },
+    "TEAGAN-FRONT-M.p11": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -259.1774,
+        "y": -589.3568
+      }
+    },
+    "TEAGAN-FRONT-M.p110": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -234.7437,
+        "y": -35.9178
+      }
+    },
+    "TEAGAN-FRONT-M.p111": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -231.6915,
+        "y": -50.0023
+      }
+    },
+    "TEAGAN-FRONT-M.p112": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -229.1158,
+        "y": -63.6833
+      }
+    },
+    "TEAGAN-FRONT-M.p113": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -226.9952,
+        "y": -76.953
+      }
+    },
+    "TEAGAN-FRONT-M.p114": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -225.3083,
+        "y": -89.8035
+      }
+    },
+    "TEAGAN-FRONT-M.p115": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -224.0335,
+        "y": -102.2269
+      }
+    },
+    "TEAGAN-FRONT-M.p116": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -223.1496,
+        "y": -114.2155
+      }
+    },
+    "TEAGAN-FRONT-M.p117": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -222.6349,
+        "y": -125.7615
+      }
+    },
+    "TEAGAN-FRONT-M.p118": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -222.4682,
+        "y": -136.857
+      }
+    },
+    "TEAGAN-FRONT-M.p119": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -222.5932,
+        "y": -146.3807
+      }
+    },
+    "TEAGAN-FRONT-M.p12": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -258.16,
+        "y": -637.8603
+      }
+    },
+    "TEAGAN-FRONT-M.p120": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -222.9583,
+        "y": -155.5252
+      }
+    },
+    "TEAGAN-FRONT-M.p121": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -223.5486,
+        "y": -164.2836
+      }
+    },
+    "TEAGAN-FRONT-M.p122": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -224.3491,
+        "y": -172.6488
+      }
+    },
+    "TEAGAN-FRONT-M.p123": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -225.3449,
+        "y": -180.6136
+      }
+    },
+    "TEAGAN-FRONT-M.p124": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -226.521,
+        "y": -188.1711
+      }
+    },
+    "TEAGAN-FRONT-M.p125": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -227.8625,
+        "y": -195.314
+      }
+    },
+    "TEAGAN-FRONT-M.p126": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -229.3544,
+        "y": -202.0355
+      }
+    },
+    "TEAGAN-FRONT-M.p127": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -230.9818,
+        "y": -208.3283
+      }
+    },
+    "TEAGAN-FRONT-M.p128": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -232.7297,
+        "y": -214.1854
+      }
+    },
+    "TEAGAN-FRONT-M.p129": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -234.5832,
+        "y": -219.5998
+      }
+    },
+    "TEAGAN-FRONT-M.p13": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -257.8,
+        "y": -690.0
+      }
+    },
+    "TEAGAN-FRONT-M.p130": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -236.5273,
+        "y": -224.5643
+      }
+    },
+    "TEAGAN-FRONT-M.p131": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -238.5471,
+        "y": -229.0719
+      }
+    },
+    "TEAGAN-FRONT-M.p132": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -240.6277,
+        "y": -233.1156
+      }
+    },
+    "TEAGAN-FRONT-M.p133": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -242.754,
+        "y": -236.6881
+      }
+    },
+    "TEAGAN-FRONT-M.p134": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -244.9112,
+        "y": -239.7826
+      }
+    },
+    "TEAGAN-FRONT-M.p135": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -247.3424,
+        "y": -242.6076
+      }
+    },
+    "TEAGAN-FRONT-M.p136": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -250.7953,
+        "y": -245.7136
+      }
+    },
+    "TEAGAN-FRONT-M.p137": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -255.3398,
+        "y": -249.182
+      }
+    },
+    "TEAGAN-FRONT-M.p138": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -259.3357,
+        "y": -251.8439
+      }
+    },
+    "TEAGAN-FRONT-M.p139": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -263.6812,
+        "y": -254.3591
+      }
+    },
+    "TEAGAN-FRONT-M.p14": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -247.8,
+        "y": -720.0
+      }
+    },
+    "TEAGAN-FRONT-M.p140": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -268.2636,
+        "y": -256.5589
+      }
+    },
+    "TEAGAN-FRONT-M.p141": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -272.9704,
+        "y": -258.2743
+      }
+    },
+    "TEAGAN-FRONT-M.p142": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -276.5207,
+        "y": -259.129
+      }
+    },
+    "TEAGAN-FRONT-M.p143": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -280.0,
+        "y": -259.45
+      }
+    },
+    "TEAGAN-FRONT-M.p144": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -289.748,
+        "y": -271.6808
+      }
+    },
+    "TEAGAN-FRONT-M.p15": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 247.8,
+        "y": -720.0
+      }
+    },
+    "TEAGAN-FRONT-M.p16": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 257.8,
+        "y": -690.0
+      }
+    },
+    "TEAGAN-FRONT-M.p17": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 258.16,
+        "y": -637.8603
+      }
+    },
+    "TEAGAN-FRONT-M.p18": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 259.1774,
+        "y": -589.3568
+      }
+    },
+    "TEAGAN-FRONT-M.p19": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 260.7584,
+        "y": -544.4518
+      }
+    },
+    "TEAGAN-FRONT-M.p2": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -282.2631,
+        "y": -311.3245
+      }
+    },
+    "TEAGAN-FRONT-M.p20": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 262.8093,
+        "y": -503.1074
+      }
+    },
+    "TEAGAN-FRONT-M.p21": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 265.2362,
+        "y": -465.2858
+      }
+    },
+    "TEAGAN-FRONT-M.p22": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 267.9453,
+        "y": -430.9494
+      }
+    },
+    "TEAGAN-FRONT-M.p23": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 270.8429,
+        "y": -400.0604
+      }
+    },
+    "TEAGAN-FRONT-M.p24": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 273.835,
+        "y": -372.581
+      }
+    },
+    "TEAGAN-FRONT-M.p25": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 276.7646,
+        "y": -348.956
+      }
+    },
+    "TEAGAN-FRONT-M.p26": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 279.6037,
+        "y": -328.5491
+      }
+    },
+    "TEAGAN-FRONT-M.p27": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 282.2631,
+        "y": -311.3245
+      }
+    },
+    "TEAGAN-FRONT-M.p28": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 284.6539,
+        "y": -297.2464
+      }
+    },
+    "TEAGAN-FRONT-M.p29": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 288.2729,
+        "y": -278.3859
+      }
+    },
+    "TEAGAN-FRONT-M.p3": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -279.6037,
+        "y": -328.5491
+      }
+    },
+    "TEAGAN-FRONT-M.p30": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 289.748,
+        "y": -271.6808
+      }
+    },
+    "TEAGAN-FRONT-M.p31": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 280.0,
+        "y": -259.45
+      }
+    },
+    "TEAGAN-FRONT-M.p32": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 276.5207,
+        "y": -259.129
+      }
+    },
+    "TEAGAN-FRONT-M.p33": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 272.9704,
+        "y": -258.2743
+      }
+    },
+    "TEAGAN-FRONT-M.p34": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 268.2636,
+        "y": -256.5589
+      }
+    },
+    "TEAGAN-FRONT-M.p35": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 263.6812,
+        "y": -254.3591
+      }
+    },
+    "TEAGAN-FRONT-M.p36": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 259.3357,
+        "y": -251.8439
+      }
+    },
+    "TEAGAN-FRONT-M.p37": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 255.3398,
+        "y": -249.182
+      }
+    },
+    "TEAGAN-FRONT-M.p38": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 250.7953,
+        "y": -245.7136
+      }
+    },
+    "TEAGAN-FRONT-M.p39": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 247.3424,
+        "y": -242.6076
+      }
+    },
+    "TEAGAN-FRONT-M.p4": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -276.7646,
+        "y": -348.956
+      }
+    },
+    "TEAGAN-FRONT-M.p40": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 244.9112,
+        "y": -239.7826
+      }
+    },
+    "TEAGAN-FRONT-M.p41": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 242.754,
+        "y": -236.6881
+      }
+    },
+    "TEAGAN-FRONT-M.p42": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 240.6277,
+        "y": -233.1156
+      }
+    },
+    "TEAGAN-FRONT-M.p43": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 238.5471,
+        "y": -229.0719
+      }
+    },
+    "TEAGAN-FRONT-M.p44": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 236.5273,
+        "y": -224.5643
+      }
+    },
+    "TEAGAN-FRONT-M.p45": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 234.5832,
+        "y": -219.5998
+      }
+    },
+    "TEAGAN-FRONT-M.p46": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 232.7297,
+        "y": -214.1854
+      }
+    },
+    "TEAGAN-FRONT-M.p47": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 230.9818,
+        "y": -208.3283
+      }
+    },
+    "TEAGAN-FRONT-M.p48": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 229.3544,
+        "y": -202.0355
+      }
+    },
+    "TEAGAN-FRONT-M.p49": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 227.8625,
+        "y": -195.314
+      }
+    },
+    "TEAGAN-FRONT-M.p5": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -273.835,
+        "y": -372.581
+      }
+    },
+    "TEAGAN-FRONT-M.p50": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 226.521,
+        "y": -188.1711
+      }
+    },
+    "TEAGAN-FRONT-M.p51": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 225.3449,
+        "y": -180.6136
+      }
+    },
+    "TEAGAN-FRONT-M.p52": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 224.3491,
+        "y": -172.6488
+      }
+    },
+    "TEAGAN-FRONT-M.p53": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 223.5486,
+        "y": -164.2836
+      }
+    },
+    "TEAGAN-FRONT-M.p54": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 222.9583,
+        "y": -155.5252
+      }
+    },
+    "TEAGAN-FRONT-M.p55": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 222.5932,
+        "y": -146.3807
+      }
+    },
+    "TEAGAN-FRONT-M.p56": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 222.4682,
+        "y": -136.857
+      }
+    },
+    "TEAGAN-FRONT-M.p57": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 222.6349,
+        "y": -125.7615
+      }
+    },
+    "TEAGAN-FRONT-M.p58": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 223.1496,
+        "y": -114.2155
+      }
+    },
+    "TEAGAN-FRONT-M.p59": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 224.0335,
+        "y": -102.2269
+      }
+    },
+    "TEAGAN-FRONT-M.p6": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -270.8429,
+        "y": -400.0604
+      }
+    },
+    "TEAGAN-FRONT-M.p60": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 225.3083,
+        "y": -89.8035
+      }
+    },
+    "TEAGAN-FRONT-M.p61": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 226.9952,
+        "y": -76.953
+      }
+    },
+    "TEAGAN-FRONT-M.p62": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 229.1158,
+        "y": -63.6833
+      }
+    },
+    "TEAGAN-FRONT-M.p63": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 231.6915,
+        "y": -50.0023
+      }
+    },
+    "TEAGAN-FRONT-M.p64": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 234.7437,
+        "y": -35.9178
+      }
+    },
+    "TEAGAN-FRONT-M.p65": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 227.2495,
+        "y": -23.9246
+      }
+    },
+    "TEAGAN-FRONT-M.p66": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 125.1662,
+        "y": -0.3568
+      }
+    },
+    "TEAGAN-FRONT-M.p67": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 113.173,
+        "y": -7.851
+      }
+    },
+    "TEAGAN-FRONT-M.p68": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 111.0019,
+        "y": -15.5742
+      }
+    },
+    "TEAGAN-FRONT-M.p69": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 108.0865,
+        "y": -23.2891
+      }
+    },
+    "TEAGAN-FRONT-M.p7": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -267.9453,
+        "y": -430.9494
+      }
+    },
+    "TEAGAN-FRONT-M.p70": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 104.4821,
+        "y": -30.9487
+      }
+    },
+    "TEAGAN-FRONT-M.p71": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 100.2444,
+        "y": -38.5061
+      }
+    },
+    "TEAGAN-FRONT-M.p72": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 95.4287,
+        "y": -45.9145
+      }
+    },
+    "TEAGAN-FRONT-M.p73": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 90.0906,
+        "y": -53.1267
+      }
+    },
+    "TEAGAN-FRONT-M.p74": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 84.2855,
+        "y": -60.0961
+      }
+    },
+    "TEAGAN-FRONT-M.p75": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 78.0688,
+        "y": -66.7755
+      }
+    },
+    "TEAGAN-FRONT-M.p76": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 71.4962,
+        "y": -73.1181
+      }
+    },
+    "TEAGAN-FRONT-M.p77": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 64.623,
+        "y": -79.077
+      }
+    },
+    "TEAGAN-FRONT-M.p78": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 57.5047,
+        "y": -84.6053
+      }
+    },
+    "TEAGAN-FRONT-M.p79": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 50.1969,
+        "y": -89.6559
+      }
+    },
+    "TEAGAN-FRONT-M.p8": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -265.2362,
+        "y": -465.2858
+      }
+    },
+    "TEAGAN-FRONT-M.p80": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 42.7549,
+        "y": -94.1821
+      }
+    },
+    "TEAGAN-FRONT-M.p81": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 35.2342,
+        "y": -98.1368
+      }
+    },
+    "TEAGAN-FRONT-M.p82": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 27.6904,
+        "y": -101.4732
+      }
+    },
+    "TEAGAN-FRONT-M.p83": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 20.1789,
+        "y": -104.1444
+      }
+    },
+    "TEAGAN-FRONT-M.p84": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 15.0185,
+        "y": -105.5749
+      }
+    },
+    "TEAGAN-FRONT-M.p85": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 9.9219,
+        "y": -106.6277
+      }
+    },
+    "TEAGAN-FRONT-M.p86": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 4.9091,
+        "y": -107.2778
+      }
+    },
+    "TEAGAN-FRONT-M.p87": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 0.0,
+        "y": -107.5
+      }
+    },
+    "TEAGAN-FRONT-M.p88": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -4.9091,
+        "y": -107.2778
+      }
+    },
+    "TEAGAN-FRONT-M.p89": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -9.9219,
+        "y": -106.6277
+      }
+    },
+    "TEAGAN-FRONT-M.p9": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -262.8093,
+        "y": -503.1074
+      }
+    },
+    "TEAGAN-FRONT-M.p90": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -15.0185,
+        "y": -105.5749
+      }
+    },
+    "TEAGAN-FRONT-M.p91": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -20.1789,
+        "y": -104.1444
+      }
+    },
+    "TEAGAN-FRONT-M.p92": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -27.6904,
+        "y": -101.4732
+      }
+    },
+    "TEAGAN-FRONT-M.p93": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -35.2342,
+        "y": -98.1368
+      }
+    },
+    "TEAGAN-FRONT-M.p94": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -42.7549,
+        "y": -94.1821
+      }
+    },
+    "TEAGAN-FRONT-M.p95": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -50.1969,
+        "y": -89.6559
+      }
+    },
+    "TEAGAN-FRONT-M.p96": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -57.5047,
+        "y": -84.6053
+      }
+    },
+    "TEAGAN-FRONT-M.p97": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -64.623,
+        "y": -79.077
+      }
+    },
+    "TEAGAN-FRONT-M.p98": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -71.4962,
+        "y": -73.1181
+      }
+    },
+    "TEAGAN-FRONT-M.p99": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -78.0688,
+        "y": -66.7755
+      }
+    },
+    "TEAGAN-SLEEVE-M.e0": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p0",
+      "to": "TEAGAN-SLEEVE-M.p1"
+    },
+    "TEAGAN-SLEEVE-M.e1": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p1",
+      "to": "TEAGAN-SLEEVE-M.p2"
+    },
+    "TEAGAN-SLEEVE-M.e10": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p10",
+      "to": "TEAGAN-SLEEVE-M.p11"
+    },
+    "TEAGAN-SLEEVE-M.e11": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p11",
+      "to": "TEAGAN-SLEEVE-M.p12"
+    },
+    "TEAGAN-SLEEVE-M.e12": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p12",
+      "to": "TEAGAN-SLEEVE-M.p13"
+    },
+    "TEAGAN-SLEEVE-M.e13": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p13",
+      "to": "TEAGAN-SLEEVE-M.p14"
+    },
+    "TEAGAN-SLEEVE-M.e14": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p14",
+      "to": "TEAGAN-SLEEVE-M.p15"
+    },
+    "TEAGAN-SLEEVE-M.e15": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p15",
+      "to": "TEAGAN-SLEEVE-M.p16"
+    },
+    "TEAGAN-SLEEVE-M.e16": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p16",
+      "to": "TEAGAN-SLEEVE-M.p17"
+    },
+    "TEAGAN-SLEEVE-M.e17": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p17",
+      "to": "TEAGAN-SLEEVE-M.p18"
+    },
+    "TEAGAN-SLEEVE-M.e18": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p18",
+      "to": "TEAGAN-SLEEVE-M.p19"
+    },
+    "TEAGAN-SLEEVE-M.e19": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p19",
+      "to": "TEAGAN-SLEEVE-M.p20"
+    },
+    "TEAGAN-SLEEVE-M.e2": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p2",
+      "to": "TEAGAN-SLEEVE-M.p3"
+    },
+    "TEAGAN-SLEEVE-M.e20": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p20",
+      "to": "TEAGAN-SLEEVE-M.p21"
+    },
+    "TEAGAN-SLEEVE-M.e21": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p21",
+      "to": "TEAGAN-SLEEVE-M.p22"
+    },
+    "TEAGAN-SLEEVE-M.e22": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p22",
+      "to": "TEAGAN-SLEEVE-M.p23"
+    },
+    "TEAGAN-SLEEVE-M.e23": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p23",
+      "to": "TEAGAN-SLEEVE-M.p24"
+    },
+    "TEAGAN-SLEEVE-M.e24": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p24",
+      "to": "TEAGAN-SLEEVE-M.p25"
+    },
+    "TEAGAN-SLEEVE-M.e25": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p25",
+      "to": "TEAGAN-SLEEVE-M.p26"
+    },
+    "TEAGAN-SLEEVE-M.e26": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p26",
+      "to": "TEAGAN-SLEEVE-M.p27"
+    },
+    "TEAGAN-SLEEVE-M.e27": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p27",
+      "to": "TEAGAN-SLEEVE-M.p28"
+    },
+    "TEAGAN-SLEEVE-M.e28": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p28",
+      "to": "TEAGAN-SLEEVE-M.p29"
+    },
+    "TEAGAN-SLEEVE-M.e29": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p29",
+      "to": "TEAGAN-SLEEVE-M.p30"
+    },
+    "TEAGAN-SLEEVE-M.e3": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p3",
+      "to": "TEAGAN-SLEEVE-M.p4"
+    },
+    "TEAGAN-SLEEVE-M.e30": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p30",
+      "to": "TEAGAN-SLEEVE-M.p31"
+    },
+    "TEAGAN-SLEEVE-M.e31": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p31",
+      "to": "TEAGAN-SLEEVE-M.p32"
+    },
+    "TEAGAN-SLEEVE-M.e32": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p32",
+      "to": "TEAGAN-SLEEVE-M.p33"
+    },
+    "TEAGAN-SLEEVE-M.e33": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p33",
+      "to": "TEAGAN-SLEEVE-M.p34"
+    },
+    "TEAGAN-SLEEVE-M.e34": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p34",
+      "to": "TEAGAN-SLEEVE-M.p35"
+    },
+    "TEAGAN-SLEEVE-M.e35": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p35",
+      "to": "TEAGAN-SLEEVE-M.p36"
+    },
+    "TEAGAN-SLEEVE-M.e36": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p36",
+      "to": "TEAGAN-SLEEVE-M.p37"
+    },
+    "TEAGAN-SLEEVE-M.e37": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p37",
+      "to": "TEAGAN-SLEEVE-M.p38"
+    },
+    "TEAGAN-SLEEVE-M.e38": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p38",
+      "to": "TEAGAN-SLEEVE-M.p39"
+    },
+    "TEAGAN-SLEEVE-M.e39": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p39",
+      "to": "TEAGAN-SLEEVE-M.p40"
+    },
+    "TEAGAN-SLEEVE-M.e4": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p4",
+      "to": "TEAGAN-SLEEVE-M.p5"
+    },
+    "TEAGAN-SLEEVE-M.e40": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p40",
+      "to": "TEAGAN-SLEEVE-M.p41"
+    },
+    "TEAGAN-SLEEVE-M.e41": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p41",
+      "to": "TEAGAN-SLEEVE-M.p42"
+    },
+    "TEAGAN-SLEEVE-M.e42": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p42",
+      "to": "TEAGAN-SLEEVE-M.p43"
+    },
+    "TEAGAN-SLEEVE-M.e43": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p43",
+      "to": "TEAGAN-SLEEVE-M.p44"
+    },
+    "TEAGAN-SLEEVE-M.e44": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p44",
+      "to": "TEAGAN-SLEEVE-M.p45"
+    },
+    "TEAGAN-SLEEVE-M.e45": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p45",
+      "to": "TEAGAN-SLEEVE-M.p46"
+    },
+    "TEAGAN-SLEEVE-M.e46": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p46",
+      "to": "TEAGAN-SLEEVE-M.p47"
+    },
+    "TEAGAN-SLEEVE-M.e47": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p47",
+      "to": "TEAGAN-SLEEVE-M.p48"
+    },
+    "TEAGAN-SLEEVE-M.e48": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p48",
+      "to": "TEAGAN-SLEEVE-M.p49"
+    },
+    "TEAGAN-SLEEVE-M.e49": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p49",
+      "to": "TEAGAN-SLEEVE-M.p50"
+    },
+    "TEAGAN-SLEEVE-M.e5": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p5",
+      "to": "TEAGAN-SLEEVE-M.p6"
+    },
+    "TEAGAN-SLEEVE-M.e50": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p50",
+      "to": "TEAGAN-SLEEVE-M.p51"
+    },
+    "TEAGAN-SLEEVE-M.e51": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p51",
+      "to": "TEAGAN-SLEEVE-M.p52"
+    },
+    "TEAGAN-SLEEVE-M.e52": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p52",
+      "to": "TEAGAN-SLEEVE-M.p53"
+    },
+    "TEAGAN-SLEEVE-M.e53": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p53",
+      "to": "TEAGAN-SLEEVE-M.p54"
+    },
+    "TEAGAN-SLEEVE-M.e54": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p54",
+      "to": "TEAGAN-SLEEVE-M.p55"
+    },
+    "TEAGAN-SLEEVE-M.e55": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p55",
+      "to": "TEAGAN-SLEEVE-M.p56"
+    },
+    "TEAGAN-SLEEVE-M.e56": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p56",
+      "to": "TEAGAN-SLEEVE-M.p57"
+    },
+    "TEAGAN-SLEEVE-M.e57": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p57",
+      "to": "TEAGAN-SLEEVE-M.p58"
+    },
+    "TEAGAN-SLEEVE-M.e58": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p58",
+      "to": "TEAGAN-SLEEVE-M.p59"
+    },
+    "TEAGAN-SLEEVE-M.e59": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p59",
+      "to": "TEAGAN-SLEEVE-M.p60"
+    },
+    "TEAGAN-SLEEVE-M.e6": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p6",
+      "to": "TEAGAN-SLEEVE-M.p7"
+    },
+    "TEAGAN-SLEEVE-M.e60": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p60",
+      "to": "TEAGAN-SLEEVE-M.p61"
+    },
+    "TEAGAN-SLEEVE-M.e61": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p61",
+      "to": "TEAGAN-SLEEVE-M.p62"
+    },
+    "TEAGAN-SLEEVE-M.e62": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p62",
+      "to": "TEAGAN-SLEEVE-M.p63"
+    },
+    "TEAGAN-SLEEVE-M.e63": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p63",
+      "to": "TEAGAN-SLEEVE-M.p64"
+    },
+    "TEAGAN-SLEEVE-M.e64": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p64",
+      "to": "TEAGAN-SLEEVE-M.p65"
+    },
+    "TEAGAN-SLEEVE-M.e65": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p65",
+      "to": "TEAGAN-SLEEVE-M.p66"
+    },
+    "TEAGAN-SLEEVE-M.e66": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p66",
+      "to": "TEAGAN-SLEEVE-M.p0"
+    },
+    "TEAGAN-SLEEVE-M.e7": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p7",
+      "to": "TEAGAN-SLEEVE-M.p8"
+    },
+    "TEAGAN-SLEEVE-M.e8": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p8",
+      "to": "TEAGAN-SLEEVE-M.p9"
+    },
+    "TEAGAN-SLEEVE-M.e9": {
+      "kind": "line",
+      "from": "TEAGAN-SLEEVE-M.p9",
+      "to": "TEAGAN-SLEEVE-M.p10"
+    },
+    "TEAGAN-SLEEVE-M.grain0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 3.4218,
+        "y": -50.5631
+      }
+    },
+    "TEAGAN-SLEEVE-M.grain1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 3.4218,
+        "y": 143.8493
+      }
+    },
+    "TEAGAN-SLEEVE-M.mark0.0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 102.9916,
+        "y": 83.2348
+      }
+    },
+    "TEAGAN-SLEEVE-M.mark1.0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -106.5215,
+        "y": 88.5125
+      }
+    },
+    "TEAGAN-SLEEVE-M.mark2.0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 3.4218,
+        "y": -50.5631
+      }
+    },
+    "TEAGAN-SLEEVE-M.p0": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -214.5458,
+        "y": -61.3638
+      }
+    },
+    "TEAGAN-SLEEVE-M.p1": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -204.5458,
+        "y": -91.3638
+      }
+    },
+    "TEAGAN-SLEEVE-M.p10": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 179.8877,
+        "y": 22.4314
+      }
+    },
+    "TEAGAN-SLEEVE-M.p11": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 170.8589,
+        "y": 27.8686
+      }
+    },
+    "TEAGAN-SLEEVE-M.p12": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 160.6417,
+        "y": 34.5795
+      }
+    },
+    "TEAGAN-SLEEVE-M.p13": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 151.9829,
+        "y": 40.9466
+      }
+    },
+    "TEAGAN-SLEEVE-M.p14": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 144.2919,
+        "y": 47.4737
+      }
+    },
+    "TEAGAN-SLEEVE-M.p15": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 137.4291,
+        "y": 54.1575
+      }
+    },
+    "TEAGAN-SLEEVE-M.p16": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 131.2549,
+        "y": 60.9945
+      }
+    },
+    "TEAGAN-SLEEVE-M.p17": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 125.63,
+        "y": 67.9815
+      }
+    },
+    "TEAGAN-SLEEVE-M.p18": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 120.4148,
+        "y": 75.115
+      }
+    },
+    "TEAGAN-SLEEVE-M.p19": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 115.4698,
+        "y": 82.3916
+      }
+    },
+    "TEAGAN-SLEEVE-M.p2": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 204.5458,
+        "y": -91.3638
+      }
+    },
+    "TEAGAN-SLEEVE-M.p20": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 110.6555,
+        "y": 89.8079
+      }
+    },
+    "TEAGAN-SLEEVE-M.p21": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 102.6626,
+        "y": 102.3176
+      }
+    },
+    "TEAGAN-SLEEVE-M.p22": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 94.1379,
+        "y": 115.1842
+      }
+    },
+    "TEAGAN-SLEEVE-M.p23": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 89.5136,
+        "y": 121.7512
+      }
+    },
+    "TEAGAN-SLEEVE-M.p24": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 84.5613,
+        "y": 128.4074
+      }
+    },
+    "TEAGAN-SLEEVE-M.p25": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 79.2162,
+        "y": 135.1527
+      }
+    },
+    "TEAGAN-SLEEVE-M.p26": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 73.4131,
+        "y": 141.9872
+      }
+    },
+    "TEAGAN-SLEEVE-M.p27": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 70.819,
+        "y": 144.6626
+      }
+    },
+    "TEAGAN-SLEEVE-M.p28": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 67.8978,
+        "y": 147.1787
+      }
+    },
+    "TEAGAN-SLEEVE-M.p29": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 64.6685,
+        "y": 149.5337
+      }
+    },
+    "TEAGAN-SLEEVE-M.p3": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 214.5458,
+        "y": -61.3638
+      }
+    },
+    "TEAGAN-SLEEVE-M.p30": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 61.1505,
+        "y": 151.7258
+      }
+    },
+    "TEAGAN-SLEEVE-M.p31": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 57.363,
+        "y": 153.753
+      }
+    },
+    "TEAGAN-SLEEVE-M.p32": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 53.3253,
+        "y": 155.6136
+      }
+    },
+    "TEAGAN-SLEEVE-M.p33": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 49.0566,
+        "y": 157.3057
+      }
+    },
+    "TEAGAN-SLEEVE-M.p34": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 44.5762,
+        "y": 158.8275
+      }
+    },
+    "TEAGAN-SLEEVE-M.p35": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 35.0572,
+        "y": 161.3528
+      }
+    },
+    "TEAGAN-SLEEVE-M.p36": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 24.9225,
+        "y": 163.1748
+      }
+    },
+    "TEAGAN-SLEEVE-M.p37": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 14.326,
+        "y": 164.2787
+      }
+    },
+    "TEAGAN-SLEEVE-M.p38": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 3.4218,
+        "y": 164.65
+      }
+    },
+    "TEAGAN-SLEEVE-M.p39": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -1.4114,
+        "y": 164.5787
+      }
+    },
+    "TEAGAN-SLEEVE-M.p4": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 214.5458,
+        "y": 0.0
+      }
+    },
+    "TEAGAN-SLEEVE-M.p40": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -1.7055,
+        "y": 164.5744
+      }
+    },
+    "TEAGAN-SLEEVE-M.p41": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -12.925,
+        "y": 163.8663
+      }
+    },
+    "TEAGAN-SLEEVE-M.p42": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -23.917,
+        "y": 162.4264
+      }
+    },
+    "TEAGAN-SLEEVE-M.p43": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -34.5049,
+        "y": 160.2859
+      }
+    },
+    "TEAGAN-SLEEVE-M.p44": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -44.5121,
+        "y": 157.4762
+      }
+    },
+    "TEAGAN-SLEEVE-M.p45": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -53.7623,
+        "y": 154.0286
+      }
+    },
+    "TEAGAN-SLEEVE-M.p46": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -58.0483,
+        "y": 152.0753
+      }
+    },
+    "TEAGAN-SLEEVE-M.p47": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -62.0789,
+        "y": 149.9744
+      }
+    },
+    "TEAGAN-SLEEVE-M.p48": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -65.8319,
+        "y": 147.7296
+      }
+    },
+    "TEAGAN-SLEEVE-M.p49": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -69.2853,
+        "y": 145.3449
+      }
+    },
+    "TEAGAN-SLEEVE-M.p5": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 207.6754,
+        "y": 9.4977
+      }
+    },
+    "TEAGAN-SLEEVE-M.p50": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -72.4171,
+        "y": 142.8242
+      }
+    },
+    "TEAGAN-SLEEVE-M.p51": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -75.2052,
+        "y": 140.1715
+      }
+    },
+    "TEAGAN-SLEEVE-M.p52": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -83.6564,
+        "y": 130.8798
+      }
+    },
+    "TEAGAN-SLEEVE-M.p53": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -94.1695,
+        "y": 118.6698
+      }
+    },
+    "TEAGAN-SLEEVE-M.p54": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -118.8346,
+        "y": 89.3859
+      }
+    },
+    "TEAGAN-SLEEVE-M.p55": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -122.3468,
+        "y": 85.2629
+      }
+    },
+    "TEAGAN-SLEEVE-M.p56": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -135.4675,
+        "y": 69.9094
+      }
+    },
+    "TEAGAN-SLEEVE-M.p57": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -147.8438,
+        "y": 55.9048
+      }
+    },
+    "TEAGAN-SLEEVE-M.p58": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -158.7585,
+        "y": 44.3872
+      }
+    },
+    "TEAGAN-SLEEVE-M.p59": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -163.4435,
+        "y": 39.9167
+      }
+    },
+    "TEAGAN-SLEEVE-M.p6": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 203.6087,
+        "y": 10.8989
+      }
+    },
+    "TEAGAN-SLEEVE-M.p60": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -167.4942,
+        "y": 36.4949
+      }
+    },
+    "TEAGAN-SLEEVE-M.p61": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -177.7673,
+        "y": 28.9648
+      }
+    },
+    "TEAGAN-SLEEVE-M.p62": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -177.4154,
+        "y": 29.2235
+      }
+    },
+    "TEAGAN-SLEEVE-M.p63": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -188.7525,
+        "y": 21.5542
+      }
+    },
+    "TEAGAN-SLEEVE-M.p64": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -198.7765,
+        "y": 15.1693
+      }
+    },
+    "TEAGAN-SLEEVE-M.p65": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -209.63,
+        "y": 8.6111
+      }
+    },
+    "TEAGAN-SLEEVE-M.p66": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": -214.5458,
+        "y": 0.0
+      }
+    },
+    "TEAGAN-SLEEVE-M.p7": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 199.5886,
+        "y": 12.5016
+      }
+    },
+    "TEAGAN-SLEEVE-M.p8": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 194.2781,
+        "y": 14.874
+      }
+    },
+    "TEAGAN-SLEEVE-M.p9": {
+      "kind": "point",
+      "operation": {
+        "op": "absolute",
+        "x": 187.7026,
+        "y": 18.1419
+      }
+    }
+  },
+  "pieces": [
+    {
+      "id": "TEAGAN-FRONT-M",
+      "name": "front",
+      "edges": [
+        {
+          "object": "TEAGAN-FRONT-M.e0",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e1",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e2",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e3",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e4",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e5",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e6",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e7",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e8",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e9",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e10",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e11",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e12",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e13",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e14",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e15",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e16",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e17",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e18",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e19",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e20",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e21",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e22",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e23",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e24",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e25",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e26",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e27",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e28",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e29",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e30",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e31",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e32",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e33",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e34",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e35",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e36",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e37",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e38",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e39",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e40",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e41",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e42",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e43",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e44",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e45",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e46",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e47",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e48",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e49",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e50",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e51",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e52",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e53",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e54",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e55",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e56",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e57",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e58",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e59",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e60",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e61",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e62",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e63",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e64",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e65",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e66",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e67",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e68",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e69",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e70",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e71",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e72",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e73",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e74",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e75",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e76",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e77",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e78",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e79",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e80",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e81",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e82",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e83",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e84",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e85",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e86",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e87",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e88",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e89",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e90",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e91",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e92",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e93",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e94",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e95",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e96",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e97",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e98",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e99",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e100",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e101",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e102",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e103",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e104",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e105",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e106",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e107",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e108",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e109",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e110",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e111",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e112",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e113",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e114",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e115",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e116",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e117",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e118",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e119",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e120",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e121",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e122",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e123",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e124",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e125",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e126",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e127",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e128",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e129",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e130",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e131",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e132",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e133",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e134",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e135",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e136",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e137",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e138",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e139",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e140",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e141",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e142",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e143",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-FRONT-M.e144",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        }
+      ],
+      "quantity": 1,
+      "mirror_quantity": 0,
+      "material": "fabric",
+      "grain": [
+        "TEAGAN-FRONT-M.grain0",
+        "TEAGAN-FRONT-M.grain1"
+      ],
+      "fold_line": null,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "annotations": [
+        {
+          "kind": "points",
+          "mark": "notch",
+          "points": [
+            "TEAGAN-FRONT-M.mark0.0"
+          ],
+          "text": "notch"
+        },
+        {
+          "kind": "points",
+          "mark": "notch",
+          "points": [
+            "TEAGAN-FRONT-M.mark1.0"
+          ],
+          "text": "notch"
+        },
+        {
+          "kind": "points",
+          "mark": "text",
+          "points": [
+            "TEAGAN-FRONT-M.mark2.0"
+          ],
+          "text": "teagan front M"
+        }
+      ],
+      "grade_points": {}
+    },
+    {
+      "id": "TEAGAN-BACK-M",
+      "name": "back",
+      "edges": [
+        {
+          "object": "TEAGAN-BACK-M.e0",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e1",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e2",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e3",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e4",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e5",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e6",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e7",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e8",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e9",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e10",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e11",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e12",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e13",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e14",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e15",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e16",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e17",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e18",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e19",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e20",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e21",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e22",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e23",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e24",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e25",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e26",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e27",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e28",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e29",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e30",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e31",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e32",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e33",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e34",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e35",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e36",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e37",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e38",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e39",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e40",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e41",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e42",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e43",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e44",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e45",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e46",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e47",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e48",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e49",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e50",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e51",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e52",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e53",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e54",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e55",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e56",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e57",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e58",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e59",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e60",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e61",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e62",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e63",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e64",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e65",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e66",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e67",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e68",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e69",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e70",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e71",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e72",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e73",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e74",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e75",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e76",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e77",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e78",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e79",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e80",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e81",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e82",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e83",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e84",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e85",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e86",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e87",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e88",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e89",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e90",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e91",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e92",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e93",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e94",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e95",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e96",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e97",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e98",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e99",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e100",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e101",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e102",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e103",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e104",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e105",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e106",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e107",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e108",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e109",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e110",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e111",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e112",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e113",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e114",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e115",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e116",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e117",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e118",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e119",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e120",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e121",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e122",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e123",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e124",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e125",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-BACK-M.e126",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        }
+      ],
+      "quantity": 1,
+      "mirror_quantity": 0,
+      "material": "fabric",
+      "grain": [
+        "TEAGAN-BACK-M.grain0",
+        "TEAGAN-BACK-M.grain1"
+      ],
+      "fold_line": null,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "annotations": [
+        {
+          "kind": "points",
+          "mark": "notch",
+          "points": [
+            "TEAGAN-BACK-M.mark0.0"
+          ],
+          "text": "bnotch"
+        },
+        {
+          "kind": "points",
+          "mark": "notch",
+          "points": [
+            "TEAGAN-BACK-M.mark1.0"
+          ],
+          "text": "bnotch"
+        },
+        {
+          "kind": "points",
+          "mark": "text",
+          "points": [
+            "TEAGAN-BACK-M.mark2.0"
+          ],
+          "text": "teagan back M"
+        }
+      ],
+      "grade_points": {}
+    },
+    {
+      "id": "TEAGAN-SLEEVE-M",
+      "name": "sleeve",
+      "edges": [
+        {
+          "object": "TEAGAN-SLEEVE-M.e0",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e1",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e2",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e3",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e4",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e5",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e6",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e7",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e8",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e9",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e10",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e11",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e12",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e13",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e14",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e15",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e16",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e17",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e18",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e19",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e20",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e21",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e22",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e23",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e24",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e25",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e26",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e27",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e28",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e29",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e30",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e31",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e32",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e33",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e34",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e35",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e36",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e37",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e38",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e39",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e40",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e41",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e42",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e43",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e44",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e45",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e46",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e47",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e48",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e49",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e50",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e51",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e52",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e53",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e54",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e55",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e56",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e57",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e58",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e59",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e60",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e61",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e62",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e63",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e64",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e65",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        },
+        {
+          "object": "TEAGAN-SLEEVE-M.e66",
+          "reversed": false,
+          "allowance": 0.0,
+          "corner": "miter"
+        }
+      ],
+      "quantity": 1,
+      "mirror_quantity": 1,
+      "material": "fabric",
+      "grain": [
+        "TEAGAN-SLEEVE-M.grain0",
+        "TEAGAN-SLEEVE-M.grain1"
+      ],
+      "fold_line": null,
+      "rotation": "inherit",
+      "buffer": 0.0,
+      "annotations": [
+        {
+          "kind": "points",
+          "mark": "notch",
+          "points": [
+            "TEAGAN-SLEEVE-M.mark0.0"
+          ],
+          "text": "notch"
+        },
+        {
+          "kind": "points",
+          "mark": "notch",
+          "points": [
+            "TEAGAN-SLEEVE-M.mark1.0"
+          ],
+          "text": "bnotch"
+        },
+        {
+          "kind": "points",
+          "mark": "text",
+          "points": [
+            "TEAGAN-SLEEVE-M.mark2.0"
+          ],
+          "text": "teagan sleeve M"
+        }
+      ],
+      "grade_points": {}
+    }
+  ],
+  "rules": {},
+  "meta": {
+    "assumptions": [],
+    "attribution": "FreeSewing 4.10.2, copyright Joost De Cock and FreeSewing contributors, MIT. See LICENSE.FreeSewing.MIT.",
+    "copyright": "Joost De Cock and FreeSewing contributors",
+    "cut_line": "FreeSewing seam allowance paths; design-specific hems and flat-felled allowances retained",
+    "flatten_tolerance_mm": 0.15,
+    "license": "MIT",
+    "measurement_sets": {
+      "L": "cisMaleAdult40",
+      "M": "cisMaleAdult38",
+      "S": "cisMaleAdult36",
+      "XL": "cisMaleAdult42"
+    },
+    "seam_allowance_mm": 10,
+    "source": "FreeSewing",
+    "source_url": "https://freesewing.eu/docs/designs/teagan/",
+    "unfolded": true,
+    "units": "mm",
+    "version": "4.10.2"
+  }
+}

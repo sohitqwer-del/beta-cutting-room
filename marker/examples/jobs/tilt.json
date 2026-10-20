@@ -1,0 +1,64 @@
+{
+  "format": "beta-marker.job/v1",
+  "name": "Synthetic narrow panel requiring tilt",
+  "fabric": {
+    "width": 30.1,
+    "max_length": null,
+    "nap": "none",
+    "allow_flip": false,
+    "tilt_deg": 2.0,
+    "layout": "open",
+    "defects": [],
+    "shade": null,
+    "repeat": null,
+    "shrinkage": {
+      "length_pct": 0.0,
+      "width_pct": 0.0
+    }
+  },
+  "spacing": {
+    "piece_gap": 0.0,
+    "edge_gap": 0.0
+  },
+  "pieces": [
+    {
+      "id": "bias-panel",
+      "name": "bias-panel",
+      "style": "BETA synthetic",
+      "size": null,
+      "material": null,
+      "outline": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          199.87816540381914,
+          6.979899340500194
+        ],
+        [
+          198.8311805027441,
+          36.96162415107307
+        ],
+        [
+          -1.0469849010750292,
+          29.981724810572874
+        ]
+      ],
+      "grain": null,
+      "quantity": 1,
+      "mirror_quantity": 0,
+      "rotation": "fixed",
+      "buffer": 0.0,
+      "marks": [],
+      "match_points": [],
+      "fold_line": null,
+      "block_margin": null,
+      "flip": null,
+      "tilt_deg": null
+    }
+  ],
+  "order": null,
+  "match_rules": [],
+  "meta": {}
+}

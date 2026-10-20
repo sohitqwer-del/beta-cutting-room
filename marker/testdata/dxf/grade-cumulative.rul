@@ -1,0 +1,9 @@
+// Original Project BETA grading exercise, CC BY 4.0
+SIZES: S M L
+BASE: M
+UNITS: MM
+MODE: CUMULATIVE
+RULE: 1 2,1 0,0 -2,-1
+RULE: 2 -2,1 0,0 2,-1
+RULE: 3 -2,-1 0,0 2,1
+RULE: 4 2,-1 0,0 -2,1

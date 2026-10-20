@@ -1,0 +1,176 @@
+{
+  "schema": "beta-site-benchmark/1",
+  "id": "academic-60s",
+  "title": "Academic nesting instances, 60 seconds",
+  "kind": "academic",
+  "status": "sample",
+  "status_note": "Sample data copied from the documented round-2 results (marker/docs/benchmarks.md). The benchmark runner's own export replaces this file.",
+  "order": 30,
+  "date": "2026-10-18",
+  "summary_text": "Seven standard research instances, including shirts, trousers and swimwear. BETA had 60 seconds. The paper's means used 1200 seconds on a faster desktop CPU.",
+  "software": {
+    "beta_version": "0.2 (round 2)",
+    "engine_revision": "3022b1285ff7",
+    "engine": "sparrow 0.3.0 on jagua-rs 1.0 (unmodified)"
+  },
+  "reference": {
+    "name": "sparrow paper means (100 runs, 1200 s, 3 threads, AMD Ryzen 9 7950X)",
+    "type": "published-paper",
+    "citation": "Gardeyn, Vanden Berghe and Wauters, An open-source heuristic to reboot 2D nesting research, arXiv:2509.13329v4, Tables 2-3",
+    "url": "https://arxiv.org/abs/2509.13329"
+  },
+  "conditions": {
+    "budget_label": "60 s per run (paper: 1200 s)",
+    "budget_s": 60,
+    "machine": "Shared 16-thread Intel laptop (i9-11900H), other programs running",
+    "jobs": 5,
+    "workers_per_task": 3,
+    "seeds": [
+      1,
+      2,
+      3
+    ],
+    "background_load": "not controlled"
+  },
+  "assumptions": [
+    "BETA uses sparrow itself, so this measures BETA's adapter and the shorter time. It is not an independent algorithm comparison.",
+    "No garment rules or gaps are added. Instance files are the MIT-licensed sparrow v0.3.0 files."
+  ],
+  "groups": [
+    {
+      "label": "All 7 instances, 3 seeds each",
+      "attempts": 21,
+      "valid": 21,
+      "mean_diff_pp": -2.373,
+      "median_diff_pp": -2.3398,
+      "win": 0,
+      "tie": 0,
+      "loss": 21,
+      "mean_length_saving_pct": -2.8331,
+      "median_length_saving_pct": -2.7058,
+      "other_failures": 0,
+      "headline": true
+    },
+    {
+      "label": "albano",
+      "attempts": 3,
+      "valid": 3,
+      "mean_diff_pp": -1.5552,
+      "median_diff_pp": -1.8648,
+      "win": 0,
+      "tie": 0,
+      "loss": 3,
+      "mean_length_saving_pct": -1.773,
+      "median_length_saving_pct": -2.1287,
+      "other_failures": 0,
+      "mean_reference_eff_pct": 89.47,
+      "mean_beta_eff_pct": 87.9148
+    },
+    {
+      "label": "dagli",
+      "attempts": 3,
+      "valid": 3,
+      "mean_diff_pp": -3.8187,
+      "median_diff_pp": -4.373,
+      "win": 0,
+      "tie": 0,
+      "loss": 3,
+      "mean_length_saving_pct": -4.4805,
+      "median_length_saving_pct": -5.1516,
+      "other_failures": 0,
+      "mean_reference_eff_pct": 89.26,
+      "mean_beta_eff_pct": 85.4413
+    },
+    {
+      "label": "mao",
+      "attempts": 3,
+      "valid": 3,
+      "mean_diff_pp": -2.3822,
+      "median_diff_pp": -2.3875,
+      "win": 0,
+      "tie": 0,
+      "loss": 3,
+      "mean_length_saving_pct": -2.8443,
+      "median_length_saving_pct": -2.8507,
+      "other_failures": 0,
+      "mean_reference_eff_pct": 86.14,
+      "mean_beta_eff_pct": 83.7578
+    },
+    {
+      "label": "marques",
+      "attempts": 3,
+      "valid": 3,
+      "mean_diff_pp": -1.3011,
+      "median_diff_pp": -1.8033,
+      "win": 0,
+      "tie": 0,
+      "loss": 3,
+      "mean_length_saving_pct": -1.4595,
+      "median_length_saving_pct": -2.0233,
+      "other_failures": 0,
+      "mean_reference_eff_pct": 90.93,
+      "mean_beta_eff_pct": 89.6289
+    },
+    {
+      "label": "shirts",
+      "attempts": 3,
+      "valid": 3,
+      "mean_diff_pp": -2.4101,
+      "median_diff_pp": -2.3621,
+      "win": 0,
+      "tie": 0,
+      "loss": 3,
+      "mean_length_saving_pct": -2.7624,
+      "median_length_saving_pct": -2.7058,
+      "other_failures": 0,
+      "mean_reference_eff_pct": 89.66,
+      "mean_beta_eff_pct": 87.2499
+    },
+    {
+      "label": "swim",
+      "attempts": 3,
+      "valid": 3,
+      "mean_diff_pp": -3.5178,
+      "median_diff_pp": -3.6224,
+      "win": 0,
+      "tie": 0,
+      "loss": 3,
+      "mean_length_saving_pct": -4.7075,
+      "median_length_saving_pct": -4.8534,
+      "other_failures": 0,
+      "mean_reference_eff_pct": 78.26,
+      "mean_beta_eff_pct": 74.7422
+    },
+    {
+      "label": "trousers",
+      "attempts": 3,
+      "valid": 3,
+      "mean_diff_pp": -1.6258,
+      "median_diff_pp": -1.5825,
+      "win": 0,
+      "tie": 0,
+      "loss": 3,
+      "mean_length_saving_pct": -1.8045,
+      "median_length_saving_pct": -1.7555,
+      "other_failures": 0,
+      "mean_reference_eff_pct": 91.73,
+      "mean_beta_eff_pct": 90.1042
+    }
+  ],
+  "reproduce": {
+    "commands": [
+      "cargo run --release -p beta-marker-cli -- bench academic --time 60 --seeds 1,2,3 --threads-per-task 3 --jobs 5 --out <new-folder>"
+    ],
+    "doc": "marker/docs/benchmarks.md"
+  },
+  "sources": [
+    {
+      "label": "Round-2 academic report",
+      "url": "marker/bench/results/2026-10-18-academic-round2-60s.md"
+    },
+    {
+      "label": "Reference values (CSV)",
+      "url": "marker/bench/academic-references.csv"
+    }
+  ]
+}

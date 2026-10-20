@@ -1,0 +1,45 @@
+{
+    "lectra":  {
+                   "sample_match_60_sha256":  "4b7bd76d882c2106c1b821eabc3b452879189e3e82814983cfde5a270c10436d",
+                   "sample_300_sha256":  "66edbac7fcb1baa57945147a99113b7449f262d928012d43385847d039849c8c",
+                   "converter_sha256":  "790c3c708bca70cd9865efcbbcda8763f95cf05fb973b456f01215626d0bdd85"
+               },
+    "schema":  "beta-public-inputs/1",
+    "academic":  [
+                     {
+                         "url":  "https://raw.githubusercontent.com/JeroenGar/sparrow/v0.3.0/data/input/shirts.json",
+                         "sha256":  "4dfce1f22beaeada3fe5c269fe8c8f01fed323ff28b4a8128738318a59b6bb54",
+                         "id":  "shirts"
+                     },
+                     {
+                         "url":  "https://raw.githubusercontent.com/JeroenGar/sparrow/v0.3.0/data/input/trousers.json",
+                         "sha256":  "53af43b0e1f5060660beab75fdc3ac75b5bd786f512e5e235de282c6d141c85c",
+                         "id":  "trousers"
+                     },
+                     {
+                         "url":  "https://raw.githubusercontent.com/JeroenGar/sparrow/v0.3.0/data/input/swim.json",
+                         "sha256":  "e425ceb1c919398f610a5216c513a624e7acbf2a84772c9cdbe0daba15036694",
+                         "id":  "swim"
+                     },
+                     {
+                         "url":  "https://raw.githubusercontent.com/JeroenGar/sparrow/v0.3.0/data/input/albano.json",
+                         "sha256":  "a4b5dbe638dc0d5d52b0949e3fe5671ce81a9e6ea60a50fdc4a5b77546be51d5",
+                         "id":  "albano"
+                     },
+                     {
+                         "url":  "https://raw.githubusercontent.com/JeroenGar/sparrow/v0.3.0/data/input/dagli.json",
+                         "sha256":  "0ad314ab1340a1106df7a184507a534d9d6d3dc8f99e47b75409a10c30641b7c",
+                         "id":  "dagli"
+                     },
+                     {
+                         "url":  "https://raw.githubusercontent.com/JeroenGar/sparrow/v0.3.0/data/input/mao.json",
+                         "sha256":  "cdf3bb8f6b04e15113789bdaef22d3e8e309e6633709f88ba2e097087b74f8e4",
+                         "id":  "mao"
+                     },
+                     {
+                         "url":  "https://raw.githubusercontent.com/JeroenGar/sparrow/v0.3.0/data/input/marques.json",
+                         "sha256":  "bead96cdb36f6637eb5e21aa5df5f78781bd1cddd913b5ff7b0457205c8e3b2d",
+                         "id":  "marques"
+                     }
+                 ]
+}

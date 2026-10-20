@@ -1,0 +1,702 @@
+{
+  "job": {
+    "format": "beta-marker.job/v1",
+    "name": "Shared rectangle",
+    "fabric": {
+      "width": 100,
+      "max_length": null,
+      "nap": "none",
+      "allow_flip": false,
+      "tilt_deg": 0
+    },
+    "spacing": {
+      "piece_gap": 2,
+      "edge_gap": 1
+    },
+    "pieces": [
+      {
+        "id": "rect",
+        "name": "Rectangle",
+        "style": null,
+        "size": "M",
+        "material": null,
+        "outline": [
+          [
+            0,
+            0
+          ],
+          [
+            20,
+            0
+          ],
+          [
+            20,
+            10
+          ],
+          [
+            0,
+            10
+          ]
+        ],
+        "grain": [
+          [
+            0,
+            0
+          ],
+          [
+            10,
+            0
+          ]
+        ],
+        "quantity": 1,
+        "mirror_quantity": 1,
+        "rotation": "inherit",
+        "buffer": 0,
+        "marks": [
+          {
+            "kind": "notch",
+            "points": [
+              [
+                10,
+                0
+              ]
+            ],
+            "text": null
+          },
+          {
+            "kind": "drill",
+            "points": [
+              [
+                5,
+                5
+              ]
+            ],
+            "text": null
+          },
+          {
+            "kind": "line",
+            "points": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                2
+              ]
+            ],
+            "text": null
+          },
+          {
+            "kind": "text",
+            "points": [
+              [
+                3,
+                3
+              ]
+            ],
+            "text": "M"
+          }
+        ],
+        "flip": null,
+        "tilt_deg": null
+      }
+    ],
+    "order": {
+      "sizes": {
+        "M": 2
+      }
+    },
+    "meta": {
+      "source": "Synthetic contract fixture",
+      "revision": 1
+    }
+  },
+  "result": {
+    "format": "beta-marker.result/v1",
+    "job_name": "Shared rectangle",
+    "width": 100,
+    "length": 21,
+    "piece_area": 200,
+    "efficiency": 0.09523809523809523,
+    "engine": "fixture",
+    "seed": 42,
+    "runtime_s": 0,
+    "placements": [
+      {
+        "piece_id": "rect",
+        "copy": 0,
+        "mirrored": false,
+        "rotation_deg": 0,
+        "translate": [
+          1,
+          1
+        ],
+        "locked": false
+      }
+    ],
+    "warnings": []
+  },
+  "v02": {
+    "job": {
+      "format": "beta-marker.job/v1",
+      "name": "Shared rectangle",
+      "fabric": {
+        "width": 100,
+        "max_length": null,
+        "nap": "one_way_per_bundle",
+        "allow_flip": true,
+        "tilt_deg": 0,
+        "layout": "folded",
+        "defects": [
+          {
+            "id": "hole",
+            "polygon": [
+              [
+                80,
+                80
+              ],
+              [
+                90,
+                80
+              ],
+              [
+                90,
+                90
+              ],
+              [
+                80,
+                90
+              ]
+            ],
+            "note": "Hole"
+          }
+        ],
+        "shade": {
+          "axis": "length",
+          "band_mm": 1000
+        },
+        "repeat": {
+          "period_x": 20,
+          "period_y": 10,
+          "offset_x": 1,
+          "offset_y": 2,
+          "tolerance_mm": 1
+        },
+        "shrinkage": {
+          "length_pct": 2,
+          "width_pct": 3
+        }
+      },
+      "spacing": {
+        "piece_gap": 2,
+        "edge_gap": 1
+      },
+      "pieces": [
+        {
+          "id": "rect",
+          "name": "Rectangle",
+          "style": null,
+          "size": "M",
+          "material": null,
+          "outline": [
+            [
+              0,
+              0
+            ],
+            [
+              20,
+              0
+            ],
+            [
+              20,
+              10
+            ],
+            [
+              0,
+              10
+            ]
+          ],
+          "grain": [
+            [
+              0,
+              0
+            ],
+            [
+              10,
+              0
+            ]
+          ],
+          "quantity": 1,
+          "mirror_quantity": 1,
+          "rotation": "inherit",
+          "buffer": 0,
+          "marks": [
+            {
+              "kind": "notch",
+              "points": [
+                [
+                  10,
+                  0
+                ]
+              ],
+              "text": null
+            },
+            {
+              "kind": "drill",
+              "points": [
+                [
+                  5,
+                  5
+                ]
+              ],
+              "text": null
+            },
+            {
+              "kind": "line",
+              "points": [
+                [
+                  1,
+                  1
+                ],
+                [
+                  2,
+                  2
+                ]
+              ],
+              "text": null
+            },
+            {
+              "kind": "text",
+              "points": [
+                [
+                  3,
+                  3
+                ]
+              ],
+              "text": "M"
+            }
+          ],
+          "match_points": [
+            {
+              "id": "seam",
+              "point": [
+                5,
+                5
+              ]
+            }
+          ],
+          "fold_line": [
+            [
+              0,
+              5
+            ],
+            [
+              20,
+              5
+            ]
+          ],
+          "block_margin": 2,
+          "flip": null,
+          "tilt_deg": null
+        }
+      ],
+      "order": {
+        "sizes": {
+          "M": 2
+        }
+      },
+      "meta": {
+        "source": "Synthetic contract fixture",
+        "revision": 1
+      },
+      "match_rules": [
+        {
+          "a": {
+            "piece_id": "rect",
+            "point_id": "seam"
+          },
+          "b": null,
+          "axes": "both",
+          "offset": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    "result": {
+      "format": "beta-marker.result/v1",
+      "job_name": "Shared rectangle",
+      "width": 100,
+      "length": 21,
+      "piece_area": 200,
+      "efficiency": 0.09523809523809523,
+      "engine": "fixture",
+      "seed": 42,
+      "runtime_s": 0,
+      "placements": [
+        {
+          "piece_id": "rect",
+          "copy": 0,
+          "mirrored": false,
+          "rotation_deg": 0,
+          "translate": [
+            1,
+            1
+          ],
+          "locked": true,
+          "bundle": 0,
+          "on_fold": true
+        }
+      ],
+      "warnings": []
+    },
+    "options": {
+      "time_limit_s": 0.1,
+      "seed": 42,
+      "workers": 2,
+      "early_termination": true,
+      "fixed": [
+        {
+          "piece_id": "rect",
+          "copy": 0,
+          "mirrored": false,
+          "rotation_deg": 0,
+          "translate": [
+            1,
+            1
+          ],
+          "locked": true,
+          "bundle": 0,
+          "on_fold": true
+        }
+      ],
+      "runs": 3,
+      "warm_start": {
+        "format": "beta-marker.result/v1",
+        "job_name": "Shared rectangle",
+        "width": 100,
+        "length": 21,
+        "piece_area": 200,
+        "efficiency": 0.09523809523809523,
+        "engine": "fixture",
+        "seed": 42,
+        "runtime_s": 0,
+        "placements": [
+          {
+            "piece_id": "rect",
+            "copy": 0,
+            "mirrored": false,
+            "rotation_deg": 0,
+            "translate": [
+              1,
+              1
+            ],
+            "locked": true,
+            "bundle": 0,
+            "on_fold": true
+          }
+        ],
+        "warnings": []
+      }
+    },
+    "order": {
+      "format": "beta-marker.cutorder/v1",
+      "name": "Test order",
+      "job": {
+        "format": "beta-marker.job/v1",
+        "name": "Shared rectangle",
+        "fabric": {
+          "width": 100,
+          "max_length": null,
+          "nap": "one_way_per_bundle",
+          "allow_flip": true,
+          "tilt_deg": 0,
+          "layout": "folded",
+          "defects": [
+            {
+              "id": "hole",
+              "polygon": [
+                [
+                  80,
+                  80
+                ],
+                [
+                  90,
+                  80
+                ],
+                [
+                  90,
+                  90
+                ],
+                [
+                  80,
+                  90
+                ]
+              ],
+              "note": "Hole"
+            }
+          ],
+          "shade": {
+            "axis": "length",
+            "band_mm": 1000
+          },
+          "repeat": {
+            "period_x": 20,
+            "period_y": 10,
+            "offset_x": 1,
+            "offset_y": 2,
+            "tolerance_mm": 1
+          },
+          "shrinkage": {
+            "length_pct": 2,
+            "width_pct": 3
+          }
+        },
+        "spacing": {
+          "piece_gap": 2,
+          "edge_gap": 1
+        },
+        "pieces": [
+          {
+            "id": "rect",
+            "name": "Rectangle",
+            "style": null,
+            "size": "M",
+            "material": null,
+            "outline": [
+              [
+                0,
+                0
+              ],
+              [
+                20,
+                0
+              ],
+              [
+                20,
+                10
+              ],
+              [
+                0,
+                10
+              ]
+            ],
+            "grain": [
+              [
+                0,
+                0
+              ],
+              [
+                10,
+                0
+              ]
+            ],
+            "quantity": 1,
+            "mirror_quantity": 1,
+            "rotation": "inherit",
+            "buffer": 0,
+            "marks": [
+              {
+                "kind": "notch",
+                "points": [
+                  [
+                    10,
+                    0
+                  ]
+                ],
+                "text": null
+              },
+              {
+                "kind": "drill",
+                "points": [
+                  [
+                    5,
+                    5
+                  ]
+                ],
+                "text": null
+              },
+              {
+                "kind": "line",
+                "points": [
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    2,
+                    2
+                  ]
+                ],
+                "text": null
+              },
+              {
+                "kind": "text",
+                "points": [
+                  [
+                    3,
+                    3
+                  ]
+                ],
+                "text": "M"
+              }
+            ],
+            "match_points": [
+              {
+                "id": "seam",
+                "point": [
+                  5,
+                  5
+                ]
+              }
+            ],
+            "fold_line": [
+              [
+                0,
+                5
+              ],
+              [
+                20,
+                5
+              ]
+            ],
+            "block_margin": 2,
+            "flip": null,
+            "tilt_deg": null
+          }
+        ],
+        "order": {
+          "sizes": {
+            "M": 2
+          }
+        },
+        "meta": {
+          "source": "Synthetic contract fixture",
+          "revision": 1
+        },
+        "match_rules": [
+          {
+            "a": {
+              "piece_id": "rect",
+              "point_id": "seam"
+            },
+            "b": null,
+            "axes": "both",
+            "offset": [
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "quantities": {
+        "M": 20
+      },
+      "max_plies": 10,
+      "max_garments_per_marker": 2,
+      "overcut_pct": 1
+    },
+    "plan_options": {
+      "time_per_marker_s": 0.1,
+      "end_allowance_mm": 10,
+      "lay_cost_m": 0.5,
+      "estimated_efficiency": 0.75,
+      "max_candidates": 128,
+      "max_refinements": 16,
+      "search_nodes": 20000,
+      "seed": 42,
+      "final_time_s": 0
+    },
+    "plan": {
+      "format": "beta-marker.cutplan/v1",
+      "order_name": "Test order",
+      "options": {
+        "time_per_marker_s": 0.1,
+        "end_allowance_mm": 10,
+        "lay_cost_m": 0.5,
+        "estimated_efficiency": 0.75,
+        "max_candidates": 128,
+        "max_refinements": 16,
+        "search_nodes": 20000,
+        "seed": 42,
+        "final_time_s": 0
+      },
+      "lays": [
+        {
+          "ratio": {
+            "M": 2
+          },
+          "plies": 10,
+          "marker_length_mm": 21,
+          "efficiency": 0.1,
+          "fabric_m": 0.41,
+          "result": {
+            "format": "beta-marker.result/v1",
+            "job_name": "Shared rectangle",
+            "width": 100,
+            "length": 21,
+            "piece_area": 200,
+            "efficiency": 0.09523809523809523,
+            "engine": "fixture",
+            "seed": 42,
+            "runtime_s": 0,
+            "placements": [
+              {
+                "piece_id": "rect",
+                "copy": 0,
+                "mirrored": false,
+                "rotation_deg": 0,
+                "translate": [
+                  1,
+                  1
+                ],
+                "locked": true,
+                "bundle": 0,
+                "on_fold": true
+              }
+            ],
+            "warnings": []
+          }
+        }
+      ],
+      "total_fabric_m": 0.41,
+      "objective_m": 0.91,
+      "ordered": {
+        "M": 20
+      },
+      "planned": {
+        "M": 20
+      },
+      "shortfall": {},
+      "overcut": {},
+      "complete": true,
+      "optimal_for_evaluated_markers": true,
+      "markers_evaluated": 1,
+      "runtime_s": 0.1,
+      "warnings": []
+    },
+    "enum_values": {
+      "layouts": [
+        "open",
+        "folded",
+        "tubular"
+      ],
+      "naps": [
+        "none",
+        "one_way",
+        "one_way_per_bundle"
+      ],
+      "shade_axes": [
+        "length",
+        "width"
+      ],
+      "match_axes": [
+        "x",
+        "y",
+        "both"
+      ]
+    }
+  }
+}

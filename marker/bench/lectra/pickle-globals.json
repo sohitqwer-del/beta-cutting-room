@@ -1,0 +1,54 @@
+{
+  "tasks.gz": [
+    "builtins.slice",
+    "numpy.dtype",
+    "numpy.ndarray",
+    "numpy.core.multiarray._reconstruct",
+    "numpy.core.numeric._frombuffer",
+    "pandas._libs.internals._unpickle_block",
+    "pandas.core.frame.DataFrame",
+    "pandas.core.indexes.base.Index",
+    "pandas.core.indexes.base._new_Index",
+    "pandas.core.indexes.range.RangeIndex",
+    "pandas.core.internals.managers.BlockManager"
+  ],
+  "parts.gz": [
+    "builtins.slice",
+    "numpy.dtype",
+    "numpy.ndarray",
+    "numpy.core.multiarray._reconstruct",
+    "numpy.core.numeric._frombuffer",
+    "pandas._libs.internals._unpickle_block",
+    "pandas.core.frame.DataFrame",
+    "pandas.core.indexes.base.Index",
+    "pandas.core.indexes.base._new_Index",
+    "pandas.core.indexes.numeric.Int64Index",
+    "pandas.core.internals.managers.BlockManager"
+  ],
+  "constraints.gz": [
+    "builtins.slice",
+    "numpy.dtype",
+    "numpy.ndarray",
+    "numpy.core.multiarray._reconstruct",
+    "numpy.core.numeric._frombuffer",
+    "pandas._libs.internals._unpickle_block",
+    "pandas.core.frame.DataFrame",
+    "pandas.core.indexes.base.Index",
+    "pandas.core.indexes.base._new_Index",
+    "pandas.core.indexes.numeric.Int64Index",
+    "pandas.core.internals.managers.BlockManager"
+  ],
+  "shapes.gz": [
+    "builtins.slice",
+    "numpy.dtype",
+    "numpy.ndarray",
+    "numpy.core.multiarray._reconstruct",
+    "numpy.core.numeric._frombuffer",
+    "pandas._libs.internals._unpickle_block",
+    "pandas.core.frame.DataFrame",
+    "pandas.core.indexes.base.Index",
+    "pandas.core.indexes.base._new_Index",
+    "pandas.core.indexes.numeric.Int64Index",
+    "pandas.core.internals.managers.BlockManager"
+  ]
+}

@@ -1,0 +1,18 @@
+[package]
+name = "beta-pattern-digitize"
+description = "BETA Pattern: digitize paper patterns from photos or scans"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+beta-marker-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+image = { version = "=0.25.8", default-features = false, features = ["jpeg", "png"] }
+
+[[bin]]
+name = "beta-digitize"
+path = "src/main.rs"

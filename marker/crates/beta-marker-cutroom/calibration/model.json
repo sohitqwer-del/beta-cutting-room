@@ -1,0 +1,12 @@
+{
+  "coefficients": [
+    0.6658273806422187,
+    0.010933723403934795,
+    -0.7317172169013741,
+    0.13003977479641246,
+    0.037360130040602534,
+    -0.051459095463394874
+  ],
+  "training_samples": 16,
+  "provenance": "Own 1-second sparrow nests, workers=2, widths 1400/1600 mm, source ratios multiplied by 1/2. Whole-pattern holdout; FreeSewing MIT, GarmentCodeData and Lectra CC BY 4.0. See calibration/README.md."
+}

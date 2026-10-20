@@ -2,33 +2,50 @@
 
 export const site = {
   name: 'BETA Cutting Room',
-  version: '0.4.0',
+  version: '0.5.0',
   /** Public source repository, e.g. "https://github.com/<org>/project-beta". */
   repoUrl: 'https://github.com/sohitqwer-del/beta-cutting-room' as string | null,
   /** Public address of this website, used for social preview tags. */
   siteUrl: 'https://sohitqwer-del.github.io/beta-cutting-room/' as string | null,
   /** Branch used for links into the repository. */
   repoBranch: 'main',
+  /** Static app beside the website; no server or account is needed. */
+  webAppUrl: 'app/' as string | null,
   /** Contact address for sample markers and questions. */
   contactEmail: 'sohitqwer@gmail.com' as string | null,
   downloads: {
     windows: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_x64-setup.exe' as string | null,
-      file: 'BETA-Cutting-Room_0.4.0_x64-setup.exe',
-      size: '7.86 MiB',
-      sha256: '6066499c315cda9c60cf34b01c0398de119dd338cd9b5003ad8e94a7f1804df7' as string | null,
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.5.0/BETA-Cutting-Room_0.5.0_x64-setup.exe' as string | null,
+      file: 'BETA-Cutting-Room_0.5.0_x64-setup.exe',
+      size: '9.18 MiB',
+      sha256: '4ceb1058ba57eb244594900be7b472005b279a299a2a670038c18ffa1581f2ea' as string | null,
     },
     portable: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_windows-x64-portable.zip' as string | null,
-      file: 'BETA-Cutting-Room_0.4.0_windows-x64-portable.zip',
-      size: '8.42 MiB',
-      sha256: 'c5ae4817fe7913b61089c91cc5dab66f2e663d4bd5dc522ce4c4a2f6ef65c0ca' as string | null,
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.5.0/BETA-Cutting-Room_0.5.0_windows-x64-portable.zip' as string | null,
+      file: 'BETA-Cutting-Room_0.5.0_windows-x64-portable.zip',
+      size: '9.90 MiB',
+      sha256: 'bb67647fa1b5f35dccfb75cc04f96077166e44788e50a04d05b78d127c60d566' as string | null,
     },
     server: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_linux-x86_64.tar.gz' as string | null,
-      file: 'BETA-Cutting-Room_0.4.0_linux-x86_64.tar.gz (Linux server, needs glibc 2.43 or newer)',
-      size: '7.92 MiB',
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.5.0/BETA-Cutting-Room_0.5.0_linux-x86_64.tar.gz' as string | null,
+      file: 'BETA-Cutting-Room_0.5.0_linux-x86_64.tar.gz (Linux server, glibc 2.31 target; tested with 2.31 and 2.43)',
+      size: '8.91 MiB',
+      sha256: '4854f75bcc3293939d554e59f0274b32d5c975a3cb75888a6b917ee842584694' as string | null,
     },
+  },
+  /**
+   * Demo video. The site plays `public/assets/video/beta-demo-en.mp4` when that file exists (copy it there
+   * before building; it is not committed). Otherwise, set `demoVideoUrl` (for example a GitHub release asset):
+   * the home page then shows the poster as a link to it, so the page itself still loads nothing remote.
+   * Made by `marker/deploy/video/make-video.mjs`. Keep `length` and `size` in step with the file.
+   */
+  demoVideo: {
+    file: 'assets/video/beta-demo-en.mp4',
+    demoVideoUrl: null as string | null,
+    poster: 'assets/video/beta-demo-poster.jpg',
+    captions: 'assets/video/beta-demo-en.vtt',
+    length: '3 min 45 s',
+    size: '15 MB',
   },
   /** Where people report problems and send ideas. `null` hides a link. */
   feedback: {

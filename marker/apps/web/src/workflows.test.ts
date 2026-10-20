@@ -1,10 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { demoJob, demoResult } from './demo';
 import { readDocument } from './state';
-import { clampDefectPoint, compareLengths, defectZone, nestPayload, planErrors, planPayload, rectangleDefect, type PlanForm } from './workflows';
+import { clampDefectPoint, compareLengths, defectZone, nestPayload, planErrors, planPayload, planStatus, rectangleDefect, type PlanForm } from './workflows';
 import contract from '../../../packages/marker-wasm/test/fixtures/contract.json';
 
 describe('v0.2 operator workflows', () => {
+  it('marks partial plans incomplete and names missing quantities instead of declaring them ready', () => {
+    expect(planStatus({ complete: true, shortfall: {} })).toBe('Plan ready. Review each marker before cutting.');
+    const partial = planStatus({ complete: false, shortfall: { M: 12, L: 4 } });
+    expect(partial).toContain('Incomplete plan.');
+    expect(partial).toContain('M: 12, L: 4');
+    expect(partial).toContain('Do not cut this as a complete order.');
+    expect(partial).not.toContain('Plan ready');
+    expect(planStatus({ complete: false, shortfall: {} })).toContain('Incomplete plan.');
+  });
   it('re-nests around exact locked placements and sends portfolio / warm start', () => {
     const state = structuredClone({ job: demoJob, result: demoResult });
     state.result.placements[0]!.locked = true;

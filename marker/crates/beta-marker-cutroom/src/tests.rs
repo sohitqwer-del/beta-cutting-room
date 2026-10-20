@@ -321,6 +321,22 @@ fn report_reconciles_allowances_end_bits_and_efficiency() {
     assert!(reports_csv(&[r]).contains("\"L,\"\"1\""));
 }
 #[test]
+fn report_csv_protects_identifiers_and_preserves_negative_variance() {
+    let mut a = actuals();
+    a.lay = "=1+1".into();
+    a.order = "  @order".into();
+    a.spreading[0].issued_mm = 20_000.0;
+    let report = lay_report(&a).expect("report");
+    assert!(report.variance_mm < 0.0);
+    let csv = reports_csv(&[report]);
+    assert!(csv.contains("\"'=1+1\",\"'  @order\""));
+    assert!(csv.contains(",-700.000,"));
+    for id in ["+SUM(1,2)", "-1+2", "\t=1", "\r=1", "\n=1"] {
+        a.lay = id.into();
+        assert!(reports_csv(&[lay_report(&a).expect("report")]).contains("\"'"));
+    }
+}
+#[test]
 fn order_efficiency_is_area_weighted() {
     let a = actuals();
     let mut b = a.clone();

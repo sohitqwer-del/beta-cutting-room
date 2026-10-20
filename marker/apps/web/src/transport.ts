@@ -1,4 +1,5 @@
 /** Browser HTTP and offline Tauri IPC share the same Response contract. */
+import { staticMode, SERVER_FEATURE_MESSAGE } from './static-mode';
 export interface NativeReply { status: number; mime: string; extension: string | null; body: number[] }
 interface Tauri { core: { invoke<T>(command: string, args?: Record<string, unknown>): Promise<T> }; event: { listen<T>(name: string, handler: (event: { payload: T }) => void): Promise<() => void> } }
 declare global { interface Window { __TAURI__?: Tauri } }
@@ -22,6 +23,11 @@ export function setServerToken(token: string): void {
 /** Keep byte exports and JSON errors identical across both transports. */
 export async function apiFetch(url: string, init?: RequestInit): Promise<Response> {
   if (!isDesktop()) {
+    if (staticMode() && url.startsWith('/api/')) {
+      return new Response(JSON.stringify({ error: SERVER_FEATURE_MESSAGE }), {
+        status: 503, headers: { 'Content-Type': 'application/json' },
+      });
+    }
     const token = url.startsWith('/api/') ? serverToken() : '';
     if (!token) return fetch(url, init);
     const headers = new Headers(init?.headers); headers.set('Authorization', `Bearer ${token}`);

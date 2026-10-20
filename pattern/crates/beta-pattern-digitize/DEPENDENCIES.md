@@ -36,3 +36,28 @@ Existing workspace dependencies `anyhow`, `serde`, `serde_json`, and
 The new dependency stack declares Rust minimum versions no higher than 1.85;
 the workspace declares Rust 1.90. The actual build toolchain is recorded with
 the accuracy results.
+
+
+## Quick Marker additions
+
+The scanner and assist model add no new runtime third-party dependencies.
+Marker and Pattern WASM crates now depend on this existing image stack, and
+Marker WASM also uses the existing export crate. Fixed Hindi/Tamil headings are
+pre-shaped at development time. The export crate's dev-only generator adds:
+
+| Crate | Version | Declared licence |
+|---|---|---|
+| rustybuzz | 0.20.1 | MIT |
+| ttf-parser | 0.25.1 | MIT OR Apache-2.0 |
+| core_maths | 0.1.1 | MIT |
+| unicode-bidi-mirroring | 0.4.0 | MIT / Apache-2.0 |
+| unicode-ccc | 0.4.0 | MIT / Apache-2.0 |
+| unicode-properties | 0.1.4 | MIT / Apache-2.0 |
+| unicode-script | 0.5.8 | MIT OR Apache-2.0 |
+
+Checked the installed crate manifests on 20 October 2026. None of these shaping
+crates is a runtime dependency of Quick Marker. Apache-2.0 Droid font sources,
+checksums and original notices are under `beta-marker-export/fonts/PROVENANCE.md`.
+The stored FreeSewing-derived descriptors are MIT-source derivatives; the
+GarmentCodeData-derived descriptors retain CC BY 4.0 attribution. See
+`model/MODEL.md`. These are public pattern fixtures, not factory data.

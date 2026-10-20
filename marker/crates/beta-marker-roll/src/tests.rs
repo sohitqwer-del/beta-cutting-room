@@ -38,6 +38,32 @@ fn lay(id: &str, length: f64, plies: u32) -> LayRequest {
     }
 }
 
+#[test]
+fn csv_inspection_and_spreading_protect_formula_leading_identifiers() {
+    let mut register = register(&[100.0]);
+    register.rolls[0].id = "=1+1".into();
+    register.rolls[0].lot = "  +lot".into();
+    register.rolls[0].dye_lot = "@dye".into();
+    register.rolls[0].shade_group = "-shade".into();
+    let csv = inspect(&register, &InspectionSettings::default())
+        .unwrap()
+        .to_csv();
+    assert!(csv.contains("roll,\"'=1+1\",\"'  +lot\",\"'@dye\",0,0,"));
+    let plan = allocate(
+        &register,
+        &[lay("=lay", 1.0, 2)],
+        &AllocationSettings::default(),
+    )
+    .unwrap();
+    let csv = plan.to_csv();
+    assert!(csv.contains("\"'=lay\",\"'=1+1\",2,2.000000,98.000000,\"'-shade\""));
+    // Machine-readable JSON keeps the exact identifiers.
+    assert_eq!(
+        serde_json::to_value(plan).unwrap()["lays"][0]["allocations"][0]["roll_id"],
+        "=1+1"
+    );
+}
+
 fn defect(id: &str, along: f64, points: u8) -> RollDefect {
     RollDefect {
         id: id.into(),

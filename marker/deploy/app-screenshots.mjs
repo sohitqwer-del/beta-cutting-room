@@ -17,7 +17,7 @@ const profile = mkdtempSync(join(out, 'browser-profile-'));
 const proc = spawn(browser, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore', windowsHide: true });
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const pending = new Map(); let nextId = 0; let ws;
-const report = { viewport: { cssWidth: 2400, cssHeight: 1500, deviceScale: 0.8, pngWidth: 1920, pngHeight: 1200 }, startedAt: new Date().toISOString(), binarySha256: process.argv[4] ? createHash('sha256').update(readFileSync(resolve(process.argv[4]))).digest('hex') : null, cases: [], requests: [], externalRequests: [], exceptions: [], screenshots: [] };
+const report = { viewport: { cssWidth: 1920, cssHeight: 1200, deviceScale: 1, pngWidth: 1920, pngHeight: 1200 }, startedAt: new Date().toISOString(), binarySha256: process.argv[4] ? createHash('sha256').update(readFileSync(resolve(process.argv[4]))).digest('hex') : null, cases: [], requests: [], externalRequests: [], exceptions: [], screenshots: [] };
 function send(method, params = {}) {
   const id = ++nextId; ws.send(JSON.stringify({ id, method, params }));
   return new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
@@ -63,7 +63,7 @@ try {
     if (message.method === 'Runtime.exceptionThrown') report.exceptions.push(message.params.exceptionDetails.text);
   };
   await send('Page.enable'); await send('Network.enable'); await send('Runtime.enable');
-  await send('Emulation.setDeviceMetricsOverride', { width: 2400, height: 1500, deviceScaleFactor: 0.8, mobile: false });
+  await send('Emulation.setDeviceMetricsOverride', { width: 1920, height: 1200, deviceScaleFactor: 1, mobile: false });
   await send('Page.navigate', { url: url.href });
 
   await until('document.querySelector("#token-dialog")?.open === true', 'token dialog ready');

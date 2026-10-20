@@ -1,4 +1,8 @@
 {
+  "layer_allocation_examples": [
+    {"piece_id":"pair","copy":0,"mirrored":false,"rotation_deg":0,"translate":[0,0],"bundle":0,"on_fold":false,"layer_allocations":[{"bundle":0,"mirrored":false},{"bundle":1,"mirrored":true}]},
+    {"piece_id":"pair","copy":1,"mirrored":false,"rotation_deg":0,"translate":[20,0],"bundle":1,"on_fold":false,"layer_allocations":[{"bundle":1,"mirrored":false},null]}
+  ],
   "job": {
     "format": "beta-marker.job/v1",
     "name": "Shared rectangle",

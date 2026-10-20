@@ -1,13 +1,13 @@
 //! Marker and spreading adapters. Stock shade identity travels with each ply.
 use crate::bundles::{CutPart, Lay, PlyRun};
 use anyhow::{Context, Result, ensure};
-use beta_marker_core::rules::{bundle_sizes, layer_copies};
+use beta_marker_core::rules::{bundle_sizes, layer_assignments};
 use beta_marker_core::{Job, MarkerResult};
 use beta_marker_roll::{LaySpread, RollRegister, ShadeIdentity};
 use std::collections::{BTreeMap, BTreeSet};
 
 /// Trace a validated marker through an audited spread into physical cut parts.
-/// Folded/tubular placements expand through `layer_copies`; an on-fold half
+/// Folded/tubular placements expand through `layer_assignments`; an on-fold half
 /// becomes one full piece. Repeated parts get distinct slots. Garment IDs use
 /// core bundle order. Mixed inventory shades within one ply are rejected.
 /// Call `beta_marker_roll::validate_plan` on the full spread before this adapter.
@@ -39,29 +39,25 @@ pub fn from_spread(
         let p = pieces
             .get(pl.piece_id.as_str())
             .context("Unknown marker piece.")?;
-        let garment = pl
-            .bundle
-            .context("Marker pieces need garment bundle IDs. Re-nest the marker.")?;
-        let expected = sizes
-            .get(garment as usize)
-            .context("Marker bundle ID is out of range.")?;
-        ensure!(
-            job.order.is_none() || expected == &p.size,
-            "Bundle size differs from canonical garment order."
-        );
-        let (a, b) = layer_copies(job.fabric.layout, pl);
-        for (mirrored, count) in [(false, a), (true, b)] {
-            for _ in 0..count {
-                let slot = slots.entry((p.id.clone(), garment, mirrored)).or_insert(0);
-                parts.push(CutPart {
-                    piece_id: p.id.clone(),
-                    size: p.size.clone().unwrap_or_else(|| "unsized".into()),
-                    garment,
-                    slot: *slot,
-                    mirrored,
-                });
-                *slot += 1;
-            }
+        for (garment, mirrored) in layer_assignments(job.fabric.layout, pl) {
+            let garment =
+                garment.context("Marker pieces need garment bundle IDs. Re-nest the marker.")?;
+            let expected = sizes
+                .get(garment as usize)
+                .context("Marker bundle ID is out of range.")?;
+            ensure!(
+                job.order.is_none() || expected == &p.size,
+                "Bundle size differs from canonical garment order."
+            );
+            let slot = slots.entry((p.id.clone(), garment, mirrored)).or_insert(0);
+            parts.push(CutPart {
+                piece_id: p.id.clone(),
+                size: p.size.clone().unwrap_or_else(|| "unsized".into()),
+                garment,
+                slot: *slot,
+                mirrored,
+            });
+            *slot += 1;
         }
     }
     let mut plies: Vec<PlyRun> = Vec::new();
@@ -189,6 +185,90 @@ mod tests {
             assert_eq!(count, if on_fold { 3 } else { 6 });
             assert!(bundles.iter().all(|b| b.stickers[0].number == 1));
         }
+        Ok(())
+    }
+
+    #[test]
+    fn explicit_layers_label_their_own_garments_and_exclude_surplus() -> Result<()> {
+        let job = Job {
+            format: JOB_FORMAT.into(),
+            name: "shared layers".into(),
+            fabric: Fabric {
+                width: 20.0,
+                layout: Layout::Folded,
+                ..Default::default()
+            },
+            pieces: vec![Piece {
+                id: "front".into(),
+                size: Some("M".into()),
+                quantity: 1,
+                outline: vec![[0., 0.], [10., 0.], [10., 10.], [0., 10.]],
+                fold_line: Some([[0., 5.], [10., 5.]]),
+                ..Default::default()
+            }],
+            order: Some(Order {
+                sizes: BTreeMap::from([("M".into(), 3)]),
+            }),
+            ..Default::default()
+        };
+        let marker = marker(
+            &job,
+            vec![
+                Placement {
+                    piece_id: "front".into(),
+                    bundle: Some(0),
+                    layer_allocations: vec![
+                        Some(LayerAllocation {
+                            bundle: 0,
+                            mirrored: false,
+                        }),
+                        Some(LayerAllocation {
+                            bundle: 1,
+                            mirrored: false,
+                        }),
+                    ],
+                    ..Default::default()
+                },
+                Placement {
+                    piece_id: "front".into(),
+                    copy: 1,
+                    bundle: Some(2),
+                    translate: [10., 0.],
+                    layer_allocations: vec![
+                        Some(LayerAllocation {
+                            bundle: 2,
+                            mirrored: false,
+                        }),
+                        None,
+                    ],
+                    ..Default::default()
+                },
+            ],
+        );
+        let mut register = beta_marker_roll::demo_register();
+        register.rolls.truncate(1);
+        let spread = beta_marker_roll::allocate(
+            &register,
+            &[LayRequest {
+                id: "L1".into(),
+                marker_length_m: marker.length / 1000.0,
+                plies: 2,
+                fabric_width_mm: 20.0,
+                shade_rule: ShadePolicy::SameGroup,
+                eligible_roll_ids: Vec::new(),
+                allow_splicing: false,
+                splice_zones: Vec::new(),
+            }],
+            &Default::default(),
+        )?;
+        let lay = from_spread(&job, &marker, &register, &spread.lays[0], "O1", "Blue")?;
+        assert_eq!(
+            lay.parts.iter().map(|p| p.garment).collect::<Vec<_>>(),
+            vec![0, 1, 2]
+        );
+        assert!(lay.parts.iter().all(|p| p.slot == 0 && !p.mirrored));
+        let bundles = bundle_lay(&lay, BundleRules::default())?;
+        assert_eq!(bundles.iter().map(|b| b.stickers.len()).sum::<usize>(), 6);
         Ok(())
     }
 }

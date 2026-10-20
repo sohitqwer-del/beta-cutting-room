@@ -1,19 +1,6 @@
-.editor-tools,.editor-supply{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface);margin:14px 0;min-width:0}
-.editor-tools>.toolgroup{margin-bottom:10px;flex-wrap:wrap;gap:6px}.editor-tools label,.validation-panel .toolgroup label{display:grid;gap:3px;font-size:12px;color:var(--text-2)}
-.editor-tools input[type=number]{width:108px}.editor-tools input,.editor-tools select,.editor-supply input,.editor-supply select{max-width:100%}
-.editor-tools details,.editor-supply details{padding:8px 0}.editor-tools summary,.editor-supply summary{cursor:pointer;font-weight:650}.editor-tools details>.toolgroup{margin-top:10px;flex-wrap:wrap}.editor-tools p,.editor-supply p{font-size:13px;color:var(--text-3)}
-.editor-tools [aria-pressed=true],.ed-unplaced [aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent)}
-.editor-supply .toolgroup{flex-wrap:wrap;gap:8px;margin:10px 0}.ed-unplaced{display:flex;flex-wrap:wrap;gap:6px;max-height:190px;overflow:auto;padding:8px 0}.ed-unplaced button{font-size:12px;text-align:left}
-.ed-status{padding:10px 14px;background:var(--surface-2);border-top:1px solid var(--line);font-size:13px;line-height:1.6;color:var(--text)}
-#ed-shortcuts{border:1px solid var(--line);border-radius:12px;padding:24px;max-width:650px;width:calc(100% - 32px);max-height:85vh;overflow:auto}#ed-shortcuts::backdrop{background:rgb(8 16 12 / 55%)}#ed-shortcuts dl{display:grid;grid-template-columns:minmax(140px,1fr) 2fr;gap:8px;font-size:14px}#ed-shortcuts dd{margin:0}#ed-shortcuts kbd{font:inherit;font-weight:650}#ed-pairs{max-height:180px;overflow:auto}
-.editor-tools button:focus-visible,.editor-supply button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-@media(max-width:650px){.editor-tools>.toolgroup{align-items:stretch}.editor-tools input[type=number]{width:90px}#ed-shortcuts dl{grid-template-columns:1fr}#ed-shortcuts dd{margin-bottom:8px}}
-/* Compact tool rows so the marker canvas stays near the top of the screen. */
-.editor-tools{padding:8px 12px;margin:0 0 12px;box-shadow:var(--shadow-1)}
-.editor-tools>.toolgroup{margin-bottom:6px;align-items:flex-end;row-gap:6px}
-.editor-tools>.toolgroup>strong,.editor-tools>.toolgroup>b{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-3);min-width:72px;align-self:center}
-.editor-tools button,.editor-supply button{min-height:32px;padding:4px 10px;font-size:12px}
-.editor-tools input,.editor-tools select{min-height:32px;padding:3px 8px;font-size:13px}
-.editor-tools input[type=number]{width:90px}
-.editor-tools details{padding:4px 0}
-.editor-tools p{margin:4px 0}
+/* Editor tools: layout lives in style.css (section 6, Marker editor). Only the shortcut list is styled here. */
+#ed-shortcuts { max-width: min(680px, calc(100vw - 32px)); }
+#ed-shortcuts dl { display: grid; grid-template-columns: minmax(150px, max-content) 1fr; gap: 8px 16px; margin: 0; font-size: var(--fs-s); align-items: baseline; }
+#ed-shortcuts dt kbd { white-space: nowrap; }
+#ed-shortcuts dd { margin: 0; color: var(--text-2); }
+@media (max-width: 650px) { #ed-shortcuts dl { grid-template-columns: 1fr; } #ed-shortcuts dd { margin-bottom: 8px; } }

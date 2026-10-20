@@ -3,6 +3,7 @@ import { logo, VERSION } from '../brand';
 import { downloadFile, isDesktop } from '../transport';
 import type { DocumentState } from '../state';
 import { FEEDBACK_CONFIG } from './config';
+import { openFeedbackLink } from './external';
 import { currentLanguage, t, translateFeedback, type FeedbackKey } from './i18n';
 import { isMilestone, rememberAsk, rememberWelcome, shouldAsk, shouldShowWelcome, type KeyStore } from './memory';
 import { buildReport, detectOs, issueUrl, languageName, mailtoUrl, platformName, privacyHints, reportFileName,
@@ -10,13 +11,12 @@ import { buildReport, detectOs, issueUrl, languageName, mailtoUrl, platformName,
 
 /** Feedback everywhere, a humble first-run welcome and one gentle "How did that go?" ask.
  * Self-contained: the shell calls installFeedback() once. Nothing is sent without the user's choice.
- * Desktop: the Tauri window blocks external navigation and has no opener plugin, so links and the
- * email address are copied instead of opened. */
+ * Desktop links use the scoped official Tauri opener. Copy-link remains the fallback. */
 export interface FeedbackHost { state?: () => DocumentState; message?: (text: string, error?: boolean) => void }
 export interface FeedbackApi { open(kind?: FeedbackKind): void; showWelcome(): void; askOnce(): void }
 
 /** English screen names for reports. Indexes are fixed by the shell. */
-const SCREEN_NAMES: Record<number, string> = { 0: 'Marker editor', 1: 'Cut plan', 2: 'Compare', 3: 'Help', 4: 'Pattern', 5: 'Digitize', 6: 'Rolls', 7: 'Bundles', 8: 'Floor', 9: 'Home', 10: 'Reports' };
+const SCREEN_NAMES: Record<number, string> = { 0: 'Marker editor', 1: 'Cut plan', 2: 'Compare', 3: 'Help', 4: 'Pattern', 5: 'Digitize', 6: 'Rolls', 7: 'Bundles', 8: 'Floor', 9: 'Home', 10: 'Reports', 11: 'Photo to marker' };
 /** Screens where anonymous marker numbers make sense. */
 const MARKER_SCREENS = new Set([0, 1, 2]);
 const KINDS: FeedbackKind[] = ['bug', 'missing', 'idea'];
@@ -57,10 +57,10 @@ function trapFocus(dialog: HTMLDialogElement): void {
   });
 }
 
-/** External links: a normal new-tab link in the browser; a copy button in the desktop app. */
-function externalLink(url: string, key: FeedbackKey, desktopKey: FeedbackKey): string {
+/** Browser navigation stays unchanged; desktop buttons use the scoped opener. */
+function externalLink(url: string, key: FeedbackKey): string {
   return isDesktop()
-    ? `<button type="button" class="small" data-fb-copy-link="${esc(url)}">${label(desktopKey)}</button>`
+    ? `<button type="button" class="small" data-fb-external="${esc(url)}">${label(key)}</button>`
     : `<a class="button small fb-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${label(key)} <span class="fb-offscreen" data-fb="new_tab">${esc(t('new_tab'))}</span></a>`;
 }
 
@@ -107,8 +107,8 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
       <p id="fb-short-note" class="hint" data-fb="short_note" hidden>${esc(t('short_note'))}</p>
       <h3 id="fb-send-title" data-fb="send_title">${esc(t('send_title'))}</h3>
       <ul class="fb-send" aria-labelledby="fb-send-title">
-        ${desktop ? sendRow('fb-github', 'send_github_desktop', 'send_github_desktop_hint', true) : sendRow('fb-github', 'send_github', 'send_github_hint', true)}
-        ${desktop ? sendRow('fb-email', 'send_email_desktop', 'send_email_desktop_hint') : sendRow('fb-email', 'send_email', 'send_email_hint')}
+        ${sendRow('fb-github', 'send_github', 'send_github_hint', true)}
+        ${sendRow('fb-email', 'send_email', 'send_email_hint')}
         ${sendRow('fb-copy', 'send_copy', 'send_copy_hint')}
         ${sendRow('fb-save', 'send_save', 'send_save_hint')}
       </ul>
@@ -136,7 +136,7 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
   trapFocus(dialog); trapFocus(welcome);
 
   // ----- Help screen and About: a humble line and the same three actions -----
-  const helpActions = `<div class="toolgroup fb-actions"><button type="button" class="primary small" data-fb-open>${label('title')}</button>${externalLink(FEEDBACK_CONFIG.discussions, 'discussion', 'discussion_desktop')}<button type="button" class="small" data-fb-show-welcome>${label('show_welcome')}</button></div>`;
+  const helpActions = `<div class="toolgroup fb-actions"><button type="button" class="primary small" data-fb-open>${label('title')}</button>${externalLink(FEEDBACK_CONFIG.discussions, 'discussion')}<button type="button" class="small" data-fb-show-welcome>${label('show_welcome')}</button></div>`;
   const help = document.querySelector<HTMLElement>('#screen-3');
   if (help) {
     const box = document.createElement('section'); box.className = 'fb-help'; box.setAttribute('aria-labelledby', 'fb-help-title');
@@ -221,16 +221,26 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
   $('fb-github').addEventListener('click', async () => {
     if (!report) return;
     const link = issueUrl(report, kind);
-    if (desktop) { (await copyText(link.url)) ? done('done_link') : fail('copy_failed'); return; }
     if (link.truncated) await copyText(report.text);
+    if (desktop) {
+      const outcome = await openFeedbackLink(link.url, copyText);
+      if (outcome === 'opened') done(link.truncated ? 'done_github_long' : 'done_github');
+      else if (outcome === 'copied') done('done_link'); else fail('copy_failed');
+      return;
+    }
     window.open(link.url, '_blank', 'noopener,noreferrer');
     done(link.truncated ? 'done_github_long' : 'done_github');
   });
   $('fb-email').addEventListener('click', async () => {
     if (!report) return;
-    if (desktop) { (await copyText(FEEDBACK_CONFIG.email)) ? done('done_address') : fail('copy_failed'); return; }
     const link = mailtoUrl(report);
     if (link.truncated) await copyText(report.text);
+    if (desktop) {
+      const outcome = await openFeedbackLink(link.url, copyText);
+      if (outcome === 'opened') done('done_email');
+      else if (outcome === 'copied') done('done_link'); else fail('copy_failed');
+      return;
+    }
     const a = document.createElement('a'); a.href = link.url; a.rel = 'noopener'; a.click();
     done('done_email');
   });
@@ -248,8 +258,13 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
     const openButton = target.closest<HTMLElement>('[data-fb-open]');
     if (openButton) { open((openButton.dataset.fbOpen || undefined) as FeedbackKind | undefined); return; }
     if (target.closest('[data-fb-show-welcome]')) { document.querySelector<HTMLDialogElement>('#about-dialog[open]')?.close(); showWelcome(); return; }
-    const copy = target.closest<HTMLElement>('[data-fb-copy-link]');
-    if (copy) { const ok = await copyText(copy.dataset.fbCopyLink!); const text = ok ? t('link_copied') : t('copy_failed'); announce(text); host.message?.(text, !ok); }
+    const external = target.closest<HTMLElement>('[data-fb-external]');
+    if (external) {
+      const outcome = await openFeedbackLink(external.dataset.fbExternal!, copyText);
+      const ok = outcome === 'opened' || outcome === 'copied';
+      const text = t(outcome === 'opened' ? 'link_opened' : outcome === 'copied' ? 'link_copied' : 'copy_failed');
+      announce(text); host.message?.(text, !ok);
+    }
   });
 
   // ----- "Report a problem with this screen": one link under each screen's main heading -----

@@ -4,7 +4,8 @@ import type { CutPlan, Job, Layout, MarkerCore, MarkerResult, MatchAxes, Nap, Pt
 import { bbox } from '@beta/marker-wasm/geometry';
 import type { DocumentState } from './state';
 import { readDocument } from './state';
-import { clampDefectPoint, compareLengths, defectZone, nestPayload, planErrors, planPayload, rectangleDefect, type Comparison, type PlanForm } from './workflows';
+import { icon } from './icons';
+import { clampDefectPoint, compareLengths, defectZone, nestPayload, planErrors, planPayload, planStatus, rectangleDefect, type Comparison, type PlanForm } from './workflows';
 
 export interface Editor {
   get(): DocumentState; core(): MarkerCore | undefined; busy(): boolean;
@@ -38,23 +39,26 @@ export function installFeatures(editor: Editor) {
   let cursor: Pt = [0, 0];
   $('.filebar').insertAdjacentHTML('afterend', `<nav class="screen-tabs" aria-label="Workspace screens">${[['Pattern',4],['Digitize',5],['Editor',0],['Cut plan',1],['Rolls',6],['Bundles',7],['Compare',2],['Help',3]].map(([s,i]) => `<button data-screen="${i}" aria-pressed="${i === 0}" aria-controls="${i === 0 ? 'editor-screen' : `screen-${i}`}">${s}</button>`).join('')}</nav>`);
   $('aside').insertAdjacentHTML('beforeend', '<section id="fabric-v2" class="v2-panel"></section><section id="piece-v2" class="v2-panel"></section>');
-  $('.panel-heading').insertAdjacentHTML('afterend', '<nav class="settings-tabs" aria-label="Editor settings"><button type="button" data-settings="job" aria-pressed="true">Job</button><button type="button" data-settings="fabric" aria-pressed="false">Fabric</button><button type="button" data-settings="piece" aria-pressed="false">Piece rules</button></nav>');
+  $('.panel-heading').insertAdjacentHTML('afterend', '<nav class="settings-tabs" aria-label="Editor settings"><button type="button" data-settings="job" aria-pressed="true">Basics</button><button type="button" data-settings="fabric" aria-pressed="false">Fabric rules</button><button type="button" data-settings="piece" aria-pressed="false">Piece rules</button></nav>');
   $('#fabric-v2').hidden = true; $('#piece-v2').hidden = true;
   document.querySelectorAll<HTMLButtonElement>('[data-settings]').forEach(button => button.onclick = () => {
     const tab = button.dataset.settings;
-    for (const selector of ['#job-form', '.import-settings', '#nest-form']) $(selector).hidden = tab !== 'job';
+    // The Nest dock stays visible on every tab.
+    for (const selector of ['#job-form', '.import-settings']) $(selector).hidden = tab !== 'job';
     $('#fabric-v2').hidden = tab !== 'fabric'; $('#piece-v2').hidden = tab !== 'piece';
     document.querySelectorAll<HTMLButtonElement>('[data-settings]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
     $('aside').scrollTop = 0;
   });
   $('.workspace').insertAdjacentHTML('afterend', `
-    <section id="screen-1" class="screen" hidden><h1>Cut plan</h1><p>Enter garments to cut. One lay is one marker spread in several fabric layers (plies).</p>
-      <form id="plan-form"><div id="plan-quantities" class="fields"></div><div class="fields plan-fields">
-      ${number('max-plies','Max plies per lay',50,1,'1')}${number('max-garments','Max garments per marker',4,1,'1')}${number('overcut','Allowed over-cut (%)',0)}${number('plan-time','Time per marker (seconds)',5,0.1)}${number('plan-final-time','Final search per ratio (seconds; 0 to skip)',0)}${number('end-allowance','Allowance at each end (mm)',0)}${number('lay-cost','Cost per lay (INR)',0)}</div>
-      <button id="make-plan" class="primary" type="submit">Make cut plan</button><p id="plan-error" role="status"></p></form><div id="plan-result" aria-live="polite" data-empty="No cut plan yet. Enter the garments to cut for each size, then choose Make cut plan."></div></section>
-    <section id="screen-2" class="screen" hidden><h1>Compare fabric use</h1><p>Open a PLT marker from your current CAD. We check it with the same rules and re-nest the same pieces on the same fabric width.</p>
-      <div class="fields">${number('compare-width','Fabric width (mm)',editor.get().job.fabric.width,1)}${number('compare-time','Re-nest time (seconds)',10,0.1)}</div>
-      <label class="upload-label">Current CAD marker (.plt)<input id="compare-file" type="file" accept=".plt,.hpgl"></label><button id="compare-run" class="primary" disabled>Re-nest and compare</button><p id="compare-status" role="status"></p><div id="compare-result" aria-live="polite" data-empty="No comparison yet. Choose a PLT marker file from your current CAD system."></div></section>
+    <section id="screen-1" class="screen" hidden><div class="screen-head"><div><h1>Cut plan</h1><p>Enter garments to cut. One lay is one marker spread in several fabric layers (plies).</p></div></div>
+      <form id="plan-form" class="card plan-card"><h2 class="section-title"><span class="step-badge" aria-hidden="true">1</span>Garments to cut</h2><div id="plan-quantities" class="fields size-grid"></div>
+      <h2 class="section-title"><span class="step-badge" aria-hidden="true">2</span>Lay limits</h2><div class="fields plan-fields">${number('max-plies','Max plies per lay',50,1,'1')}${number('max-garments','Max garments per marker',4,1,'1')}</div>
+      <details class="advanced"><summary>More options: over-cut, search time, end allowance, cost</summary><div class="fields plan-fields">${number('overcut','Allowed over-cut (%)',0)}${number('plan-time','Time per marker (seconds)',5,0.1)}${number('plan-final-time','Final search per ratio (seconds)',0)}${number('end-allowance','Allowance at each end (mm)',0)}${number('lay-cost','Cost per lay (INR)',0)}</div><p class="hint">Final search 0 skips the longer search. End allowance is added at both ends of every ply. Lay cost is an estimate for comparing plans.</p></details>
+      <div class="form-actions"><button id="make-plan" class="primary large" type="submit">${icon('plan')}Make cut plan</button><p id="plan-error" role="status"></p></div></form><div id="plan-result" aria-live="polite" data-empty="No cut plan yet. Enter the garments to cut for each size, then choose Make cut plan."></div></section>
+    <section id="screen-2" class="screen" hidden><div class="screen-head"><div><h1>Compare fabric use</h1><p>Open a PLT marker from your current CAD. We check it with the same rules and re-nest the same pieces on the same fabric width.</p></div></div>
+      <div class="card compare-card"><h2 class="section-title"><span class="step-badge" aria-hidden="true">1</span>Fabric and search time</h2><div class="fields">${number('compare-width','Fabric width (mm)',editor.get().job.fabric.width,1)}${number('compare-time','Re-nest time (seconds)',10,0.1)}</div>
+      <h2 class="section-title"><span class="step-badge" aria-hidden="true">2</span>Your CAD marker</h2><label class="upload-label">Current CAD marker (.plt)<input id="compare-file" type="file" accept=".plt,.hpgl"></label>
+      <div class="form-actions"><button id="compare-run" class="primary large" disabled>${icon('compare')}Re-nest and compare</button><p id="compare-status" role="status"></p></div></div><div id="compare-result" aria-live="polite" data-empty="No comparison yet. Choose a PLT marker file from your current CAD system."></div></section>
     <section id="screen-3" class="screen help-page" hidden><h1>What a marker planner does</h1><p>A marker planner arranges garment pattern pieces across the fabric width. A shorter marker uses less fabric for the same garments.</p>
       <div class="process" role="img" aria-label="Pattern pieces, then size ratio, then marker on fabric width, then efficiency, then plotter or cutter, then cut plan">${['Pattern pieces','Size ratio','Marker on fabric width','Efficiency','Plotter / cutter','Cut plan'].map((s,i) => `<div><b>${i+1}</b>${s}</div>${i<5 ? '<span aria-hidden="true">→</span>':''}`).join('')}</div>
       <dl><dt>Grain</dt><dd>The grain line follows the length of the fabric. Keep each pattern's grain line in the allowed direction so the garment hangs correctly.</dd>
@@ -214,13 +218,14 @@ export function installFeatures(editor: Editor) {
     event.preventDefault();if(operation||editor.busy())return;
     try{
       const form=formValues(),payload=planPayload(editor.get().job,form);operation=true;$<HTMLButtonElement>('#make-plan').disabled=true;$('#plan-error').textContent='Rust is evaluating the cut plan…';
-      plan=await(await editor.api('plan',JSON.stringify(payload))).json() as CutPlan;planJob=payload.order.job;planEnd=form.endAllowance;planCost=form.layCost;renderPlan();$('#plan-error').textContent='Plan ready. Review each marker before cutting.';
+      plan=await(await editor.api('plan',JSON.stringify(payload))).json() as CutPlan;planJob=payload.order.job;planEnd=form.endAllowance;planCost=form.layCost;renderPlan();$('#plan-error').textContent=planStatus(plan);
     }catch(e){$('#plan-error').textContent=errorText(e);}
     finally{operation=false;$<HTMLButtonElement>('#make-plan').disabled=false;}
   });
   function renderPlan():void{
     if(!plan)return;
-    $('#plan-result').innerHTML=`<div class="table-scroll"><table><caption>${esc(plan.order_name)} — planned lays</caption><thead><tr>${['Lay','Size ratio','Plies','Length (m)','Efficiency','Fabric (m)','Marker'].map(s=>`<th scope="col">${s}</th>`).join('')}</tr></thead><tbody>${plan.lays.map((l,i)=>`<tr><th scope="row">${i+1}</th><td>${Object.entries(l.ratio).map(([s,n])=>`${esc(s)}:${n}`).join(' · ')}</td><td>${l.plies}</td><td>${(l.marker_length_mm/1000).toFixed(3)}</td><td>${(l.efficiency*100).toFixed(1)}%</td><td>${((l.marker_length_mm+2*planEnd)*l.plies/1000).toFixed(3)}</td><td><button data-open-lay="${i}" ${l.result?'':'disabled'}>Open marker</button></td></tr>`).join('')}</tbody></table></div><div class="result-totals"><strong>${plan.total_fabric_m.toFixed(3)} m total fabric</strong><span>${plan.lays.length} lays</span><span>Lay cost: INR ${(planCost*plan.lays.length).toFixed(2)} (estimate)</span><button type="button" data-print>Print cut plan</button></div><p>Planned garments: ${Object.entries(plan.planned).map(([s,n])=>`${esc(s)}: ${n}`).join(' · ')}</p>${plan.warnings.map(w=>`<p>${esc(planMessage(w))}</p>`).join('')}`;
+    const tile=(label:string,value:string)=>`<div><span>${label}</span><strong>${value}</strong></div>`;
+    $('#plan-result').innerHTML=`<div class="plan-totals result-totals">${tile('Total fabric',`${plan.total_fabric_m.toFixed(3)} m`)}${tile('Lays',String(plan.lays.length))}${tile('Planned garments',Object.entries(plan.planned).map(([s,n])=>`${esc(s)} ${n}`).join(' · '))}${tile('Lay cost (estimate)',`INR ${(planCost*plan.lays.length).toFixed(2)}`)}<button type="button" data-print>${icon('print')}Print cut plan</button></div><div class="table-scroll"><table><caption>${esc(plan.order_name)} — planned lays</caption><thead><tr>${['Lay','Size ratio','Plies','Length (m)','Efficiency','Fabric (m)','Marker'].map(s=>`<th scope="col">${s}</th>`).join('')}</tr></thead><tbody>${plan.lays.map((l,i)=>`<tr><th scope="row">${i+1}</th><td>${Object.entries(l.ratio).map(([s,n])=>`${esc(s)}:${n}`).join(' · ')}</td><td>${l.plies}</td><td>${(l.marker_length_mm/1000).toFixed(3)}</td><td>${(l.efficiency*100).toFixed(1)}%</td><td>${((l.marker_length_mm+2*planEnd)*l.plies/1000).toFixed(3)}</td><td><button data-open-lay="${i}" ${l.result?'':'disabled'}>Open marker</button></td></tr>`).join('')}</tbody></table></div>${plan.warnings.length?`<div class="notice"><ul>${plan.warnings.map(w=>`<li>${esc(planMessage(w))}</li>`).join('')}</ul></div>`:''}`;
   }
   $('#plan-result').addEventListener('click',event=>{const b=(event.target as Element).closest<HTMLButtonElement>('[data-open-lay]');const lay=plan?.lays[Number(b?.dataset.openLay)];if(!lay?.result||!planJob)return;const job=structuredClone(planJob);job.order={sizes:lay.ratio};editor.open({job,result:lay.result});screen(0);});
   $('#compare-file').addEventListener('change',async()=>{

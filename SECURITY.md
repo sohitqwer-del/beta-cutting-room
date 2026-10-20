@@ -15,7 +15,7 @@ report privately, assess scope, agree on disclosure and verify the fix.
 
 ## Version scope
 
-0.4.0 is a launch candidate. It has not completed an independent security audit.
+0.4.0 is public. It has not completed an independent security audit.
 Earlier milestones are development snapshots, without a maintenance guarantee.
 See the [release checklist](marker/docs/RELEASE-CHECKLIST.md) for required acceptance.
 

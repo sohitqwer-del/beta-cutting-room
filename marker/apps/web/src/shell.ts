@@ -1,10 +1,13 @@
+import { icon } from './icons';
+import { installUx } from './ux';
 import { CREDITS, logo, PRODUCT, VERSION } from './brand';
 import { isDesktop, serverToken, setServerToken } from './transport';
 import type { DocumentState } from './state';
 import { installFeedback } from './feedback';
+import { installQuick, QUICK_SCREEN } from './quick/ui';
 
-/** App frame: sidebar navigation, top bar, workflow steps, Home, Reports, About, theme, language and server token.
- * It moves the existing screens into one layout and never changes their behaviour. */
+/** App frame: sidebar navigation (full or icon rail), top bar, workflow steps with "Next", Home, Reports, About,
+ * theme, language and server token. It moves the existing screens into one layout and never changes their behaviour. */
 export interface ShellHost {
   show(index: number): void;
   message(text: string, error?: boolean): void;
@@ -13,32 +16,12 @@ export interface ShellHost {
 }
 
 const esc = (v: unknown): string => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
-const ICONS: Record<string, string> = {
-  home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
-  pattern: '<path d="M4 4v16h16"/><path d="M5 19c5-1 6-5 7-9s3-6 8-6"/>',
-  digitize: '<rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8 7l2-3h4l2 3"/>',
-  marker: '<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M9 5v14"/><path d="M15 5c-2 4-2 10 0 14"/>',
-  plan: '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 12.5l9 5 9-5"/><path d="M3 17l9 5 9-5"/>',
-  compare: '<path d="M12 4v16"/><path d="M5 8h14"/><path d="M5 8l-3 6h6z"/><path d="M19 8l-3 6h6z"/><path d="M8 20h8"/>',
-  rolls: '<circle cx="7" cy="12" r="4"/><circle cx="7" cy="12" r="1"/><path d="M7 8h13v8H7"/>',
-  floor: '<path d="M3 21V10l5 3v-3l5 3V7l8 4v10z"/><path d="M7 17h2M12 17h2M17 17h2"/>',
-  bundles: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8" r="1.5"/>',
-  reports: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/>',
-  help: '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .9-1 1.6v.6"/><path d="M12 17.3v.2"/>',
-  open: '<path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>',
-  new: '<path d="M6 3h8l4 4v14H6z"/><path d="M12 10v6M9 13h6"/>',
-  demo: '<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/>',
-  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
-  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.3v.2"/>',
-  key: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14.5 8.5l2 2"/>',
-  print: '<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="1"/><path d="M7 14h10v7H7z"/>',
-};
-export const icon = (name: string): string => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${ICONS[name] ?? ''}</svg>`;
 
 interface Screen { index: number; key: string; title: string; group: string; icon: string; hash: string }
-/** Screen indexes are fixed by existing modules: 0 editor, 1 plan, 2 compare, 3 help, 4 pattern, 5 digitize, 6 rolls, 7 bundles, 8 floor. */
+/** Screen indexes are fixed by existing modules: 0 editor, 1 plan, 2 compare, 3 help, 4 pattern, 5 digitize, 6 rolls, 7 bundles, 8 floor, 11 quick marker. */
 const SCREENS: Screen[] = [
   { index: 9, key: 'home', title: 'Home', group: '', icon: 'home', hash: 'home' },
+  { index: QUICK_SCREEN, key: 'quick', title: 'Photo to marker', group: '', icon: 'photo-marker', hash: 'quick' },
   { index: 4, key: 'pattern', title: 'Pattern', group: 'design', icon: 'pattern', hash: 'pattern' },
   { index: 5, key: 'digitize', title: 'Digitize', group: 'design', icon: 'digitize', hash: 'digitize' },
   { index: 0, key: 'editor', title: 'Marker editor', group: 'planning', icon: 'marker', hash: 'marker' },
@@ -53,32 +36,33 @@ const SCREENS: Screen[] = [
 const GROUPS: Record<string, string> = { design: 'Design', planning: 'Marker and planning', cutting_floor: 'Cutting floor', insight: 'Reports and help' };
 
 /** Pattern → marker → plan → rolls → spread → cut → bundles → sewing. Floor steps open a Floor page. */
-const STEPS: Array<{ key: string; label: string; screen: number; floorPage?: string; hint: string }> = [
-  { key: 'pattern', label: 'Pattern', screen: 4, hint: 'Draft or import pieces and grade sizes.' },
-  { key: 'marker', label: 'Marker', screen: 0, hint: 'Nest pieces across the fabric width.' },
-  { key: 'cut_plan', label: 'Cut plan', screen: 1, hint: 'Split an order into lays and plies.' },
-  { key: 'rolls', label: 'Rolls', screen: 6, hint: 'Inspect cloth and group shades.' },
-  { key: 'spread', label: 'Spread', screen: 8, floorPage: 'spreading', hint: 'Release a lay with its rolls.' },
-  { key: 'cut', label: 'Cut', screen: 8, floorPage: 'tracking', hint: 'Record what was cut.' },
-  { key: 'bundles', label: 'Bundles', screen: 7, hint: 'Number parts and print tickets.' },
-  { key: 'sewing_step', label: 'Sewing', screen: 8, floorPage: 'sewing', hint: 'Scan bundles out to lines.' },
+const STEPS: Array<{ key: string; label: string; screen: number; floorPage?: string; hint: string; icon: string }> = [
+  { key: 'pattern', label: 'Pattern', screen: 4, hint: 'Draft or import pieces and grade sizes.', icon: 'pattern' },
+  { key: 'marker', label: 'Marker', screen: 0, hint: 'Nest pieces across the fabric width.', icon: 'marker' },
+  { key: 'cut_plan', label: 'Cut plan', screen: 1, hint: 'Split an order into lays and plies.', icon: 'plan' },
+  { key: 'rolls', label: 'Rolls', screen: 6, hint: 'Inspect cloth and group shades.', icon: 'rolls' },
+  { key: 'spread', label: 'Spread', screen: 8, floorPage: 'spreading', hint: 'Release a lay with its rolls.', icon: 'spread' },
+  { key: 'cut', label: 'Cut', screen: 8, floorPage: 'tracking', hint: 'Record what was cut.', icon: 'cut' },
+  { key: 'bundles', label: 'Bundles', screen: 7, hint: 'Number parts and print tickets.', icon: 'bundles' },
+  { key: 'sewing_step', label: 'Sewing', screen: 8, floorPage: 'sewing', hint: 'Scan bundles out to lines.', icon: 'sewing' },
 ];
 
-const RECENT_KEY = 'beta-recent-files', THEME_KEY = 'beta-theme', LAST_KEY = 'beta-last-screen';
+const RECENT_KEY = 'beta-recent-files', THEME_KEY = 'beta-theme', LAST_KEY = 'beta-last-screen', RAIL_KEY = 'beta-nav-rail';
 type Recent = { name: string; kind: string; at: string };
 function readRecent(): Recent[] { try { const v = JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]') as Recent[]; return Array.isArray(v) ? v.slice(0, 8) : []; } catch { return []; } }
 function rememberFile(name: string, kind: string): void {
   try { localStorage.setItem(RECENT_KEY, JSON.stringify([{ name, kind, at: new Date().toISOString() }, ...readRecent().filter(r => r.name !== name)].slice(0, 8))); } catch { /* Storage blocked. */ }
 }
+/** Light is the default. "system" follows the operating system; the CSS only turns dark for data-theme=dark|system. */
 function applyTheme(theme: string): void {
-  if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme; else delete document.documentElement.dataset.theme;
+  document.documentElement.dataset.theme = theme === 'dark' || theme === 'system' ? theme : 'light';
 }
 
 export function installShell(host: ShellHost) {
   const $ = <T extends Element = HTMLElement>(s: string, root: ParentNode = document): T => root.querySelector<T>(s)!;
   const app = $<HTMLDivElement>('#app');
-  let theme = 'system';
-  try { theme = localStorage.getItem(THEME_KEY) ?? 'system'; } catch { /* default */ }
+  let theme = 'light';
+  try { theme = localStorage.getItem(THEME_KEY) ?? 'light'; } catch { /* default */ }
   applyTheme(theme);
   let current = 0;
 
@@ -93,25 +77,28 @@ export function installShell(host: ShellHost) {
   app.classList.add('app-shell');
   const skip = document.createElement('a'); skip.href = '#content'; skip.className = 'skip-link'; skip.textContent = 'Skip to main content';
   const sidebar = document.createElement('div'); sidebar.className = 'sidebar'; sidebar.id = 'sidebar';
-  sidebar.innerHTML = `<button type="button" class="brand" data-go="9" aria-label="${PRODUCT} home">${logo(34)}<span><strong>${PRODUCT}</strong><small>Pattern to sewing line</small></span></button>`;
+  sidebar.innerHTML = `<button type="button" class="brand" data-go="9" aria-label="${PRODUCT} home">${logo(34)}<span class="brand-text"><strong>${PRODUCT}</strong><small>Pattern to sewing line</small></span></button>`;
   const appMain = document.createElement('div'); appMain.className = 'app-main';
   const content = document.createElement('main'); content.id = 'content'; content.tabIndex = -1;
   content.innerHTML = `<div class="print-header" aria-hidden="true"><span>${PRODUCT} ${esc(VERSION)}</span><span id="print-title"></span><span id="print-date"></span></div>`;
   app.prepend(skip, sidebar, appMain);
   appMain.append(header);
 
-  header.innerHTML = `<button type="button" class="menu-toggle ghost" id="menu-toggle" aria-controls="sidebar" aria-expanded="false" aria-label="Show navigation">${icon('menu')}</button>
+  header.innerHTML = `<button type="button" class="menu-toggle icon-btn ghost" id="menu-toggle" aria-controls="sidebar" aria-expanded="false" aria-label="Show navigation">${icon('menu')}</button>
     <div class="topbar-title"><span class="eyebrow" id="topbar-group"></span><strong id="topbar-title">Home</strong></div>
-    <div class="topbar-tools" role="group" aria-label="App settings"></div>`;
+    <div class="topbar-tools" id="topbar-tools" role="group" aria-label="App settings"></div>
+    <button type="button" class="topbar-more icon-btn ghost" id="topbar-more" aria-controls="topbar-tools" aria-expanded="false" aria-label="More: language, theme and help">${icon('more')}</button>`;
   const tools = $<HTMLElement>('.topbar-tools', header);
-  tools.append(status);
-  tools.insertAdjacentHTML('beforeend', `<label><span class="label-text" data-floor-label="language">Language</span><select id="app-language" aria-label="Language"><option value="en">English</option><option value="hi" lang="hi">हिन्दी · draft</option><option value="ta" lang="ta">தமிழ் · draft</option></select></label>
-    <label><span class="label-text">Theme</span><select id="app-theme" aria-label="Colour theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
-    ${isDesktop() ? '' : `<button type="button" id="token-button" class="small" aria-haspopup="dialog" title="Server access token">${icon('key')}<span id="token-label">Server token</span></button>`}
-    <button type="button" id="about-button" class="small" aria-haspopup="dialog" aria-label="About ${PRODUCT}">${icon('info')}<span>About</span></button>`);
+  tools.before(status);
+  // The feedback module adds its button before #about-button.
+  tools.insertAdjacentHTML('beforeend', `<label class="tool-select">${icon('globe')}<span class="label-text" data-floor-label="language">Language</span><select id="app-language" aria-label="Language"><option value="en">English</option><option value="hi" lang="hi">हिन्दी · draft</option><option value="ta" lang="ta">தமிழ் · draft</option></select></label>
+    <label class="tool-select">${icon('sun')}<span class="label-text">Theme</span><select id="app-theme" aria-label="Colour theme"><option value="light">Light</option><option value="dark">Dark</option><option value="system">Same as computer</option></select></label>
+    ${isDesktop() ? '' : `<button type="button" id="token-button" class="small tool-button" aria-haspopup="dialog" data-tip="Server access token">${icon('key')}<span id="token-label">Server token</span></button>`}
+    <button type="button" id="about-button" class="small tool-button" aria-haspopup="dialog" aria-label="About ${PRODUCT}">${icon('info')}<span class="tool-text">About</span></button>`);
 
   const workflow = document.createElement('nav'); workflow.className = 'workflow'; workflow.setAttribute('aria-label', 'Cutting room workflow');
-  workflow.innerHTML = `<span class="workflow-label" data-floor-label="workflow">Workflow</span><ol>${STEPS.map((s, i) => `<li><button type="button" data-step="${i}" title="${esc(s.hint)}"><span class="step-no" aria-hidden="true">${i + 1}</span><span data-floor-label="${s.key}">${esc(s.label)}</span></button></li>`).join('')}</ol>`;
+  workflow.innerHTML = `<span class="workflow-label" data-floor-label="workflow">Workflow</span><ol>${STEPS.map((s, i) => `<li><button type="button" data-step="${i}" aria-description="${esc(s.hint)}"><span class="step-no" aria-hidden="true">${i + 1}</span><span data-floor-label="${s.key}">${esc(s.label)}</span></button></li>`).join('')}</ol>
+    <button type="button" class="workflow-next" id="workflow-next" hidden><span class="next-word" data-floor-label="next">Next</span><span class="next-name"></span>${icon('arrow-right')}</button>`;
   header.after(workflow);
   workflow.after(filebar);
   appMain.append(content);
@@ -138,11 +125,29 @@ export function installShell(host: ShellHost) {
     if (at < 0) return; event.preventDefault();
     const next = buttons[(at + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length]!; next.focus(); next.click();
   });
-  sidebar.insertAdjacentHTML('beforeend', `<div class="sidebar-foot"><p>Open source · runs on your own PC or server · your data stays in your factory.</p><p>Version ${esc(VERSION)} · Apache-2.0</p></div>`);
+  sidebar.insertAdjacentHTML('beforeend', `<div class="sidebar-foot"><p class="sidebar-promise">Open source · runs on your own PC or server · your data stays in your factory.</p><p class="sidebar-version">Version ${esc(VERSION)} · Apache-2.0</p>
+    <button type="button" id="nav-rail-toggle" class="rail-toggle" aria-controls="sidebar">${icon('chevrons-left')}<span class="nav-label">Collapse menu</span></button></div>`);
+
+  // Rail: icons only, labels as tooltips. Default below 1400 px wide so the work area gets the space.
+  const railToggle = $<HTMLButtonElement>('#nav-rail-toggle');
+  function setRail(rail: boolean, remember: boolean): void {
+    app.classList.toggle('nav-rail', rail);
+    railToggle.setAttribute('aria-expanded', String(!rail));
+    railToggle.setAttribute('aria-label', rail ? 'Expand menu' : 'Collapse menu');
+    railToggle.innerHTML = `${icon(rail ? 'chevrons-right' : 'chevrons-left')}<span class="nav-label">${rail ? 'Expand menu' : 'Collapse menu'}</span>`;
+    if (remember) try { localStorage.setItem(RAIL_KEY, rail ? 'rail' : 'full'); } catch { /* session only */ }
+    window.dispatchEvent(new Event('resize'));
+  }
+  let savedRail: string | null = null;
+  try { savedRail = localStorage.getItem(RAIL_KEY); } catch { /* default */ }
+  setRail(savedRail ? savedRail === 'rail' : window.innerWidth < 1400, false);
+  railToggle.addEventListener('click', () => setRail(!app.classList.contains('nav-rail'), true));
 
   // ----- Home and Reports screens -----
   content.insertAdjacentHTML('beforeend', homeHtml() + reportsHtml());
   const homeScreen = $<HTMLElement>('#screen-9');
+  // Quick Marker: phone flow for small units (self-contained module in src/quick/).
+  installQuick({ message: host.message }, content);
 
   // ----- Dialogs -----
   document.body.insertAdjacentHTML('beforeend', `
@@ -176,6 +181,8 @@ export function installShell(host: ShellHost) {
 
   // ----- Navigation state -----
   const byIndex = new Map(SCREENS.map(s => [s.index, s]));
+  const nextButton = $<HTMLButtonElement>('#workflow-next');
+  let nextStep = -1;
   function sync(index: number): void {
     current = index;
     const s = byIndex.get(index);
@@ -186,29 +193,48 @@ export function installShell(host: ShellHost) {
     $('#print-title').textContent = s?.title ?? '';
     $('#print-date').textContent = new Date().toLocaleDateString();
     document.title = `${s?.title ?? ''} · ${PRODUCT}`;
-    workflow.hidden = index === 9;
+    workflow.hidden = index === 9 || index === QUICK_SCREEN;
+    app.dataset.activeScreen = String(index);
     if (index === 9) renderHome();
     const page = document.querySelector<HTMLElement>('[data-floor-page][aria-pressed=true]')?.dataset.floorPage;
+    let active = -1;
     workflow.querySelectorAll<HTMLButtonElement>('[data-step]').forEach(b => {
       const step = STEPS[Number(b.dataset.step)]!;
-      const active = step.screen === index && (!step.floorPage || step.floorPage === page);
-      if (active) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      const on = step.screen === index && (!step.floorPage || step.floorPage === page);
+      if (on) { b.setAttribute('aria-current', 'step'); active = Number(b.dataset.step); } else b.removeAttribute('aria-current');
     });
+    // Keep the current step in view when the step list scrolls (narrow screens).
+    const list = workflow.querySelector('ol')!, currentStep = workflow.querySelector<HTMLElement>('[aria-current=step]');
+    if (currentStep && list.scrollWidth > list.clientWidth) {
+      const a = currentStep.getBoundingClientRect(), b = list.getBoundingClientRect();
+      list.scrollLeft += a.left + a.width / 2 - (b.left + b.width / 2);
+    }
+    // "Next" always offers the following step of the workflow.
+    nextStep = active >= 0 && active < STEPS.length - 1 ? active + 1 : -1;
+    nextButton.hidden = nextStep < 0;
+    if (nextStep >= 0) {
+      const next = STEPS[nextStep]!, name = workflow.querySelector<HTMLElement>(`[data-step="${nextStep}"] [data-floor-label]`)?.textContent ?? next.label;
+      $('.next-name', nextButton).textContent = name;
+      nextButton.setAttribute('aria-label', `Next step: ${nextStep + 1} ${name}. ${next.hint}`);
+      nextButton.dataset.tip = next.hint; nextButton.dataset.tipAlign = 'end';
+    }
     if (s && location.hash !== `#/${s.hash}`) history.replaceState(null, '', `#/${s.hash}`);
     try { localStorage.setItem(LAST_KEY, String(index)); } catch { /* optional */ }
     app.classList.remove('nav-open'); $('#menu-toggle').setAttribute('aria-expanded', 'false');
+    closeTools(false);
   }
   window.addEventListener('beta-screen', event => sync((event as CustomEvent<number>).detail));
   document.addEventListener('click', event => { if ((event.target as Element).closest('[data-floor-page]')) queueMicrotask(() => sync(current)); });
   function go(index: number, floorPage?: string, focus?: string): void {
     host.show(index);
     if (floorPage) { document.querySelector<HTMLButtonElement>(`[data-floor-page="${floorPage}"]`)?.click(); sync(index); }
-    if (focus) document.querySelector<HTMLElement>(focus)?.focus();
+    if (focus) { const target = document.querySelector<HTMLElement>(focus); target?.scrollIntoView({ block: 'center' }); target?.focus(); }
   }
   workflow.addEventListener('click', event => {
     const b = (event.target as Element).closest<HTMLButtonElement>('[data-step]'); if (!b) return;
     const step = STEPS[Number(b.dataset.step)]!; go(step.screen, step.floorPage);
   });
+  nextButton.addEventListener('click', () => { const step = STEPS[nextStep]; if (step) { go(step.screen, step.floorPage); content.focus({ preventScroll: true }); } });
   document.addEventListener('click', event => {
     const target = event.target as Element;
     const goButton = target.closest<HTMLElement>('[data-go]');
@@ -221,12 +247,25 @@ export function installShell(host: ShellHost) {
     const open = !app.classList.contains('nav-open'); app.classList.toggle('nav-open', open);
     $('#menu-toggle').setAttribute('aria-expanded', String(open)); if (open) nav.querySelector<HTMLElement>('[aria-pressed=true]')?.focus();
   });
-  document.addEventListener('keydown', event => { if (event.key === 'Escape' && app.classList.contains('nav-open')) { app.classList.remove('nav-open'); $('#menu-toggle').focus(); } });
+  // Phones: language, theme, token, feedback and About sit in a "More" panel.
+  const more = $<HTMLButtonElement>('#topbar-more');
+  function closeTools(focus: boolean): void { if (!header.classList.contains('tools-open')) return; header.classList.remove('tools-open'); more.setAttribute('aria-expanded', 'false'); if (focus) more.focus(); }
+  more.addEventListener('click', () => {
+    const open = !header.classList.contains('tools-open'); header.classList.toggle('tools-open', open); more.setAttribute('aria-expanded', String(open));
+    if (open) tools.querySelector<HTMLElement>('select, button')?.focus();
+  });
+  document.addEventListener('click', event => { if (header.classList.contains('tools-open') && !header.contains(event.target as Node)) closeTools(false); });
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    if (app.classList.contains('nav-open')) { app.classList.remove('nav-open'); $('#menu-toggle').focus(); }
+    closeTools(true);
+  });
 
   async function action(name: string, element: HTMLElement): Promise<void> {
     const click = (selector: string) => document.querySelector<HTMLElement>(selector)?.click();
     switch (name) {
       case 'open-file': click('#open-button'); break;
+      case 'new-marker': go(0); click('#open-button'); break;
       case 'open-project': click('#project-open'); break;
       case 'demo': click('#demo'); go(0); break;
       case 'new-pattern':
@@ -247,42 +286,54 @@ export function installShell(host: ShellHost) {
 
   // ----- Home -----
   function homeHtml(): string {
-    const card = (act: string, iconName: string, title: string, text: string, extra = '') => `<button type="button" class="action-card${extra}" ${act}><span class="icon-tile">${icon(iconName)}</span><strong>${title}</strong><span>${text}</span></button>`;
+    const card = (act: string, iconName: string, title: string, text: string, extra = '') => `<button type="button" class="action-card${extra}" ${act}><span class="icon-tile">${icon(iconName)}</span><span class="action-text"><strong>${title}</strong><span>${text}</span></span>${icon('arrow-right', 'action-arrow')}</button>`;
+    const task = (go: string, iconName: string, title: string, text: string) => `<button type="button" class="task-card" ${go}><span class="icon-tile">${icon(iconName)}</span><strong>${title}</strong><span>${text}</span></button>`;
+    const guide = (n: number, title: string, text: string, buttons: string) => `<li><span class="step-badge" aria-hidden="true">${n}</span><div class="guide-text"><strong>${title}</strong><span>${text}</span></div><div class="guide-actions">${buttons}</div></li>`;
     return `<section id="screen-9" class="screen home" hidden aria-labelledby="home-title">
-    <div class="home-hero">${logo(72, `${PRODUCT} logo`)}<div><h1 id="home-title">${PRODUCT}</h1><p>Make patterns and markers, plan the cut, and track every lay and bundle from fabric roll to sewing line.</p>
-      <div class="chips"><span class="chip ok">Open source · Apache-2.0</span><span class="chip">Runs on your own PC or server</span><span class="chip">Your data stays in your factory</span><span class="chip">Works offline</span></div></div></div>
-    <div class="home-section"><h2>Start</h2><div class="start-grid">
-      ${card('data-act="open-file"', 'open', 'Open a file', isDesktop() ? 'Marker, pattern, DXF, PLT or project file.' : 'DXF pieces or a saved marker job or result.', ' primary-card')}
-      ${isDesktop() ? card('data-act="open-project"', 'open', 'Open a project', 'A saved .betaproj folder with all screens.') : ''}
-      ${card('data-act="new-pattern"', 'new', 'Start a new pattern', 'Begin a blank draft with measurements and sizes.')}
-      ${card('data-act="demo"', 'demo', 'Open the demo', 'A small synthetic shirt marker to try every tool.')}
-    </div></div>
-    <div class="home-section"><h2>Continue</h2><div id="home-recent"></div></div>
-    <div class="home-section"><h2>Common tasks</h2><div class="start-grid">
-      ${card('data-go="0"', 'marker', 'Make a marker', 'Set fabric width and size ratio, then nest the pieces.')}
-      ${card('data-go="1"', 'plan', 'Plan an order', 'Turn garments per size into lays, plies and metres.')}
-      ${card('data-go="6"', 'rolls', 'Inspect fabric rolls', 'Record 4-point defects, shade and shrinkage.')}
-      ${card('data-go="7"', 'bundles', 'Print bundle tickets', 'Number cut parts and print tickets or stickers.')}
-    </div></div>
-    <div class="home-section"><h2 data-floor-label="workflow">Workflow</h2><p class="hint">Each step hands its result to the next. Choose a step to open it.</p>
-      <ol class="flow-map">${STEPS.map(s => `<li><button type="button" data-go="${s.screen}" ${s.floorPage ? `data-page="${s.floorPage}"` : ''}><strong data-floor-label="${s.key}">${esc(s.label)}</strong><span>${esc(s.hint)}</span></button></li>`).join('')}</ol></div>
-    <div class="home-foot"><span>Open source · runs on your own PC or server · your data stays in your factory.</span><button type="button" class="small" data-open-about>About ${PRODUCT} ${esc(VERSION)}</button></div>
+    <div class="home-hero">${logo(64, `${PRODUCT} logo`)}<div class="home-hero-text"><h1 id="home-title">${PRODUCT}</h1><p>Make patterns and markers, plan the cut, and track every lay and bundle from fabric roll to sewing line.</p></div>
+      <ul class="chips" aria-label="About this app"><li class="chip ok">${icon('check')}Open source · Apache-2.0</li><li class="chip">Works offline</li><li class="chip">Your data stays in your factory</li></ul></div>
+    <div class="home-columns">
+      <section class="home-section" aria-labelledby="home-start"><h2 id="home-start">Start</h2><div class="start-grid">
+        ${card(`data-go="${QUICK_SCREEN}"`, 'photo-marker', 'Photo to marker', 'No CAD? Take a photo of your paper pattern pieces with your phone. BETA finds the shapes and plans the marker.', ' quick-card')}
+        ${card('data-act="new-marker"', 'marker', 'Start a new marker', 'Open DXF pattern pieces, set the fabric width and nest.', ' primary-card')}
+        ${card('data-act="demo"', 'demo', 'Try the demo', 'A small sample shirt. Safe to try every tool.')}
+        ${card('data-act="new-pattern"', 'new', 'Start a new pattern', 'A blank draft with measurements and sizes.')}
+        ${isDesktop() ? card('data-act="open-project"', 'open', 'Open a project', 'A saved .betaproj folder with all screens.') : card('data-act="open-file"', 'open', 'Open a saved marker', 'Marker job or result JSON, or DXF pieces.')}
+      </div></section>
+      <section class="home-section" aria-labelledby="home-continue"><h2 id="home-continue">Continue</h2><div id="home-recent"></div></section>
+    </div>
+    <section class="home-section home-guide card" aria-labelledby="home-guide"><h2 id="home-guide">Your first marker in 3 minutes</h2>
+      <ol class="guide-steps">
+        ${guide(1, 'Open the pieces', 'Choose a DXF file from your CAD, or use the demo shirt.', `<button type="button" data-act="new-marker">${icon('open')}Open DXF</button><button type="button" data-act="demo">${icon('demo')}Demo</button>`)}
+        ${guide(2, 'Set fabric and sizes', 'Enter the fabric width and how many garments of each size go in one marker.', `<button type="button" data-go="0" data-focus='[data-field="width"]'>Go to setup</button>`)}
+        ${guide(3, 'Nest the marker', 'Press Nest marker. The best result so far shows while it searches.', `<button type="button" data-go="0" data-focus="#nest">${icon('play')}Nest</button>`)}
+        ${guide(4, 'Check and export', 'Look for “Checks passed” under the marker, then export PLT, PDF or DXF.', `<button type="button" data-go="0" data-focus="#export-menu > summary">${icon('download')}Export</button>`)}
+      </ol></section>
+    <section class="home-section" aria-labelledby="home-tasks"><h2 id="home-tasks">Common tasks</h2><div class="task-grid">
+      ${task('data-go="1"', 'plan', 'Plan a cut order', 'Garments per size → lays, plies and metres.')}
+      ${task('data-go="6"', 'rolls', 'Inspect rolls', '4-point defects, shade and shrinkage groups.')}
+      ${task('data-go="8" data-page="spreading"', 'print', 'Print a spreading sheet', 'Release a lay with its rolls and print the lay sheet.')}
+      ${task('data-go="7"', 'bundles', 'Make bundles', 'Number cut parts and print tickets or stickers.')}
+    </div></section>
+    <section class="home-section" aria-labelledby="home-flow"><h2 id="home-flow" data-floor-label="workflow">Workflow</h2><p class="hint">Each step hands its result to the next. Choose a step to open it.</p>
+      <ol class="flow-map">${STEPS.map((s, i) => `<li><button type="button" data-go="${s.screen}" ${s.floorPage ? `data-page="${s.floorPage}"` : ''}><span class="flow-head"><span class="flow-no" aria-hidden="true">${i + 1}</span>${icon(s.icon)}</span><strong data-floor-label="${s.key}">${esc(s.label)}</strong><span>${esc(s.hint)}</span></button></li>`).join('')}</ol></section>
+    <div class="home-foot"><span>Open source · runs on your own PC or server · your data stays in your factory.</span><button type="button" class="small ghost" data-open-about>${icon('info')}About ${PRODUCT} ${esc(VERSION)}</button></div>
     </section>`;
   }
   function renderHome(): void {
     const list: string[] = [];
     const job = host.state().job;
-    list.push(`<li><button type="button" data-go="0">${icon('marker')}<span>Current marker: <strong>${esc(job.name)}</strong> · ${job.pieces.length} pieces · ${(job.fabric.width / 10).toFixed(1)} cm wide</span></button></li>`);
+    list.push(`<li><button type="button" data-go="0"><span class="icon-tile">${icon('marker')}</span><span><strong>${esc(job.name)}</strong><small>Current marker · ${job.pieces.length} pieces · ${(job.fabric.width / 10).toFixed(1)} cm wide</small></span>${icon('chevron-right', 'action-arrow')}</button></li>`);
     try {
       const saved = JSON.parse(localStorage.getItem('beta-cutting-room-v1') ?? 'null') as { document?: { name?: string; sizes?: string[] } } | null;
-      if (saved?.document?.name) list.push(`<li><button type="button" data-go="4">${icon('pattern')}<span>Pattern draft saved on this computer: <strong>${esc(saved.document.name)}</strong> · ${saved.document.sizes?.length ?? 0} sizes</span></button></li>`);
+      if (saved?.document?.name) list.push(`<li><button type="button" data-go="4"><span class="icon-tile">${icon('pattern')}</span><span><strong>${esc(saved.document.name)}</strong><small>Pattern draft on this computer · ${saved.document.sizes?.length ?? 0} sizes</small></span>${icon('chevron-right', 'action-arrow')}</button></li>`);
     } catch { /* No draft. */ }
     const recent = document.querySelector<HTMLSelectElement>('#native-recent');
     if (recent) {
-      for (const o of Array.from(recent.options).filter(o => o.value).slice(0, 6)) list.push(`<li><button type="button" data-act="recent" data-path="${esc(o.value)}">${icon('open')}<span>${esc(o.value)}</span></button></li>`);
+      for (const o of Array.from(recent.options).filter(o => o.value).slice(0, 6)) list.push(`<li><button type="button" data-act="recent" data-path="${esc(o.value)}"><span class="icon-tile">${icon('file')}</span><span><strong>${esc(o.value.split(/[\\/]/).pop())}</strong><small>${esc(o.value)}</small></span>${icon('chevron-right', 'action-arrow')}</button></li>`);
     }
     const files = isDesktop() ? [] : readRecent();
-    $('#home-recent').innerHTML = `<ul class="recent-list">${list.join('')}</ul>${files.length ? `<h3>Files opened recently in this browser</h3><p class="hint">For safety a browser cannot reopen a file by itself. Choose Open a file and pick it again.</p><ul class="plain-list">${files.map(f => `<li>${esc(f.name)} <span class="chip">${esc(f.kind)}</span> <span class="hint">${esc(new Date(f.at).toLocaleString())}</span></li>`).join('')}</ul>` : ''}`;
+    $('#home-recent').innerHTML = `<ul class="recent-list">${list.join('')}</ul>${files.length ? `<details class="recent-files"><summary>Files opened recently in this browser (${files.length})</summary><p class="hint">For safety a browser cannot reopen a file by itself. Choose Open a saved marker and pick it again.</p><ul class="plain-list">${files.map(f => `<li>${esc(f.name)} <span class="chip">${esc(f.kind)}</span> <span class="hint">${esc(new Date(f.at).toLocaleString())}</span></li>`).join('')}</ul></details>` : ''}`;
   }
   for (const [selector, kind] of [['#open-file', 'Marker'], ['#pattern-file', 'Pattern'], ['#roll-file', 'Rolls'], ['#compare-file', 'Compare'], ['#digitize-photo', 'Photo']] as const) {
     document.querySelector<HTMLInputElement>(selector)?.addEventListener('change', event => { const f = (event.target as HTMLInputElement).files?.[0]; if (f) rememberFile(f.name, kind); });
@@ -290,17 +341,17 @@ export function installShell(host: ShellHost) {
 
   // ----- Reports -----
   function reportsHtml(): string {
-    const card = (title: string, text: string, where: string, buttons: string) => `<article><h2>${title}</h2><p>${text}</p><span class="where">${where}</span><div class="toolgroup">${buttons}</div></article>`;
+    const card = (iconName: string, title: string, text: string, where: string, buttons: string) => `<article><div class="report-head"><span class="icon-tile">${icon(iconName)}</span><h2>${title}</h2></div><p>${text}</p><span class="where">${where}</span><div class="toolgroup">${buttons}</div></article>`;
     return `<section id="screen-10" class="screen" hidden aria-labelledby="reports-title"><div class="screen-head"><div><span class="eyebrow">Reports and help</span><h1 id="reports-title" data-floor-label="reports">Reports</h1><p>Every report is made on this computer from checked data. Choose a report to open the screen that makes it.</p></div></div>
     <div class="report-grid">
-      ${card('Marker report and mini-marker', 'Marker length, efficiency, piece counts and a small printable picture of the current marker. The marker must pass all checks.', 'From: Marker editor', '<button type="button" data-act="export" data-format="report">Report (TXT)</button><button type="button" data-act="export" data-format="mini">Mini-marker (PDF)</button><button type="button" data-go="0">Open marker</button>')}
-      ${card('Cut plan', 'Lays, plies, size ratios, marker lengths and total fabric in metres for an order. Print it for the cutting master.', 'From: Cut plan', '<button type="button" data-go="1">Open cut plan</button>')}
-      ${card('Lay sheet and spreader files', 'Printable lay sheet with rolls, plies and end allowances, plus generic spreader CSV/JSON.', 'From: Floor › Spreading', '<button type="button" data-go="8" data-page="spreading">Open spreading</button>')}
-      ${card('Cutting report and fabric cost', 'Issued fabric, end bits, cut pieces, re-cuts and an estimated fabric cost per garment.', 'From: Bundles', '<button type="button" data-go="7">Open bundles</button>')}
-      ${card('Daily floor dashboard', 'Fabric used, weighted efficiency, end bits, re-cuts and sewing issues for a date. Export consumption as CSV.', 'From: Floor › Dashboard', '<button type="button" data-go="8" data-page="dashboard">Open dashboard</button>')}
-      ${card('Sewing work in progress', 'Bundles issued to each sewing line, as a CSV for BETA Time.', 'From: Floor › Issue to sewing', '<button type="button" data-go="8" data-page="sewing">Open sewing issue</button>')}
-      ${card('Roll inspection', '4-point inspection scores, pass or fail against the buyer limit, and shade and shrinkage groups.', 'From: Rolls', '<button type="button" data-go="6">Open rolls</button>')}
-      ${card('Day in the cutting room', 'A printable one-page walkthrough from pattern to sewing for training new staff.', 'From: Help', '<button type="button" data-go="3">Open help</button><button type="button" data-go="8" data-page="manual">User manual</button>')}
+      ${card('marker', 'Marker report and mini-marker', 'Marker length, efficiency, piece counts and a small printable picture of the current marker. The marker must pass all checks.', 'From: Marker editor', '<button type="button" data-act="export" data-format="report">Report (TXT)</button><button type="button" data-act="export" data-format="mini">Mini-marker (PDF)</button><button type="button" data-go="0">Open marker</button>')}
+      ${card('plan', 'Cut plan', 'Lays, plies, size ratios, marker lengths and total fabric in metres for an order. Print it for the cutting master.', 'From: Cut plan', '<button type="button" data-go="1">Open cut plan</button>')}
+      ${card('spread', 'Lay sheet and spreader files', 'Printable lay sheet with rolls, plies and end allowances, plus generic spreader CSV/JSON.', 'From: Floor › Spreading', '<button type="button" data-go="8" data-page="spreading">Open spreading</button>')}
+      ${card('cut', 'Cutting report and fabric cost', 'Issued fabric, end bits, cut pieces, re-cuts and an estimated fabric cost per garment.', 'From: Bundles', '<button type="button" data-go="7">Open bundles</button>')}
+      ${card('floor', 'Daily floor dashboard', 'Fabric used, weighted efficiency, end bits, re-cuts and sewing issues for a date. Export consumption as CSV.', 'From: Floor › Dashboard', '<button type="button" data-go="8" data-page="dashboard">Open dashboard</button>')}
+      ${card('sewing', 'Sewing work in progress', 'Bundles issued to each sewing line, as a CSV for BETA Time.', 'From: Floor › Issue to sewing', '<button type="button" data-go="8" data-page="sewing">Open sewing issue</button>')}
+      ${card('rolls', 'Roll inspection', '4-point inspection scores, pass or fail against the buyer limit, and shade and shrinkage groups.', 'From: Rolls', '<button type="button" data-go="6">Open rolls</button>')}
+      ${card('help', 'Day in the cutting room', 'A printable one-page walkthrough from pattern to sewing for training new staff.', 'From: Help', '<button type="button" data-go="3">Open help</button><button type="button" data-go="8" data-page="manual">User manual</button>')}
     </div></section>`;
   }
 
@@ -316,7 +367,7 @@ export function installShell(host: ShellHost) {
 
   // ----- Theme -----
   const themeSelect = $<HTMLSelectElement>('#app-theme');
-  themeSelect.value = ['light', 'dark'].includes(theme) ? theme : 'system';
+  themeSelect.value = ['light', 'dark', 'system'].includes(theme) ? theme : 'light';
   themeSelect.addEventListener('change', () => { theme = themeSelect.value; applyTheme(theme); try { localStorage.setItem(THEME_KEY, theme); } catch { /* session only */ } });
 
   // ----- About -----
@@ -388,6 +439,9 @@ export function installShell(host: ShellHost) {
     '#spread-result': 'No allocation yet. Inspect rolls, then allocate a group to the cut plan.',
   };
   for (const [selector, text] of Object.entries(empty)) document.querySelector(selector)?.setAttribute('data-empty', text);
+
+  // ----- Units inside number fields, menus that close on Escape and outside clicks -----
+  installUx(document.body);
 
   // ----- Feedback button, screen links, welcome and one-time ask (self-contained module) -----
   installFeedback({ state: host.state, message: host.message });

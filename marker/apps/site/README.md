@@ -49,6 +49,7 @@ There are no runtime npm dependencies; TypeScript and Vitest come from the root 
 | Public repository URL | `src/config.ts` → `repoUrl` (turns document paths into links) |
 | Contact address | `src/config.ts` → `contactEmail` |
 | Real screenshots | `public/assets/screens/*.png` (names in that folder's README) |
+| Demo video | Copy `beta-demo-en.web.mp4` from the video build to `public/assets/video/beta-demo-en.mp4` (git-ignored), with the poster and `beta-demo-en.vtt`. Or set `demoVideo.demoVideoUrl` in `src/config.ts`. See `marker/deploy/video/README.md`. |
 | Final benchmark data | `data/benchmark/*.json` (see below) |
 
 `null` values show "Coming soon" or a placeholder line. Rebuild after each change.

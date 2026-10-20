@@ -40,7 +40,9 @@ struct Table {
 }
 impl Table {
     fn load(path: &Path) -> Result<Self> {
-        let mut data = csv::records(&fs::read_to_string(path)?)?.into_iter();
+        let text = fs::read_to_string(path)
+            .with_context(|| format!("Cannot read benchmark CSV {}", path.display()))?;
+        let mut data = csv::records(&text)?.into_iter();
         let header = data.next().context("empty CSV")?;
         let rows: Vec<_> = data.collect();
         ensure!(
@@ -74,7 +76,8 @@ impl Table {
     }
 }
 fn json(path: &Path) -> Result<Value> {
-    let bytes = fs::read(path)?;
+    let bytes = fs::read(path)
+        .with_context(|| format!("Cannot read benchmark evidence {}", path.display()))?;
     Ok(serde_json::from_slice(
         bytes.strip_prefix(&[0xef, 0xbb, 0xbf]).unwrap_or(&bytes),
     )?)
@@ -153,7 +156,9 @@ fn sampling_gap_s(samples: &[(u64, f64)], start: u64, end: u64) -> f64 {
 }
 
 pub(super) fn audit(root: &Path, reference: Option<&Path>) -> Result<Audit> {
-    let samples = cpu_samples(root)?;
+    let samples = cpu_samples(root).context(
+        "Cannot audit benchmark load. Record CPU samples in conditions.json while the benchmark runs first.",
+    )?;
     let mut rows = Vec::new();
     for (arm, path) in arms(root) {
         let table = Table::load(&path.join("results.csv"))?;
@@ -221,7 +226,9 @@ pub(super) fn audit(root: &Path, reference: Option<&Path>) -> Result<Audit> {
 /// Preserve all raw trials. Use the first retry below the original load cutoff;
 /// if none qualifies, retain the last retry and disclose it as a persistent outlier.
 pub(super) fn finalize(root: &Path) -> Result<()> {
-    let initial: Audit = serde_json::from_value(json(&root.join("load-audit.json"))?)?;
+    let initial: Audit = serde_json::from_value(json(&root.join("load-audit.json")).context(
+        "Run beta-marker bench audit --run <folder> before finalizing benchmark results.",
+    )?)?;
     let replay: Replay = serde_json::from_value(json(&root.join("replay.json"))?)?;
     let mut pending: BTreeSet<Key> = initial.outlier_tasks.iter().cloned().collect();
     let mut sources = vec![root.to_owned()];
@@ -378,6 +385,19 @@ pub(super) fn finalize(root: &Path) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn missing_load_evidence_names_the_file_and_next_action() {
+        let root =
+            PathBuf::from(std::env::var_os("CARGO_TARGET_DIR").unwrap_or_else(|| ".".into()))
+                .join(format!("absent-benchmark-evidence-{}", std::process::id()));
+        let audit_error = format!("{:#}", audit(&root, None).unwrap_err());
+        assert!(audit_error.contains("conditions.json"));
+        assert!(audit_error.contains("Record CPU samples"));
+        let finalize_error = format!("{:#}", finalize(&root).unwrap_err());
+        assert!(finalize_error.contains("load-audit.json"));
+        assert!(finalize_error.contains("bench audit --run"));
+        assert!(!root.exists());
+    }
     #[test]
     fn missing_telemetry_flags_an_interruption_even_when_cpu_is_saturated() {
         let samples = [(0, 100.0), (6000, 100.0), (504000, 100.0), (510000, 100.0)];

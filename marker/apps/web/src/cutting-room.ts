@@ -4,7 +4,7 @@ import { loadPatternCore, type Bundle, type CostResponse, type CutPlan, type Cut
 import starter from '../../../packages/marker-wasm/test/fixtures/pattern.doc.json';
 import type { Editor } from './features';
 import { emptyResult } from './state';
-import { acceptedJob, csvRows, readPattern, readRollCsv, rollColumns } from './cutting-room-data';
+import { acceptedJob, csvRows, inspectionRequest, readPattern, readRollCsv, rollColumns, spreadBundleFields } from './cutting-room-data';
 import { carryWarnings, seamlyWarnings, warningsHtml } from './import-warnings';
 const esc = (v: unknown): string => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 const $ = <T extends Element = HTMLElement>(s: string): T => window.document.querySelector<T>(s)!;
@@ -159,11 +159,15 @@ export function installCuttingRoom(editor: Editor, screen: (index: number) => vo
         return; register.rolls.find(r => r.id === text('defect-roll'))?.defects.splice(Number(b.dataset.deleteObservation), 1); invalidateRolls(); });
     $('#roll-file').addEventListener('change', () => void task('#roll-status', async () => { const file = $<HTMLInputElement>('#roll-file').files?.[0]; if (!file)
         return; if (file.size > 10 * 1024 * 1024)
-        throw new Error('Roll register exceeds 10 MB.'); const next = file.name.endsWith('.json') ? JSON.parse(await file.text()) as RollRegister : readRollCsv(await file.text()); await json('roll/inspect', { register: next }); register = next; invalidateRolls(); $('#roll-status').textContent = `${register.rolls.length} rolls imported. Inspect before spreading.`; $<HTMLInputElement>('#roll-file').value = ''; }));
+        throw new Error('Roll register exceeds 10 MB.'); const next = /\.json$/i.test(file.name) ? JSON.parse(await file.text()) as RollRegister : readRollCsv(await file.text()); await json('roll/inspect', { register: next }); register = next; invalidateRolls(); $('#roll-status').textContent = `${register.rolls.length} rolls imported. Inspect before spreading.`; $<HTMLInputElement>('#roll-file').value = ''; }));
     $('#roll-template').onclick = () => download(`${rollColumns.join(',')}\nR1,LOT1,DYE1,A,100,100,1500,0,0\n`, 'rolls.csv', 'text/csv');
     $('#roll-save').onclick = () => download(JSON.stringify(register, null, 2), 'roll-register.json');
+    const currentInspectionRequest = () => inspectionRequest(register, num('inspection-limit'), text('inspection-unit'), num('shrink-band'));
+    for (const id of ['inspection-limit', 'inspection-unit', 'shrink-band']) {
+        $(`#${id}`).addEventListener('input', () => { invalidateRolls(); $('#roll-status').textContent = 'Inspection settings changed. Inspect rolls again before spreading.'; });
+    }
     $('#inspect-rolls').onclick = () => void task('#roll-status', async () => { if (!register.rolls.length)
-        throw new Error('Add or import rolls first.'); inspection = await json<InspectResponse>('roll/inspect', { register, settings: { limit: num('inspection-limit'), unit: text('inspection-unit'), point_cap: 'per_yard' }, grouping: { band_step_pct: num('shrink-band') } }); inspectionKey = JSON.stringify(register); $('#inspection-result').innerHTML = table('Inspection results', ['Roll', 'Raw / capped', 'Per 100 yd2', 'Per 100 m2', 'Result'], inspection.inspection.rolls.map(r => [esc(r.roll_id), `${r.score.raw_points} / ${r.score.scored_points}`, r.score.points_per_100_sq_yd.toFixed(2), r.score.points_per_100_m2.toFixed(2), `<strong class="${r.score.passed ? '' : 'error-text'}">${r.score.passed ? 'PASS' : 'FAIL'}</strong>`])) + table('Shade / shrinkage groups', ['Lot / dye lot / shade', 'Rolls', 'Mean shrinkage L / W (%)', 'Use'], inspection.groups.map((g, i) => [`${esc(g.lot)} / ${esc(g.dye_lot)} / ${esc(g.shade_group)}`, g.roll_ids.map(esc).join(', '), `${g.average_shrinkage.length_pct?.toFixed(2)} / ${g.average_shrinkage.width_pct?.toFixed(2)}`, `<button data-group-to-marker="${i}">Apply shrinkage to marker</button>`])); $('#spread-group').innerHTML = inspection.groups.map((g, i) => `<option value="${i}">${esc(g.lot)} / ${esc(g.dye_lot)} / ${esc(g.shade_group)}  |  ${g.roll_ids.length} rolls</option>`).join(''); $('#roll-status').textContent = 'Inspection ready. Select one compatible group for spreading.'; });
+        throw new Error('Add or import rolls first.'); const request = currentInspectionRequest(); const key = JSON.stringify(request); const next = await json<InspectResponse>('roll/inspect', request); if (key !== JSON.stringify(currentInspectionRequest())) throw new Error('Inspection settings changed. Inspect rolls again.'); inspection = next; inspectionKey = key; $('#inspection-result').innerHTML = table('Inspection results', ['Roll', 'Raw / capped', 'Per 100 yd2', 'Per 100 m2', 'Result'], inspection.inspection.rolls.map(r => [esc(r.roll_id), `${r.score.raw_points} / ${r.score.scored_points}`, r.score.points_per_100_sq_yd.toFixed(2), r.score.points_per_100_m2.toFixed(2), `<strong class="${r.score.passed ? '' : 'error-text'}">${r.score.passed ? 'PASS' : 'FAIL'}</strong>`])) + table('Shade / shrinkage groups', ['Lot / dye lot / shade', 'Rolls', 'Mean shrinkage L / W (%)', 'Use'], inspection.groups.map((g, i) => [`${esc(g.lot)} / ${esc(g.dye_lot)} / ${esc(g.shade_group)}`, g.roll_ids.map(esc).join(', '), `${g.average_shrinkage.length_pct?.toFixed(2)} / ${g.average_shrinkage.width_pct?.toFixed(2)}`, `<button data-group-to-marker="${i}">Apply shrinkage to marker</button>`])); $('#spread-group').innerHTML = inspection.groups.map((g, i) => `<option value="${i}">${esc(g.lot)} / ${esc(g.dye_lot)} / ${esc(g.shade_group)}  |  ${g.roll_ids.length} rolls</option>`).join(''); $('#roll-status').textContent = 'Inspection ready. Select one compatible group for spreading.'; });
     $('#inspection-result').addEventListener('click', event => { const b = (event.target as Element).closest<HTMLButtonElement>('[data-group-to-marker]'), g = inspection?.groups[Number(b?.dataset.groupToMarker)]; if (!b || !g || working)
         return; const next = structuredClone(editor.get()); next.job.fabric.shrinkage = g.average_shrinkage; next.result = emptyResult(next.job); editor.open(next); screen(0); editor.message('Group shrinkage applied. Nest again and remake the cut plan.'); });
     function spreadSource(): {
@@ -175,7 +179,7 @@ export function installCuttingRoom(editor: Editor, screen: (index: number) => vo
     }[] { const p = planning(); if (text('spread-source-select') === 'plan')
         return (p.plan?.lays ?? []).flatMap((l, i) => l.result && p.job ? [{ id: `LAY-${String(i + 1).padStart(2, '0')}`, job: { ...structuredClone(p.job), order: { sizes: l.ratio } }, result: l.result, plies: l.plies, end_allowance_mm: p.endAllowance }] : []); const s = editor.get(); return [{ id: 'LAY-01', job: s.job, result: s.result, plies: num('spread-plies'), end_allowance_mm: 0 }]; }
     $('#spread-rolls').onclick = () => void task('#spread-status', async () => {
-        if (!inspection || inspectionKey !== JSON.stringify(register))
+        if (!inspection || inspectionKey !== JSON.stringify(currentInspectionRequest()))
             throw new Error('Inspect the current roll register first.');
         const g = inspection.groups[Number(text('spread-group'))];
         if (!g)
@@ -207,17 +211,14 @@ export function installCuttingRoom(editor: Editor, screen: (index: number) => vo
         const button = (event.target as Element).closest<HTMLButtonElement>('[data-spread-bundles]');
         if (!button) return;
         void task('#spread-status', async () => {
-            if (!spread || spreadKey !== JSON.stringify(spreadSource()) || inspectionKey !== JSON.stringify(register)) throw new Error('The source changed. Allocate rolls again.');
+            if (!spread || spreadKey !== JSON.stringify(spreadSource()) || inspectionKey !== JSON.stringify(currentInspectionRequest())) throw new Error('The source changed. Allocate rolls again.');
             const source = spreadSources.find(s => s.id === button.dataset.spreadBundles);
             if (!source) throw new Error('Source marker is unavailable. Allocate rolls again.');
             const lay = await json<PhysicalLay>('cutroom/from-spread', {job:source.job,result:source.result,register,spread,lay_id:source.id,order:text('bundle-order').trim(),colour:text('bundle-colour').trim()});
             importedSpread = {job:source.job,result:source.result,lay};
             screen(7);
             $<HTMLSelectElement>('#bundle-source').value = 'spread';
-            $<HTMLInputElement>('#bundle-lay').value = lay.id;
-            $<HTMLInputElement>('#bundle-plies').value = String(lay.plies.at(-1)!.last);
-            const csv = (v:string) => '"' + v.replace(/"/g,'""') + '"';
-            $<HTMLTextAreaElement>('#bundle-runs').value = lay.plies.map(r => `${r.first},${r.last},${csv(r.shade_group)}`).join('\n');
+            applySpreadBundleFields(lay);
             $('#bundle-status').textContent = 'Actual allocated shade identities loaded from the audited spread. Review them before bundling.';
         });
     });
@@ -229,8 +230,15 @@ export function installCuttingRoom(editor: Editor, screen: (index: number) => vo
         return { ...editor.get(), plies: num('bundle-plies') }; const p = planning(), l = p.plan?.lays[Number(choice)]; return l?.result && p.job ? { job: { ...structuredClone(p.job), order: { sizes: l.ratio } }, result: l.result, plies: l.plies } : undefined; }
     function shadeRuns(): PlyRun[] { return csvRows(text('bundle-runs')).map(row => { if (row.length !== 3)
         throw new Error('Use first,last,shade_group for each shade run.'); return { first: Number(row[0]), last: Number(row[1]), shade_group: row[2]!.trim() }; }); }
+    function applySpreadBundleFields(lay: PhysicalLay): void {
+        const fields = spreadBundleFields(lay);
+        $<HTMLInputElement>('#bundle-lay').value = fields.id;
+        $<HTMLInputElement>('#bundle-plies').value = String(fields.plies);
+        $<HTMLTextAreaElement>('#bundle-runs').value = fields.runs;
+    }
     $('#bundle-source').addEventListener('change', () => { const s = markerSource(); if (!s)
-        return; $<HTMLInputElement>('#bundle-plies').value = String(s.plies); const i = text('bundle-source'); if (i !== 'marker')
+        return; if (text('bundle-source') === 'spread' && importedSpread) { applySpreadBundleFields(importedSpread.lay); return; }
+        $<HTMLInputElement>('#bundle-plies').value = String(s.plies); const i = text('bundle-source'); if (i !== 'marker')
         $<HTMLInputElement>('#bundle-lay').value = `LAY-${String(Number(i) + 1).padStart(2, '0')}`; });
     $('#make-bundles').onclick = () => void task('#bundle-status', async () => { const s = markerSource(); if (!s)
         throw new Error('Choose a marker with a saved result.'); const runs = shadeRuns(); if (runs.at(-1)?.last !== num('bundle-plies'))

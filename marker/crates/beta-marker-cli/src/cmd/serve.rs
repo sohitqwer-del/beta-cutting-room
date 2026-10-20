@@ -479,27 +479,25 @@ fn physical_lay(input: PhysicalLayRequest) -> anyhow::Result<beta_marker_cutroom
             .iter()
             .find(|p| p.id == placement.piece_id)
             .ok_or_else(|| anyhow::anyhow!("Unknown piece {}", placement.piece_id))?;
-        let garment = placement.bundle.ok_or_else(|| {
-            anyhow::anyhow!("Marker has no garment identities. Nest it again before bundling")
-        })?;
         let size = piece
             .size
             .clone()
             .ok_or_else(|| anyhow::anyhow!("Piece needs a size"))?;
-        let (normal, mirrored) =
-            beta_marker_core::rules::layer_copies(input.job.fabric.layout, placement);
-        for (hand, count) in [(false, normal), (true, mirrored)] {
-            for _ in 0..count {
-                let slot = slots.entry((piece.id.clone(), garment, hand)).or_insert(0);
-                parts.push(CutPart {
-                    piece_id: piece.id.clone(),
-                    size: size.clone(),
-                    garment,
-                    slot: *slot,
-                    mirrored: hand,
-                });
-                *slot += 1;
-            }
+        for (garment, hand) in
+            beta_marker_core::rules::layer_assignments(input.job.fabric.layout, placement)
+        {
+            let garment = garment.ok_or_else(|| {
+                anyhow::anyhow!("Marker has no garment identities. Nest it again before bundling")
+            })?;
+            let slot = slots.entry((piece.id.clone(), garment, hand)).or_insert(0);
+            parts.push(CutPart {
+                piece_id: piece.id.clone(),
+                size: size.clone(),
+                garment,
+                slot: *slot,
+                mirrored: hand,
+            });
+            *slot += 1;
         }
     }
     Ok(Lay {
@@ -923,12 +921,17 @@ fn route(method: &Method, url: &str, body: &[u8], root: &Path) -> Route {
     }
     let (path, query) = url.split_once('?').unwrap_or((url, ""));
     let mut params = std::collections::BTreeMap::new();
-    for pair in query.split('&').filter(|pair| !pair.is_empty()) {
-        let Some((key, value)) = pair.split_once('=') else {
-            return Reply::error(400, "Invalid query parameter").into();
-        };
-        if params.insert(key, value).is_some() {
-            return Reply::error(400, "Duplicate query parameter").into();
+    // Page flags and asset cache-busters do not configure Rust operations.
+    // Keep the existing strict syntax/duplicate checks for every API request.
+    let static_get = method == Method::GET && path != "/api" && !path.starts_with("/api/");
+    if !static_get {
+        for pair in query.split('&').filter(|pair| !pair.is_empty()) {
+            let Some((key, value)) = pair.split_once('=') else {
+                return Reply::error(400, "Invalid query parameter").into();
+            };
+            if params.insert(key, value).is_some() {
+                return Reply::error(400, "Duplicate query parameter").into();
+            }
         }
     }
     if method == Method::GET && path == "/api/health" {
@@ -2002,6 +2005,47 @@ mod tests {
         );
     }
     #[test]
+    fn static_query_flags_are_ignored_while_api_queries_stay_strict() -> anyhow::Result<()> {
+        let root = std::env::var_os("CARGO_TARGET_DIR")
+            .map(PathBuf::from)
+            .unwrap_or_else(std::env::temp_dir)
+            .join(format!("beta-static-query-{}", std::process::id()));
+        std::fs::create_dir_all(&root)?;
+        std::fs::write(
+            root.join("index.html"),
+            b"<!doctype html><title>Original query test</title>",
+        )?;
+        std::fs::write(root.join("app.js"), b"// Original static query test")?;
+        let get = |url: &str| match route(&Method::GET, url, b"", &root) {
+            Route::Reply(reply) => reply,
+            _ => panic!("Expected static reply for {url}"),
+        };
+        for url in [
+            "/?welcome",
+            "/?feedback-ask&unknown",
+            "/?x=1&x=2",
+            "/index.html?welcome",
+        ] {
+            let reply = get(url);
+            assert_eq!(reply.status, 200, "{url}");
+            assert!(reply.body.starts_with(b"<!doctype html>"));
+        }
+        assert_eq!(get("/app.js?cache-bust&x=1&x=2").status, 200);
+        assert_eq!(get("/%2e%2e/Cargo.toml?welcome").status, 404);
+        for url in ["/api?welcome", "/api/health?welcome", "/api/health?x=1&x=2"] {
+            assert_eq!(get(url).status, 400, "{url}");
+        }
+        assert_eq!(get("/api/health").status, 200);
+        assert_eq!(
+            reply(Method::POST, "/api/export?format=pdf&welcome", b"{}").status,
+            400
+        );
+        std::fs::remove_file(root.join("index.html"))?;
+        std::fs::remove_file(root.join("app.js"))?;
+        std::fs::remove_dir(root)?;
+        Ok(())
+    }
+    #[test]
     fn health_bad_input_and_missing_static() {
         let health = reply(Method::GET, "/api/health", b"");
         assert_eq!(health.status, 200);
@@ -2332,6 +2376,31 @@ mod tests {
         ] {
             assert_eq!(post(path, json!({})).status, 400, "{path}");
         }
+    }
+    #[test]
+    fn physical_lay_keeps_explicit_layer_garments_and_omits_surplus() {
+        let mut f = floor_fixture();
+        f["job"]["fabric"]["layout"] = json!("folded");
+        f["job"]["order"]["sizes"]["M"] = json!(3);
+        f["job"]["pieces"][0]["fold_line"] = json!([[0, 10], [20, 10]]);
+        let mut first = f["result"]["placements"][0].clone();
+        first["layer_allocations"] = json!([
+            {"bundle":0,"mirrored":false}, {"bundle":1,"mirrored":false}
+        ]);
+        let mut last = first.clone();
+        last["copy"] = json!(1);
+        last["bundle"] = json!(2);
+        last["translate"] = json!([21, 1]);
+        last["layer_allocations"] = json!([{"bundle":2,"mirrored":false}, null]);
+        f["result"]["placements"] = json!([first, last]);
+        let response = post("/api/cutroom/lay", json!({
+            "job": f["job"], "result": f["result"], "id":"LAY-01",
+            "order":"ORDER-01", "colour":"Blue", "plies":f["lay"]["plies"]
+        }));
+        assert_eq!(response.status, 200, "{}", String::from_utf8_lossy(&response.body));
+        let lay: beta_marker_cutroom::bundles::Lay = serde_json::from_slice(&response.body).unwrap();
+        assert_eq!(lay.parts.iter().map(|p| p.garment).collect::<Vec<_>>(), vec![0, 1, 2]);
+        assert!(lay.parts.iter().all(|p| p.slot == 0 && !p.mirrored));
     }
 
     #[test]

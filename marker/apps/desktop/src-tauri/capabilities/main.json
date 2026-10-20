@@ -1,11 +1,18 @@
 {
   "identifier": "main",
-  "description": "Local main window events only; filesystem access uses native dialogs.",
+  "description": "Main window events and explicit BETA feedback links; filesystem access uses native dialogs.",
   "windows": [
     "main"
   ],
   "permissions": [
     "core:event:default",
-    "core:window:allow-close"
+    "core:window:allow-close",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        { "url": "https://github.com/sohitqwer-del/beta-cutting-room/**" },
+        { "url": "mailto:sohitqwer@gmail.com*" }
+      ]
+    }
   ]
 }

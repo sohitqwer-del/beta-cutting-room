@@ -1,8 +1,14 @@
-# Windows dependency licence audit
+# Windows dependency licence audit: 0.5.0
 
-Cargo metadata was resolved for `x86_64-pc-windows-gnu`. Each row lists the declared licence expression. For OR expressions, the permissive alternative is selected. Sparrow has no Cargo licence field; its upstream LICENSE begins with MIT License. The existing unmodified jagua-rs is the only MPL exception.
+Generated from the release target graph. The complete target-scoped inventory
+is [THIRD-PARTY-LICENSES.md](../../THIRD-PARTY-LICENSES.md). Full upstream texts
+are in THIRD_PARTY_NOTICES.txt and are included in the installer. Fonts and
+build tools are included in the complete inventory as separate entries.
 
-The original local Apache-2.0 adapters replace upstream `dom_query` and `option-ext`. This removes the upstream MPL-only CSS/selector helper chain. They are not copies of the upstream implementations.
+SPDX alternatives select an allowed permissive licence. Unmodified jagua-rs
+1.0.0 is the sole MPL-2.0 exception. Sparrow's local upstream LICENSE is MIT.
+The original Apache-2.0 dom_query and option-ext adapters remain in use.
+The separate WebView2 SDK loader licence is in the complete inventory.
 
 | Package | Version | Licence |
 |---|---|---|
@@ -17,20 +23,29 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | anstyle-wincon | 3.0.11 | MIT OR Apache-2.0 |
 | anyhow | 1.0.104 | MIT OR Apache-2.0 |
 | approx | 0.5.1 | Apache-2.0 |
+| atoi_simd | 0.16.1 | MIT OR Apache-2.0 |
+| atomic-waker | 1.1.2 | Apache-2.0 OR MIT |
 | autocfg | 1.5.1 | Apache-2.0 OR MIT |
 | base64 | 0.22.1 | MIT OR Apache-2.0 |
 | base64 | 0.23.1 | MIT OR Apache-2.0 |
-| beta-cutting-room | 0.4.0 | Apache-2.0 |
-| beta-marker-core | 0.1.0 | Apache-2.0 |
-| beta-marker-cutroom | 0.1.0 | Apache-2.0 |
-| beta-marker-dxf | 0.1.0 | Apache-2.0 |
-| beta-marker-export | 0.1.0 | Apache-2.0 |
-| beta-marker-match | 0.1.0 | Apache-2.0 |
-| beta-marker-nest | 0.1.0 | Apache-2.0 |
-| beta-marker-plan | 0.1.0 | Apache-2.0 |
-| beta-marker-roll | 0.1.0 | Apache-2.0 |
-| beta-pattern-core | 0.1.0 | Apache-2.0 |
-| beta-pattern-digitize | 0.1.0 | Apache-2.0 |
+| beta-cutting-room | 0.5.0 | Apache-2.0 |
+| beta-marker-cli | 0.5.0 | Apache-2.0 |
+| beta-marker-cluster | 0.5.0 | Apache-2.0 |
+| beta-marker-core | 0.5.0 | Apache-2.0 |
+| beta-marker-cutroom | 0.5.0 | Apache-2.0 |
+| beta-marker-dxf | 0.5.0 | Apache-2.0 |
+| beta-marker-edit | 0.5.0 | Apache-2.0 |
+| beta-marker-export | 0.5.0 | Apache-2.0 |
+| beta-marker-floor | 0.5.0 | Apache-2.0 |
+| beta-marker-learn | 0.5.0 | Apache-2.0 |
+| beta-marker-match | 0.5.0 | Apache-2.0 |
+| beta-marker-nest | 0.5.0 | Apache-2.0 |
+| beta-marker-plan | 0.5.0 | Apache-2.0 |
+| beta-marker-queue | 0.5.0 | Apache-2.0 |
+| beta-marker-roll | 0.5.0 | Apache-2.0 |
+| beta-marker-wasm | 0.5.0 | Apache-2.0 |
+| beta-pattern-core | 0.5.0 | Apache-2.0 |
+| beta-pattern-digitize | 0.5.0 | Apache-2.0 |
 | bitflags | 1.3.2 | MIT/Apache-2.0 |
 | bitflags | 2.13.2 | MIT OR Apache-2.0 |
 | block-buffer | 0.10.4 | MIT OR Apache-2.0 |
@@ -42,6 +57,7 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | byteorder | 1.5.0 | Unlicense OR MIT |
 | byteorder-lite | 0.1.0 | Unlicense OR MIT |
 | bytes | 1.12.1 | MIT |
+| calamine | 0.31.0 | MIT |
 | camino | 1.2.6 | MIT OR Apache-2.0 |
 | cargo-platform | 0.1.9 | MIT OR Apache-2.0 |
 | cargo_metadata | 0.19.2 | MIT |
@@ -55,8 +71,11 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | clap_builder | 4.6.7 | MIT OR Apache-2.0 |
 | clap_derive | 4.6.7 | MIT OR Apache-2.0 |
 | clap_lex | 1.1.1 | MIT OR Apache-2.0 |
+| codepage | 0.1.3 | Apache-2.0 OR MIT |
 | colorchoice | 1.0.5 | MIT OR Apache-2.0 |
 | cookie | 0.18.2 | MIT OR Apache-2.0 |
+| core_detect | 1.0.0 | MIT/Apache-2.0 |
+| core_maths | 0.1.1 | MIT |
 | cpufeatures | 0.2.17 | MIT OR Apache-2.0 |
 | cpufeatures | 0.3.1 | MIT OR Apache-2.0 |
 | crc32fast | 1.5.2 | MIT OR Apache-2.0 |
@@ -65,11 +84,14 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | crossbeam-epoch | 0.9.21 | MIT OR Apache-2.0 |
 | crossbeam-utils | 0.8.23 | MIT OR Apache-2.0 |
 | crypto-common | 0.1.7 | MIT OR Apache-2.0 |
+| csv | 1.4.0 | Unlicense/MIT |
+| csv-core | 0.1.13 | Unlicense/MIT |
 | ctor | 1.0.13 | Apache-2.0 OR MIT |
 | ctrlc | 3.5.2 | MIT/Apache-2.0 |
 | darling | 0.24.1 | MIT |
 | darling_core | 0.24.1 | MIT |
 | darling_macro | 0.24.1 | MIT |
+| debug_unsafe | 0.1.4 | MIT OR Apache-2.0 |
 | defmt | 1.2.0 | MIT OR Apache-2.0 |
 | defmt-macros | 1.2.0 | MIT OR Apache-2.0 |
 | defmt-parser | 1.1.0 | MIT OR Apache-2.0 |
@@ -86,8 +108,10 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | dyn-clone | 1.0.20 | MIT OR Apache-2.0 |
 | either | 1.19.0 | MIT OR Apache-2.0 |
 | embed-resource | 3.0.12 | MIT |
+| encoding_rs | 0.8.42 | (Apache-2.0 OR MIT) AND BSD-3-Clause |
 | equivalent | 1.0.3 | Apache-2.0 OR MIT |
 | erased-serde | 0.4.10 | MIT OR Apache-2.0 |
+| fast-float2 | 0.2.4 | MIT OR Apache-2.0 |
 | fastrand | 2.5.0 | Apache-2.0 OR MIT |
 | fdeflate | 0.3.7 | MIT OR Apache-2.0 |
 | fern | 0.7.1 | MIT |
@@ -97,6 +121,13 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | float_next_after | 2.0.0 | MIT |
 | fnv | 1.0.7 | Apache-2.0 / MIT |
 | form_urlencoded | 1.2.2 | MIT OR Apache-2.0 |
+| futures-channel | 0.3.34 | MIT OR Apache-2.0 |
+| futures-core | 0.3.34 | MIT OR Apache-2.0 |
+| futures-io | 0.3.34 | MIT OR Apache-2.0 |
+| futures-macro | 0.3.34 | MIT OR Apache-2.0 |
+| futures-sink | 0.3.34 | MIT OR Apache-2.0 |
+| futures-task | 0.3.34 | MIT OR Apache-2.0 |
+| futures-util | 0.3.34 | MIT OR Apache-2.0 |
 | generic-array | 0.14.7 | MIT |
 | geo | 0.33.1 | MIT OR Apache-2.0 |
 | geo-types | 0.7.20 | MIT OR Apache-2.0 |
@@ -112,6 +143,12 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | hex | 0.4.3 | MIT OR Apache-2.0 |
 | html5ever | 0.39.0 | MIT OR Apache-2.0 |
 | http | 1.5.0 | MIT OR Apache-2.0 |
+| http-body | 1.1.0 | MIT |
+| http-body-util | 0.1.5 | MIT |
+| httparse | 1.10.1 | MIT OR Apache-2.0 |
+| httpdate | 1.0.3 | MIT OR Apache-2.0 |
+| hyper | 1.12.0 | MIT |
+| hyper-util | 0.1.21 | MIT |
 | i_float | 1.16.0 | MIT |
 | i_key_sort | 0.10.3 | MIT |
 | i_overlay | 4.5.2 | MIT OR Apache-2.0 |
@@ -132,6 +169,7 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | indexmap | 1.9.3 | Apache-2.0 OR MIT |
 | indexmap | 2.14.2 | Apache-2.0 OR MIT |
 | infer | 0.22.0 | MIT |
+| ipnet | 2.12.2 | MIT OR Apache-2.0 |
 | is_terminal_polyfill | 1.70.2 | MIT OR Apache-2.0 |
 | itertools | 0.15.0 | MIT OR Apache-2.0 |
 | itoa | 1.0.18 | MIT OR Apache-2.0 |
@@ -141,6 +179,7 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | jiff-static | 0.2.38 | Unlicense OR MIT |
 | jiff-tzdb | 0.1.9 | Unlicense OR MIT |
 | jiff-tzdb-platform | 0.1.3 | Unlicense OR MIT |
+| js-sys | 0.3.106 | MIT OR Apache-2.0 |
 | json-patch | 4.2.0 | MIT/Apache-2.0 |
 | jsonptr | 0.7.1 | MIT OR Apache-2.0 |
 | keyboard-types | 0.8.3 | MIT OR Apache-2.0 |
@@ -160,6 +199,7 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | mio | 1.2.4 | MIT |
 | moxcms | 0.7.11 | BSD-3-Clause OR Apache-2.0 |
 | muda | 0.20.0 | Apache-2.0 OR MIT |
+| multiversion_no_op | 1.0.0 | Apache-2.0 OR MIT |
 | ndarray | 0.17.2 | MIT OR Apache-2.0 |
 | new_debug_unreachable | 1.0.6 | MIT |
 | num-complex | 0.4.6 | MIT OR Apache-2.0 |
@@ -170,6 +210,7 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | numfmt | 1.2.0 | MIT |
 | once_cell | 1.21.4 | MIT OR Apache-2.0 |
 | once_cell_polyfill | 1.70.2 | MIT OR Apache-2.0 |
+| open | 5.4.4 | MIT |
 | option-ext | 0.2.0 | Apache-2.0 |
 | ordered-float | 5.5.0 | MIT |
 | parking_lot | 0.12.5 | MIT OR Apache-2.0 |
@@ -190,6 +231,7 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | proc-macro2 | 1.0.107 | MIT OR Apache-2.0 |
 | pxfm | 0.1.30 | BSD-3-Clause OR Apache-2.0 |
 | qrcode | 0.14.1 | MIT OR Apache-2.0 |
+| quick-xml | 0.38.4 | MIT |
 | quick-xml | 0.42.0 | MIT |
 | quote | 1.0.47 | MIT OR Apache-2.0 |
 | rand | 0.10.3 | MIT OR Apache-2.0 |
@@ -211,6 +253,9 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | rstar | 0.12.2 | MIT OR Apache-2.0 |
 | rust_xlsxwriter | 0.95.0 | MIT OR Apache-2.0 |
 | rustc_version | 0.4.1 | MIT OR Apache-2.0 |
+| rustversion | 1.0.23 | MIT OR Apache-2.0 |
+| rustybuzz | 0.20.1 | MIT |
+| ryu | 1.0.23 | Apache-2.0 OR BSL-1.0 |
 | same-file | 1.0.6 | Unlicense/MIT |
 | schemars | 0.8.22 | MIT |
 | schemars | 0.9.0 | MIT |
@@ -234,12 +279,14 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | shlex | 2.0.1 | MIT OR Apache-2.0 |
 | sif-itree | 0.4.1 | MIT OR Apache-2.0 |
 | simd-adler32 | 0.3.10 | MIT |
+| simdutf8 | 0.1.5 | MIT OR Apache-2.0 |
 | siphasher | 1.0.4 | MIT OR Apache-2.0 |
+| slab | 0.4.12 | MIT |
 | slotmap | 1.1.1 | Zlib |
 | smallvec | 1.16.3 | MIT OR Apache-2.0 |
 | socket2 | 0.6.5 | MIT OR Apache-2.0 |
 | softbuffer | 0.4.8 | MIT OR Apache-2.0 |
-| sparrow | 0.3.0 | MIT (upstream LICENSE inspected) |
+| sparrow | 0.3.0 | MIT (LICENSE file; manifest omits licence) |
 | stable_deref_trait | 1.2.1 | MIT OR Apache-2.0 |
 | static_vcruntime | 3.0.0 | MIT OR Apache-2.0 OR Zlib |
 | string_cache | 0.9.0 | MIT OR Apache-2.0 |
@@ -258,6 +305,7 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | tauri-plugin | 2.7.2 | Apache-2.0 OR MIT |
 | tauri-plugin-dialog | 2.8.3 | Apache-2.0 OR MIT |
 | tauri-plugin-fs | 2.7.1 | Apache-2.0 OR MIT |
+| tauri-plugin-opener | 2.7.2 | Apache-2.0 OR MIT |
 | tauri-plugin-single-instance | 2.5.4 | Apache-2.0 OR MIT |
 | tauri-runtime | 2.12.2 | Apache-2.0 OR MIT |
 | tauri-runtime-wry | 2.12.2 | Apache-2.0 OR MIT |
@@ -279,14 +327,21 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | toml_datetime | 1.1.2+spec-1.1.0 | MIT OR Apache-2.0 |
 | toml_parser | 1.1.5+spec-1.1.0 | MIT OR Apache-2.0 |
 | toml_writer | 1.1.3+spec-1.1.0 | MIT OR Apache-2.0 |
+| tower-service | 0.3.3 | MIT |
 | tracing | 0.1.44 | MIT |
 | tracing-attributes | 0.1.31 | MIT |
 | tracing-core | 0.1.36 | MIT |
 | tray-icon | 0.25.1 | MIT OR Apache-2.0 |
+| try-lock | 0.2.5 | MIT |
+| ttf-parser | 0.25.1 | MIT OR Apache-2.0 |
 | typed-path | 0.12.3 | MIT OR Apache-2.0 |
 | typeid | 1.0.3 | MIT OR Apache-2.0 |
 | typenum | 1.20.1 | MIT OR Apache-2.0 |
+| unicode-bidi-mirroring | 0.4.0 | MIT/Apache-2.0 |
+| unicode-ccc | 0.4.0 | MIT/Apache-2.0 |
 | unicode-ident | 1.0.27 | (MIT OR Apache-2.0) AND Unicode-3.0 |
+| unicode-properties | 0.1.4 | MIT/Apache-2.0 |
+| unicode-script | 0.5.8 | MIT OR Apache-2.0 |
 | unicode-segmentation | 1.13.3 | MIT OR Apache-2.0 |
 | url | 2.5.8 | MIT OR Apache-2.0 |
 | urlpattern | 0.6.0 | MIT |
@@ -295,6 +350,11 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | uuid | 1.28.0 | Apache-2.0 OR MIT |
 | version_check | 0.9.5 | MIT/Apache-2.0 |
 | walkdir | 2.5.0 | Unlicense/MIT |
+| want | 0.3.2 | MIT |
+| wasm-bindgen | 0.2.129 | MIT OR Apache-2.0 |
+| wasm-bindgen-macro | 0.2.129 | MIT OR Apache-2.0 |
+| wasm-bindgen-macro-support | 0.2.129 | MIT OR Apache-2.0 |
+| wasm-bindgen-shared | 0.2.129 | MIT OR Apache-2.0 |
 | web-time | 1.1.0 | MIT OR Apache-2.0 |
 | web_atoms | 0.2.6 | MIT OR Apache-2.0 |
 | webview2-com | 0.39.1 | MIT |
@@ -329,17 +389,10 @@ The original local Apache-2.0 adapters replace upstream `dom_query` and `option-
 | zerotrie | 0.2.5 | Unicode-3.0 |
 | zerovec | 0.11.8 | Unicode-3.0 |
 | zerovec-derive | 0.11.6 | Unicode-3.0 |
+| zip | 4.6.1 | MIT |
 | zip | 7.4.0 | MIT |
 | zlib-rs | 0.6.8 | Zlib |
 | zmij | 1.0.23 | MIT |
 | zopfli | 0.8.4 | Apache-2.0 |
 | zune-core | 0.4.12 | MIT OR Apache-2.0 OR Zlib |
 | zune-jpeg | 0.4.21 | MIT OR Apache-2.0 OR Zlib |
-
-npm build tool: `@tauri-apps/cli` 2.12.3 and `@tauri-apps/cli-win32-x64-msvc` 2.12.3: Apache-2.0 OR MIT (installed package manifests and bundled licence files checked). No new npm runtime package is added. The `@beta/marker-desktop` workspace is Apache-2.0.
-
-NSIS 3.13 core/stubs use zlib/libpng terms. Its optional LZMA module uses CPL-1.0, so this app explicitly selects the zlib compressor and excludes that module from its distributed installer. The downloaded build tool includes other optional compressors; they are not selected. Microsoft WebView2 is a separately installed Windows prerequisite, not a redistributed crate or npm package.
-
-The build-time licence gate rejects any unapproved dependency expression. Re-run it after changing dependencies.
-
-NSIS helper `nsis_tauri_utils.dll` 0.5.3: MIT OR Apache-2.0; [upstream MIT licence](https://github.com/tauri-apps/nsis-tauri-utils/blob/dev/LICENSE_MIT).

@@ -663,3 +663,16 @@ thead .feature-col { z-index: 2; }
   .section-alt, .site-footer { background: none; color: #000; }
   details > :not(summary) { display: block; }
 }
+
+/* Demo video (home). No autoplay; the poster shows until the visitor presses play. */
+.section-video { padding-top: clamp(2.5rem, 1.5rem + 3vw, 4rem); }
+.video-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); gap: clamp(1.5rem, 1rem + 2vw, 3rem); align-items: center; }
+.video-frame { border-radius: 18px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow-l); background: var(--ink); aspect-ratio: 16 / 9; }
+.demo-video, .demo-poster-link img { display: block; width: 100%; height: 100%; object-fit: contain; background: var(--ink); }
+.demo-poster-link { position: relative; display: block; height: 100%; }
+.demo-play { position: absolute; left: 50%; top: 50%; width: 5rem; height: 5rem; margin: -2.5rem 0 0 -2.5rem; border-radius: 50%; background: var(--brand); box-shadow: 0 10px 24px rgb(23 107 82 / 0.35); }
+.demo-play::after { content: ""; position: absolute; left: 2rem; top: 1.45rem; border-left: 1.5rem solid #fff; border-top: 1.05rem solid transparent; border-bottom: 1.05rem solid transparent; }
+.demo-poster-link:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+.video-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0.75rem; padding: 0; }
+.video-meta span { font-size: 0.875rem; font-weight: 600; padding: 0.3rem 0.7rem; border-radius: 999px; background: var(--brand-soft); color: var(--brand-hover); }
+@media (max-width: 52rem) { .video-grid { grid-template-columns: 1fr; } }

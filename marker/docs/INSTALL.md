@@ -1,14 +1,15 @@
-# Install BETA Cutting Room 0.4.0
+# Install BETA Cutting Room 0.5.0
 
-This release is a launch candidate. Public download links follow only after
-the [release checklist](RELEASE-CHECKLIST.md) is approved. Nothing here installs
-a service or publishes a release automatically.
+Version 0.5.0 packages and their checks are recorded in [the release record](RELEASE-0.5.0.md).
+The [release checklist](RELEASE-CHECKLIST.md) records remaining installation and
+factory-acceptance checks. Publication alone does not complete those checks.
+Nothing here installs a service or publishes a release automatically.
 
 ## Windows desktop
 
-Use the x64 NSIS installer `BETA-Cutting-Room_0.4.0_x64-setup.exe`. It installs
+Use the x64 NSIS installer `BETA-Cutting-Room_0.5.0_x64-setup.exe`. It installs
 for the current user. Compare its SHA-256 with the release record before running
-it. The candidate is unsigned; signing and clean-PC acceptance remain gates.
+it. The installer is unsigned; signing and clean-PC acceptance remain gates.
 
 Microsoft Edge WebView2 Runtime must already be installed. The installer skips
 network bootstrap so installation can remain offline. If missing, an
@@ -26,7 +27,7 @@ account. Hindi and Tamil text need native-speaker review.
 
 ## Windows portable CLI and browser app
 
-Extract `BETA-Cutting-Room_0.4.0_windows-x64-portable.zip` to a writable folder.
+Extract `BETA-Cutting-Room_0.5.0_windows-x64-portable.zip` to a writable folder.
 Run `start-server.cmd`, then open `http://127.0.0.1:7878`. Leave the console open;
 Ctrl+C stops it. Do not open `web/index.html` directly from disk. The CLI also
 runs as `.\beta-marker.exe --help` in PowerShell.
@@ -41,7 +42,7 @@ The Linux package is the CLI plus static browser assets. The Windows desktop
 installer is separate. A Linux desktop GUI is not part of this release's package
 or permissive-licence claim.
 
-Extract `BETA-Cutting-Room_0.4.0_linux-x86_64.tar.gz`, enter the extracted folder,
+Extract `BETA-Cutting-Room_0.5.0_linux-x86_64.tar.gz`, enter the extracted folder,
 then run:
 
 ```sh
@@ -65,19 +66,23 @@ runs offline. Set `CARGO_TARGET_DIR` outside the checkout and keep
 
 From the repository root:
 
+For distributable builds, use the [release build checklist](RELEASE-BUILDS.md).
+Its wrapper removes Cargo-home and source-tree paths, preserves the recorded
+source timestamp, and checks the final CLI bytes. The commands below use it.
+
 ```sh
 npm install
-npm run build:wasm -w @beta/marker-wasm
-npm run build:pattern-wasm -w @beta/marker-wasm
-npm run build:floor-wasm -w @beta/marker-web
+node marker/deploy/release-build.mjs marker-wasm
+node marker/deploy/release-build.mjs pattern-wasm
+node marker/deploy/release-build.mjs floor-wasm
 npm run build -w @beta/marker-web
-cargo build --manifest-path marker/Cargo.toml --release -p beta-marker-cli
+node marker/deploy/release-build.mjs cli
 ```
 
 On Windows, the desktop wrapper also needs `BETA_TOOLS_DIR` pointing to a tool
 directory containing `desktop/node_modules/@tauri-apps/cli` and cached
 `tauri-bundler` tools. Set `WASM_BINDGEN` if its CLI is outside PATH. Run
-`npm run build -w @beta/marker-desktop`. Find the installer under
+`node marker/deploy/release-build.mjs desktop`. Find the installer under
 `$CARGO_TARGET_DIR/release/bundle/nsis/`. See the
 [desktop report](../apps/desktop/DESKTOP_REPORT.md) for toolchain/licence bounds.
 Build Floor WASM first: the desktop pre-build currently builds only Marker and

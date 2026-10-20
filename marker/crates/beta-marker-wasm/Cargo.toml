@@ -11,6 +11,11 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 beta-marker-core.workspace = true
 beta-marker-edit.workspace = true
+beta-marker-nest.workspace = true
 serde_json.workspace = true
 serde.workspace = true
 wasm-bindgen = "0.2"
+
+beta-pattern-digitize = { path = "../../../pattern/crates/beta-pattern-digitize" }
+beta-marker-export = { path = "../beta-marker-export" }
+js-sys = "0.3"

@@ -236,9 +236,17 @@ pub fn order_report(lays: &[LayActuals]) -> Result<CuttingReport> {
     Ok(r)
 }
 fn csv_field(s: &str) -> String {
-    format!("\"{}\"", s.replace('"', "\"\""))
+    // CSV quoting alone does not stop a spreadsheet from evaluating a formula.
+    let prefix =
+        if s.trim_start().starts_with(['=', '+', '-', '@']) || s.starts_with(['\t', '\r', '\n']) {
+            "'"
+        } else {
+            ""
+        };
+    format!("\"{prefix}{}\"", s.replace('"', "\"\""))
 }
-/// RFC 4180 CSV with explicit units and CRLF records. Suitable for ERP/WIP import.
+/// RFC 4180 CSV with explicit units and CRLF records. Formula-leading text is
+/// prefixed with an apostrophe for spreadsheet safety; numeric values stay numeric.
 pub fn reports_csv(reports: &[CuttingReport]) -> String {
     let mut out = String::from(
         "scope,id,order,planned_mm,actual_mm,issued_mm,end_bits_mm,variance_mm,cutting_efficiency_pct,marker_efficiency_pct,planned_pieces,pieces_cut,recut_count\r\n",

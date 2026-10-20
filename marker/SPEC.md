@@ -94,7 +94,7 @@ Contract fields are in `model.rs` (all optional, default = version 0.1 behaviour
 | Portfolio / warm start | `NestOptions.runs`, `warm_start` | Several seeds in parallel, best valid wins; start from an earlier result. | nest |
 | Faceless fabric | `fabric.allow_flip`, `Piece.flip` | Any copy may be placed mirrored; counts are per piece (`quantity + mirror_quantity`). Per-piece override: `rules::flip_allowed`. | nest, validator |
 | Per-piece tilt | `Piece.tilt_deg` | Overrides `fabric.tilt_deg` for one piece (`rules::allowed_rotations`). | nest, validator |
-| Folded / tubular | `fabric.layout`, `Piece.fold_line`, `Placement.on_fold` | Two layers per placement (`rules::layer_copies`); symmetric pieces may be placed as a half on a fold edge (folded: `y = width`; tubular: `y = 0` or `y = width`). Surplus layer copies are warnings, missing copies are errors. | nest, validator |
+| Folded / tubular | `fabric.layout`, `Piece.fold_line`, `Placement.on_fold`, `Placement.layer_allocations` | A full cut yields normal and mirrored layers; explicit assignments may serve different garments of the same size. Symmetric halves may use either source hand on a fold edge. Useful copies must match demand exactly; unassigned physical copies are surplus. | nest, validator |
 | Defects | `fabric.defects` | No placed outline may overlap a defect zone (gaps do not apply to defects). | nest, validator |
 | Fusing blocks | `Piece.block_margin` | Nest the grain-aligned bounding rectangle + margin instead of the outline. Validation and output use the block rectangle as the cut line; the report lists blocks. | nest, validator, export |
 | Shrinkage | `fabric.shrinkage` | `rules::effective_job` enlarges pieces before nesting; results refer to the effective job; `validate` applies it too. | nest, validator |
@@ -106,6 +106,34 @@ Contract fields are in `model.rs` (all optional, default = version 0.1 behaviour
 | Compare with current CAD | `beta-marker import` of HPGL/PLT markers | Read a marker plotted by another CAD, rebuild pieces and their placement, recompute its length/efficiency, re-nest the same pieces. | dxf |
 | Grading | AAMA/ASTM rule tables | Generate sizes from a base size and grade rules. | dxf |
 | Cutter output | `beta-marker export --format iso|dxf|xlsx` | ISO 6983 style G-code (configurable), AAMA-style marker DXF, Excel cutting report, bundle labels. | export |
+
+### Layer allocation contract (round 0.5)
+
+`Placement.layer_allocations` defaults to an empty list and is omitted when empty.
+Old JSON retains the legacy assignment of both physical layers to `bundle`,
+including its surplus warnings. A new layered result declares assignments on
+every placement. A full cut has two entries, in **physical normal, mirrored**
+order regardless of the displayed placement's `mirrored` value. An on-fold cut
+has one entry. Each entry is either `{"bundle": k, "mirrored": false|true}` for
+one useful demanded copy, or `null` for an unused surplus copy. `bundle` equals
+the first non-null entry's garment number. All assigned garments must have the
+piece's size. Open fabric rejects explicit layer assignments.
+
+The validator checks exact normal and mirrored demand globally and per garment.
+It rejects extra useful assignments, missing copies, wrong hands, wrong sizes
+and mixed legacy/explicit allocation. Flip permission pools the two demand hands,
+as before. A declared `fold_line` means the full piece is symmetric, so its two
+physical copies are interchangeable. This does not enable optional flipping of
+full placements. An on-fold half may use either displayed hand without requiring
+mirror demand or flip permission. Its one useful copy has the declared demand hand.
+
+`rules::layer_copies` and `bundle_layer_copies` count useful explicit assignments;
+legacy placements retain their physical-copy counts. `layer_assignments` supplies
+useful garment/hand pairs to cutting-room labels and XLSX reports. `placement_bundles` lists
+every garment served by a cut. Bundle shade, nap and matching checks include
+each assigned garment. Marker `piece_area` and `efficiency` remain occupied spread
+area measures. Useful-demand yield is requested full-piece area divided by
+`layers * width * length`; it never includes surplus.
 
 ## 8. Paths and commands
 

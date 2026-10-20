@@ -1,9 +1,36 @@
 # Changelog
 
+## 0.5.0 - 21 October 2026
+
+- Redesigned the app screens, navigation and welcome. Added feedback on every screen, a new logo, and a new website. Desktop feedback links use a scoped opener.
+- Added graded seam checks, RUL/JSON rule libraries, mirror and unfold tools, button and drill rows, and fold guides to Pattern.
+- Improved folded-fabric nesting and physical-layer allocation. The public Teagan test rose from 42.8% to 62.9% useful yield. Folded layouts still trail open fabric.
+- Added Quick Marker: review paper patterns from a photo with A4 or a BETA target, then make a marker. Export tiled print pages, a chalk guide or a calibrated projector layout. Real-photo accuracy has not been tested.
+- Added local browser nesting in a WASM worker, an offline PWA, and a static app that needs no Rust server. Browser nesting is best for small jobs; desktop search is much stronger on large markers.
+- Fixed audit findings in validation, imports, exports and production workflows. Added a repeatable demo video pipeline.
+- Preserved exact locked coordinates across JSON round trips, including long decimal values.
+- Remapped build paths, refreshed third-party notices and added a combined website/app build for GitHub Pages.
+
+See [the release record](docs/RELEASE-0.5.0.md) for checks, artifacts and known limits. This is a fun project created with the help of modern AI tools.
+
+
 Versions below describe development milestones. They do not imply that 0.1-0.3
 were publicly shipped. Linked reports distinguish executed checks from limits.
 
-## 0.4.0 - launch candidate
+## Unreleased
+
+- Re-inspect rolls after inspection-policy/grouping changes, including changes
+  made during a request. Preserve audited lay identity when switching bundle sources.
+- Name cut-plan shortfalls instead of declaring incomplete orders ready.
+- Reject duplicate roll CSV columns, accept uppercase JSON filenames, protect
+  spreadsheet CSV text, and explain missing benchmark load evidence.
+- Open explicit desktop feedback links with the official Tauri opener, scoped
+  to the BETA repository and maintainer email. Copy the link when opening fails.
+- Release build wrappers remap source/Cargo paths and scan the CLI executable.
+  Older-glibc and repeatability gates are documented. See the
+  [20 October audit](docs/IMPROVEMENTS-2026-10-20.md) for evidence and open issues.
+
+## 0.4.0
 
 - BETA Cutting Room desktop for Windows: native Rust operations, projects,
   autosave/recovery, file associations, progress, cancellation and NSIS packaging.

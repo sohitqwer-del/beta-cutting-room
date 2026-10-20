@@ -1,6 +1,7 @@
 //! Version 0.2 orchestration. The ordinary job still uses the original adapter.
 mod bounded;
 mod checks;
+mod layers;
 #[cfg(test)]
 mod tests;
 
@@ -10,7 +11,7 @@ use beta_marker_core::geometry::grain_alignment_deg;
 use beta_marker_core::{Job, Layout, MarkerResult, Nap, Piece, Placement, RotationRule};
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::mpsc;
-use std::time::Instant;
+use crate::Instant;
 
 #[derive(Clone, Debug)]
 struct Slot {
@@ -65,7 +66,20 @@ pub(super) fn nest_controlled(
     safety::check_input(&job)?;
     let issues = beta_marker_core::check_job(&job);
     ensure!(issues.is_empty(), "invalid job: {issues:?}");
-    let slots = slots(&job)?;
+    let legacy_layers = job.fabric.layout != Layout::Open
+        && opts.fixed.iter().chain(opts.warm_start.iter().flat_map(|r| &r.placements))
+            .any(|p| p.layer_allocations.is_empty());
+    let slots = if legacy_layers {
+        legacy_slots(&job)?
+    } else if job.fabric.layout != Layout::Open {
+        if let Some(warm) = &opts.warm_start {
+            layers::from_placements(&job, &warm.placements)?
+        } else {
+            layers::slots_after(&job, false, &opts.fixed)?
+        }
+    } else {
+        slots(&job)?
+    };
     let fixed = fixed_placements(&job, &slots, &opts.fixed)?;
     checks::geometry(&job, &fixed)?;
     if let Some(warm) = &opts.warm_start {
@@ -192,6 +206,10 @@ pub(super) fn nest_controlled(
             ));
         }
         if job.fabric.layout != Layout::Open {
+            let unassigned = placed.iter().flat_map(|p| &p.layer_allocations).filter(|a| a.is_none()).count();
+            if unassigned > 0 {
+                result.warnings.push(format!("Two-layer surplus for '{}': {unassigned} unassigned copies.", piece.id));
+            }
             let (normal, mirrored) = placed
                 .iter()
                 .map(|p| beta_marker_core::rules::layer_copies(job.fabric.layout, p))
@@ -356,6 +374,13 @@ fn bundles(job: &Job, piece: &Piece) -> Vec<u32> {
 }
 
 fn slots(job: &Job) -> Result<Vec<Slot>> {
+    if job.fabric.layout != Layout::Open {
+        return layers::slots(job, false);
+    }
+    legacy_slots(job)
+}
+
+fn legacy_slots(job: &Job) -> Result<Vec<Slot>> {
     let mut out = Vec::new();
     for (index, piece) in job.pieces.iter().enumerate() {
         let mut copies = [0, 0];
@@ -425,6 +450,7 @@ fn fixed_placements(job: &Job, slots: &[Slot], fixed: &[Placement]) -> Result<Ve
                     // A locked full two-layer cut may replace a planned fold
                     // half. Its extra handed copy is checked/reported later.
                     && (!pl.on_fold || s.placement.on_fold)
+                    && (pl.layer_allocations.is_empty() || pl.layer_allocations == s.placement.layer_allocations)
                     && pl.bundle.is_none_or(|b| s.placement.bundle == Some(b))
                     && (beta_marker_core::rules::flip_allowed(job, &job.pieces[s.piece])
                         || job.fabric.layout != Layout::Open
@@ -441,6 +467,12 @@ fn fixed_placements(job: &Job, slots: &[Slot], fixed: &[Placement]) -> Result<Ve
         let mut copy = pl.clone();
         if copy.bundle.is_none() {
             copy.bundle = slots[index].placement.bundle;
+        }
+        if job.fabric.layout != Layout::Open && copy.layer_allocations.is_empty() {
+            copy.layer_allocations.clone_from(&slots[index].placement.layer_allocations);
+            if !copy.on_fold && copy.layer_allocations.len() == 1 {
+                copy.layer_allocations.push(None);
+            }
         }
         out.push(copy);
     }
@@ -478,6 +510,9 @@ fn directions(
     fixed: &[Placement],
     variant: usize,
 ) -> Result<BTreeMap<u32, f64>> {
+    if job.fabric.layout != Layout::Open && slots.iter().all(|s| !s.placement.layer_allocations.is_empty()) {
+        return layers::directions(job, slots, fixed);
+    }
     let mut dirs = BTreeMap::new();
     for slot in slots {
         let bundle = slot.placement.bundle.context("slot without bundle")?;
@@ -522,6 +557,18 @@ fn run(
     cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<MarkerResult> {
     let variant = variant.wrapping_add(tuning.mirror_variant);
+    if job.fabric.layout != Layout::Open {
+        return layers::pack(job, slots, fixed, opts, variant, tuning, progress, cancel);
+    }
+    run_allocated(job, slots, fixed, opts, variant, tuning, progress, cancel)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_allocated(
+    job: &Job, slots: &[Slot], fixed: &[Placement], opts: &NestOptions, variant: usize,
+    tuning: &super::SearchTuning, progress: &mut dyn FnMut(NestProgress),
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<MarkerResult> {
     let simple = fixed.is_empty()
         && job.fabric.defects.is_empty()
         && job.fabric.layout == Layout::Open
@@ -531,7 +578,9 @@ fn run(
             .any(|p| beta_marker_core::rules::flip_allowed(job, p))
         && job.fabric.nap != Nap::OneWayPerBundle
         && job.pieces.iter().all(|p| p.block_margin.is_none());
-    let small_cpu = std::thread::available_parallelism().map_or(true, |n| n.get() < 3);
+    // Sparrow uses Rayon's serial fallback on wasm32; no native workers are needed.
+    let small_cpu = !cfg!(target_arch = "wasm32")
+        && std::thread::available_parallelism().map_or(true, |n| n.get() < 3);
     if simple && !small_cpu && cancel.is_none() {
         let mut result = nest_single(job, opts, progress, tuning)?;
         assign_bundles(job, &mut result.placements);
@@ -599,6 +648,7 @@ fn run(
             pl.piece_id = format!("__slot_{i}");
             pl.copy = 0;
             pl.bundle = Some(0);
+            pl.layer_allocations.clear();
         }
         Some(result)
     });
@@ -613,6 +663,7 @@ fn run(
         pl.piece_id.clone_from(&template.piece_id);
         pl.copy = template.copy;
         pl.bundle = template.bundle;
+        pl.layer_allocations.clone_from(&template.layer_allocations);
     }
     renumber(&mut result.placements, fixed);
     checks::refresh(job, &mut result)?;

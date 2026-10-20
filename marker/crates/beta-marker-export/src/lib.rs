@@ -197,3 +197,9 @@ pub fn export(
     };
     Ok((bytes, mime, extension))
 }
+
+mod quick;
+pub use quick::{
+    ChalkGuideOptions, Language, Paper, ProjectedPiece, ProjectorLayout, TiledMarkerOptions,
+    chalk_guide_pdf, projector_layout, tiled_marker_pdf,
+};

@@ -1,6 +1,6 @@
 # BETA Cutting Room
 
-**Open-source, self-hosted cutting-room software for garment factories. Version 0.4.0.**
+**Open-source, self-hosted cutting-room software for garment factories. Version 0.5.0.**
 
 BETA takes a style from pattern to sewing line: draft and grade patterns, nest
 markers, plan cuts, inspect rolls, print spreading sheets, cut and make bundles.
@@ -8,6 +8,8 @@ It runs offline on a Windows PC, or on your own factory server. No account,
 no cloud, no licence fee. Your patterns never leave your factory.
 
 - Website: https://sohitqwer-del.github.io/beta-cutting-room/
+- **Try it now in your browser (no install):** https://sohitqwer-del.github.io/beta-cutting-room/app/
+- Demo video (3 min): on the website home page
 - Download: [Releases](https://github.com/sohitqwer-del/beta-cutting-room/releases)
 - Benchmark: [marker/docs/benchmarks.md](marker/docs/benchmarks.md)
 - Contact: sohitqwer@gmail.com
@@ -51,11 +53,12 @@ Tukatech, Gerber and Optitex are not yet compared. Details and caveats:
 
 ## Install
 
-- **Windows:** download `BETA-Cutting-Room_0.4.0_x64-setup.exe` from Releases
+- **Browser:** open the app link above on a PC or phone. It works offline after the first visit and keeps your data on the device. Best for trying and small jobs; for big markers use the desktop app.
+- **Windows:** download `BETA-Cutting-Room_0.5.0_x64-setup.exe` from Releases
   and check its SHA-256. The installer is not code-signed yet, so SmartScreen
   may warn you. See [marker/docs/INSTALL.md](marker/docs/INSTALL.md).
 - **Server:** see [marker/docs/SELF-HOSTING.md](marker/docs/SELF-HOSTING.md).
-  The ready-made Linux build needs glibc 2.43 or newer; otherwise build from source.
+  The ready-made Linux build needs glibc 2.31 or newer (for example Ubuntu 20.04+).
 
 ## Build from source
 

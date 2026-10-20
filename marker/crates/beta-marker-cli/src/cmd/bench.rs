@@ -22,14 +22,14 @@ pub struct Args {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Audit background CPU and create score-independent rerun inputs.
+    /// Audit background CPU from a run with recorded conditions.json CPU samples.
     Audit {
         #[arg(long)]
         run: PathBuf,
         #[arg(long)]
         reference: Option<PathBuf>,
     },
-    /// Materialize effective CSVs after score-independent load reruns.
+    /// Materialize effective CSVs after bench audit and score-independent load reruns.
     Finalize {
         #[arg(long)]
         run: PathBuf,

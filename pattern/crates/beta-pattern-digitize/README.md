@@ -166,3 +166,33 @@ regenerate the workspace lockfile after merging this crate. Tests and lint:
 cargo test --workspace
 cargo clippy --workspace --all-targets
 ```
+
+
+## Quick Marker: unprinted A4 and phone memory limits
+
+The `quick` module adds an offline JPEG/PNG entry point, `scan_bytes`, used by the
+Marker and Pattern WASM crates. It detects a separate plain white A4 sheet on
+dark matte backing, fits four subpixel corners, and maps outlines to mm. An
+optional second sheet checks consistency away from the first. The coded BETA
+target remains available in the same API as the accurate mode.
+
+Quick mode accepts at most 12 MP and 20 MB encoded, then reduces to a 2000-pixel
+long edge before vision. Coarse background normalization handles slow lighting
+changes; contour extraction keeps subpixel grey crossings. Background texture
+and contour-complexity caps reject scenes that would threaten phone memory.
+Blur, shadow, glare, tilt, clipping, low contrast and possible touching pieces
+produce review warnings. These are heuristics; a missing warning is not proof
+of a good photograph. Brown paper is supported only with enough floor contrast.
+
+A4 calibration cannot correct unknown lens distortion or non-flat paper. Its
+error estimate excludes these effects, and the synthetic lens case reaches
+13.652 mm maximum error. Read the new tables in `ACCURACY.md`. No real phone
+accuracy is claimed. Keep separate pieces at least 10 mm apart and use a normal
+camera lens. Select the sheet corners if an A4-shaped pattern causes ambiguity.
+
+The shape model, geometric suggestions, multi-photo merge and outputs are
+described in `marker/docs/QUICK-MARKER-API.md` (from repository root). Suggestions
+never change cut quantities, grain, folds or delete duplicates automatically.
+Every ordered size needs real patterns; Quick Marker does not grade them.
+See `model/MODEL.md` for the weak held-out name classification result and
+`REAL-PHOTO-TEST.md` for a practical physical validation protocol.

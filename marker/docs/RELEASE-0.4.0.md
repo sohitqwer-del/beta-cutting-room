@@ -1,5 +1,14 @@
 # BETA Cutting Room 0.4.0 release record
 
+Historical record: the opening text and artifact hashes below describe the
+original build and are retained for traceability. Version 0.4.0 is now public;
+this record must not be read as a current publication-status check. For new
+builds use [RELEASE-BUILDS.md](RELEASE-BUILDS.md): it adds
+`--remap-path-prefix=<Cargo home>=/cargo` and
+`--remap-path-prefix=<source root>=/build` to CLI, WASM and desktop builds,
+checks executable bytes for local paths, and plans an older glibc baseline.
+Those changes do not retroactively change the hashes or ABI of the listed files.
+
 This is an unpublished, unsigned launch candidate. The runtime source is
 `4078d36` on `marker/mvp`, including engine fix `e437b34`. The release branch
 adds packaging records, public sample screenshots and checks. No engine upgrade:

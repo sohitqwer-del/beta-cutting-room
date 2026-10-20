@@ -145,7 +145,7 @@ pub(crate) fn components(mask: &[u8], w: usize, h: usize, min: usize) -> Vec<Vec
     result
 }
 
-fn quad(points: &[Pt]) -> Option<[Pt; 4]> {
+pub(crate) fn quad(points: &[Pt]) -> Option<[Pt; 4]> {
     let mut h = geometry::hull(points.to_vec());
     if h.len() < 4 {
         return None;

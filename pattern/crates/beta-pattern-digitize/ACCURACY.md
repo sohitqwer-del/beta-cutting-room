@@ -114,3 +114,127 @@ instructions and the complete limitations.
 
 No shared contract changes are needed. The lead must regenerate the workspace
 lockfile after merging; it is deliberately not included in this commit.
+
+
+# Quick Marker phone path: 20 October 2026
+
+These are **synthetic** measurements from the new bounded Quick Marker API,
+not real phone photographs. The older table above is the original target-only
+path and remains a separate baseline. Inputs below are 4000 x 3000 JPEG (12 MP),
+decoded by `quick::scan_bytes`, then reduced to a 2000 pixel long edge.
+Processing includes decode, segmentation, assist and PNG overlay encoding.
+It does not include TypeScript JSON transfer or photo rendering.
+
+Same three MIT FreeSewing Bella outlines as above. A4 scenes place the actual
+210 x 297 mm reference on an 800 x 600 mm dark textured floor beside one piece.
+The piece is scaled to fit 330 x 420 mm. Its left edge is 110 mm from the sheet's
+right edge; far edges extend several hundred mm beyond it. Target scenes still
+scale each piece to the A3 working area, about 197 mm high. **The two modes do
+not test equal physical piece sizes**; do not read this as a controlled ranking
+of their absolute performance on full garment pieces.
+
+Coordinates are compared directly against independent renderer truth, using
+bidirectional samples every 0.5 mm. No translation, rotation or rescaling is
+fitted to the recovered outline. All 18 scans found one piece and the expected
+reference. Raw measurements, including warnings, are in `QUICK-ACCURACY.json`.
+
+## A4 mode
+
+| Piece | Photo case | Mean mm | Sampled max mm | Area error % | Native seconds |
+|---|---|---:|---:|---:|---:|
+| back | frontal | 0.096 | 0.317 | 0.036 | 0.826 |
+| back | perspective-shadow-texture | 0.120 | 0.564 | 0.047 | 0.915 |
+| back | blur-brown | 0.643 | 1.631 | 0.606 | 0.909 |
+| back | radial-lens | 3.725 | 11.163 | 5.135 | 0.766 |
+| frontSideDart | frontal | 0.070 | 0.363 | 0.061 | 0.875 |
+| frontSideDart | perspective-shadow-texture | 0.108 | 0.537 | 0.105 | 1.003 |
+| frontSideDart | blur-brown | 0.537 | 1.672 | 0.831 | 1.160 |
+| frontSideDart | radial-lens | 3.707 | 13.652 | 6.538 | 1.114 |
+| sleeve | frontal | 0.084 | 0.397 | 0.038 | 1.118 |
+| sleeve | perspective-shadow-texture | 0.107 | 0.388 | 0.048 | 1.061 |
+| sleeve | blur-brown | 0.629 | 1.521 | 0.777 | 1.111 |
+| sleeve | radial-lens | 3.225 | 8.509 | 4.887 | 1.065 |
+
+The nine cases without lens distortion meet the proposed mean < 1 mm / sampled
+max < 2 mm engineering target. The three radial-distortion cases **fail** it.
+One plain sheet supplies no lens calibration; errors reach **13.652 mm** here.
+The returned `expectedErrorMm` models corner sampling, distance from the sheet
+and perspective only. These lens errors exceed it. It is not a statistical
+confidence bound and cannot account for curled paper, wrinkles or height offsets.
+Use the BETA target and physical checks when accuracy matters.
+
+- Frontal: blur sigma 0.5 photo pixels, smooth lighting loss 0.08, noise +/-1.
+- Perspective/shadow/texture: quadrilateral corners `(0.05,0.10), (0.93,0.04),
+  (0.97,0.92), (0.08,0.96)` of the photo; sigma 1.2; lighting loss 0.40;
+  seeded noise +/-5. Background has fine crossed sinusoidal cloth texture.
+  A smooth localized shadow crosses the piece; this is not every kind of hard shadow.
+- Blur/brown: same perspective; paper intensity 185 rather than 231; sigma 3.0;
+  lighting loss 0.30; noise +/-4.
+- Radial lens: same perspective; k1=0.035; sigma 0.9; lighting loss 0.28;
+  noise +/-4. This mode deliberately does not fit a radial coefficient.
+- World renderer uses 4 pixels/mm and inverse projective sampling. Noise seed 42.
+- The A4 shape itself is 242 grey on a nominal 38-grey floor. This controlled
+  contrast does not establish performance on worn cards, glossy paper or busy floors.
+
+## BETA target through Quick Marker
+
+| Piece | Photo case | Mean mm | Sampled max mm | Area error % | Native seconds |
+|---|---|---:|---:|---:|---:|
+| back | frontal | 0.045 | 0.655 | 0.032 | 0.638 |
+| back | phone | 0.050 | 0.655 | 0.050 | 0.783 |
+| frontSideDart | frontal | 0.065 | 0.865 | 0.007 | 0.913 |
+| frontSideDart | phone | 0.061 | 0.856 | 0.071 | 0.953 |
+| sleeve | frontal | 0.048 | 1.025 | 0.034 | 0.964 |
+| sleeve | phone | 0.049 | 1.094 | 0.065 | 1.005 |
+
+All six target cases meet the same engineering target. The phone cases use
+k1=0.035 and fit it using the BETA tags. These use the original target renderer
+(8 pixels/mm, dark marks and printed codes), with the PhotoOptions defaults
+except the stated front/phone perspective and radial setting. Detection sees the
+downsampled photo. There is still no physical-camera or printer validation.
+
+## Assist and reproduction
+
+The shape classifier scores **17/78 (21.79%)** with whole styles held out; this
+is below the global majority-class baseline. All name suggestions are low
+confidence. See `model/MODEL.md` and `model/evaluation.json`, including per-class
+counts, duplicate exclusions and the important limits of this very small sample.
+Symmetry, mirror pairing, duplicate checks and grain fallback are geometry
+heuristics with unit tests; they have no measured real-photo precision yet.
+
+From the repository root, with the assigned build directory and three build jobs:
+
+```sh
+cargo run --manifest-path pattern/Cargo.toml -p beta-pattern-digitize \
+  --example quick_benchmark --config 'profile.dev.package.beta-pattern-digitize.opt-level=3' \
+  -- marker/testdata/open/freesewing/bella-M.job.json \
+  pattern/crates/beta-pattern-digitize/tmp/full
+```
+
+`--quick` selects 1600 x 1200 input for iteration; it is not the table above.
+Large generated JPEG/PNG files are ignored under the crate's `tmp/` directory.
+Runtime varies on the shared i9-11900H laptop. Native scans above take
+0.638-1.160 seconds. Browser/WASM timings and memory are reported in
+`QUICK-MARKER-API.md` after the headless WASM check. Phone timing is only an
+estimate until an actual phone run is made.
+
+Follow `REAL-PHOTO-TEST.md` for the ten-photo physical test. A4-shaped pattern
+pieces remain ambiguous; inspect the highlighted reference or select its corners.
+Two sheets provide a consistency check, not a full two-reference lens calibration.
+Touching/overlapping pieces and arbitrary interior shadows can still merge or
+split outlines; the engine warns heuristically and never claims automatic repair.
+
+
+The final RGB WASM run took 4.00 s cold and 3.41-3.61 s warm. Its linear memory
+high-water mark was 140.1 MiB; total Node peak was 288.4 MB. See
+`WASM-PERFORMANCE.json`. This is one synthetic RGB JPEG, not an entire phone
+browser memory guarantee. A mid-range phone estimate is 10-25 s for a comparable
+photo, pending physical testing. The geometry benchmark above used grayscale JPEG
+encoding; the separate RGB fixture was used to test decoder memory realistically.
+
+The new Quick API leaves grain unaccepted even when a drawn line is detected.
+Consequently the raw contour benchmark's `grain_error_deg` can be null; that is
+not a measured grain-recognition failure. The drawn-line regression checks its
+candidate and visible blue overlay, while the old target-only benchmark above
+still reports accepted native grain-angle measurements. No real-photo grain,
+notch or drill precision is claimed for Quick mode.

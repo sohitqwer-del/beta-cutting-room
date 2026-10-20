@@ -70,6 +70,134 @@ fn has(j: &Job, r: &MarkerResult, code: &str) -> bool {
 }
 
 #[test]
+fn explicit_layers_serve_two_garments_with_exact_handed_counts() {
+    let (mut j, mut r) = fixture();
+    j.fabric.layout = Layout::Folded;
+    j.pieces[0].quantity = 1;
+    j.pieces[0].mirror_quantity = 1;
+    j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 2)]) });
+    for (i, p) in r.placements.iter_mut().enumerate() {
+        p.bundle = Some(i as u32);
+        p.layer_allocations = vec![
+            Some(LayerAllocation { bundle: i as u32, mirrored: false }),
+            Some(LayerAllocation { bundle: 1 - i as u32, mirrored: true }),
+        ];
+    }
+    assert!(validate(&j, &r).ok, "{:?}", validate(&j, &r).errors);
+    r.placements[1].layer_allocations[1] = None;
+    assert!(has(&j, &r, "missing_piece"));
+    assert!(has(&j, &r, "bundle"));
+    r.placements[1].layer_allocations[1] = Some(LayerAllocation { bundle: 1, mirrored: true });
+    assert!(has(&j, &r, "bundle")); // Global count alone cannot catch this.
+    r.placements[1].layer_allocations[1] = Some(LayerAllocation { bundle: 0, mirrored: false });
+    assert!(has(&j, &r, "layer_allocation"));
+    assert!(has(&j, &r, "extra_piece"));
+}
+
+#[test]
+fn shared_layers_participate_in_both_garments_shade_nap_and_match_checks() {
+    let (mut j, mut r) = fixture();
+    j.fabric.layout = Layout::Folded;
+    j.pieces[0].quantity = 1;
+    j.pieces[0].mirror_quantity = 1;
+    j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 2)]) });
+    for (i, p) in r.placements.iter_mut().enumerate() {
+        p.bundle = Some(i as u32);
+        p.layer_allocations = vec![
+            Some(LayerAllocation { bundle: i as u32, mirrored: false }),
+            Some(LayerAllocation { bundle: 1 - i as u32, mirrored: true }),
+        ];
+    }
+    j.fabric.shade = Some(ShadeRule { axis: ShadeAxis::Length, band_mm: 15. });
+    assert!(has(&j, &r, "shade"));
+    j.fabric.shade = None;
+    j.fabric.nap = Nap::OneWayPerBundle;
+    r.placements[1].rotation_deg = 180.;
+    r.placements[1].translate = [30., 10.];
+    assert!(has(&j, &r, "nap_bundle"));
+    j.fabric.nap = Nap::None;
+    r.placements[1].rotation_deg = 0.;
+    r.placements[1].translate = [25., 0.];
+    j.fabric.repeat = Some(Repeat { period_x: Some(20.), ..Default::default() });
+    j.pieces[0].match_points = vec![MatchPoint { id: "stripe".into(), point: [0., 0.] }];
+    j.match_rules = vec![MatchRule {
+        a: PointRef { piece_id: "square".into(), point_id: "stripe".into() },
+        b: None, axes: MatchAxes::X, offset: [0., 0.],
+    }];
+    assert!(has(&j, &r, "match"));
+}
+
+#[test]
+fn explicit_surplus_is_not_useful_and_cannot_cross_sizes_or_open_fabric() {
+    let (mut j, mut r) = fixture();
+    j.fabric.layout = Layout::Tubular;
+    j.pieces[0].quantity = 1;
+    r.placements.truncate(1);
+    r.placements[0].bundle = Some(0);
+    r.placements[0].layer_allocations = vec![Some(LayerAllocation { bundle: 0, mirrored: false }), None];
+    let report = validate(&j, &r);
+    assert!(report.ok, "{:?}", report.errors);
+    assert!(report.warnings.iter().any(|w| w.code == "surplus_copy"));
+    assert_eq!(layer_copies(j.fabric.layout, &r.placements[0]), (1, 0));
+    j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 1), ("L".into(), 1)]) });
+    r.placements[0].layer_allocations[0].as_mut().unwrap().bundle = 1;
+    assert!(has(&j, &r, "layer_allocation"));
+    j.fabric.layout = Layout::Open;
+    assert!(has(&j, &r, "layer_allocation"));
+}
+
+#[test]
+fn declared_symmetric_full_layers_can_fill_two_normal_demands() {
+    let (mut j, mut r) = fixture();
+    j.fabric.layout = Layout::Folded;
+    j.pieces[0].quantity = 1;
+    j.pieces[0].fold_line = Some([[0., 5.], [10., 5.]]);
+    j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 2)]) });
+    r.placements.truncate(1);
+    r.placements[0].bundle = Some(0);
+    r.placements[0].layer_allocations = vec![
+        Some(LayerAllocation { bundle: 0, mirrored: false }),
+        Some(LayerAllocation { bundle: 1, mirrored: false }),
+    ];
+    assert!(validate(&j, &r).ok, "{:?}", validate(&j, &r).errors);
+    j.pieces[0].fold_line = None;
+    assert!(has(&j, &r, "layer_allocation"));
+}
+
+#[test]
+fn symmetric_on_fold_mirror_is_half_choice_not_full_flip_permission() {
+    let (mut j, mut r) = fixture();
+    j.fabric.layout = Layout::Folded;
+    j.fabric.nap = Nap::OneWay;
+    j.pieces[0].quantity = 1;
+    j.pieces[0].grain = Some([[0., 0.], [10., 0.]]);
+    j.pieces[0].fold_line = Some([[0., 5.], [10., 5.]]);
+    r.placements.truncate(1);
+    let p = &mut r.placements[0];
+    p.on_fold = true;
+    p.mirrored = true;
+    p.rotation_deg = 180.;
+    // Mirroring flips the grain as well: a 180-degree turn restores +x.
+    p.translate = [0., 105.];
+    assert!(validate(&j, &r).ok, "{:?}", validate(&j, &r).errors);
+    r.placements[0].on_fold = false;
+    assert!(has(&j, &r, "mirror"));
+}
+
+#[test]
+fn layer_wire_fixture_round_trips_and_old_json_defaults() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../../packages/marker-wasm/test/fixtures/contract.json"
+    )).unwrap();
+    for raw in fixture["layer_allocation_examples"].as_array().unwrap() {
+        let p: Placement = serde_json::from_value(raw.clone()).unwrap();
+        assert_eq!(serde_json::to_value(&p).unwrap()["layer_allocations"], raw["layer_allocations"]);
+    }
+    let old: Placement = serde_json::from_value(fixture["result"]["placements"][0].clone()).unwrap();
+    assert!(old.layer_allocations.is_empty());
+}
+
+#[test]
 fn counts_unknown_and_duplicate_copy() {
     let (mut j, mut r) = fixture();
     assert!(validate(&j, &r).ok);

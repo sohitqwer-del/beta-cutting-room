@@ -1,7 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { apiFetch, serverToken, setServerToken } from './transport';
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 describe('desktop transport', () => {
+ it('explains server-only features locally in a static build without a network request', async () => {
+  vi.stubEnv('VITE_BETA_STATIC', '1'); vi.stubGlobal('window', {});
+  const fetch = vi.fn(); vi.stubGlobal('fetch', fetch);
+  const response = await apiFetch('/api/plan', { method: 'POST', body: '{}' });
+  expect(response.status).toBe(503);
+  expect((await response.json() as {error:string}).error).toContain('desktop app');
+  expect(fetch).not.toHaveBeenCalled();
+ });
  it('preserves the HTTP request in a browser', async () => {
   vi.stubGlobal('window', {});const fetch = vi.fn().mockResolvedValue(new Response('ok'));vi.stubGlobal('fetch',fetch);
   const init={method:'POST',body:'{}'};expect(await (await apiFetch('/api/validate',init)).text()).toBe('ok');expect(fetch).toHaveBeenCalledWith('/api/validate',init);

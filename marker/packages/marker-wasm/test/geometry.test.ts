@@ -2,9 +2,14 @@ import { describe, expect, it } from 'vitest';
 import fixtures from './fixtures/transform.json';
 import contract from './fixtures/contract.json';
 import { bbox, transform } from '../src/geometry';
-import type { Pt } from '../src/types';
+import type { Pt, Placement } from '../src/types';
 import type { CutOrder, CutPlan, Job, Layout, MarkerResult, MatchAxes, Nap, NestOptions, PlanOptions, ShadeAxis } from '../src/types';
 describe('drawing matches the shared Rust contract', () => {
+  it('keeps separate layer bundles and explicit surplus in the wire contract', () => {
+    const placements: Placement[] = contract.layer_allocation_examples.map(p => ({ ...p, translate: p.translate as Pt }));
+    expect(placements[0]!.layer_allocations?.map(a => a?.bundle)).toEqual([0, 1]);
+    expect(placements[1]!.layer_allocations?.[1]).toBeNull();
+  });
   for (const [index, fixture] of fixtures.entries()) it(`transform fixture ${index}`, () => {
     const actual = transform(fixture.points as Pt[], fixture.mirrored, fixture.rotation_deg, fixture.translate as Pt);
     expect(actual).toHaveLength(fixture.expected.length);

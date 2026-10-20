@@ -1,6 +1,6 @@
 import { apiFetch, downloadFile, isDesktop } from './transport';
 import { installDesktop } from '../../desktop/src/native';
-import { loadMarkerCore, type ImportReport, type Issue, type Job, type MarkerCore, type MarkerDrawing, type MarkerResult, type Nap, type Pt, type RotationRule, type ValidationReport } from '@beta/marker-wasm';
+import { nest as nestInBrowser, loadMarkerCore, type ImportReport, type Issue, type Job, type MarkerCore, type MarkerDrawing, type MarkerResult, type Nap, type Pt, type RotationRule, type ValidationReport } from '@beta/marker-wasm';
 import { bbox, placed } from '@beta/marker-wasm/geometry';
 import { demoJob, demoResult } from './demo';
 import { changePlacement, emptyResult, History, readDocument, type DocumentState } from './state';
@@ -12,40 +12,75 @@ import { cleanSelection } from './editor-state';
 import { installEditorTools } from './editor-tools';
 import { seamlyWarnings, warningsHtml } from './import-warnings';
 import { installShell } from './shell';
+import { icon } from './icons';
+import { staticMode, installStaticNotices } from './static-mode';
 import './style.css';
+// Screen styles after the design system so they can refine it.
+import './quick/quick.css';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
+const tool = (id: string, name: string, label: string, tip: string, keys = '', extra = ''): string =>
+  `<button type="button" id="${id}" class="icon-btn" aria-label="${label}"${keys ? ` aria-keyshortcuts="${keys}"` : ''} data-tip="${tip}" ${extra}>${icon(name)}<span class="btn-label">${label}</span></button>`;
+// Layout: command bar (files) → Setup panel (left, Nest docked at the bottom) → toolbar, canvas and status bar → Tools panel (right).
 app.innerHTML = `
 <header class="topbar"><span id="server-status" class="connection" role="status">Checking local server…</span></header>
-<div class="filebar" id="editor-filebar" role="group" aria-label="Marker files">
-  <button id="open-button" class="primary">Open file</button><input id="open-file" type="file" accept=".dxf,.json" hidden>
-  <button id="demo">Load demo</button><span class="file-hint">DXF pieces, marker job JSON or marker result JSON</span>
-  <div class="push"></div><button id="save-job">Save job JSON</button><button id="save-result">Save result JSON</button>
+<div class="filebar commandbar" id="editor-filebar" role="group" aria-label="Marker files">
+  <button id="open-button">${icon('open')}Open file</button><input id="open-file" type="file" accept=".dxf,.json" hidden>
+  <button id="demo">${icon('demo')}Load demo</button><span class="file-hint">DXF pieces, marker job JSON or marker result JSON</span>
+  <div class="push"></div>
+  <details class="menu" id="save-menu"><summary>${icon('save')}Save</summary><div class="menu-panel" role="group" aria-label="Save marker files">
+    <button id="save-job">Save job JSON<small>Pieces and rules</small></button><button id="save-result">Save result JSON<small>Placements</small></button></div></details>
+  <details class="menu" id="export-menu"><summary>${icon('download')}Export</summary><div class="menu-panel export-panel" role="group" aria-label="Export marker">
+    <p class="hint">SVG, plotter (PLT), PDF and cutter files are made by the local Rust engine.</p>
+    <span class="menu-label">Plotter and cutter</span><button data-export="plt">PLT plotter file</button><button data-export="iso">ISO cutter file</button><button data-export="dxf">DXF marker</button>
+    <span class="menu-label">Print and share</span><button data-export="pdf">PDF, full size</button><button data-export="mini">Mini-marker PDF</button><button data-export="labels">Piece labels PDF</button><button data-export="svg">SVG picture</button>
+    <span class="menu-label">Reports</span><button data-export="report">Marker report (text)</button><button data-export="xlsx">Excel report (XLSX)</button></div></details>
 </div>
 <div id="message" class="message" role="status" aria-live="polite" hidden></div>
 <div class="workspace">
-<aside aria-label="Job settings">
-  <div class="panel-heading"><span class="eyebrow">JOB SETTINGS</span><h1 id="job-title"></h1></div>
+<aside aria-label="Job settings" class="setup-panel" id="setup-panel">
+  <div class="panel-heading"><span class="eyebrow">Marker setup</span><h1 id="job-title"></h1></div>
   <form id="job-form"></form>
-  <section class="import-settings"><h2>DXF import</h2><label>Source units<select id="units"><option value="auto">Detect automatically</option><option value="mm">Millimetres</option><option value="cm">Centimetres</option><option value="inch">Inches</option></select></label><label class="check"><input id="pairs" type="checkbox">Left/right pairs</label><p class="hint">Splits an even quantity into left and right pieces: Quantity 2 becomes 1 normal + 1 mirrored copy.</p></section>
-  <form id="nest-form"><h2>Automatic nesting</h2><div class="fields"><label>Time limit (seconds)<input id="time" type="number" value="30" min="0.1" step="0.1" required></label><label>Seed<input id="seed" type="number" value="42" min="0" max="9007199254740991" step="1" required></label><label>Portfolio runs<input id="runs" type="number" value="1" min="1" max="100" step="1" required></label></div><label class="check"><input id="warm-start" type="checkbox">Start from current marker</label><button class="primary wide" id="nest" type="submit">Nest marker</button><button id="renest" type="submit" class="wide">Re-nest unlocked</button><p class="hint">Uses the local Rust server. Lock pieces with L, then re-nest the unlocked pieces around them.</p></form>
+  <details class="import-settings advanced"><summary>DXF import options</summary><label>Source units<select id="units"><option value="auto">Detect automatically</option><option value="mm">Millimetres</option><option value="cm">Centimetres</option><option value="inch">Inches</option></select></label><label class="check"><input id="pairs" type="checkbox">Left/right pairs</label><p class="hint">Splits an even quantity into left and right pieces: Quantity 2 becomes 1 normal + 1 mirrored copy.</p></details>
+  <form id="nest-form" class="nest-dock"><div class="nest-row"><label class="nest-time">Time limit (seconds)<input id="time" type="number" value="30" min="0.1" step="0.1" required></label><button class="primary large" id="nest" type="submit">${icon('play')}<span class="btn-label">Nest marker</span></button></div>
+    <details class="advanced"><summary>More nesting options</summary><div class="fields"><label>Seed<input id="seed" type="number" value="42" min="0" max="9007199254740991" step="1" required></label><label>Portfolio runs<input id="runs" type="number" value="1" min="1" max="100" step="1" required></label></div><label class="check"><input id="warm-start" type="checkbox">Start from current marker</label><button id="renest" type="submit" class="wide">${icon('lock')}Re-nest unlocked pieces</button><p class="hint">Rust nesting runs in this browser when no server is connected. Lock pieces with L, then re-nest around them.</p></details></form>
 </aside>
 <div class="editor-main">
-  <div class="main-heading"><div><span class="eyebrow">MARKER WORKSPACE</span><h2 id="marker-title">Marker layout</h2></div><span id="engine" class="tag"></span></div>
-  <section id="stats" class="stats" aria-label="Marker statistics"></section>
-  <div id="nest-progress" class="nest-progress" aria-label="Nesting progress" role="status" aria-live="polite" hidden><span id="nest-progress-time">Starting…</span><progress id="nest-progress-bar" max="1" value="0" aria-label="Search time used"></progress><strong id="nest-progress-best">No valid marker yet</strong><span>Best so far: shortest valid marker found by the search.</span><button type="button" id="nest-cancel" hidden>Cancel search</button><span id="nest-cancel-note" class="hint" hidden>The local server stops the search at the time limit.</span></div>
+  <h2 id="marker-title" class="sr-only">Marker layout</h2>
   <section id="import-warnings" class="notice warn" aria-labelledby="import-warnings-heading" hidden></section>
   <div class="canvas-card">
-    <div class="toolbar" aria-label="Marker tools"><div class="toolgroup"><button id="undo" title="Undo (Ctrl+Z)">Undo</button><button id="redo" title="Redo (Ctrl+Y)">Redo</button></div><div class="toolgroup"><button id="rotate" title="Next allowed rotation (R)">Rotate · R</button><button id="lock" title="Lock or unlock (L)">Lock · L</button><button id="pack">Pack left</button><label>Colour by<select id="colour-mode"><option value="size">Size</option><option value="bundle">Bundle</option></select></label></div><div class="push"></div><div class="toolgroup"><button id="zoom-out" aria-label="Zoom out">−</button><button id="fit" title="Fit marker (0)">Fit</button><button id="zoom-in" aria-label="Zoom in">+</button></div></div>
-    <div class="ruler-label">LENGTH IN METRES <span id="zoom-label"></span></div>
-    <svg id="canvas" role="group" aria-label="Marker. Tab to select pieces. Arrows nudge the selected group. Alt plus arrows bump. R rotates, L locks. Question mark opens keyboard help." tabindex="0"></svg>
-    <div class="canvas-footer"><span id="selection">Select a piece to edit</span><span id="fabric-label"></span></div>
+    <div class="toolbar" role="group" aria-label="Marker tools">
+      ${tool('toggle-setup', 'panel-left', 'Setup panel', 'Show or hide the setup panel', '', 'aria-controls="setup-panel" aria-pressed="true" data-tip-align="start"')}
+      <div class="toolgroup" role="group" aria-label="History">${tool('undo', 'undo', 'Undo', 'Undo · Ctrl+Z', 'Control+Z')}${tool('redo', 'redo', 'Redo', 'Redo · Ctrl+Y', 'Control+Y')}</div>
+      <div class="toolgroup segmented" id="tool-modes" role="group" aria-label="Pointer mode"></div>
+      <div class="toolgroup" id="tool-actions" role="group" aria-label="Piece actions">${tool('rotate', 'rotate', 'Rotate', 'Next allowed rotation · R', 'R')}${tool('lock', 'lock', 'Lock', 'Lock or unlock · L', 'L')}</div>
+      <div class="toolgroup" id="tool-tidy" role="group" aria-label="Tidy the marker"></div>
+      <div class="push"></div>
+      <label class="tool-select colour-by">${icon('swatches')}<span class="label-text">Colour by</span><select id="colour-mode" aria-label="Colour pieces by"><option value="size">Size</option><option value="bundle">Bundle</option></select></label>
+      <div class="toolgroup" role="group" aria-label="Zoom">${tool('zoom-out', 'zoom-out', 'Zoom out', 'Zoom out · −', '-')}${tool('fit', 'fit', 'Fit', 'Fit marker · 0', '0')}${tool('zoom-in', 'zoom-in', 'Zoom in', 'Zoom in · +', '+')}</div>
+      ${tool('toggle-inspector', 'panel-right', 'Tools panel', 'Show or hide the tools panel', '', 'aria-controls="inspector" aria-pressed="false" data-tip-align="end"')}
+    </div>
+    <div class="canvas-stage">
+      <svg id="canvas" role="group" aria-label="Marker. Tab to select pieces. Arrows nudge the selected group. Alt plus arrows bump. R rotates, L locks. Question mark opens keyboard help." tabindex="0"></svg>
+      <div id="canvas-empty" class="canvas-empty" hidden>${icon('marker')}<strong>No pieces on the marker yet</strong><span>Check the fabric width and size ratio in Setup, then press <b>Nest marker</b>. You can also place pieces by hand from the piece bin.</span></div>
+      <div id="nest-progress" class="nest-progress" aria-label="Nesting progress" role="status" aria-live="polite" hidden><div class="nest-progress-row"><span id="nest-progress-time">Starting…</span><button type="button" id="nest-cancel" class="small" hidden>${icon('stop')}Cancel search</button></div><progress id="nest-progress-bar" max="1" value="0" aria-label="Search time used"></progress><div class="nest-progress-row"><span>Best so far</span><strong id="nest-progress-best">No valid marker yet</strong></div><span id="nest-cancel-note" class="hint" hidden>The local server stops the search at the time limit.</span></div>
+    </div>
+    <div class="statusbar">
+      <section id="stats" class="stats" aria-label="Marker statistics"></section>
+      <div class="status-chips"><a class="check-link" href="#validation-heading"><span id="check-status" class="tag"></span></a><a class="check-link" href="#ed-supply" id="ed-unplaced-chip" hidden></a><span id="engine" class="tag engine-tag"></span></div>
+    </div>
+    <div class="canvas-footer"><span id="selection">Select a piece to edit</span><div id="legend" class="legend" aria-label="Piece sizes"></div><span id="fabric-label"></span><span class="ruler-label">Ruler in metres · <span id="zoom-label"></span></span></div>
   </div>
-  <div class="under-canvas"><div id="legend" class="legend" aria-label="Piece sizes"></div><p>Wheel to zoom · drag to move or pan · Alt+arrows: bump · ?: shortcuts</p></div>
-  <section class="validation-panel" aria-labelledby="validation-heading"><div class="validation-heading"><h2 id="validation-heading">Live checks</h2><span id="check-status" class="tag"></span></div><p id="wasm-status" role="status">Loading local Rust WASM…</p><ul id="issues" aria-live="polite"></ul></section>
-  <section class="export-panel"><div><h2>Export marker</h2><p class="hint">SVG, plotter (PLT), PDF and cutter files are made by the local Rust engine.</p></div><div class="toolgroup"><button data-export="svg">SVG</button><button data-export="plt">PLT</button><button data-export="pdf">PDF</button><button data-export="report">Report TXT</button><button data-export="iso">ISO</button><button data-export="dxf">DXF</button><button data-export="xlsx">XLSX</button><button data-export="labels">LABELS</button><button data-export="mini">MINI</button></div></section>
+  <div class="under-canvas"><p>Wheel to zoom · drag to move or pan · Alt+arrows: bump · <kbd>?</kbd> all shortcuts</p></div>
+  <section class="validation-panel" aria-labelledby="validation-heading"><div class="validation-heading"><h2 id="validation-heading">Live checks</h2></div><p id="wasm-status" role="status">Loading local Rust WASM…</p><ul id="issues" aria-live="polite"></ul></section>
   <p class="help">Marker efficiency = piece area / (width × length). Gaps and buffers do not count as piece area. Coordinates and distances are in millimetres.</p>
-</div></div>`;
+</div>
+<aside id="inspector" class="inspector" aria-labelledby="inspector-title">
+  <div class="inspector-head"><h2 id="inspector-title">Tools</h2>${tool('inspector-close', 'close', 'Hide tools panel', 'Hide tools panel', '', 'data-tip-align="end"')}</div>
+  <section class="inspector-section" aria-labelledby="inspector-selected"><h3 id="inspector-selected">Selected</h3><div id="inspector-summary"></div>
+    <div class="inspector-row">${tool('pack', 'compact', 'Pack left', 'Bump the selection left to contact')}</div></section>
+  <div id="inspector-tools"></div>
+</aside></div>`;
 
 const $ = <T extends Element = HTMLElement>(selector: string): T => document.querySelector<T>(selector)!;
 const canvas = $<SVGSVGElement>('#canvas');
@@ -62,6 +97,8 @@ let jobIssues: Issue[] = [];
 let wasmProblem = '';
 let dirtyWithoutChecks = false;
 let nesting = false;
+let serverOnline = false;
+let browserStop: AbortController | undefined;
 let exporting = false;
 let features: ReturnType<typeof installFeatures> | undefined;
 let view: View = { x: 0, y: 0, width: 2000, height: 1500 };
@@ -102,16 +139,17 @@ function renderForm(): void {
   $('#job-title').textContent = job.name;
   $('#marker-title').textContent = job.name;
   $('#job-form').innerHTML = `
-    <h2>Fabric & clearance</h2><div class="fields">${numberField('Fabric width (mm)', 'width', job.fabric.width, 1)}
+    <section class="setup-step"><h2 class="section-title"><span class="step-badge" aria-hidden="true">1</span>Fabric and gaps</h2><div class="fields two">${numberField('Fabric width (mm)', 'width', job.fabric.width, 1)}
     <label>Nap<select data-field="nap"><option value="none" ${(job.fabric.nap ?? 'none') === 'none' ? 'selected' : ''}>None</option><option value="one_way_per_bundle" ${job.fabric.nap === 'one_way_per_bundle' ? 'selected' : ''}>One way per garment</option><option value="one_way" ${job.fabric.nap === 'one_way' ? 'selected' : ''}>One-way</option></select></label>
-    ${numberField('Tilt (degrees)', 'tilt', job.fabric.tilt_deg ?? 0)}${numberField('Piece gap (mm)', 'piece_gap', job.spacing?.piece_gap ?? 0)}${numberField('Edge gap (mm)', 'edge_gap', job.spacing?.edge_gap ?? 0)}</div>
-    <h2>Size ratio <span class="small">garments per marker</span></h2><div class="ratio">${sizes().map(size => numberField(esc(size), `ratio:${esc(size)}`, job.order ? job.order.sizes[size] ?? 0 : 1, 0, '1')).join('') || '<p class="hint">No sizes in this job. Each piece uses its own quantity.</p>'}</div>
-    <h2>Pieces <span class="small">${job.pieces.length} shapes</span></h2><div class="piece-list">${job.pieces.map((piece, i) => `
+    ${numberField('Piece gap (mm)', 'piece_gap', job.spacing?.piece_gap ?? 0)}${numberField('Edge gap (mm)', 'edge_gap', job.spacing?.edge_gap ?? 0)}</div>
+    <details class="advanced"><summary>More fabric options</summary><div class="fields two">${numberField('Tilt (degrees)', 'tilt', job.fabric.tilt_deg ?? 0)}</div><p class="hint">Fold, shrinkage, shade bands, stripes and defects are in Fabric rules.</p></details></section>
+    <section class="setup-step"><h2 class="section-title"><span class="step-badge" aria-hidden="true">2</span>Size ratio <span class="small">garments per marker</span></h2><div class="ratio">${sizes().map(size => numberField(esc(size), `ratio:${esc(size)}`, job.order ? job.order.sizes[size] ?? 0 : 1, 0, '1')).join('') || '<p class="hint">No sizes in this job. Each piece uses its own quantity.</p>'}</div></section>
+    <section class="setup-step"><h2 class="section-title"><span class="step-badge" aria-hidden="true">3</span>Pieces <span class="small">${job.pieces.length} shapes</span></h2><div class="piece-list">${job.pieces.map((piece, i) => `
       <details><summary><span class="swatch" style="background:${colour(piece.size)}"></span><span>${esc(piece.name)}</span><span class="piece-count">${esc(piece.size || 'No size')} · ${piece.quantity ?? 1}+${piece.mirror_quantity ?? 0}</span></summary>
       <div class="fields piece-fields"><label>Name<input data-piece="${i}" data-key="name" value="${esc(piece.name)}" required></label><label>Size<input data-piece="${i}" data-key="size" value="${esc(piece.size)}"></label>
       <label>Quantity<input data-piece="${i}" data-key="quantity" type="number" value="${piece.quantity ?? 1}" min="0" max="100000" step="1" required></label><label>Mirror quantity<input data-piece="${i}" data-key="mirror_quantity" type="number" value="${piece.mirror_quantity ?? 0}" min="0" max="100000" step="1" required></label>
       <label>Rotation<select data-piece="${i}" data-key="rotation">${(['inherit', 'fixed', 'flip180', 'quarter', 'free'] as const).map(rule => `<option value="${rule}" ${(piece.rotation ?? 'inherit') === rule ? 'selected' : ''}>${({ inherit: 'Fabric rule', fixed: 'Fixed', flip180: '0° / 180°', quarter: 'Quarter turn', free: 'Any angle' })[rule]}</option>`).join('')}</select></label>
-      <label>Buffer (mm)<input data-piece="${i}" data-key="buffer" type="number" value="${piece.buffer ?? 0}" min="0" step="any" required></label></div></details>`).join('')}</div>`;
+      <label>Buffer (mm)<input data-piece="${i}" data-key="buffer" type="number" value="${piece.buffer ?? 0}" min="0" step="any" required></label></div></details>`).join('')}</div></section>`;
   $('#job-form').querySelectorAll('details').forEach((element, i) => element.open = openPieces[i] ?? false);
   const selector = activeField ? `[data-field="${CSS.escape(activeField)}"]` : activePiece !== undefined && activeKey ? `[data-piece="${Number(activePiece)}"][data-key="${CSS.escape(activeKey)}"]` : '';
   if (selector) $('#job-form').querySelector<HTMLElement>(selector)?.focus({ preventScroll: true });
@@ -169,10 +207,30 @@ function renderSelection(): void {
   $<HTMLButtonElement>('#rotate').disabled = !p || !!p.locked || !core || nesting;
   $<HTMLButtonElement>('#pack').disabled = !p || !!p.locked || !core || nesting;
   $<HTMLButtonElement>('#lock').disabled = !p || nesting;
-  $('#lock').textContent = p?.locked ? 'Unlock · L' : 'Lock · L';
+  const lockLabel = p?.locked ? 'Unlock' : 'Lock';
+  $('#lock').innerHTML = `${icon(p?.locked ? 'unlock' : 'lock')}<span class="btn-label">${lockLabel}</span>`; $('#lock').setAttribute('aria-label', lockLabel);
+  renderInspector(p);
   $<HTMLButtonElement>('#undo').disabled = !history.canUndo || nesting;
   $<HTMLButtonElement>('#redo').disabled = !history.canRedo || nesting;
   editorTools?.selection();
+}
+/** Tools panel summary of the selected placements. Read-only; editing stays in the tools and keyboard shortcuts. */
+function renderInspector(p: MarkerResult['placements'][number] | undefined): void {
+  const box = $('#inspector-summary');
+  if (!p) { box.innerHTML = '<p class="hint">Click a piece on the marker, or press Tab on the marker to reach one. Shift+click adds more pieces.</p>'; return; }
+  const piece = state.job.pieces.find(piece => piece.id === p.piece_id);
+  const more = selection.length > 1 ? `<p class="inspector-more">${selection.length} pieces selected. Tools act on the whole group.</p>` : '';
+  const row = (label: string, value: string) => `<div><dt>${label}</dt><dd>${value}</dd></div>`;
+  box.innerHTML = `<p class="inspector-piece"><span class="swatch" style="background:${colour(piece?.size)}"></span><strong>${esc(piece?.name ?? p.piece_id)}</strong><span class="chip">${esc(piece?.size || 'No size')}</span></p>${more}
+    <dl class="inspector-facts">${row('Position', `${p.translate.map(n => n.toFixed(1)).join(', ')} mm`)}${row('Rotation', `${p.rotation_deg.toFixed(1)}°`)}${row('Copy', String(p.copy + 1))}${row('Bundle', p.bundle == null ? 'Not assigned' : String(p.bundle + 1))}${row('Mirrored', p.mirrored ? 'Yes' : 'No')}${row('Locked', p.locked ? 'Yes' : 'No')}</dl>`;
+}
+/** Setup and Tools panels can be hidden to give the canvas more room. The choice is remembered on this computer. */
+const PANELS_KEY = 'beta-editor-panels';
+function setPanel(name: 'setup' | 'inspector', open: boolean, remember = true): void {
+  $('.workspace').classList.toggle(`hide-${name}`, !open);
+  $(`#toggle-${name}`).setAttribute('aria-pressed', String(open));
+  if (remember) try { const saved = JSON.parse(localStorage.getItem(PANELS_KEY) ?? '{}') as Record<string, boolean>; localStorage.setItem(PANELS_KEY, JSON.stringify({ ...saved, [name]: open })); } catch { /* session only */ }
+  requestAnimationFrame(fit);
 }
 function renderView(): void {
   const focused = document.activeElement?.getAttribute('data-index');
@@ -196,6 +254,7 @@ function renderView(): void {
   }).join('')}
   ${editorTools?.overlay(width,unit) ?? ''}`;
   $('#fabric-label').textContent = `${width.toLocaleString()} mm fabric width · grain →`;
+  $('#canvas-empty').hidden = state.result.placements.length > 0;
   $('#zoom-label').textContent = `${(1 / unit).toFixed(2)} px/mm`;
   $('#legend').innerHTML = features?.colourByBundle() ? [...new Set(state.result.placements.map(p => p.bundle))].map(bundle => `<span><i class="swatch" style="background:${colours[(bundle ?? 0) % colours.length]}"></i>${bundle == null ? 'Unassigned bundle' : `Bundle ${bundle + 1}`}</span>`).join('') : sizes().map(size => `<span><i class="swatch" style="background:${colour(size)}"></i>${esc(size)}</span>`).join('') + '<span class="mirror-key">M = mirrored copy</span>';
   renderSelection();
@@ -232,13 +291,13 @@ async function save(name: string, data: BlobPart, type: string): Promise<void> {
 async function api(path: string, body: BodyInit): Promise<Response> {
   let response: Response;
   try { response = await apiFetch(`/api/${path}`, { method: 'POST', body, headers: { 'Content-Type': path.startsWith('import') || path === 'digitize' ? 'application/octet-stream' : 'application/json' } }); }
-  catch (error) { throw new Error(isDesktop() ? errorText(error) : 'Local server is unavailable. Start beta-marker serve. JSON files and the viewer work without it.'); }
+  catch (error) { throw new Error(isDesktop() ? errorText(error) : 'Local server is unavailable. Start beta-marker serve. JSON files, editing and browser nesting work without it.'); }
   if (response.status === 401 && !isDesktop()) {
     shell.askToken();
     throw new Error('This BETA server needs an access token. Enter the token from your administrator, then try again.');
   }
   if (!response.ok) {
-    const payload = await response.json().catch(() => ({ error: `Server returned ${response.status}. Start beta-marker serve for DXF, nesting and exports.` })) as { error?: string };
+    const payload = await response.json().catch(() => ({ error: `Server returned ${response.status}. Use the desktop app or server for this operation.` })) as { error?: string };
     throw new Error(payload.error || `Server error ${response.status}`);
   }
   return response;
@@ -250,9 +309,9 @@ function showProgress(elapsed: number, budget: number, bestLength: number | null
   $<HTMLProgressElement>('#nest-progress-bar').value = budget > 0 ? Math.min(1, elapsed / budget) : 0;
   $('#nest-progress-time').textContent = `Searching: ${elapsed.toFixed(1)} s of about ${budget.toFixed(budget < 10 ? 1 : 0)} s`;
   $('#nest-progress-best').textContent = bestLength == null ? 'No valid marker yet' : `${(bestLength / 1000).toFixed(3)} m${bestEfficiency == null ? '' : ` · ${(bestEfficiency * 100).toFixed(1)}% efficiency`}`;
-  $('#nest-cancel').hidden = !isDesktop(); $('#nest-cancel-note').hidden = isDesktop();
+  $('#nest-cancel').hidden = !isDesktop() && !browserStop; $('#nest-cancel-note').hidden = isDesktop() || !!browserStop;
 }
-$('#nest-cancel').addEventListener('click', () => { const native = document.querySelector<HTMLButtonElement>('#native-cancel'); if (native) { native.disabled = false; native.click(); } });
+$('#nest-cancel').addEventListener('click', () => { if (browserStop) { browserStop.abort(); message('Stopping after this round; keeping the best valid marker.'); return; } const native = document.querySelector<HTMLButtonElement>('#native-cancel'); if (native) { native.disabled = false; native.click(); } });
 $('#job-form').addEventListener('submit', event => event.preventDefault());
 $('#job-form').addEventListener('change', event => {
   if (nesting) return;
@@ -316,24 +375,46 @@ $('#save-result').addEventListener('click', () => { void save('marker.result.jso
 $('#nest-form').addEventListener('submit', async event => {
   event.preventDefault(); if (nesting || features?.busy()) return;
   const unlocked = (event as SubmitEvent).submitter?.id === 'renest';
-  nesting = true; const button = $<HTMLButtonElement>('#nest'); button.disabled = true; button.textContent = 'Nesting…';
+  nesting = true; const button = $<HTMLButtonElement>('#nest'); button.disabled = true; $('#nest .btn-label').textContent = 'Nesting…';
   app.setAttribute('aria-busy', 'true'); renderSelection();
   $('#job-form').querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select').forEach(input => input.disabled = true);
   for (const id of ['demo', 'open-file', 'open-button']) $<HTMLButtonElement | HTMLInputElement>(`#${id}`).disabled = true;
-  message(isDesktop() ? 'Rust is nesting the marker. You can cancel the search.' : 'Rust is nesting the marker. The local server stays available.');
+  const local = !isDesktop() && (staticMode() || !serverOnline);
+  browserStop = local ? new AbortController() : undefined;
+  message(local ? 'Rust is nesting in this browser. Stop keeps the best valid marker.' : 'Rust is nesting the marker.');
   const limit = Number($<HTMLInputElement>('#time').value), runs = Number($<HTMLInputElement>('#runs').value);
-  showProgress(0, limit * Math.max(1, runs), null, null);
-  const progressTimer = window.setInterval(() => { void apiFetch('/api/nest/status').then(r => r.json()).then((p: {elapsed_s:number;best_length_mm:number|null;best_efficiency:number|null}) => { if (!nesting) return; showProgress(p.elapsed_s, limit * Math.max(1, runs), p.best_length_mm, p.best_efficiency); message(`Nesting: ${p.elapsed_s.toFixed(1)} s${p.best_length_mm == null ? '' : ` · best ${(p.best_length_mm / 1000).toFixed(3)} m`}${p.best_efficiency == null ? '' : ` · ${(p.best_efficiency * 100).toFixed(1)}%`}`); }).catch(() => {}); }, 1000);
+  showProgress(0, local ? limit : limit * Math.max(1, runs), null, null);
+  let lastLength: number | null = null, lastEfficiency: number | null = null;
+  const started = performance.now();
+  const progressTimer = window.setInterval(() => {
+    if (local) { showProgress((performance.now() - started) / 1000, limit, lastLength, lastEfficiency); return; }
+    void apiFetch('/api/nest/status').then(r => r.json()).then((p: {elapsed_s:number;best_length_mm:number|null;best_efficiency:number|null}) => {
+      if (nesting) showProgress(p.elapsed_s, limit * Math.max(1, runs), p.best_length_mm, p.best_efficiency);
+    }).catch(() => {});
+  }, 500);
   try {
-    const response = await api('nest', JSON.stringify(nestPayload(state, { time_limit_s: Number($<HTMLInputElement>('#time').value), seed: Number($<HTMLInputElement>('#seed').value), workers: 2, runs: Number($<HTMLInputElement>('#runs').value) }, unlocked, $<HTMLInputElement>('#warm-start').checked)));
-    const result = readDocument(await response.text());
-    if (!('placements' in result)) throw new Error('The server did not return a marker result.');
+    const payload = nestPayload(state, { time_limit_s: limit, seed: Number($<HTMLInputElement>('#seed').value), workers: 2, runs }, unlocked, $<HTMLInputElement>('#warm-start').checked);
+    let result: MarkerResult;
+    if (local) {
+      if (runs !== 1) throw new Error('Browser nesting uses one run. Set Portfolio runs to 1, or connect the desktop app/server.');
+      result = await nestInBrowser(payload.job, {
+        time_limit_s: limit, seed: payload.options.seed, fixed: payload.options.fixed, warm_start: payload.options.warm_start,
+      }, progress => {
+        lastLength = progress.result.length; lastEfficiency = progress.result.efficiency;
+        showProgress(progress.seconds, limit, lastLength, lastEfficiency);
+      }, { signal: browserStop!.signal });
+    } else {
+      const response = await api('nest', JSON.stringify(payload));
+      const decoded = readDocument(await response.text());
+      if (!('placements' in decoded)) throw new Error('The server did not return a marker result.');
+      result = decoded;
+    }
     const editCheck = editorCore?.inspect({job:state.job,result});
     if (editCheck && (editCheck.section_violations.length || editCheck.end_violations.length)) throw new Error('The new nest crosses a saved cut line or marker end. The current marker is kept. Adjust the cut lines or table end before nesting again.');
     nesting = false; commit({ ...state, result }); fit(); message('Nesting finished. Review the validation checks before cutting.');
   } catch (error) { message(errorText(error), true); }
   finally {
-    window.clearInterval(progressTimer); $('#nest-progress').hidden = true; nesting = false; button.disabled = false; button.textContent = 'Nest marker'; app.removeAttribute('aria-busy');
+    window.clearInterval(progressTimer); browserStop = undefined; $('#nest-progress').hidden = true; nesting = false; button.disabled = false; $('#nest .btn-label').textContent = 'Nest marker'; app.removeAttribute('aria-busy');
     $('#job-form').querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select').forEach(input => input.disabled = false);
     for (const id of ['demo', 'open-file', 'open-button']) $<HTMLButtonElement | HTMLInputElement>(`#${id}`).disabled = false;
     renderSelection();
@@ -445,17 +526,36 @@ editorTools = installEditorTools({get:()=>state,core:()=>editorCore,busy:()=>nes
   select: indices=>{selection=cleanSelection(indices,state.result.placements.length);selected=selection[0]??-1;renderSelection();},commit,redraw:renderView,message,save});
 const shell = installShell({ show: index => features!.show(index), message, recheck: checkHealth, state: () => state });
 window.addEventListener('beta-screen', event => { if ((event as CustomEvent<number>).detail === 0 && fitPending) requestAnimationFrame(fit); });
+// Other screens (Quick Marker) hand a finished job and marker to the editor.
+window.addEventListener('beta-open-document', event => {
+  if (nesting || features?.busy()) { message('Wait for the current operation to finish.', true); return; }
+  state = structuredClone((event as CustomEvent<DocumentState>).detail); selected = -1; selection = []; dirtyWithoutChecks = !core;
+  render(true); history = new History(state); features?.show(0); fit(); message('Marker opened in the editor. Check it before cutting.');
+});
 $('#colour-mode').addEventListener('change', event => { features?.setColourByBundle((event.target as HTMLSelectElement).value === 'bundle'); renderView(); });
+{
+  let saved: Record<string, boolean> = {};
+  try { saved = JSON.parse(localStorage.getItem(PANELS_KEY) ?? '{}') as Record<string, boolean>; } catch { /* defaults */ }
+  setPanel('setup', saved.setup ?? true, false);
+  setPanel('inspector', saved.inspector ?? window.innerWidth >= 1600, false);
+  $('#toggle-setup').addEventListener('click', () => setPanel('setup', $('.workspace').classList.contains('hide-setup')));
+  $('#toggle-inspector').addEventListener('click', () => setPanel('inspector', $('.workspace').classList.contains('hide-inspector')));
+  $('#inspector-close').addEventListener('click', () => { setPanel('inspector', false); $('#toggle-inspector').focus(); });
+  window.addEventListener('beta-inspector', () => { if ($('.workspace').classList.contains('hide-inspector')) setPanel('inspector', true); });
+}
 render(true); fit();
 void loadMarkerCore().then(async loaded => { core = loaded; editorCore = await loadEditorCore(); render(); history = new History(state); }).catch(error => { wasmProblem = `WASM could not load: ${errorText(error)} Build @beta/marker-wasm and reload to enable editing and checks.`; renderStats(); renderSelection(); });
 function checkHealth(): void {
+  if (staticMode()) { serverOnline = false; $('#server-status').textContent = 'Browser mode ? local Rust WASM'; $('#server-status').classList.add('connected'); return; }
   void apiFetch('/api/health').then(async response => {
     if (response.status === 401 && !isDesktop()) { $('#server-status').textContent = 'Server needs an access token'; $('#server-status').classList.remove('connected'); shell.askToken(); return; }
     if (!response.ok) throw new Error();
     const health = await response.json() as { ok: boolean; version: string }; if (!health.ok) throw new Error();
+    serverOnline = true;
     $('#server-status').textContent = `${isDesktop() ? 'Desktop · Rust engine' : 'Local server'} · v${health.version}`; $('#server-status').classList.add('connected');
   }).catch(() => { $('#server-status').textContent = 'Viewer mode · local server offline'; $('#server-status').classList.remove('connected'); });
 }
 checkHealth();
+installStaticNotices();
 
 void installDesktop({ get: () => state, open: next => { if (nesting || features?.busy()) throw new Error('Wait for the current operation.'); state = structuredClone(next); selected = -1; dirtyWithoutChecks = !core; render(true); history = new History(state); fit(); }, busy: () => nesting || !!features?.busy(), message, planning: () => features?.desktopSnapshot(), saved: () => features?.desktopSaved(), restorePlanning: value => features?.desktopRestore(value) });

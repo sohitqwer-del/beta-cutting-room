@@ -347,3 +347,11 @@ mod editor_round_trips {
         );
     }
 }
+
+/// Photo digitizing uses the same bounded engine as Quick Marker.
+#[wasm_bindgen]
+pub fn quick_scan(photo: &[u8], options: &str) -> Result<String, String> {
+    let options = serde_json::from_str(options).map_err(error)?;
+    let scan = beta_pattern_digitize::quick::scan_bytes(photo, &options).map_err(error)?;
+    serde_json::to_string(&scan).map_err(error)
+}

@@ -1,4 +1,4 @@
-import type { CutOrder, Job, MarkerResult, NestOptions, PlanOptions, Pt, Zone } from '@beta/marker-wasm';
+import type { CutOrder, CutPlan, Job, MarkerResult, NestOptions, PlanOptions, Pt, Zone } from '@beta/marker-wasm';
 import type { DocumentState } from './state';
 
 /** Copy locks exactly; never let a later editor change mutate a submitted request. */
@@ -28,6 +28,12 @@ export function planPayload(job: Job, form: PlanForm): { order: CutOrder; option
   return structuredClone({ order: { format: 'beta-marker.cutorder/v1', name: job.name, job, quantities: form.quantities,
     max_plies: form.maxPlies, max_garments_per_marker: form.maxGarments, overcut_pct: form.overcut },
   options: { time_per_marker_s: form.time, final_time_s: form.finalTime ?? 0, end_allowance_mm: form.endAllowance } });
+}
+/** A saved partial result is useful evidence, but it is not an order ready to cut. */
+export function planStatus(plan: Pick<CutPlan, 'complete' | 'shortfall'>): string {
+  if (plan.complete) return 'Plan ready. Review each marker before cutting.';
+  const missing = Object.entries(plan.shortfall).map(([size, quantity]) => `${size}: ${quantity}`).join(', ');
+  return `Incomplete plan.${missing ? ` Missing garments — ${missing}.` : ''} Do not cut this as a complete order. Review the warnings and try other limits or more search time.`;
 }
 /** Savings may be negative. A zero or invalid reference has no defined saving. */
 export function compareLengths(theirs: number, ours: number): { metres: number; percent: number } | null {

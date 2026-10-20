@@ -30,8 +30,12 @@ export interface Job {
   format: string; name: string; fabric: Fabric; spacing?: Spacing; pieces: Piece[];
   order?: Order | null; meta?: Record<string, Json>; match_rules?: MatchRule[];
 }
+/** Useful copy assigned from a physical fabric layer. */
+export interface LayerAllocation { bundle: number; mirrored: boolean }
 export interface Placement {
   piece_id: string; copy: number; mirrored: boolean; rotation_deg: number; translate: Pt; locked?: boolean; bundle?: number | null; on_fold?: boolean;
+  /** Physical normal then mirrored layer; null is surplus. Empty/omitted uses legacy bundle allocation. */
+  layer_allocations?: (LayerAllocation | null)[];
 }
 export interface MarkerResult {
   format: string; job_name: string; width: number; length: number; piece_area: number;

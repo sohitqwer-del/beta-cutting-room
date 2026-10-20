@@ -13,5 +13,6 @@ serde_json.workspace = true
 rust_xlsxwriter = { version = "0.95", default-features = false }
 
 [dev-dependencies]
+rustybuzz = "=0.20.1"
 beta-marker-dxf.workspace = true
 zip = { version = "7.2", default-features = false, features = ["deflate"] }

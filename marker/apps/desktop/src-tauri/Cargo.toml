@@ -1,6 +1,6 @@
 [package]
 name = "beta-cutting-room"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2024"
 license = "Apache-2.0"
 description = "Offline BETA Cutting Room desktop"
@@ -16,6 +16,7 @@ tauri = { version = "=2.12.4", features = [] }
 tauri-macros = "=2.7.3"
 tauri-plugin-dialog = "=2.8.3"
 tauri-plugin-single-instance = "=2.5.4"
+tauri-plugin-opener = "=2.7.2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 anyhow = "1"
@@ -40,3 +41,7 @@ windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
+
+[dev-dependencies]
+# Same matcher used by the opener; tests inspect scopes without launching a browser.
+glob = "=0.3.4"

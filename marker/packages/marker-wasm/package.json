@@ -1,6 +1,6 @@
 {
   "name": "@beta/marker-wasm",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Typed offline Rust WASM bindings for BETA Marker",
   "license": "Apache-2.0",
   "type": "module",

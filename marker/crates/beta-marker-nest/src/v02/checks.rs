@@ -210,28 +210,33 @@ fn counts(job: &Job, placements: &[Placement]) -> Result<()> {
             "invalid or missing bundle for '{}'",
             piece.id
         );
+        ensure!(
+            beta_marker_core::rules::placement_bundles(pl).iter().all(|b| bundles(job, piece).contains(b)),
+            "invalid layer bundle for '{}'", piece.id
+        );
     }
     for piece in &job.pieces {
         for bundle in bundles(job, piece) {
             let mut copies = (0u64, 0u64);
             for pl in placements
                 .iter()
-                .filter(|p| p.piece_id == piece.id && p.bundle == Some(bundle))
+                .filter(|p| p.piece_id == piece.id)
             {
-                let layers = beta_marker_core::rules::layer_copies(job.fabric.layout, pl);
+                let layers = beta_marker_core::rules::bundle_layer_copies(job.fabric.layout, pl, bundle);
                 copies.0 += u64::from(layers.0);
                 copies.1 += u64::from(layers.1);
             }
+            let explicit = placements.iter().any(|p| !p.layer_allocations.is_empty());
             if beta_marker_core::rules::flip_allowed(job, piece) {
                 let total = copies.0 + copies.1;
                 let expected = u64::from(piece.quantity) + u64::from(piece.mirror_quantity);
                 ensure!(
                     total >= expected
-                        && total <= expected + u64::from(job.fabric.layout != Layout::Open),
+                        && total <= expected + u64::from(job.fabric.layout != Layout::Open && !explicit),
                     "wrong faceless demand for '{}' bundle {bundle}",
                     piece.id
                 );
-            } else if job.fabric.layout == Layout::Open {
+            } else if job.fabric.layout == Layout::Open || explicit {
                 ensure!(
                     copies == (u64::from(piece.quantity), u64::from(piece.mirror_quantity)),
                     "wrong demand for '{}' bundle {bundle}",

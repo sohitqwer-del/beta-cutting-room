@@ -1,0 +1,608 @@
+{
+  "accuracy": 0.21794871794871795,
+  "classes": {
+    "back": [
+      2,
+      10
+    ],
+    "binding": [
+      0,
+      1
+    ],
+    "collar": [
+      0,
+      2
+    ],
+    "cuff": [
+      0,
+      7
+    ],
+    "front": [
+      4,
+      11
+    ],
+    "hood": [
+      0,
+      2
+    ],
+    "placket": [
+      0,
+      2
+    ],
+    "pocket": [
+      0,
+      2
+    ],
+    "skirt": [
+      2,
+      19
+    ],
+    "sleeve": [
+      5,
+      10
+    ],
+    "trouser": [
+      0,
+      2
+    ],
+    "waistband": [
+      4,
+      9
+    ],
+    "yoke": [
+      0,
+      1
+    ]
+  },
+  "correct": 17,
+  "predictions": [
+    {
+      "actual": "back",
+      "correct": false,
+      "distance": 0.2893859765145429,
+      "predicted": "skirt",
+      "source": "freesewing/bella/back"
+    },
+    {
+      "actual": "front",
+      "correct": false,
+      "distance": 0.4186585390581131,
+      "predicted": "pocket",
+      "source": "freesewing/bella/frontSideDart"
+    },
+    {
+      "actual": "sleeve",
+      "correct": false,
+      "distance": 0.28832689451834154,
+      "predicted": "skirt",
+      "source": "freesewing/bella/sleeve"
+    },
+    {
+      "actual": "front",
+      "correct": true,
+      "distance": 0.5672800669247267,
+      "predicted": "front",
+      "source": "freesewing/hugo/front"
+    },
+    {
+      "actual": "back",
+      "correct": false,
+      "distance": 0.6214520470173068,
+      "predicted": "front",
+      "source": "freesewing/hugo/back"
+    },
+    {
+      "actual": "sleeve",
+      "correct": true,
+      "distance": 0.3221187272618505,
+      "predicted": "sleeve",
+      "source": "freesewing/hugo/sleeve"
+    },
+    {
+      "actual": "pocket",
+      "correct": false,
+      "distance": 0.35685338738433886,
+      "predicted": "skirt",
+      "source": "freesewing/hugo/pocket"
+    },
+    {
+      "actual": "pocket",
+      "correct": false,
+      "distance": 0.22389882643422626,
+      "predicted": "front",
+      "source": "freesewing/hugo/pocketFacing"
+    },
+    {
+      "actual": "hood",
+      "correct": false,
+      "distance": 0.1805822972751041,
+      "predicted": "sleeve",
+      "source": "freesewing/hugo/hoodSide"
+    },
+    {
+      "actual": "hood",
+      "correct": false,
+      "distance": 0.032328739034699634,
+      "predicted": "waistband",
+      "source": "freesewing/hugo/hoodCenter"
+    },
+    {
+      "actual": "binding",
+      "correct": false,
+      "distance": 0.15555770314892778,
+      "predicted": "skirt",
+      "source": "freesewing/hugo/neckBinding"
+    },
+    {
+      "actual": "waistband",
+      "correct": true,
+      "distance": 0.05753222143976308,
+      "predicted": "waistband",
+      "source": "freesewing/hugo/waistband"
+    },
+    {
+      "actual": "cuff",
+      "correct": false,
+      "distance": 0.032392412680738336,
+      "predicted": "skirt",
+      "source": "freesewing/hugo/cuff"
+    },
+    {
+      "actual": "back",
+      "correct": true,
+      "distance": 0.21218523239263432,
+      "predicted": "back",
+      "source": "freesewing/simon/back"
+    },
+    {
+      "actual": "collar",
+      "correct": false,
+      "distance": 0.2142375819328247,
+      "predicted": "waistband",
+      "source": "freesewing/simon/collar"
+    },
+    {
+      "actual": "collar",
+      "correct": false,
+      "distance": 0.18081136459833422,
+      "predicted": "waistband",
+      "source": "freesewing/simon/collarStand"
+    },
+    {
+      "actual": "cuff",
+      "correct": false,
+      "distance": 0.3540547241517627,
+      "predicted": "back",
+      "source": "freesewing/simon/cuff"
+    },
+    {
+      "actual": "front",
+      "correct": false,
+      "distance": 0.14860759620788033,
+      "predicted": "trouser",
+      "source": "freesewing/simon/frontRight"
+    },
+    {
+      "actual": "front",
+      "correct": false,
+      "distance": 0.19484347716606068,
+      "predicted": "trouser",
+      "source": "freesewing/simon/frontLeft"
+    },
+    {
+      "actual": "sleeve",
+      "correct": false,
+      "distance": 0.2921076946833375,
+      "predicted": "front",
+      "source": "freesewing/simon/sleeve"
+    },
+    {
+      "actual": "placket",
+      "correct": false,
+      "distance": 0.2620280597755891,
+      "predicted": "back",
+      "source": "freesewing/simon/sleevePlacketOverlap"
+    },
+    {
+      "actual": "placket",
+      "correct": false,
+      "distance": 0.052329959837699225,
+      "predicted": "cuff",
+      "source": "freesewing/simon/sleevePlacketUnderlap"
+    },
+    {
+      "actual": "yoke",
+      "correct": false,
+      "distance": 0.2321768140769406,
+      "predicted": "back",
+      "source": "freesewing/simon/yoke"
+    },
+    {
+      "actual": "front",
+      "correct": false,
+      "distance": 0.23009626774762643,
+      "predicted": "back",
+      "source": "freesewing/teagan/front"
+    },
+    {
+      "actual": "back",
+      "correct": true,
+      "distance": 0.21218523239263432,
+      "predicted": "back",
+      "source": "freesewing/teagan/back"
+    },
+    {
+      "actual": "sleeve",
+      "correct": true,
+      "distance": 0.3221187272618505,
+      "predicted": "sleeve",
+      "source": "freesewing/teagan/sleeve"
+    },
+    {
+      "actual": "back",
+      "correct": false,
+      "distance": 0.2321768140769406,
+      "predicted": "yoke",
+      "source": "freesewing/titan/back"
+    },
+    {
+      "actual": "front",
+      "correct": false,
+      "distance": 0.22389882643422626,
+      "predicted": "pocket",
+      "source": "freesewing/titan/front"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.8289039293917839,
+      "predicted": "back",
+      "source": "garmentcode/rand_07UUJUMCB1/ins_skirt_front_1"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.7254980667962206,
+      "predicted": "trouser",
+      "source": "garmentcode/rand_07UUJUMCB1/skirt_front"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.7892219278003368,
+      "predicted": "trouser",
+      "source": "garmentcode/rand_07UUJUMCB1/skirt_back"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.4171938718323922,
+      "predicted": "front",
+      "source": "garmentcode/rand_0B1IDD2JL0/skirt_front"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.5404441417301666,
+      "predicted": "front",
+      "source": "garmentcode/rand_0B1IDD2JL0/skirt_back"
+    },
+    {
+      "actual": "back",
+      "correct": false,
+      "distance": 0.3337960019772331,
+      "predicted": "sleeve",
+      "source": "garmentcode/rand_0B1IDD2JL0/left_btorso"
+    },
+    {
+      "actual": "front",
+      "correct": false,
+      "distance": 0.2921076946833375,
+      "predicted": "sleeve",
+      "source": "garmentcode/rand_0B1IDD2JL0/left_ftorso"
+    },
+    {
+      "actual": "front",
+      "correct": true,
+      "distance": 0.4041710923184105,
+      "predicted": "front",
+      "source": "garmentcode/rand_0B1IDD2JL0/right_ftorso"
+    },
+    {
+      "actual": "back",
+      "correct": false,
+      "distance": 0.2692698164705522,
+      "predicted": "sleeve",
+      "source": "garmentcode/rand_0B1IDD2JL0/right_btorso"
+    },
+    {
+      "actual": "sleeve",
+      "correct": true,
+      "distance": 0.20121961669697536,
+      "predicted": "sleeve",
+      "source": "garmentcode/rand_0B1IDD2JL0/right_sleeve_f"
+    },
+    {
+      "actual": "cuff",
+      "correct": false,
+      "distance": 0.2670132702765718,
+      "predicted": "skirt",
+      "source": "garmentcode/rand_0B1IDD2JL0/sl_right_cuff_skirt_f"
+    },
+    {
+      "actual": "sleeve",
+      "correct": true,
+      "distance": 0.20891158453067415,
+      "predicted": "sleeve",
+      "source": "garmentcode/rand_0B1IDD2JL0/right_sleeve_b"
+    },
+    {
+      "actual": "waistband",
+      "correct": false,
+      "distance": 0.039950288490061214,
+      "predicted": "hood",
+      "source": "garmentcode/rand_0C4F68606B/wb_back"
+    },
+    {
+      "actual": "waistband",
+      "correct": true,
+      "distance": 0.02009195062593241,
+      "predicted": "waistband",
+      "source": "garmentcode/rand_0C4F68606B/wb_front"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.24653579046027002,
+      "predicted": "front",
+      "source": "garmentcode/rand_0C4F68606B/skirt_panel_8"
+    },
+    {
+      "actual": "skirt",
+      "correct": true,
+      "distance": 0.10179141565485059,
+      "predicted": "skirt",
+      "source": "garmentcode/rand_0E9JS7307I/skirt_back"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.032392412680738336,
+      "predicted": "cuff",
+      "source": "garmentcode/rand_0E9JS7307I/skirt_front"
+    },
+    {
+      "actual": "back",
+      "correct": false,
+      "distance": 0.5567548637133886,
+      "predicted": "sleeve",
+      "source": "garmentcode/rand_0J0B80KRWK/right_btorso"
+    },
+    {
+      "actual": "front",
+      "correct": false,
+      "distance": 0.4814824671198525,
+      "predicted": "back",
+      "source": "garmentcode/rand_0J0B80KRWK/right_ftorso"
+    },
+    {
+      "actual": "cuff",
+      "correct": false,
+      "distance": 0.052329959837699225,
+      "predicted": "placket",
+      "source": "garmentcode/rand_0J0B80KRWK/sl_right_cuff_f"
+    },
+    {
+      "actual": "cuff",
+      "correct": false,
+      "distance": 0.26938657264309757,
+      "predicted": "collar",
+      "source": "garmentcode/rand_0J0B80KRWK/sl_right_cuff_skirt_f"
+    },
+    {
+      "actual": "sleeve",
+      "correct": false,
+      "distance": 0.2692698164705522,
+      "predicted": "back",
+      "source": "garmentcode/rand_0J0B80KRWK/right_sleeve_f"
+    },
+    {
+      "actual": "sleeve",
+      "correct": true,
+      "distance": 0.2363642629449232,
+      "predicted": "sleeve",
+      "source": "garmentcode/rand_0J0B80KRWK/right_sleeve_b"
+    },
+    {
+      "actual": "back",
+      "correct": false,
+      "distance": 0.5562385154249982,
+      "predicted": "sleeve",
+      "source": "garmentcode/rand_0J0B80KRWK/left_btorso"
+    },
+    {
+      "actual": "waistband",
+      "correct": false,
+      "distance": 0.3190450824321543,
+      "predicted": "collar",
+      "source": "garmentcode/rand_0J0B80KRWK/wb_front"
+    },
+    {
+      "actual": "waistband",
+      "correct": false,
+      "distance": 0.18081136459833422,
+      "predicted": "collar",
+      "source": "garmentcode/rand_0J0B80KRWK/wb_back"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.18905100924973228,
+      "predicted": "placket",
+      "source": "garmentcode/rand_0SZOL0ZI99/skirt_back"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.14009964109935633,
+      "predicted": "hood",
+      "source": "garmentcode/rand_0SZOL0ZI99/skirt_front"
+    },
+    {
+      "actual": "waistband",
+      "correct": false,
+      "distance": 0.032328739034699634,
+      "predicted": "hood",
+      "source": "garmentcode/rand_0SZOL0ZI99/wb_back"
+    },
+    {
+      "actual": "waistband",
+      "correct": true,
+      "distance": 0.02009195062593241,
+      "predicted": "waistband",
+      "source": "garmentcode/rand_0SZOL0ZI99/wb_front"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.38565636756650545,
+      "predicted": "front",
+      "source": "garmentcode/rand_0XTT7C4PC0/skirt_back"
+    },
+    {
+      "actual": "waistband",
+      "correct": true,
+      "distance": 0.16557137175894404,
+      "predicted": "waistband",
+      "source": "garmentcode/rand_0XTT7C4PC0/wb_front"
+    },
+    {
+      "actual": "waistband",
+      "correct": false,
+      "distance": 0.218618828669996,
+      "predicted": "collar",
+      "source": "garmentcode/rand_0XTT7C4PC0/wb_back"
+    },
+    {
+      "actual": "cuff",
+      "correct": false,
+      "distance": 0.31578295757476904,
+      "predicted": "front",
+      "source": "garmentcode/rand_14LPYAPYDY/pant_r_cuff_skirt_f"
+    },
+    {
+      "actual": "trouser",
+      "correct": false,
+      "distance": 0.20736427031997554,
+      "predicted": "front",
+      "source": "garmentcode/rand_14LPYAPYDY/pant_b_r"
+    },
+    {
+      "actual": "trouser",
+      "correct": false,
+      "distance": 0.14860759620788033,
+      "predicted": "front",
+      "source": "garmentcode/rand_14LPYAPYDY/pant_f_r"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.1001347514751797,
+      "predicted": "cuff",
+      "source": "garmentcode/rand_16M4M86OOS/skirt_back"
+    },
+    {
+      "actual": "skirt",
+      "correct": true,
+      "distance": 0.03982670951944048,
+      "predicted": "skirt",
+      "source": "garmentcode/rand_16M4M86OOS/skirt_front"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.7169096070177717,
+      "predicted": "binding",
+      "source": "garmentcode/rand_1B6BU0JTB4/skirt_back_1"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.47891876284617185,
+      "predicted": "binding",
+      "source": "garmentcode/rand_1B6BU0JTB4/skirt_front_1"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.15555770314892778,
+      "predicted": "binding",
+      "source": "garmentcode/rand_1B6BU0JTB4/skirt_front_0"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.36550488497995354,
+      "predicted": "binding",
+      "source": "garmentcode/rand_1B6BU0JTB4/skirt_back_0"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.2670132702765718,
+      "predicted": "cuff",
+      "source": "garmentcode/rand_1B6BU0JTB4/skirt_front"
+    },
+    {
+      "actual": "skirt",
+      "correct": false,
+      "distance": 0.28832689451834154,
+      "predicted": "sleeve",
+      "source": "garmentcode/rand_1B6BU0JTB4/skirt_back"
+    },
+    {
+      "actual": "sleeve",
+      "correct": false,
+      "distance": 0.19132170411581007,
+      "predicted": "hood",
+      "source": "garmentcode/rand_1B6BU0JTB4/left_sleeve_f"
+    },
+    {
+      "actual": "cuff",
+      "correct": false,
+      "distance": 0.10501337086616983,
+      "predicted": "skirt",
+      "source": "garmentcode/rand_1B6BU0JTB4/sl_left_cuff_b"
+    },
+    {
+      "actual": "sleeve",
+      "correct": false,
+      "distance": 0.1805822972751041,
+      "predicted": "hood",
+      "source": "garmentcode/rand_1B6BU0JTB4/left_sleeve_b"
+    },
+    {
+      "actual": "front",
+      "correct": true,
+      "distance": 0.4041710923184105,
+      "predicted": "front",
+      "source": "garmentcode/rand_1B6BU0JTB4/left_ftorso"
+    },
+    {
+      "actual": "back",
+      "correct": false,
+      "distance": 0.16618925459873232,
+      "predicted": "front",
+      "source": "garmentcode/rand_1B6BU0JTB4/left_btorso"
+    },
+    {
+      "actual": "front",
+      "correct": true,
+      "distance": 0.4054766440566654,
+      "predicted": "front",
+      "source": "garmentcode/rand_1B6BU0JTB4/right_ftorso"
+    }
+  ],
+  "split": "leave-one-whole-style-out; no ratio sizes or interfacing duplicates; near-identical descriptors deduplicated within style",
+  "total": 78
+}

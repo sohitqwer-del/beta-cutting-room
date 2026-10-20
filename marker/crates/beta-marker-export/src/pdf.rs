@@ -13,7 +13,7 @@ pub(super) fn escaped(s: &str) -> String {
         .replace('(', "\\(")
         .replace(')', "\\)")
 }
-fn stream(content: &str, extra: &str) -> Vec<u8> {
+pub(super) fn stream(content: &str, extra: &str) -> Vec<u8> {
     format!(
         "<< /Length {} {extra} >>\nstream\n{content}\nendstream",
         content.len()
@@ -193,7 +193,7 @@ pub(super) fn paper_pages(
     finish(objects)
 }
 
-fn finish(objects: Vec<Vec<u8>>) -> anyhow::Result<Vec<u8>> {
+pub(super) fn finish(objects: Vec<Vec<u8>>) -> anyhow::Result<Vec<u8>> {
     let mut out = b"%PDF-1.4\n%\xE2\xE3\xCF\xD3\n".to_vec();
     let mut offsets = vec![0];
     for (i, object) in objects.iter().enumerate() {
@@ -206,7 +206,7 @@ fn finish(objects: Vec<Vec<u8>>) -> anyhow::Result<Vec<u8>> {
     let mut tail = format!("xref\n0 {}\n0000000000 65535 f \n", offsets.len());
     for offset in &offsets[1..] {
         ensure!(
-            *offset <= 9_999_999_999_usize,
+            (*offset as u64) <= 9_999_999_999_u64,
             "PDF is too large for a classic xref table."
         );
         writeln!(tail, "{offset:010} 00000 n ")?;

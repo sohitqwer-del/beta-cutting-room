@@ -1,4 +1,4 @@
-# BETA Cutting Room desktop 0.4.0
+# BETA Cutting Room desktop 0.5.0
 
 A Windows x64 Tauri 2 application. The existing Cutting Room interface runs in the Windows WebView2 control. Rust calls the BETA crates directly. There is no HTTP server, runtime CDN, telemetry or updater. A strict content security policy and a navigation guard block remote pages. Only local event permissions are granted to the main window. Native file commands reject UNC paths.
 

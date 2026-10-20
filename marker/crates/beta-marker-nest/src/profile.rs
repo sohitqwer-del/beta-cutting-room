@@ -1,5 +1,5 @@
 //! Opt-in phase timing for local diagnosis; no geometry or job data is logged.
-use std::time::Instant;
+use crate::Instant;
 
 pub(crate) struct Phase {
     name: &'static str,

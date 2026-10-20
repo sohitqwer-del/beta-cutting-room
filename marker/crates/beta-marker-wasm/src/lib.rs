@@ -1,8 +1,8 @@
 //! JSON-in/JSON-out browser bindings. These functions also run in native tests.
+mod nesting;
 use beta_marker_core::{Job, MarkerResult, Placement, Pt};
 use serde::{Serialize, de::DeserializeOwned};
 use wasm_bindgen::prelude::*;
-
 
 fn read<T: DeserializeOwned>(json: &str) -> Result<T, String> {
     serde_json::from_str(json).map_err(|error| error.to_string())
@@ -332,3 +332,6 @@ mod tests {
         assert!(transform("[]", false, f64::NAN, "[0,0]").is_err());
     }
 }
+
+mod quick;
+pub use quick::*;

@@ -8,7 +8,7 @@ use anyhow::{Context, Result, ensure};
 use beta_marker_core::{Fabric, JOB_FORMAT, Job, Mark, MarkKind, Piece, Pt};
 use image::{GrayImage, ImageReader, Luma, Rgb, RgbImage};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, path::Path, time::Instant};
+use std::{collections::HashMap, path::Path};
 
 /// Controls for a scan. Defaults suit light paper on the printed grey board.
 #[derive(Debug, Clone)]
@@ -104,7 +104,7 @@ pub fn scan_file(path: &Path, target: &Target, options: &ScanOptions) -> Result<
 
 /// Run calibration, metric resampling, segmentation, tracing, and mark recognition.
 pub fn scan(image: &GrayImage, target: &Target, options: &ScanOptions) -> Result<ScanResult> {
-    let start = Instant::now();
+    let start = crate::Timer::start();
     target.validate()?;
     ensure!(
         options.mm_per_pixel.is_finite() && (0.1..=2.).contains(&options.mm_per_pixel),
@@ -335,7 +335,7 @@ pub fn scan(image: &GrayImage, target: &Target, options: &ScanOptions) -> Result
             detected_markers: detections.len(),
             calibration: cal,
             threshold,
-            runtime_s: start.elapsed().as_secs_f64(),
+            runtime_s: start.seconds(),
             warnings,
         },
         rectified,
@@ -368,7 +368,7 @@ fn validate_border(image: &GrayImage, pitch: f64) -> Result<()> {
     }
     Ok(())
 }
-fn close_mask(mask: &[u8], w: usize, h: usize, r: usize) -> Vec<u8> {
+pub(crate) fn close_mask(mask: &[u8], w: usize, h: usize, r: usize) -> Vec<u8> {
     fn pass(input: &[u8], w: usize, h: usize, r: usize, dilate: bool) -> Vec<u8> {
         let mut integral = vec![0_u32; (w + 1) * (h + 1)];
         for y in 0..h {
@@ -430,7 +430,7 @@ fn normalize_background(image: &GrayImage, pitch: f64) -> GrayImage {
             .clamp(0., 255.) as u8])
     })
 }
-fn otsu(image: &GrayImage, border: u32) -> u8 {
+pub(crate) fn otsu(image: &GrayImage, border: u32) -> u8 {
     let mut hist = [0_u64; 256];
     for y in border..image.height() - border {
         for x in border..image.width() - border {
@@ -468,7 +468,7 @@ fn otsu(image: &GrayImage, border: u32) -> u8 {
 
 // Marching squares: graph vertices are horizontal/vertical sample-grid edges.
 // Grey-level interpolation gives subpixel crossings instead of pixel stair steps.
-fn trace(mask: &[u8], grey: &GrayImage, threshold: u8) -> Vec<Vec<Pt>> {
+pub(crate) fn trace(mask: &[u8], grey: &GrayImage, threshold: u8) -> Vec<Vec<Pt>> {
     let w = grey.width() as usize;
     let h = grey.height() as usize;
     let mut graph = HashMap::<usize, (Pt, Vec<usize>)>::new();
@@ -582,7 +582,11 @@ fn smooth_contour(p: &[Pt], limit: f64) -> Vec<Pt> {
         .collect()
 }
 
-fn features(image: &GrayImage, outline: &[Pt], pitch: f64) -> (Vec<Mark>, Option<[Pt; 2]>) {
+pub(crate) fn features(
+    image: &GrayImage,
+    outline: &[Pt],
+    pitch: f64,
+) -> (Vec<Mark>, Option<[Pt; 2]>) {
     let w = image.width() as usize;
     let h = image.height() as usize;
     let mut mask = vec![0; w * h];
@@ -683,7 +687,7 @@ fn features(image: &GrayImage, outline: &[Pt], pitch: f64) -> (Vec<Mark>, Option
     }
     (marks, grain)
 }
-fn cut_notches(contour: &[Pt]) -> Vec<Mark> {
+pub(crate) fn cut_notches(contour: &[Pt]) -> Vec<Mark> {
     // Group adjacent re-entrant turns: resampling can flatten a V's very tip
     // into a short segment. A broad armhole fails the mouth/depth/length checks.
     let p = simplify(contour, 0.65);

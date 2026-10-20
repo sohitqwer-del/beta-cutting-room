@@ -1,0 +1,142 @@
+WEBVTT
+
+00:00:00.358 --> 00:00:02.371
+Save fabric on every marker.
+
+00:00:02.421 --> 00:00:07.978
+BETA Cutting Room is free and open
+source. It runs in your own factory.
+
+00:00:08.634 --> 00:00:12.731
+A garment is cut from flat
+shapes, called pattern pieces.
+
+00:00:12.781 --> 00:00:17.711
+A marker is the cutting plan: all
+the pieces, laid on the fabric width.
+
+00:00:17.761 --> 00:00:22.238
+Pieces closer together make a
+shorter marker, and use less fabric.
+
+00:00:22.288 --> 00:00:28.523
+Example: 10 cm shorter, on 50
+layers, saves 5 metres of fabric.
+
+00:00:28.573 --> 00:00:35.124
+At ₹150 a metre, that is ₹750 saved on one lay.
+
+00:00:35.174 --> 00:00:39.512
+CAD software makes this
+layout for you, and checks it.
+
+00:00:40.142 --> 00:00:46.425
+Many units still mark by hand, with
+chalk. And commercial CAD is expensive.
+
+00:00:47.051 --> 00:00:50.108
+This is BETA Marker, with a demo shirt.
+
+00:00:50.158 --> 00:00:54.887
+Set the fabric width: 1500 mm.
+
+00:00:54.937 --> 00:00:58.641
+Set the size ratio: garments of each size.
+
+00:00:59.910 --> 00:01:03.378
+Press Nest. BETA places every piece for you.
+
+00:01:03.428 --> 00:01:07.473
+It tries many layouts,
+and shows the best so far.
+
+00:01:11.133 --> 00:01:14.560
+The result: marker length, and efficiency.
+
+00:01:14.610 --> 00:01:19.410
+Every marker is checked: no
+overlaps, and the grain is right.
+
+00:01:19.583 --> 00:01:23.159
+Then export a PDF, or a plotter file.
+
+00:01:25.751 --> 00:01:28.310
+Cut plan turns an order into lays.
+
+00:01:28.360 --> 00:01:31.970
+Enter garments per size, and the highest ply.
+
+00:01:33.605 --> 00:01:38.630
+BETA works out the lays, the
+plies, and the metres of fabric.
+
+00:01:42.426 --> 00:01:45.400
+Record each fabric roll and check it.
+
+00:01:48.289 --> 00:01:50.841
+Print a spreading sheet for each lay.
+
+00:01:52.431 --> 00:01:56.464
+Make bundles, with a QR ticket for every bundle.
+
+00:01:59.529 --> 00:02:03.583
+No CAD files? Use Quick Marker on your phone.
+
+00:02:03.633 --> 00:02:07.862
+Photograph the paper pieces,
+with an A4 sheet for size.
+
+00:02:07.912 --> 00:02:12.473
+BETA finds the outlines. You
+check and name each piece.
+
+00:02:14.807 --> 00:02:17.919
+Enter the fabric width and
+the number of garments.
+
+00:02:17.969 --> 00:02:20.081
+Then BETA makes the marker.
+
+00:02:30.630 --> 00:02:35.440
+Print it on A4 sheets, use a
+chalk guide, or a projector.
+
+00:02:37.539 --> 00:02:41.229
+BETA Pattern grades a pattern into all sizes.
+
+00:02:42.811 --> 00:02:47.087
+Seam checks show if two seams
+that join have the same length.
+
+00:02:51.344 --> 00:02:56.730
+Export DXF files for your CAD,
+or print the pieces full size.
+
+00:02:57.357 --> 00:03:00.138
+Is it good? We test it in public.
+
+00:03:00.188 --> 00:03:12.090
+300 Lectra tasks, 60 s each: BETA was 0.73 points
+below Lectra on average, 1.22 below at the median.
+
+00:03:12.140 --> 00:03:19.311
+84 wins, 12 ties, 204 losses.
+Close, but not better yet.
+
+00:03:19.361 --> 00:03:22.539
+And every marker is checked before export.
+
+00:03:23.179 --> 00:03:27.127
+Found a problem? Press Feedback, and tell us.
+
+00:03:28.326 --> 00:03:33.474
+BETA is free, works offline, and
+your data stays in your factory.
+
+00:03:33.524 --> 00:03:39.269
+It is a young project, made for fun
+with modern AI tools. We need your help.
+
+00:03:39.319 --> 00:03:43.061
+Try it now in your browser:
+sohitqwer-del.github.io/beta-cutting-room

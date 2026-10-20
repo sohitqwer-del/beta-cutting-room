@@ -4,6 +4,8 @@ mod api;
 mod pipeline;
 mod storage;
 mod worker;
+#[cfg(test)]
+mod opener_tests;
 use api::{Method, Reply, Route};
 use serde_json::{Value, json};
 use std::{
@@ -546,6 +548,7 @@ fn main() {
             if let Some(window)=app.get_webview_window("main") {let _=window.unminimize();let _=window.show();let _=window.set_focus();}
         }))
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::Builder::new().open_js_links_on_click(false).build())
         .setup(move |app| {
             let root=std::env::var_os("BETA_DATA_DIR").map(PathBuf::from).map(|p|p.join("desktop")).unwrap_or(app.path().app_local_data_dir()?);
             std::fs::create_dir_all(&root)?;

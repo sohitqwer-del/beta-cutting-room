@@ -11,6 +11,8 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::{Duration, Instant};
+#[path = "launch_study/fold.rs"]
+mod fold_study;
 
 fn save(path: impl AsRef<Path>, value: &impl Serialize) -> Result<()> {
     fs::write(path, serde_json::to_vec_pretty(value)?)?;
@@ -577,6 +579,13 @@ fn audit_tilt(path: &Path) -> Result<()> {
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().skip(1).collect();
     match args.first().map(String::as_str) {
+        Some("fold-matrix") if args.len() == 8 => fold_study::matrix(
+            Path::new(&args[1]), Path::new(&args[2]), Path::new(&args[3]),
+            Path::new(&args[4]), Path::new(&args[5]), args[6].parse()?, args[7].parse()?,
+        ),
+        Some("fold-summary") if args.len() == 3 => {
+            fold_study::summarize(Path::new(&args[1]), Path::new(&args[2]))
+        }
         Some("trial") if args.len() == 4 => trial(
             Path::new(&args[1]),
             Path::new(&args[2]),
@@ -610,7 +619,7 @@ fn main() -> Result<()> {
             save(PathBuf::from(&args[3]), &folded(&input, layout)?)
         }
         _ => bail!(
-            "trial JOB OPTIONS OUT | freedoms DEV_JSONL FIXTURE_DIR OUT SECONDS CONCURRENCY | summarize OUT [REPLAY_ROOT...] | replay ORIGINAL_EXE PAIR_DIR OUT | compare BEFORE AFTER [BEFORE AFTER...] | audit-tilt DEV_JSONL | fold-job JOB folded|tubular OUTPUT"
+            "trial JOB OPTIONS OUT | freedoms DEV_JSONL FIXTURE_DIR OUT SECONDS CONCURRENCY | summarize OUT [REPLAY_ROOT...] | replay ORIGINAL_EXE PAIR_DIR OUT | compare BEFORE AFTER [BEFORE AFTER...] | audit-tilt DEV_JSONL | fold-job JOB folded|tubular OUTPUT | fold-matrix BEFORE AFTER FIXTURES DEV_JSONL OUT SECONDS CONCURRENCY | fold-summary STUDY_ROOT OUT"
         ),
     }
 }

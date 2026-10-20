@@ -8,7 +8,8 @@ use geo::{Distance, Euclidean, Polygon, Relate};
 use rand::{RngExt, SeedableRng, rngs::Xoshiro256PlusPlus, seq::SliceRandom};
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::time::{Duration, Instant};
+use std::time::Duration;
+use crate::Instant;
 
 #[derive(Clone)]
 struct Shape {
@@ -93,13 +94,6 @@ fn orientations(
     // A full cut through folded layers already cuts a normal/mirrored pair.
     // When that pair is requested, either primary hand has the same demand.
     // This does not grant optional face-down cutting to a one-layer piece.
-    let mirrors = if beta_marker_core::rules::flip_allowed(job, piece)
-        || (job.fabric.layout == Layout::Folded && piece.mirror_quantity > 0)
-    {
-        vec![preferred, !preferred]
-    } else {
-        vec![preferred]
-    };
     let folds = if slot.placement.on_fold {
         vec![true, false]
     } else {
@@ -107,9 +101,19 @@ fn orientations(
     };
     let mut out = Vec::new();
     for on_fold in folds {
+        let explicit = !slot.placement.layer_allocations.is_empty();
+        let mirrors = if beta_marker_core::rules::flip_allowed(job, piece)
+            || ((job.fabric.layout == Layout::Folded
+                || (explicit && job.fabric.layout == Layout::Tubular)) && piece.mirror_quantity > 0)
+            || (explicit && on_fold && piece.fold_line.is_some()) {
+            vec![preferred, !preferred]
+        } else { vec![preferred] };
         for &mirrored in &mirrors {
             let mut pl = slot.placement.clone();
             pl.on_fold = on_fold;
+            if !on_fold && pl.layer_allocations.len() == 1 {
+                pl.layer_allocations.push(None);
+            }
             pl.mirrored = mirrored;
             let allowed = beta_marker_core::allowed_rotations(job, piece, mirrored);
             let mut angles = if job.fabric.nap == Nap::OneWayPerBundle {
@@ -532,6 +536,10 @@ pub(super) fn pack(
         for choice in &mut choices {
             choice.placement.copy = slot.placement.copy;
             choice.placement.bundle = slot.placement.bundle;
+            choice.placement.layer_allocations.clone_from(&slot.placement.layer_allocations);
+            if !choice.placement.on_fold && choice.placement.layer_allocations.len() == 1 {
+                choice.placement.layer_allocations.push(None);
+            }
         }
         prepared.push(choices);
     }
@@ -624,6 +632,8 @@ pub(super) fn pack(
                     unused[i]
                         && s.placement.piece_id == pl.piece_id
                         && s.placement.bundle == pl.bundle
+                        && (s.placement.layer_allocations.is_empty()
+                            || s.placement.layer_allocations.iter().flatten().eq(pl.layer_allocations.iter().flatten()))
                         && (job.fabric.layout != Layout::Open
                             || beta_marker_core::rules::flip_allowed(job, &job.pieces[s.piece])
                             || s.placement.mirrored == pl.mirrored)

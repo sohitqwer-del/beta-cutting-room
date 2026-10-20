@@ -229,11 +229,23 @@ def main() -> int:
     missing_tools = [str(p.relative_to(ROOT)) for p in [MARKER / "tools/open-patterns/freesewing", MARKER / "tools/open-patterns/garmentcode"] if not (p / "node_modules").is_dir()]
     if missing_tools:
         raise RuntimeError("Install tool dependencies before the full inventory: " + ", ".join(missing_tools))
+    # Bundled fonts are assets, not Cargo/npm dependency edges.
+    fonts = [
+        ("Droid Sans Devanagari", "export/fonts/DroidSansDevanagari-Regular.ttf", "Apache-2.0", MARKER / "crates/beta-marker-export/fonts", "https://android.googlesource.com/platform/frameworks/base/+/android-4.4.4_r2/data/fonts/"),
+        ("Droid Sans Tamil", "export/fonts/DroidSansTamil-Regular.ttf", "Apache-2.0", MARKER / "crates/beta-marker-export/fonts", "https://android.googlesource.com/platform/frameworks/base/+/android-4.4.4_r2/data/fonts/"),
+        ("Bricolage Grotesque", "site/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2", "OFL-1.1", MARKER / "apps/site/public/assets/fonts", "https://github.com/ateliertriay/bricolage"),
+    ]
+    for name, version, licence, folder, source in fonts:
+        records[("Font", name, version, source)] = {
+            "ecosystem": "Font", "name": name, "version": version,
+            "license": licence, "source": source, "folder": str(folder),
+            "scopes": {"bundled font asset"}, "authors": [], "repository": source,
+        }
     rejected = []
     for record in records.values():
         expression = record["license"]
         exception = record["name"] == "jagua-rs" and record["version"] == "1.0.0" and expression == "MPL-2.0"
-        accepted = permitted(expression) or expression.startswith("MIT (LICENSE file;")
+        accepted = permitted(expression) or expression.startswith("MIT (LICENSE file;") or (record["ecosystem"] == "Font" and expression == "OFL-1.1")
         record["decision"] = "MPL exception (unmodified)" if exception else "permissive" if accepted else "REVIEW REQUIRED"
         if not accepted and not exception:
             rejected.append(f"{record['name']} {record['version']}: {expression}")
@@ -242,9 +254,10 @@ def main() -> int:
         raise RuntimeError("The Windows SDK loader audit was not reached")
     excluded = sorted((r for k, r in all_resolved.items() if k not in records), key=lambda r: (r["name"], r["version"]))
     lines = [
-        "# Third-party licences: BETA Cutting Room 0.4.0", "",
+        "# Third-party licences: BETA Cutting Room 0.5.0", "",
         "Generated from Cargo metadata, local npm package manifests and installed package.json files.",
-        "No network licence service is used. Re-run after lockfile or dependency changes.", "",
+        "No network licence service is used. Re-run after lockfile or dependency changes.",
+        "Bundled Droid Sans fonts use Apache-2.0; the site Bricolage Grotesque font uses OFL-1.1.", "",
         "## Scope and decisions", "",
         "The main inventory covers the Windows GNU/MSVC Rust workspace graphs, Linux CLI,",
         "Pattern workspace, all three WASM modules, Marker npm workspaces and their installed build",
@@ -298,7 +311,7 @@ def main() -> int:
     if args.texts:
         args.texts.parent.mkdir(parents=True, exist_ok=True)
         with args.texts.open("w", encoding="utf-8") as output:
-            output.write("BETA Cutting Room 0.4.0 - third-party licence and notice texts\n\n")
+            output.write("BETA Cutting Room 0.5.0 - third-party licence and notice texts\n\n")
             output.write("Mozilla Public License 2.0 (jagua-rs 1.0.0, unmodified)\n")
             output.write((MARKER / "deploy/licenses/MPL-2.0.txt").read_text(encoding="utf-8") + "\n\n")
             output.write("Microsoft WebView2 SDK loader 1.0.3800.47 - BSD three-clause terms\n")
@@ -307,12 +320,18 @@ def main() -> int:
                 output.write(f"\n{'=' * 72}\n{r['ecosystem']}: {r['name']} {r['version']}\nLicence: {r['license']}\nSource: {r['source']}\n")
                 output.write(f"Authors (package manifest): {json.dumps(r.get('authors', []), ensure_ascii=False)}\nRepository: {json.dumps(r.get('repository'), ensure_ascii=False)}\n")
                 files = licence_files(Path(r["folder"]))
+                if r["ecosystem"] == "Font" and r["license"] == "OFL-1.1":
+                    files = [Path(r["folder"]) / "OFL.txt"]
                 if not files and r["source"] == "local BETA source":
                     files = [ROOT / "LICENSE"]
                 for path in files:
                     output.write(f"\n--- {path.name} ---\n{path.read_text(encoding='utf-8', errors='replace')}\n")
                 if not files:
                     output.write("\nNo root licence file in the local package; see its source distribution and declared SPDX terms.\n")
+    if args.texts:
+        # Whitespace is not part of licence terms; keep the checked-in notices diff clean.
+        text = args.texts.read_text(encoding="utf-8")
+        args.texts.write_text("\n".join(line.rstrip() for line in text.splitlines()).rstrip() + "\n", encoding="utf-8")
     if args.json:
         # Omit machine-specific source/cache paths from the transferable audit.
         serializable = [{k: sorted(v) if isinstance(v, set) else v for k, v in r.items() if k != "folder"} for r in ordered]

@@ -5,6 +5,7 @@
 //! to the grain-aligned original outlines.
 //! Fixed pieces, defects and fold edges use the adapter's f64 obstacle packer.
 
+pub mod browser;
 mod profile;
 mod safety;
 mod tuning;
@@ -27,7 +28,8 @@ use sparrow::consts::{DEFAULT_FAIL_DECAY_RATIO_CMPR, DEFAULT_MAX_CONSEQ_FAILS_EX
 use sparrow::util::listener::{ReportType, SolutionListener};
 use sparrow::util::terminator::BasicTerminator;
 use std::collections::BTreeMap;
-use std::time::{Duration, Instant};
+use std::time::Duration;
+pub(crate) use jagua_rs::Instant;
 
 /// Search controls. Sparrow import, initial construction and final checks add
 /// overhead to its exploration/compression budget. The constrained path includes

@@ -29,7 +29,7 @@ $docStage = Join-Path $stage 'docs'
 [IO.Directory]::CreateDirectory($docStage) | Out-Null
 foreach ($doc in Get-ChildItem -LiteralPath (Join-Path $markerRoot 'docs')) {
     # Keep the artifact hash record outside its own archive (no self-referencing hash).
-    if ($doc.Name -ne 'RELEASE-0.4.0.md') { Copy-Item -LiteralPath $doc.FullName -Destination $docStage -Recurse }
+    if ($doc.Name -ne ('RELEASE-' + $version + '.md')) { Copy-Item -LiteralPath $doc.FullName -Destination $docStage -Recurse }
 }
 Copy-Item -LiteralPath (Join-Path $markerRoot 'deploy') -Destination $stage -Recurse
 $notices = Join-Path $outputRoot 'THIRD-PARTY-NOTICES.txt'
@@ -42,7 +42,21 @@ beta-marker.exe serve --web-dir web %*
 '@ | Set-Content -LiteralPath (Join-Path $stage 'start-server.cmd') -Encoding ascii
 $zip = Join-Path $outputRoot "BETA-Cutting-Room_${version}_windows-x64-portable.zip"
 if (Test-Path -LiteralPath $zip) { throw "Output already exists: $zip" }
-Compress-Archive -LiteralPath $stage -DestinationPath $zip -CompressionLevel Optimal
+# Set every entry name explicitly: Windows extractors also accept forward slashes.
+Add-Type -AssemblyName System.IO.Compression
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$archive = [IO.Compression.ZipFile]::Open($zip, [IO.Compression.ZipArchiveMode]::Create)
+try {
+    foreach ($source in Get-ChildItem -LiteralPath $stage -File -Recurse | Sort-Object FullName) {
+        $entryName = $source.FullName.Substring($stageRoot.Length + 1).Replace('\', '/')
+        $entry = $archive.CreateEntry($entryName, [IO.Compression.CompressionLevel]::Optimal)
+        $inputStream = [IO.File]::OpenRead($source.FullName)
+        $outputStream = $entry.Open()
+        try { $inputStream.CopyTo($outputStream) }
+        finally { $outputStream.Dispose(); $inputStream.Dispose() }
+    }
+}
+finally { $archive.Dispose() }
 $file = Get-Item -LiteralPath $zip
 $hash = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
 [pscustomobject]@{ Path = $file.FullName; Bytes = $file.Length; SHA256 = $hash; StagingDirectory = $stage }

@@ -50,7 +50,7 @@
   "send_copy_hint": "Paste it into an email, chat or message.",
   "send_save": "Save report as a file",
   "send_save_hint": "For computers without internet. Send the file later from another computer.",
-  "desktop_note": "The desktop app does not open web pages or email by itself. Copy the link or address, then paste it.",
+  "desktop_note": "These links open your browser or email app. If opening fails, the link is copied so you can paste it. Nothing is sent automatically.",
   "short_note": "The report is long. The link holds a shorter version. The full text is copied to your clipboard, so you can paste it.",
   "back": "Back to edit",
   "close": "Close",
@@ -82,5 +82,6 @@
   "discussion_desktop": "Copy discussion link",
   "show_welcome": "Show the welcome message again",
   "new_tab": "(opens in a new tab)",
-  "link_copied": "Link copied. Paste it into your web browser."
+  "link_copied": "Link copied. Paste it into your web browser.",
+  "link_opened": "Link opened in your default app."
 }

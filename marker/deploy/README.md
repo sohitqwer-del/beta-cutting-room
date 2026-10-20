@@ -15,8 +15,13 @@ These files are examples. They do not install or start a service. See
   server; it can start and stop its own CLI child. It uses the repository's CDP
   screenshot workflow and needs no npm browser dependency.
 
-Build the Linux server with `cargo build --release -p beta-marker-cli` from
-`marker/`. It needs no desktop GUI libraries. Do not enable `target-cpu=native`
+Build the Linux server with `node marker/deploy/release-build.mjs cli` from
+the repository root. This applies `--remap-path-prefix` from Cargo home to
+`/cargo` and the whole source tree to `/build`, builds with `--locked`, and
+scans the executable for local paths. Follow the
+[release build checklist](../docs/RELEASE-BUILDS.md) for all WASM/desktop commands,
+repeatability checks and the planned Ubuntu 22.04 glibc baseline.
+The server needs no desktop GUI libraries. Do not enable `target-cpu=native`
 for binaries sent to other machines. Build the web assets on a development
 machine, then copy the executable and `apps/web/dist/` together. Rust and Node.js
 are build tools; neither is needed on a server receiving the complete package.

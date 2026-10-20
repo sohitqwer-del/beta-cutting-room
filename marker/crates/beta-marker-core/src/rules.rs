@@ -95,18 +95,56 @@ pub fn allowed_rotations(job: &Job, piece: &Piece, mirrored: bool) -> AllowedRot
     }
 }
 
-/// Copies cut by one placement, as `(normal, mirrored)`.
+/// Useful assigned copies, as `(normal, mirrored)`, or physical copies for legacy placements.
 ///
 /// Open fabric: one copy in the placed mirror state. Folded or tubular fabric: two layers,
 /// the placed copy and its mirror image, so `(1, 1)`; an `on_fold` placement cuts one full
-/// (symmetric) piece and counts as `(1, 0)`.
+/// (symmetric) piece and counts as `(1, 0)`. Explicit allocations count their
+/// demanded hands and exclude null (surplus) layers.
 pub fn layer_copies(layout: Layout, placement: &Placement) -> (u32, u32) {
+    if !placement.layer_allocations.is_empty() {
+        return placement.layer_allocations.iter().flatten().fold((0, 0), |(a, b), layer| {
+            (a + u32::from(!layer.mirrored), b + u32::from(layer.mirrored))
+        });
+    }
     match layout {
         Layout::Open if placement.mirrored => (0, 1),
         Layout::Open => (1, 0),
         _ if placement.on_fold => (1, 0),
         _ => (1, 1),
     }
+}
+
+/// Useful copies belonging to one garment. Explicit assignments exclude surplus.
+/// Legacy placements retain their original two-layer, single-bundle semantics.
+pub fn bundle_layer_copies(layout: Layout, placement: &Placement, bundle: u32) -> (u32, u32) {
+    if placement.layer_allocations.is_empty() {
+        return if placement.bundle == Some(bundle) { layer_copies(layout, placement) } else { (0, 0) };
+    }
+    placement.layer_allocations.iter().flatten().filter(|a| a.bundle == bundle)
+        .fold((0, 0), |(a, b), layer| (a + u32::from(!layer.mirrored), b + u32::from(layer.mirrored)))
+}
+
+/// Garments served by a placement, without duplicates.
+pub fn placement_bundles(placement: &Placement) -> BTreeSet<u32> {
+    if placement.layer_allocations.is_empty() {
+        placement.bundle.into_iter().collect()
+    } else {
+        placement.layer_allocations.iter().flatten().map(|a| a.bundle).collect()
+    }
+}
+
+/// Useful `(garment, demanded hand)` copies for labels and bundle reports.
+/// Explicit null layers are surplus and are omitted. Legacy copies keep their
+/// original `bundle` (which may be unassigned in a hand-made marker).
+pub fn layer_assignments(layout: Layout, placement: &Placement) -> Vec<(Option<u32>, bool)> {
+    if !placement.layer_allocations.is_empty() {
+        return placement.layer_allocations.iter().flatten()
+            .map(|a| (Some(a.bundle), a.mirrored)).collect();
+    }
+    let (normal, mirrored) = layer_copies(layout, placement);
+    std::iter::repeat_n((placement.bundle, false), normal as usize)
+        .chain(std::iter::repeat_n((placement.bundle, true), mirrored as usize)).collect()
 }
 
 /// The outline a placement puts on the marker, in marker coordinates: the full outline, or

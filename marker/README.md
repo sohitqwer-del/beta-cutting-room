@@ -1,6 +1,6 @@
 # BETA Cutting Room
 
-**Open-source garment cutting-room software. Self-hosted. Version 0.4.0 launch candidate.**
+**Open-source garment cutting-room software. Self-hosted. Version 0.5.0.**
 
 BETA helps a factory turn patterns into checked markers and cutting-room work.
 BETA Pattern covers drafting, grading and photo digitizing. BETA Marker covers
@@ -46,13 +46,13 @@ Read the [module audit](docs/CUTTING-ROOM-STATUS.md) and
 ## Install
 
 - **Windows desktop:** current-user x64 NSIS installer. WebView2 is a separate
-  offline prerequisite. The candidate is unsigned; clean-PC and Windows 10
+  offline prerequisite. The installer is unsigned; clean-PC and Windows 10
   acceptance remain open.
 - **Windows portable:** CLI, browser assets and a local-server launcher in a ZIP.
 - **Linux self-hosting:** release CLI plus matching static browser assets;
   systemd user-unit and Caddy/nginx examples are provided.
 
-Public download links will be added after release approval. See
+See the [0.5.0 release record](docs/RELEASE-0.5.0.md) for packages and known limits. See
 [installation and source builds](docs/INSTALL.md),
 [self-hosting](docs/SELF-HOSTING.md) and the
 [public release checklist](docs/RELEASE-CHECKLIST.md).

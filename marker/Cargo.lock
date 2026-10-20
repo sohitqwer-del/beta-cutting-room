@@ -310,7 +310,7 @@ checksum = "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5"
 
 [[package]]
 name = "beta-cutting-room"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -324,6 +324,7 @@ dependencies = [
  "beta-marker-roll",
  "beta-pattern-core",
  "beta-pattern-digitize",
+ "glob",
  "image",
  "serde",
  "serde_json",
@@ -332,6 +333,7 @@ dependencies = [
  "tauri-codegen",
  "tauri-macros",
  "tauri-plugin-dialog",
+ "tauri-plugin-opener",
  "tauri-plugin-single-instance",
  "tauri-utils",
  "windows-sys 0.61.2",
@@ -339,7 +341,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-cli"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -367,7 +369,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-cluster"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -380,7 +382,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-core"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -388,7 +390,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-cutroom"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -406,7 +408,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-dxf"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -419,7 +421,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-edit"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "beta-marker-core",
  "serde",
@@ -428,12 +430,13 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-export"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
  "beta-marker-dxf",
  "rust_xlsxwriter",
+ "rustybuzz",
  "serde",
  "serde_json",
  "zip 7.4.0",
@@ -441,7 +444,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-floor"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -460,7 +463,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-learn"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -470,7 +473,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-match"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -482,7 +485,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-nest"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -496,7 +499,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-plan"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -509,7 +512,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-queue"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -526,7 +529,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-roll"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -536,10 +539,14 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-wasm"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "beta-marker-core",
  "beta-marker-edit",
+ "beta-marker-export",
+ "beta-marker-nest",
+ "beta-pattern-digitize",
+ "js-sys",
  "serde",
  "serde_json",
  "wasm-bindgen",
@@ -547,7 +554,7 @@ dependencies = [
 
 [[package]]
 name = "beta-pattern-core"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -559,7 +566,7 @@ dependencies = [
 
 [[package]]
 name = "beta-pattern-digitize"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -963,6 +970,15 @@ name = "core_detect"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f8f80099a98041a3d1622845c271458a2d73e688351bf3cb999266764b81d48"
+
+[[package]]
+name = "core_maths"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77745e017f5edba1a9c1d854f6f3a52dac8a12dd5af5d2f54aecf61e43d80d30"
+dependencies = [
+ "libm",
+]
 
 [[package]]
 name = "cpufeatures"
@@ -2326,6 +2342,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "791930b43c0d5973160d90a8f3894509f2b273430f5c5c73b668636d0287c5c0"
 
 [[package]]
+name = "is-docker"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "928bae27f42bc99b60d9ac7334e3a21d10ad8f1835a4e12ec3ec0464765ed1b3"
+dependencies = [
+ "once_cell",
+]
+
+[[package]]
+name = "is-wsl"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "173609498df190136aa7dea1a91db051746d339e18476eed5ca40521f02d7aa5"
+dependencies = [
+ "is-docker",
+ "once_cell",
+]
+
+[[package]]
 name = "is_terminal_polyfill"
 version = "1.70.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3103,6 +3138,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 
 [[package]]
+name = "open"
+version = "5.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa576c76302b7b808eecc68061e67336c47833ef9d22caa74dda10fa9675eebc"
+dependencies = [
+ "dunce",
+ "is-wsl",
+ "libc",
+]
+
+[[package]]
 name = "option-ext"
 version = "0.2.0"
 
@@ -3722,6 +3768,24 @@ name = "rustversion"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
+
+[[package]]
+name = "rustybuzz"
+version = "0.20.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fd3c7c96f8a08ee34eff8857b11b49b07d71d1c3f4e88f8a88d4c9e9f90b1702"
+dependencies = [
+ "bitflags 2.13.2",
+ "bytemuck",
+ "core_maths",
+ "log",
+ "smallvec",
+ "ttf-parser",
+ "unicode-bidi-mirroring",
+ "unicode-ccc",
+ "unicode-properties",
+ "unicode-script",
+]
 
 [[package]]
 name = "ryu"
@@ -4476,6 +4540,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "tauri-plugin-opener"
+version = "2.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "53810be1b4fed22bb6ac3f4cab5a2b80d9391d1af436bda145607532bc0bb219"
+dependencies = [
+ "dunce",
+ "glob",
+ "objc2-app-kit",
+ "objc2-foundation",
+ "open",
+ "schemars 0.8.22",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.21",
+ "url",
+ "windows",
+ "zbus",
+]
+
+[[package]]
 name = "tauri-plugin-single-instance"
 version = "2.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4748,9 +4834,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-util"
-version = "0.7.20"
+version = "0.7.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e464cf451ba96ebfc6f9b6542f17ee8b8956e33f1e40d9690624e59d7a7f8a4b"
+checksum = "494815d09bf52b5548659851081238f0ca39ff638363907596da739561c62c52"
 dependencies = [
  "bytes",
  "futures-core",
@@ -4960,6 +5046,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
+name = "ttf-parser"
+version = "0.25.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
+dependencies = [
+ "core_maths",
+]
+
+[[package]]
 name = "typed-path"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4989,10 +5084,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "unicode-bidi-mirroring"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5dfa6e8c60bb66d49db113e0125ee8711b7647b5579dc7f5f19c42357ed039fe"
+
+[[package]]
+name = "unicode-ccc"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ce61d488bcdc9bc8b5d1772c404828b17fc481c0a582b5581e95fb233aef503e"
+
+[[package]]
 name = "unicode-ident"
 version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2c754d6c33795a1c324727428e5a7dedb5b06195f9890bdbcba760d3e246563"
+
+[[package]]
+name = "unicode-properties"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7df058c713841ad818f1dc5d3fd88063241cc61f49f5fbea4b951e8cf5a8d71d"
+
+[[package]]
+name = "unicode-script"
+version = "0.5.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "383ad40bb927465ec0ce7720e033cb4ca06912855fc35db31b5755d0de75b1ee"
 
 [[package]]
 name = "unicode-segmentation"

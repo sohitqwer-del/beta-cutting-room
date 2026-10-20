@@ -1,0 +1,21 @@
+{
+  "scanMs": 4000.1567999999997,
+  "repeatMs": [
+    3612.5967,
+    3405.8372,
+    3421.6293000000005
+  ],
+  "sourceSize": [
+    4000,
+    3000
+  ],
+  "processedSize": [
+    2000,
+    1500
+  ],
+  "pieces": 1,
+  "wasmMemoryBytes": 146931712,
+  "nodeRssBytes": 288342016,
+  "maxRssBytes": 288350208,
+  "note": "Node/V8 WASM on laptop; not a measured phone browser. WASM pages include allocator high-water mark."
+}

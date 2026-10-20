@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "BETA Cutting Room",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "identifier": "org.projectbeta.cuttingroom",
   "build": {
     "beforeBuildCommand": "npm run build:wasm -w @beta/marker-wasm && npm run build:pattern-wasm -w @beta/marker-wasm && npm run build -w @beta/marker-web",

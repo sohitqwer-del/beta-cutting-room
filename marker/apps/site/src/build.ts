@@ -4,6 +4,7 @@ import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, write
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadRuns } from './benchmark.ts';
+import { site } from './config.ts';
 import { clientScript, usesNetwork } from './client-build.ts';
 import { layout, pages } from './layout.ts';
 import type { Raw } from './html.ts';
@@ -31,7 +32,8 @@ if (errors.length) {
 
 const screensDir = join(publicDir, 'assets', 'screens');
 const screens = new Set(existsSync(screensDir) ? readdirSync(screensDir).filter((f) => f.endsWith('.png')) : []);
-const ctx: BuildContext = { screens, runs };
+const video = process.env.BETA_SITE_VIDEO === '1' || existsSync(join(publicDir, site.demoVideo.file));
+const ctx: BuildContext = { screens, runs, video };
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(join(dist, 'assets'), { recursive: true });
@@ -76,4 +78,4 @@ if (problems.length) {
 }
 
 const statuses = runs.map((r) => `${r.id} (${r.status})`).join(', ');
-console.log(`Built ${pages.length} pages into dist/. Benchmark runs: ${statuses}. Screenshots found: ${screens.size}.`);
+console.log(`Built ${pages.length} pages into dist/. Benchmark runs: ${statuses}. Screenshots found: ${screens.size}. Demo video: ${video ? 'self-hosted' : site.demoVideo.demoVideoUrl ? 'link' : 'not shown'}.`);

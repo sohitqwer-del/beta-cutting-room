@@ -1,4 +1,6 @@
 export * from './pattern';
+export { createMarkerNester, nest } from './nest';
+export type { MarkerNester, MarkerNesterConfig, BrowserNestOptions, NestProgress } from './nest';
 export type * from './types';
 import type { AllowedRotations, Demand, Issue, Job, MarkerDrawing, MarkerResult, Metrics, Placement, Pt, ValidationReport } from './types';
 interface RawWasm {
@@ -46,3 +48,5 @@ export async function loadMarkerCore(moduleUrl: string | URL = new URL('wasm/bet
     transform: (points, mirrored, rot, translate) => JSON.parse(raw.transform(json(points), mirrored, rot, json(translate))),
   };
 }
+
+export * from './quick';

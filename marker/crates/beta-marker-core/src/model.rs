@@ -242,6 +242,7 @@ pub struct Piece {
     /// Symmetry line `[from, to]` of a symmetric piece (for example a back cut on fold).
     /// `outline` is always the full piece. On folded/tubular fabric the piece may be placed
     /// `on_fold`: only the half on the left of `from -> to` is placed, with the line on a fold edge.
+    /// Either reflected representation of this half is allowed without enabling full-piece flips.
     #[serde(default)]
     pub fold_line: Option<[Pt; 2]>,
     /// Fusing block: nest a rectangle around the piece (in the grain-aligned frame) enlarged
@@ -349,11 +350,27 @@ pub struct Placement {
     pub locked: bool,
     /// Garment number (0-based) this copy belongs to. Needed for shade bands,
     /// one-way-per-bundle nap and matching rules; `None` = not assigned.
+    /// With explicit layers this is the first useful layer's garment.
     #[serde(default)]
     pub bundle: Option<u32>,
     /// Placed as a half on a fold edge (see [`Layout`] and `Piece::fold_line`).
     #[serde(default)]
     pub on_fold: bool,
+    /// Explicit useful-copy assignments for a layered cut. Empty keeps the legacy
+    /// assignment to `bundle`. Otherwise entries are physical normal then mirrored
+    /// layer (one normal entry for an on-fold cut). `None` marks surplus, never demand.
+    /// A declared symmetric piece or a flip permission can exchange handedness.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub layer_allocations: Vec<Option<LayerAllocation>>,
+}
+
+/// One useful copy from a physical fabric layer, assigned to a garment.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LayerAllocation {
+    /// Canonical garment number from `rules::bundle_sizes`.
+    pub bundle: u32,
+    /// Handedness of the demanded copy, independent of the displayed source half.
+    pub mirrored: bool,
 }
 
 /// Output of the independent validator (`beta_marker_core::validate`).
@@ -377,4 +394,24 @@ pub struct Issue {
     pub message: String,
     #[serde(default)]
     pub piece_ids: Vec<String>,
+}
+
+#[cfg(test)]
+mod json_precision_tests {
+    use super::Placement;
+
+    #[test]
+    fn locked_coordinates_survive_json_round_trips_exactly() {
+        // Public Simon regression: the fast JSON parser changed the last bit of Y.
+        let json = r#"{"piece_id":"public-panel","copy":0,"mirrored":false,"rotation_deg":90.0,"translate":[-114.46139526367188,964.6422119140625],"locked":true,"bundle":3,"on_fold":false}"#;
+        let placement: Placement = serde_json::from_str(json).unwrap();
+        assert_eq!(
+            placement.translate,
+            [-114.46139526367188, 964.6422119140625]
+        );
+        let serialized = serde_json::to_string(&placement).unwrap();
+        let restored: Placement = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(restored.translate, placement.translate);
+        assert!(restored.locked);
+    }
 }

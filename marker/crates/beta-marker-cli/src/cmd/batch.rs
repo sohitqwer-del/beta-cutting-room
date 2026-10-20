@@ -235,7 +235,13 @@ fn trial(index: usize, path: &Path, width: Option<f64>, args: &Args) -> Row {
 }
 
 fn csv(s: &str) -> String {
-    format!("\"{}\"", s.replace('"', "\"\""))
+    let prefix =
+        if s.trim_start().starts_with(['=', '+', '-', '@']) || s.starts_with(['\t', '\r', '\n']) {
+            "'"
+        } else {
+            ""
+        };
+    format!("\"{prefix}{}\"", s.replace('"', "\"\""))
 }
 fn md(s: &str) -> String {
     s.replace('|', "\\|").replace(['\n', '\r'], " ")
@@ -464,6 +470,40 @@ mod tests {
             "best-widths.json",
         ] {
             fs::remove_file(dir.join(f))?;
+        }
+        fs::remove_dir(dir)?;
+        Ok(())
+    }
+
+    #[test]
+    fn summary_csv_protects_text_cells_without_changing_json_or_numbers() -> Result<()> {
+        let dir = test_dir("csv-safety");
+        fs::create_dir_all(&dir)?;
+        let rows = vec![Row {
+            job: "=1+1".into(),
+            width_mm: 1500.0,
+            length_mm: None,
+            efficiency: None,
+            runtime_s: 0.0,
+            valid: false,
+            successful_runs: 0,
+            result_file: Some("@result".into()),
+            errors: vec!["  +1".into()],
+        }];
+        summaries(&dir, &rows)?;
+        let text = fs::read_to_string(dir.join("summary.csv"))?;
+        assert!(text.contains("\"'=1+1\",1500.000,"));
+        assert!(text.contains("\"'@result\",\"'  +1\""));
+        let json: Vec<serde_json::Value> =
+            serde_json::from_reader(File::open(dir.join("summary.json"))?)?;
+        assert_eq!(json[0]["job"], "=1+1");
+        for name in [
+            "summary.csv",
+            "summary.md",
+            "summary.json",
+            "best-widths.json",
+        ] {
+            fs::remove_file(dir.join(name))?;
         }
         fs::remove_dir(dir)?;
         Ok(())

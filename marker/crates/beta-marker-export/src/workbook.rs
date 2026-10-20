@@ -227,13 +227,22 @@ pub fn to_xlsx(
     let mut counts = BTreeMap::<(Option<&str>, Option<u32>, &str), (u64, u64, u64)>::new();
     for pl in &result.placements {
         if let Some(p) = pieces.get(pl.piece_id.as_str()) {
-            let entry = counts
-                .entry((p.size.as_deref(), pl.bundle, p.id.as_str()))
-                .or_default();
-            let (normal, mirror) = beta_marker_core::rules::layer_copies(job.fabric.layout, pl);
-            entry.0 += 1;
-            entry.1 += u64::from(normal);
-            entry.2 += u64::from(mirror);
+            let mut assigned = BTreeMap::<Option<u32>, (u64, u64)>::new();
+            for (bundle, mirrored) in
+                beta_marker_core::rules::layer_assignments(job.fabric.layout, pl)
+            {
+                let entry = assigned.entry(bundle).or_default();
+                entry.0 += u64::from(!mirrored);
+                entry.1 += u64::from(mirrored);
+            }
+            for (bundle, (normal, mirror)) in assigned {
+                let entry = counts
+                    .entry((p.size.as_deref(), bundle, p.id.as_str()))
+                    .or_default();
+                entry.0 += 1;
+                entry.1 += normal;
+                entry.2 += mirror;
+            }
         }
     }
     for (i, ((size, bundle, id), (placements, normal, mirror))) in counts.iter().enumerate() {

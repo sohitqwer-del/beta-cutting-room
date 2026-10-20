@@ -1,0 +1,641 @@
+[
+  {
+    "case": "frontal",
+    "estimated_error_mm": 3.2060671747579237,
+    "mode": "a4-sheet",
+    "piece": "back",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 0.035803129881453837,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 0.31745013534370004,
+      "mean_mm": 0.0959654225019507,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 0.826288,
+    "source_scale": 1.0130192266225313,
+    "warnings": [
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "perspective-shadow-texture",
+    "estimated_error_mm": 3.33205081526312,
+    "mode": "a4-sheet",
+    "piece": "back",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 0.04660912888434938,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 0.56391582902287,
+      "mean_mm": 0.12028452127843726,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 0.9150652,
+    "source_scale": 1.0130192266225313,
+    "warnings": [
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "blur-brown",
+    "estimated_error_mm": 3.3251659057144796,
+    "mode": "a4-sheet",
+    "piece": "back",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 0.605750529916076,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 1.6309154788251685,
+      "mean_mm": 0.6425692150503595,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 0.9091183,
+    "source_scale": 1.0130192266225313,
+    "warnings": [
+      {
+        "code": "blur",
+        "message": "Edges may be blurred. Hold the phone still and tap to focus.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "radial-lens",
+    "estimated_error_mm": 3.4467348906034085,
+    "mode": "a4-sheet",
+    "piece": "back",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 5.134518279455278,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 11.163179416041364,
+      "mean_mm": 3.724935134798531,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 0.765657,
+    "source_scale": 1.0130192266225313,
+    "warnings": [
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "frontal",
+    "mode": "beta-target",
+    "piece": "back",
+    "score": {
+      "area_error_pct": 0.032099053467792175,
+      "drills_found": 1,
+      "grain_error_deg": null,
+      "max_mm": 0.6552091534954634,
+      "mean_mm": 0.04522168727377957,
+      "notch_false_positives": 0,
+      "notches_expected": 2,
+      "notches_found": 2
+    },
+    "seconds": 0.6380866,
+    "source_scale": 0.47515425629675867,
+    "warnings": [
+      {
+        "code": "review_required",
+        "message": "Review every outline, notch, drill, and grain before cutting. Text can resemble marks.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm grain before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      }
+    ]
+  },
+  {
+    "case": "phone",
+    "mode": "beta-target",
+    "piece": "back",
+    "score": {
+      "area_error_pct": 0.05030885353609561,
+      "drills_found": 1,
+      "grain_error_deg": null,
+      "max_mm": 0.6552091534954634,
+      "mean_mm": 0.050235231178565445,
+      "notch_false_positives": 0,
+      "notches_expected": 2,
+      "notches_found": 2
+    },
+    "seconds": 0.7829322,
+    "source_scale": 0.47515425629675867,
+    "warnings": [
+      {
+        "code": "review_required",
+        "message": "Review every outline, notch, drill, and grain before cutting. Text can resemble marks.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm grain before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      }
+    ]
+  },
+  {
+    "case": "frontal",
+    "estimated_error_mm": 3.610904804521111,
+    "mode": "a4-sheet",
+    "piece": "frontSideDart",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 0.06081946346079188,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 0.3629469126899764,
+      "mean_mm": 0.07034024373702479,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 0.8752693,
+    "source_scale": 0.5127290422780831,
+    "warnings": [
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "perspective-shadow-texture",
+    "estimated_error_mm": 3.7529763010016857,
+    "mode": "a4-sheet",
+    "piece": "frontSideDart",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 0.10494342190457058,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 0.5372217322328948,
+      "mean_mm": 0.10778023069733682,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 1.0033545,
+    "source_scale": 0.5127290422780831,
+    "warnings": [
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "blur-brown",
+    "estimated_error_mm": 3.7467111231599612,
+    "mode": "a4-sheet",
+    "piece": "frontSideDart",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 0.8307131412385557,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 1.671510785107506,
+      "mean_mm": 0.5368896509551552,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 1.1595393999999999,
+    "source_scale": 0.5127290422780831,
+    "warnings": [
+      {
+        "code": "blur",
+        "message": "Edges may be blurred. Hold the phone still and tap to focus.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "radial-lens",
+    "estimated_error_mm": 3.894201341468029,
+    "mode": "a4-sheet",
+    "piece": "frontSideDart",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 6.538303727347383,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 13.651519627396235,
+      "mean_mm": 3.7071564618323714,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 1.1136735,
+    "source_scale": 0.5127290422780831,
+    "warnings": [
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "frontal",
+    "mode": "beta-target",
+    "piece": "frontSideDart",
+    "score": {
+      "area_error_pct": 0.007283069288457454,
+      "drills_found": 1,
+      "grain_error_deg": null,
+      "max_mm": 0.8646740073701527,
+      "mean_mm": 0.0650965354548895,
+      "notch_false_positives": 0,
+      "notches_expected": 2,
+      "notches_found": 2
+    },
+    "seconds": 0.912952,
+    "source_scale": 0.44074842214302173,
+    "warnings": [
+      {
+        "code": "review_required",
+        "message": "Review every outline, notch, drill, and grain before cutting. Text can resemble marks.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm grain before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      }
+    ]
+  },
+  {
+    "case": "phone",
+    "mode": "beta-target",
+    "piece": "frontSideDart",
+    "score": {
+      "area_error_pct": 0.0708953670762821,
+      "drills_found": 1,
+      "grain_error_deg": null,
+      "max_mm": 0.8558768990228998,
+      "mean_mm": 0.06118039830117098,
+      "notch_false_positives": 0,
+      "notches_expected": 2,
+      "notches_found": 2
+    },
+    "seconds": 0.9529643,
+    "source_scale": 0.44074842214302173,
+    "warnings": [
+      {
+        "code": "review_required",
+        "message": "Review every outline, notch, drill, and grain before cutting. Text can resemble marks.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm grain before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      }
+    ]
+  },
+  {
+    "case": "frontal",
+    "estimated_error_mm": 3.041355036530202,
+    "mode": "a4-sheet",
+    "piece": "sleeve",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 0.038352699288292665,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 0.3971989460721776,
+      "mean_mm": 0.08406110233230411,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 1.1178223,
+    "source_scale": 0.6885245901639344,
+    "warnings": [
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "perspective-shadow-texture",
+    "estimated_error_mm": 3.1604139137619,
+    "mode": "a4-sheet",
+    "piece": "sleeve",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 0.04786713918498841,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 0.3883135999368631,
+      "mean_mm": 0.10739265153300699,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 1.0609544,
+    "source_scale": 0.6885245901639344,
+    "warnings": [
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "blur-brown",
+    "estimated_error_mm": 3.1540669532199717,
+    "mode": "a4-sheet",
+    "piece": "sleeve",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 0.7772705223208795,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 1.5213519280931278,
+      "mean_mm": 0.6294702060254215,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 1.11103,
+    "source_scale": 0.6885245901639344,
+    "warnings": [
+      {
+        "code": "blur",
+        "message": "Edges may be blurred. Hold the phone still and tap to focus.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "radial-lens",
+    "estimated_error_mm": 3.245513783540063,
+    "mode": "a4-sheet",
+    "piece": "sleeve",
+    "pieces": 1,
+    "score": {
+      "area_error_pct": 4.88656170186948,
+      "drills_found": 0,
+      "grain_error_deg": null,
+      "max_mm": 8.509259311711382,
+      "mean_mm": 3.225347255241558,
+      "notch_false_positives": 0,
+      "notches_expected": 0,
+      "notches_found": 0
+    },
+    "seconds": 1.065211,
+    "source_scale": 0.6885245901639344,
+    "warnings": [
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm the grain direction before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      },
+      {
+        "code": "scale_low_confidence",
+        "message": "Scale is uncertain away from the A4 sheet. Move the sheet nearer the pieces, retake overhead, or use the BETA target.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "review_required",
+        "message": "Check the yellow A4 reference, every outline and a ruler measurement. Wrinkles, curled paper and lens distortion are not corrected by one sheet.",
+        "photoId": "photo-1"
+      }
+    ]
+  },
+  {
+    "case": "frontal",
+    "mode": "beta-target",
+    "piece": "sleeve",
+    "score": {
+      "area_error_pct": 0.034457470010542494,
+      "drills_found": 1,
+      "grain_error_deg": null,
+      "max_mm": 1.0253763106521627,
+      "mean_mm": 0.04803491211294563,
+      "notch_false_positives": 0,
+      "notches_expected": 2,
+      "notches_found": 2
+    },
+    "seconds": 0.9641594,
+    "source_scale": 0.32295081967213113,
+    "warnings": [
+      {
+        "code": "review_required",
+        "message": "Review every outline, notch, drill, and grain before cutting. Text can resemble marks.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm grain before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      }
+    ]
+  },
+  {
+    "case": "phone",
+    "mode": "beta-target",
+    "piece": "sleeve",
+    "score": {
+      "area_error_pct": 0.06533710573323476,
+      "drills_found": 1,
+      "grain_error_deg": null,
+      "max_mm": 1.093879515907638,
+      "mean_mm": 0.049496218664482235,
+      "notch_false_positives": 0,
+      "notches_expected": 2,
+      "notches_found": 2
+    },
+    "seconds": 1.0050251,
+    "source_scale": 0.32295081967213113,
+    "warnings": [
+      {
+        "code": "review_required",
+        "message": "Review every outline, notch, drill, and grain before cutting. Text can resemble marks.",
+        "photoId": "photo-1"
+      },
+      {
+        "code": "grain_unconfirmed",
+        "message": "Confirm grain before making a marker.",
+        "photoId": "photo-1",
+        "pieceId": "SCAN-1"
+      }
+    ]
+  }
+]

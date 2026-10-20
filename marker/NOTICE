@@ -13,6 +13,10 @@ executables. BETA's Apache-2.0 licence does not replace third-party terms.
 The Windows desktop includes Tauri and permissive dependencies. Original
 Apache-2.0 dom_query and option-ext compatibility adapters replace otherwise
 MPL-only transitive helper crates. jagua-rs is not patched or vendored.
+The official tauri-plugin-opener 2.7.2 is Apache-2.0 OR MIT, copyright
+Tauri Programme within The Commons Conservancy. Its dependency licences are
+listed in THIRD-PARTY-LICENSES.md and the generated release notice bundle.
+It opens only the explicitly configured BETA feedback links on a user's click.
 The Windows installer uses NSIS with its zlib compressor. It includes
 WebView2Loader.dll 1.0.3800.47 from Microsoft's SDK, under BSD three-clause
 terms. See deploy/licenses/WebView2-SDK-1.0.3800.47.txt and the inventory.

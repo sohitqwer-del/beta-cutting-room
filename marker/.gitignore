@@ -16,3 +16,6 @@ private-patterns/
 # Local outputs
 out/
 *.log
+
+# Demo video for the website: copied in before a site build, never committed (see deploy/video/README.md)
+apps/site/public/assets/video/*.mp4

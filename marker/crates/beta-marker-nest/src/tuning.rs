@@ -2,7 +2,7 @@
 use crate::{Job, MarkerResult, NestOptions, NestProgress, v02};
 use anyhow::{Result, ensure};
 use serde::{Deserialize, Serialize};
-use std::time::Instant;
+use crate::Instant;
 
 /// How independent seeds share a search budget.
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, Eq)]

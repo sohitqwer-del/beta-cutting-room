@@ -3,6 +3,11 @@
 use crate::{InspectionReport, SpreadingPlan};
 
 fn csv(value: &str) -> String {
+    // Protect identifier cells too: CSV quotes do not disable spreadsheet formulas.
+    if value.trim_start().starts_with(['=', '+', '-', '@']) || value.starts_with(['\t', '\r', '\n'])
+    {
+        return format!("\"'{}\"", value.replace('"', "\"\""));
+    }
     if value.contains([',', '"', '\n', '\r']) {
         format!("\"{}\"", value.replace('"', "\"\""))
     } else {

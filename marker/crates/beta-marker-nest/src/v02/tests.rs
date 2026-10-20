@@ -257,7 +257,7 @@ fn layered_pairs_use_one_placement_and_odd_demand_has_surplus() -> Result<()> {
     assert_eq!(result.placements.len(), 1);
     assert_eq!(
         beta_marker_core::rules::layer_copies(Layout::Folded, &result.placements[0]),
-        (1, 1)
+        (1, 0)
     );
     assert!(result.warnings.iter().any(|w| w.contains("surplus")));
     Ok(())
@@ -302,6 +302,99 @@ fn one_way_faceless_fold_can_use_the_other_symmetric_half() -> Result<()> {
     let result = super::nest(&j, &options(), &mut |_| {})?;
     assert!(result.placements[0].on_fold && result.placements[0].mirrored);
     checks::complete(&j, &result)?;
+    Ok(())
+}
+
+#[test]
+fn one_way_fold_half_does_not_need_optional_flip() -> Result<()> {
+    let mut j = job();
+    j.fabric.layout = Layout::Folded;
+    j.fabric.width = 21.0;
+    j.fabric.nap = Nap::OneWay;
+    j.spacing.edge_gap = 1.0;
+    j.pieces[0].quantity = 1;
+    j.pieces[0].grain = Some([[0., 0.], [60., 0.]]);
+    j.pieces[0].fold_line = Some([[0., 20.], [60., 20.]]);
+    let result = super::nest(&j, &options(), &mut |_| {})?;
+    assert!(result.placements[0].on_fold && result.placements[0].mirrored);
+    assert!(beta_marker_core::validate(&j, &result).ok);
+    Ok(())
+}
+
+#[test]
+fn full_symmetric_layers_share_garments_and_survive_warm_fixed_refinement() -> Result<()> {
+    let mut j = job();
+    j.fabric.layout = Layout::Folded;
+    // A shared full cut fits; two separate full cuts cannot sit side by side.
+    // This avoids making allocation correctness depend on a tiny guard/timing tie.
+    j.fabric.width = 41.;
+    j.pieces[0].quantity = 1;
+    j.pieces[0].size = Some("M".into());
+    j.pieces[0].fold_line = Some([[0., 20.], [60., 20.]]);
+    j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 2)]) });
+    let mut result = super::nest(&j, &options(), &mut |_| {})?;
+    assert_eq!(result.placements.len(), 1);
+    assert_eq!(beta_marker_core::rules::placement_bundles(&result.placements[0]), BTreeSet::from([0, 1]));
+    assert!(!result.warnings.iter().any(|w| w.contains("surplus")));
+    let warm = super::nest(&j, &NestOptions { warm_start: Some(result.clone()), ..options() }, &mut |_| {})?;
+    assert!(warm.length <= result.length);
+    result.placements[0].locked = true;
+    let fixed = result.placements[0].clone();
+    let refined = super::nest(&j, &NestOptions { fixed: vec![fixed.clone()], ..options() }, &mut |_| {})?;
+    assert_eq!(refined.placements, vec![fixed]);
+    assert!(beta_marker_core::validate(&j, &refined).ok);
+    Ok(())
+}
+
+#[test]
+fn asymmetric_layers_never_replace_an_unrequested_hand() -> Result<()> {
+    let mut j = job();
+    j.fabric.layout = Layout::Tubular;
+    j.pieces[0].quantity = 1;
+    j.pieces[0].size = Some("M".into());
+    j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 2)]) });
+    let result = super::nest(&j, &options(), &mut |_| {})?;
+    assert_eq!(result.placements.len(), 2);
+    assert!(result.placements.iter().all(|p| p.layer_allocations[1].is_none()));
+    assert!(beta_marker_core::validate(&j, &result).ok);
+    Ok(())
+}
+
+#[test]
+fn explicit_fixed_faceless_layers_consume_pooled_hands() -> Result<()> {
+    let mut j = job();
+    j.fabric.layout = Layout::Folded;
+    j.fabric.allow_flip = true;
+    j.pieces[0].quantity = 1;
+    j.pieces[0].mirror_quantity = 1;
+    let fixed = Placement {
+        piece_id: "panel".into(), bundle: Some(0), locked: true,
+        layer_allocations: vec![
+            Some(beta_marker_core::LayerAllocation { bundle: 0, mirrored: false }),
+            Some(beta_marker_core::LayerAllocation { bundle: 0, mirrored: false }),
+        ],
+        ..Default::default()
+    };
+    let result = super::nest(&j, &NestOptions { fixed: vec![fixed.clone()], ..options() }, &mut |_| {})?;
+    assert_eq!(result.placements, vec![fixed]);
+    assert!(beta_marker_core::validate(&j, &result).ok);
+    Ok(())
+}
+
+#[test]
+fn symmetric_mirror_pair_can_use_two_halves_when_a_full_cut_is_too_wide() -> Result<()> {
+    let mut j = job();
+    j.fabric.layout = Layout::Tubular;
+    j.fabric.width = 21.;
+    j.pieces[0].quantity = 1;
+    j.pieces[0].mirror_quantity = 1;
+    j.pieces[0].fold_line = Some([[0., 20.], [60., 20.]]);
+    let result = super::nest(&j, &options(), &mut |_| {})?;
+    assert_eq!(result.placements.len(), 2);
+    assert!(result.placements.iter().all(|p| p.on_fold));
+    assert_eq!(result.placements.iter().map(|p| beta_marker_core::rules::layer_copies(j.fabric.layout, p))
+        .fold((0, 0), |(a, b), (c, d)| (a + c, b + d)), (1, 1));
+    assert!(beta_marker_core::validate(&j, &result).ok);
     Ok(())
 }
 
@@ -552,7 +645,13 @@ fn fold_halves_can_use_full_two_layer_cuts_to_share_the_width() -> Result<()> {
         "fold-only construction needs two 60 mm slots"
     );
     assert!(result.placements.iter().any(|p| !p.on_fold));
-    assert!(result.warnings.iter().any(|w| w.contains("surplus")));
+    assert_eq!(
+        result.placements.iter().map(|p| beta_marker_core::rules::layer_copies(j.fabric.layout, p))
+            .fold((0, 0), |(a, b), (c, d)| (a + c, b + d)),
+        (2, 0)
+    );
+    let surplus = result.placements.iter().flat_map(|p| &p.layer_allocations).any(Option::is_none);
+    assert_eq!(result.warnings.iter().any(|w| w.contains("surplus")), surplus);
     Ok(())
 }
 

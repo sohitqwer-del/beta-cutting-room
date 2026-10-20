@@ -1,4 +1,16 @@
-import type { Job, PatternDocument, Roll, RollRegister } from '@beta/marker-wasm';
+import type { Job, PatternDocument, PhysicalLay, Roll, RollRegister } from '@beta/marker-wasm';
+
+/** Restore the physical identity of an audited lay when it is selected again. */
+export function spreadBundleFields(lay: PhysicalLay): { id: string; plies: number; runs: string } {
+    const csv = (value: string) => '"' + value.replace(/"/g, '""') + '"';
+    return { id: lay.id, plies: lay.plies.at(-1)!.last,
+        runs: lay.plies.map(run => `${run.first},${run.last},${csv(run.shade_group)}`).join('\n') };
+}
+
+/** Include the buyer policy and grouping controls in the inspection identity. */
+export function inspectionRequest(register: RollRegister, limit: number, unit: string, bandStep: number) {
+    return structuredClone({ register, settings: { limit, unit, point_cap: 'per_yard' as const }, grouping: { band_step_pct: bandStep } });
+}
 /** Decode standard quoted CSV, including commas, escaped quotes and CRLF. */
 export function csvRows(text: string): string[][] {
     const rows: string[][] = [];
@@ -48,6 +60,8 @@ export function readRollCsv(text: string): RollRegister {
     const [header, ...rows] = csvRows(text.replace(/^\uFEFF/, ''));
     if (!header || rollColumns.some(k => !header.includes(k)))
         throw new Error(`CSV needs columns: ${rollColumns.join(', ')}`);
+    if (new Set(header).size !== header.length)
+        throw new Error('CSV column names must be unique.');
     const rolls: Roll[] = rows.map((row, i) => {
         if (row.length !== header.length)
             throw new Error(`CSV row ${i + 2} has the wrong number of cells.`);

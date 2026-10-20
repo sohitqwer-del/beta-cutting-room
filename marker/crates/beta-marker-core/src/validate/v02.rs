@@ -2,8 +2,37 @@
 use super::{TOLERANCE, issue};
 use crate::geometry::{angle_diff_deg, grain_alignment_deg, norm_deg, place};
 use crate::model::*;
-use crate::rules::{bundle_sizes, flip_allowed, layer_copies, placed_outline};
+use crate::rules::{bundle_sizes, bundle_layer_copies, flip_allowed, placement_bundles, placed_outline};
 use std::collections::{BTreeMap, HashMap};
+
+pub(super) fn layers(job: &Job, piece: &Piece, pl: &Placement, report: &mut ValidationReport) {
+    if pl.layer_allocations.is_empty() {
+        return;
+    }
+    let canonical = bundle_sizes(job);
+    let count = if pl.on_fold { 1 } else { 2 };
+    let mut valid = job.fabric.layout != Layout::Open && pl.layer_allocations.len() == count;
+    let mut useful = 0;
+    for (index, layer) in pl.layer_allocations.iter().enumerate() {
+        let Some(layer) = layer else { continue };
+        useful += 1;
+        valid &= canonical.get(layer.bundle as usize).is_some_and(|size| *size == piece.size);
+        // A fold line declares geometric symmetry, not optional face-down cutting.
+        // Its two full layer copies are interchangeable; asymmetric pieces still
+        // require the physical normal/mirrored split unless flipping is allowed.
+        valid &= layer.mirrored == (index == 1) || flip_allowed(job, piece) || piece.fold_line.is_some();
+    }
+    valid &= useful > 0
+        && pl.bundle == pl.layer_allocations.iter().flatten().next().map(|a| a.bundle);
+    if !valid {
+        report.errors.push(issue("layer_allocation",
+            format!("Piece '{}' has invalid physical layer, hand or garment assignments.", piece.id), &[&piece.id]));
+    }
+    if useful < count {
+        report.warnings.push(issue("surplus_copy",
+            format!("Piece '{}' cuts {} unassigned surplus layer copies.", piece.id, count - useful), &[&piece.id]));
+    }
+}
 
 pub(super) fn fold(job: &Job, piece: &Piece, pl: &Placement, report: &mut ValidationReport) {
     if !pl.on_fold {
@@ -34,21 +63,23 @@ pub(super) fn bundles(job: &Job, result: &MarkerResult, report: &mut ValidationR
     let needed = job.fabric.shade.is_some()
         || job.fabric.nap == Nap::OneWayPerBundle
         || !job.match_rules.is_empty();
-    if !needed && result.placements.iter().all(|p| p.bundle.is_none()) {
+    if !needed && result.placements.iter().all(|p| p.bundle.is_none() && p.layer_allocations.is_empty()) {
         return;
     }
     let pieces: HashMap<_, _> = job.pieces.iter().map(|p| (p.id.as_str(), p)).collect();
     let mut groups = BTreeMap::<u32, Vec<(&Piece, &Placement)>>::new();
     for pl in &result.placements {
         if let Some(&piece) = pieces.get(pl.piece_id.as_str()) {
-            if let Some(bundle) = pl.bundle {
-                groups.entry(bundle).or_default().push((piece, pl));
-            } else if needed {
+            let assigned = placement_bundles(pl);
+            if assigned.is_empty() && needed {
                 report.errors.push(issue(
                     "bundle_missing",
                     format!("Piece '{}' has no garment bundle.", piece.id),
                     &[&piece.id],
                 ));
+            }
+            for bundle in assigned {
+                groups.entry(bundle).or_default().push((piece, pl));
             }
         }
     }
@@ -63,7 +94,7 @@ pub(super) fn bundles(job: &Job, result: &MarkerResult, report: &mut ValidationR
             .get(bundle as usize)
             .is_some_and(|expected| job.order.is_none() || expected.as_deref() == size);
         for (piece, pl) in placements {
-            let (a, b) = layer_copies(job.fabric.layout, pl);
+            let (a, b) = bundle_layer_copies(job.fabric.layout, pl, bundle);
             for (mirror, n) in [(false, a), (true, b)] {
                 *counts
                     .entry((&piece.id, mirror && !flip_allowed(job, piece)))
@@ -81,7 +112,8 @@ pub(super) fn bundles(job: &Job, result: &MarkerResult, report: &mut ValidationR
             };
             for (mirror, n) in expected {
                 let actual = counts.get(&(p.id.as_str(), mirror)).copied().unwrap_or(0);
-                let upper = if job.fabric.layout == Layout::Open {
+                let upper = if job.fabric.layout == Layout::Open
+                    || result.placements.iter().any(|p| !p.layer_allocations.is_empty()) {
                     n
                 } else if flip_allowed(job, p) {
                     n + 1 // A final two-layer placement may produce one surplus copy.

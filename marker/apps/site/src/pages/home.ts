@@ -37,11 +37,11 @@ const features = [
 
 const notYet = [
   'Plotter and cutter profiles are generic. Test them on your machines before production.',
-  'Folded and tubular fabric work, but results are weaker than on open fabric.',
+  'Folded and tubular fabric work. Folded results improved a lot in 0.5 (T-shirt test 43% to 63%) but are still below open fabric.',
   'No direct Tally or SAP connector yet. Exchange data with CSV or Excel files.',
-  'The server mode serves one computer in version 0.4. Shared use over the factory network is planned.',
+  'The server mode serves one computer in version 0.5. Shared use over the factory network is planned.',
   'The Windows installer is not code-signed yet. Windows may show a warning.',
-  'English only. Hindi and Tamil are planned.',
+  'Hindi and Tamil are drafts and need native review.',
 ];
 
 const audiences = [
@@ -122,6 +122,34 @@ function benchmarkHighlight(runs: Run[]): Raw {
 </div>`, { eyebrow: 'Public benchmark', lead: 'We test BETA on the public Lectra dataset: real nesting tasks from fashion companies, with the efficiency that Lectra’s own engine reached on each one.', cls: 'section-alt' });
 }
 
+/** "Watch the demo": a self-hosted video with captions, or a poster linking to the video file. */
+export function demoVideo(ctx: BuildContext): Raw {
+  const v = site.demoVideo;
+  const meta = html`<p class="video-meta"><span>${v.length}</span><span>Captions in English</span><span>Real app, sample data</span></p>`;
+  let media: Raw;
+  if (ctx.video) {
+    media = html`<video class="demo-video" controls preload="none" playsinline poster="${v.poster}" width="1920" height="1080" aria-describedby="demo-title-desc">
+  <source src="${v.file}" type="video/mp4">
+  <track kind="captions" srclang="en" label="English" src="${v.captions}" default>
+  <a href="${v.file}">Download the demo video (MP4)</a>
+</video>`;
+  } else if (v.demoVideoUrl) {
+    media = html`<a class="demo-poster-link" href="${v.demoVideoUrl}" rel="noopener noreferrer external"><img src="${v.poster}" alt="Watch the BETA Cutting Room demo video" width="1920" height="1080" loading="lazy" decoding="async"><span class="demo-play" aria-hidden="true"></span><span class="sr-only"> (MP4 file${v.size !== '0 MB' ? `, ${v.size}` : ''}, opens on GitHub)</span></a>`;
+  } else return html``;
+  return html`<section class="section section-video" id="demo" aria-labelledby="demo-title">
+  <div class="wrap video-grid">
+    <div class="video-copy" data-reveal>
+      <p class="eyebrow">Demo video</p>
+      <h2 id="demo-title">Watch the demo</h2>
+      <p class="lead" id="demo-title-desc">What a pattern and a marker are, then the real app: nest a marker, plan the cut, rolls and bundles, photo to marker on a phone, and our honest benchmark.</p>
+      ${meta}
+      <p class="small muted">Sound is optional. Every word is also on screen.</p>
+    </div>
+    <div class="video-frame" data-reveal>${media}</div>
+  </div>
+</section>`;
+}
+
 export function homePage(ctx: BuildContext): Raw {
   const d = site.downloads;
   const l60 = pick(ctx.runs, 'lectra-60s');
@@ -135,10 +163,12 @@ export function homePage(ctx: BuildContext): Raw {
       <h1 class="hero-title"><span class="nowrap">Open-source,</span> <span class="nowrap">self-hosted</span> <span class="hl"><span class="nowrap">cutting-room</span> software</span> for garment factories</h1>
       <p class="hero-lead">Pattern, marker, cut planning, rolls, spreading and bundles in one program. It runs on your own Windows PC or factory server and works offline. Your patterns never leave your factory.</p>
       <div class="cta-row">
+        ${site.webAppUrl ? downloadButton(site.webAppUrl, 'Open the app in your browser', 'btn btn-secondary btn-large') : ''}
         ${downloadButton(d.windows.url, 'Download for Windows', 'btn btn-primary btn-large', `Installer · ${d.windows.size}`)}
         ${downloadButton(d.portable.url, 'Portable ZIP', 'btn btn-secondary btn-large', `No install · ${d.portable.size}`)}
         ${downloadButton(d.server.url, 'Linux server', 'btn btn-secondary btn-large', `tar.gz · ${d.server.size}`)}
       </div>
+      <p class="small muted">Best for trying and small jobs; for big markers use the desktop app</p>
       <ul class="trust-list">
         <li>No account</li><li>No cloud</li><li>No licence fee</li><li>Works offline</li>
       </ul>
@@ -157,6 +187,8 @@ export function homePage(ctx: BuildContext): Raw {
     </figure>
   </div>
 </div>
+
+${demoVideo(ctx)}
 
 <section class="stats" aria-label="BETA in numbers">
   <div class="wrap"><ul class="stat-band" data-reveal data-stagger>

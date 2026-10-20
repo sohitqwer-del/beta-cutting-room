@@ -68,6 +68,7 @@ pub fn validate(job: &Job, result: &MarkerResult) -> ValidationReport {
     let mut actual = BTreeMap::new();
     let mut copies = BTreeSet::new();
     let mut shapes = Vec::new();
+    let explicit_layers = result.placements.iter().any(|p| !p.layer_allocations.is_empty());
     for pl in &result.placements {
         let Some(&p) = by_id.get(pl.piece_id.as_str()) else {
             report.errors.push(issue(
@@ -77,6 +78,11 @@ pub fn validate(job: &Job, result: &MarkerResult) -> ValidationReport {
             ));
             continue;
         };
+        if explicit_layers && job.fabric.layout != Layout::Open && pl.layer_allocations.is_empty() {
+            report.errors.push(issue("layer_allocation",
+                "Every layered placement must declare its assignments when explicit allocation is used.".into(), &[&p.id]));
+        }
+        v02::layers(job, p, pl, &mut report);
         let (normal, mirrored) = layer_copies(job.fabric.layout, pl);
         for (mirror, count) in [(false, normal), (true, mirrored)] {
             let key = (p.id.clone(), mirror && !flip_allowed(job, p));
@@ -93,7 +99,9 @@ pub fn validate(job: &Job, result: &MarkerResult) -> ValidationReport {
                 &[&p.id],
             ));
         }
-        if pl.mirrored && p.mirror_quantity == 0 && !flip_allowed(job, p) {
+        if pl.mirrored && p.mirror_quantity == 0 && !flip_allowed(job, p)
+            && !(pl.on_fold && p.fold_line.is_some() && job.fabric.layout != Layout::Open)
+        {
             report.errors.push(issue(
                 "mirror",
                 format!("Piece '{}' has no permitted mirrored copies.", p.id),
@@ -186,7 +194,7 @@ pub fn validate(job: &Job, result: &MarkerResult) -> ValidationReport {
                 format!("Piece '{id}' needs {count} copies (mirrored: {mirrored}); found {found}."),
                 &[&id],
             );
-            if found > count && job.fabric.layout != Layout::Open {
+            if found > count && job.fabric.layout != Layout::Open && !explicit_layers {
                 report.warnings.push(Issue {
                     code: "surplus_copy".into(),
                     ..finding

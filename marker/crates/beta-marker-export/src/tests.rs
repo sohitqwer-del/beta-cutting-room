@@ -464,6 +464,34 @@ fn unzip(bytes: &[u8], name: &str) -> String {
     out
 }
 #[test]
+fn xlsx_assigns_layer_copies_to_each_garment_and_excludes_surplus() {
+    let (mut j, mut r) = fixture();
+    j.fabric.layout = Layout::Folded;
+    j.order.as_mut().unwrap().sizes.insert("M".into(), 3);
+    j.pieces[0].fold_line = Some([[0., 50.], [100., 50.]]);
+    r.placements[0].bundle = Some(0);
+    r.placements[0].layer_allocations = vec![
+        Some(LayerAllocation { bundle: 0, mirrored: false }),
+        Some(LayerAllocation { bundle: 1, mirrored: false }),
+    ];
+    let mut last = r.placements[0].clone();
+    last.copy = 1;
+    last.bundle = Some(2);
+    last.translate = [100., 0.];
+    last.layer_allocations = vec![Some(LayerAllocation { bundle: 2, mirrored: false }), None];
+    r.placements.push(last);
+    let sheet = unzip(&to_xlsx(&j, &r, None).unwrap(), "xl/worksheets/sheet2.xml");
+    for (row, bundle) in [(2, 0), (3, 1), (4, 2)] {
+        for (column, expected) in [("B", bundle), ("E", 1), ("F", 1), ("G", 0)] {
+            let cell = sheet.split(&format!("r=\"{column}{row}\"")).nth(1).unwrap()
+                .split("</c>").next().unwrap();
+            assert!(cell.contains(&format!("<v>{expected}</v>")), "{column}{row}: {cell}");
+        }
+    }
+    assert!(!sheet.contains("r=\"B5\""));
+}
+
+#[test]
 fn xlsx_has_recomputed_summary_literal_text_and_optional_plan() {
     let (mut j, mut r) = fixture();
     j.pieces[0].name = "=1+1".into();

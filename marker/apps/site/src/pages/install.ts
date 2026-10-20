@@ -15,6 +15,10 @@ ${pageHead('Install and self-host', 'BETA Cutting Room runs on computers you con
   </ul></nav>
 </div>
 
+${site.webAppUrl ? section('browser', 'Try it in your browser', html`
+<div class="prose">${downloadButton(site.webAppUrl, 'Open the app in your browser', 'btn btn-secondary')}
+<p class="small muted">Best for trying and small jobs; for big markers use the desktop app</p></div>`) : ''}
+
 ${section('windows', 'Windows desktop app', html`
 <div class="split">
   <ol class="steps">
@@ -49,7 +53,7 @@ ${section('server', 'Server: beta-marker serve', html`
   <p>The <code>beta-marker</code> command runs nesting, checks and exports, and can serve the full app to a web browser. Use it on a Linux or Windows machine where you prefer a browser to the desktop app, or for batch work and benchmarks.</p>
   <div class="callout callout-warn" role="note"><p><strong>Factory network:</strong> by default the server listens only on the same computer (address <code>127.0.0.1</code>). To let other factory PCs connect, start it with <code>--bind</code> and an access token (<code>--token</code> or <code>BETA_TOKEN</code>); it will not start on the network without one. The server has no HTTPS of its own, so put it behind Caddy or nginx and a firewall. Never expose the server to the internet. See <code>marker/docs/SELF-HOSTING.md</code>.</p></div>
   <h3>Build from source</h3>
-  <p>A ready-made Linux server download is ${site.downloads.server.url ? html`available on the <a href="index.html#download">download section</a>` : 'coming soon'}. It needs a recent Linux (glibc 2.43, for example Ubuntu 26.04). On other systems, build it from the source code. You need <strong>Rust</strong> (with the <code>wasm32-unknown-unknown</code> target and a matching <code>wasm-bindgen</code> tool) and <strong>Node.js</strong>.</p>
+  <p>A ready-made Linux server download is ${site.downloads.server.url ? html`available on the <a href="index.html#download">download section</a>` : 'coming soon'}. It targets x86_64 Linux with glibc 2.31 or newer. The release was checked with extracted Ubuntu glibc 2.31 and with glibc 2.43. On other systems, build it from the source code. You need <strong>Rust</strong> (with the <code>wasm32-unknown-unknown</code> target and a matching <code>wasm-bindgen</code> tool) and <strong>Node.js</strong>.</p>
 <pre><code># From the repository root: install and build the web app
 npm install
 npm run build:wasm -w @beta/marker-wasm

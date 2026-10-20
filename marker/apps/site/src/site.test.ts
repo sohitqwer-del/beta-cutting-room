@@ -7,7 +7,7 @@ import { clientScript, usesNetwork } from './client-build.ts';
 import { MARK, markSvg } from './brand.ts';
 import { loadRuns } from './benchmark.ts';
 import { layout, pages } from './layout.ts';
-import { homePage } from './pages/home.ts';
+import { demoVideo, homePage } from './pages/home.ts';
 import { benchmarkPage } from './pages/benchmark.ts';
 import { installPage } from './pages/install.ts';
 import { docsPage } from './pages/docs.ts';
@@ -24,7 +24,7 @@ const home = homePage(ctx).value;
 describe('config', () => {
   it('has a complete portable ZIP download', () => {
     const p = site.downloads.portable;
-    expect(p.url).toMatch(/^https:\/\/github\.com\/.+\/releases\/download\/v0\.4\.0\/BETA-Cutting-Room_0\.4\.0_windows-x64-portable\.zip$/);
+    expect(p.url).toMatch(/^https:\/\/github\.com\/.+\/releases\/download\/v0\.5\.0\/BETA-Cutting-Room_0\.5\.0_windows-x64-portable\.zip$/);
     expect(p.url!.endsWith(p.file)).toBe(true);
     expect(p.size).toMatch(/^\d+(\.\d+)? MiB$/);
     expect(p.sha256).toMatch(/^[0-9a-f]{64}$/);
@@ -120,6 +120,14 @@ describe('brand mark', () => {
 });
 
 describe('home page', () => {
+  it('links the browser app with clear guidance on job size', () => {
+    for (const page of [home, installPage().value]) {
+      expect(page).toContain(`href="${site.webAppUrl}"`);
+      expect(page).toContain('Open the app in your browser');
+      expect(page).toContain('Best for trying and small jobs; for big markers use the desktop app');
+    }
+  });
+
   it('says what BETA is, that it is a fun AI-assisted project, and asks for help', () => {
     expect(home).toContain('cutting-room</span> software</span> for garment factories');
     expect(home).toContain('A fun project, built with modern AI tools');
@@ -159,6 +167,38 @@ describe('home page', () => {
       expect(img).toContain('width="1920" height="1200"');
       expect(img).toContain('loading="lazy"');
     }
+  });
+});
+
+describe('demo video', () => {
+  it('plays the self-hosted file with captions, no autoplay and no preload', () => {
+    const v = demoVideo({ ...ctx, video: true }).value;
+    expect(v).toContain('id="demo"');
+    expect(v).toContain('Watch the demo');
+    expect(v).toContain(site.demoVideo.length);
+    expect(v).toMatch(/<video [^>]*controls[^>]*preload="none"/);
+    expect(v.match(/<video [^>]*>/)![0]).not.toMatch(/autoplay|muted|loop/);
+    expect(v).toContain('<source src="assets/video/beta-demo-en.mp4" type="video/mp4">');
+    expect(v).toContain('<track kind="captions" srclang="en" label="English" src="assets/video/beta-demo-en.vtt" default>');
+    expect(v).toContain('poster="assets/video/beta-demo-poster.jpg"');
+  });
+
+  it('links to a remote file without loading it, and hides when there is no video', () => {
+    expect(demoVideo({ ...ctx, video: false }).value).toBe('');
+    const saved = site.demoVideo.demoVideoUrl;
+    site.demoVideo.demoVideoUrl = 'https://github.com/example/releases/download/v1/beta-demo-en.mp4';
+    try {
+      const v = demoVideo({ ...ctx, video: false }).value;
+      expect(v).toContain('href="https://github.com/example/releases/download/v1/beta-demo-en.mp4"');
+      expect(v).not.toContain('<video');
+      expect(v).toMatch(/<img src="assets\/video\/beta-demo-poster\.jpg" alt="[^"]+"/);
+    } finally { site.demoVideo.demoVideoUrl = saved; }
+  });
+
+  it('sits on the home page right after the hero when the file exists', () => {
+    const page = homePage({ ...ctx, video: true }).value;
+    expect(page.indexOf('id="demo"')).toBeGreaterThan(page.indexOf('class="hero"'));
+    expect(page.indexOf('id="demo"')).toBeLessThan(page.indexOf('class="stats"'));
   });
 });
 

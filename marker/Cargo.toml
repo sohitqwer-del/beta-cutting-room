@@ -22,7 +22,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.4.0"
+version = "0.5.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/sohitqwer-del/beta-cutting-room"
@@ -42,7 +42,7 @@ beta-marker-queue = { path = "crates/beta-marker-queue" }
 beta-marker-learn = { path = "crates/beta-marker-learn" }
 beta-marker-cluster = { path = "crates/beta-marker-cluster" }
 serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
 anyhow = "1.0"
 thiserror = "2.0"
 

@@ -5,7 +5,8 @@ import { resolve } from 'node:path';
 const marker = fileURLToPath(new URL('../../../', import.meta.url));
 const pkg = fileURLToPath(new URL('../pkg/', import.meta.url));
 if (!process.env.CARGO_TARGET_DIR) throw new Error('Set CARGO_TARGET_DIR to a build directory with enough free space.');
-const env = { ...process.env, CARGO_PROFILE_RELEASE_OPT_LEVEL: 'z', CARGO_PROFILE_RELEASE_LTO: 'fat',
+// Nesting is CPU-bound. Optimize for speed; size is measured separately with gzip.
+const env = { ...process.env, CARGO_PROFILE_RELEASE_OPT_LEVEL: process.env.CARGO_PROFILE_RELEASE_OPT_LEVEL || '3', CARGO_PROFILE_RELEASE_LTO: 'fat',
   CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '1', CARGO_PROFILE_RELEASE_PANIC: 'abort', CARGO_PROFILE_RELEASE_STRIP: 'debuginfo' };
 function run(command, args) {
   const result = spawnSync(command, args, { cwd: marker, env, stdio: 'inherit' });

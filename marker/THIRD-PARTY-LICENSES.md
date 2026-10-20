@@ -1,7 +1,8 @@
-# Third-party licences: BETA Cutting Room 0.4.0
+# Third-party licences: BETA Cutting Room 0.5.0
 
 Generated from Cargo metadata, local npm package manifests and installed package.json files.
 No network licence service is used. Re-run after lockfile or dependency changes.
+Bundled Droid Sans fonts use Apache-2.0; the site Bricolage Grotesque font uses OFL-1.1.
 
 ## Scope and decisions
 
@@ -23,10 +24,13 @@ sparrow 0.3.0 omits a manifest licence; its local upstream LICENSE is MIT and wa
 Original Apache-2.0 dom_query 0.28.0 and option-ext 0.2.0 adapters retain upstream
 version constraints. They are not copies of upstream MPL helper implementations.
 
-Inventoried packages: **510**. Review-required selected packages: **0**.
+Inventoried packages: **522**. Review-required selected packages: **0**.
 
 | Ecosystem | Package | Version | Declared licence | Decision |
 |---|---|---|---|---|
+| Font | Bricolage Grotesque | site/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2 | OFL-1.1 | permissive |
+| Font | Droid Sans Devanagari | export/fonts/DroidSansDevanagari-Regular.ttf | Apache-2.0 | permissive |
+| Font | Droid Sans Tamil | export/fonts/DroidSansTamil-Regular.ttf | Apache-2.0 | permissive |
 | Rust | adler2 | 2.0.1 | 0BSD OR MIT OR Apache-2.0 | permissive |
 | Rust | aho-corasick | 1.1.5 | Unlicense OR MIT | permissive |
 | Rust | alloc-no-stdlib | 3.0.0 | BSD-3-Clause | permissive |
@@ -46,28 +50,28 @@ Inventoried packages: **510**. Review-required selected packages: **0**.
 | Rust | autocfg | 1.5.1 | Apache-2.0 OR MIT | permissive |
 | Rust | base64 | 0.22.1 | MIT OR Apache-2.0 | permissive |
 | Rust | base64 | 0.23.1 | MIT OR Apache-2.0 | permissive |
-| Rust | beta-cutting-room | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-cli | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-cluster | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-core | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-cutroom | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-dxf | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-edit | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-export | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-floor | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-gpu | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-learn | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-match | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-nest | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-plan | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-queue | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-roll | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-wasm | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-open-patterns-check | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-pattern-core | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-pattern-digitize | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-pattern-wasm | 0.4.0 | Apache-2.0 | permissive |
-| Rust | beta-public-bench | 0.4.0 | Apache-2.0 | permissive |
+| Rust | beta-cutting-room | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-cli | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-cluster | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-core | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-cutroom | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-dxf | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-edit | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-export | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-floor | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-gpu | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-learn | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-match | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-nest | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-plan | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-queue | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-roll | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-wasm | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-open-patterns-check | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-pattern-core | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-pattern-digitize | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-pattern-wasm | 0.5.0 | Apache-2.0 | permissive |
+| Rust | beta-public-bench | 0.5.0 | Apache-2.0 | permissive |
 | Rust | bit-set | 0.10.0 | Apache-2.0 OR MIT | permissive |
 | Rust | bit-vec | 0.9.1 | Apache-2.0 OR MIT | permissive |
 | Rust | bitflags | 1.3.2 | MIT/Apache-2.0 | permissive |
@@ -102,6 +106,7 @@ Inventoried packages: **510**. Review-required selected packages: **0**.
 | Rust | colorchoice | 1.0.5 | MIT OR Apache-2.0 | permissive |
 | Rust | cookie | 0.18.2 | MIT OR Apache-2.0 | permissive |
 | Rust | core_detect | 1.0.0 | MIT/Apache-2.0 | permissive |
+| Rust | core_maths | 0.1.1 | MIT | permissive |
 | Rust | cpufeatures | 0.2.17 | MIT OR Apache-2.0 | permissive |
 | Rust | cpufeatures | 0.3.1 | MIT OR Apache-2.0 | permissive |
 | Rust | crc32fast | 1.5.2 | MIT OR Apache-2.0 | permissive |
@@ -244,6 +249,7 @@ Inventoried packages: **510**. Review-required selected packages: **0**.
 | Rust | numfmt | 1.2.0 | MIT | permissive |
 | Rust | once_cell | 1.21.4 | MIT OR Apache-2.0 | permissive |
 | Rust | once_cell_polyfill | 1.70.2 | MIT OR Apache-2.0 | permissive |
+| Rust | open | 5.4.4 | MIT | permissive |
 | Rust | option-ext | 0.2.0 | Apache-2.0 | permissive |
 | Rust | ordered-float | 5.5.0 | MIT | permissive |
 | Rust | parking_lot | 0.12.5 | MIT OR Apache-2.0 | permissive |
@@ -293,6 +299,7 @@ Inventoried packages: **510**. Review-required selected packages: **0**.
 | Rust | rustc-hash | 1.1.0 | Apache-2.0/MIT | permissive |
 | Rust | rustc_version | 0.4.1 | MIT OR Apache-2.0 | permissive |
 | Rust | rustversion | 1.0.23 | MIT OR Apache-2.0 | permissive |
+| Rust | rustybuzz | 0.20.1 | MIT | permissive |
 | Rust | ryu | 1.0.23 | Apache-2.0 OR BSL-1.0 | permissive |
 | Rust | same-file | 1.0.6 | Unlicense/MIT | permissive |
 | Rust | schemars | 0.8.22 | MIT | permissive |
@@ -345,6 +352,7 @@ Inventoried packages: **510**. Review-required selected packages: **0**.
 | Rust | tauri-plugin | 2.7.2 | Apache-2.0 OR MIT | permissive |
 | Rust | tauri-plugin-dialog | 2.8.3 | Apache-2.0 OR MIT | permissive |
 | Rust | tauri-plugin-fs | 2.7.1 | Apache-2.0 OR MIT | permissive |
+| Rust | tauri-plugin-opener | 2.7.2 | Apache-2.0 OR MIT | permissive |
 | Rust | tauri-plugin-single-instance | 2.5.4 | Apache-2.0 OR MIT | permissive |
 | Rust | tauri-runtime | 2.12.2 | Apache-2.0 OR MIT | permissive |
 | Rust | tauri-runtime-wry | 2.12.2 | Apache-2.0 OR MIT | permissive |
@@ -372,10 +380,15 @@ Inventoried packages: **510**. Review-required selected packages: **0**.
 | Rust | tracing-core | 0.1.36 | MIT | permissive |
 | Rust | tray-icon | 0.25.1 | MIT OR Apache-2.0 | permissive |
 | Rust | try-lock | 0.2.5 | MIT | permissive |
+| Rust | ttf-parser | 0.25.1 | MIT OR Apache-2.0 | permissive |
 | Rust | typed-path | 0.12.3 | MIT OR Apache-2.0 | permissive |
 | Rust | typeid | 1.0.3 | MIT OR Apache-2.0 | permissive |
 | Rust | typenum | 1.20.1 | MIT OR Apache-2.0 | permissive |
+| Rust | unicode-bidi-mirroring | 0.4.0 | MIT/Apache-2.0 | permissive |
+| Rust | unicode-ccc | 0.4.0 | MIT/Apache-2.0 | permissive |
 | Rust | unicode-ident | 1.0.27 | (MIT OR Apache-2.0) AND Unicode-3.0 | permissive |
+| Rust | unicode-properties | 0.1.4 | MIT/Apache-2.0 | permissive |
+| Rust | unicode-script | 0.5.8 | MIT OR Apache-2.0 | permissive |
 | Rust | unicode-segmentation | 1.13.3 | MIT OR Apache-2.0 | permissive |
 | Rust | unicode-width | 0.2.2 | MIT OR Apache-2.0 | permissive |
 | Rust | url | 2.5.8 | MIT OR Apache-2.0 | permissive |
@@ -443,10 +456,10 @@ Inventoried packages: **510**. Review-required selected packages: **0**.
 | Rust | zopfli | 0.8.4 | Apache-2.0 | permissive |
 | Rust | zune-core | 0.4.12 | MIT OR Apache-2.0 OR Zlib | permissive |
 | Rust | zune-jpeg | 0.4.21 | MIT OR Apache-2.0 OR Zlib | permissive |
-| npm | @beta/marker-desktop | 0.4.0 | Apache-2.0 | permissive |
-| npm | @beta/marker-site | 0.4.0 | Apache-2.0 | permissive |
-| npm | @beta/marker-wasm | 0.4.0 | Apache-2.0 | permissive |
-| npm | @beta/marker-web | 0.4.0 | Apache-2.0 | permissive |
+| npm | @beta/marker-desktop | 0.5.0 | Apache-2.0 | permissive |
+| npm | @beta/marker-site | 0.5.0 | Apache-2.0 | permissive |
+| npm | @beta/marker-wasm | 0.5.0 | Apache-2.0 | permissive |
+| npm | @beta/marker-web | 0.5.0 | Apache-2.0 | permissive |
 | npm | @esbuild/win32-x64 | 0.25.12 | MIT | permissive |
 | npm | @esbuild/win32-x64 | 0.28.2 | MIT | permissive |
 | npm | @freesewing/bella | 4.10.2 | MIT | permissive |
@@ -487,8 +500,8 @@ Inventoried packages: **510**. Review-required selected packages: **0**.
 | npm | @vitest/spy | 3.2.7 | MIT | permissive |
 | npm | @vitest/utils | 3.2.7 | MIT | permissive |
 | npm | assertion-error | 2.0.1 | MIT | permissive |
-| npm | beta-open-patterns-freesewing | 0.4.0 | Apache-2.0 | permissive |
-| npm | beta-open-patterns-garmentcode | 0.4.0 | Apache-2.0 | permissive |
+| npm | beta-open-patterns-freesewing | 0.5.0 | Apache-2.0 | permissive |
+| npm | beta-open-patterns-garmentcode | 0.5.0 | Apache-2.0 | permissive |
 | npm | bezier-js | 6.1.4 | MIT | permissive |
 | npm | cac | 6.7.14 | MIT | permissive |
 | npm | chai | 5.3.3 | MIT | permissive |
@@ -608,6 +621,8 @@ Do not describe the unrestricted all-platform desktop graph as permissive-only.
 | gtk3-macros | 0.18.2 | MIT |
 | heck | 0.4.1 | MIT OR Apache-2.0 |
 | iana-time-zone | 0.1.65 | MIT OR Apache-2.0 |
+| is-docker | 0.2.0 | MIT |
+| is-wsl | 0.4.0 | MIT |
 | javascriptcore-rs | 1.1.2 | MIT |
 | javascriptcore-rs-sys | 1.1.1 | MIT |
 | libappindicator | 0.9.0 | Apache-2.0 OR MIT |

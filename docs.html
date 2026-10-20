@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Help and documentation | BETA Cutting Room</title>
+<meta name="description" content="Manuals, technical documents and answers to common questions.">
+<meta name="color-scheme" content="light dark">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<script>(function(){try{var t=localStorage.getItem('beta-site-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html"><svg class="logo-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M10 8h7.2c3.3 0 5.4 1.7 5.4 4.3 0 1.8-1 3-2.5 3.6 2 .5 3.3 1.9 3.3 4 0 2.9-2.3 4.6-5.9 4.6H10z M13.3 11v4h3.4c1.5 0 2.4-.8 2.4-2s-.9-2-2.4-2z M13.3 17.9v4.2h3.9c1.6 0 2.6-.8 2.6-2.1s-1-2.1-2.6-2.1z" fill="var(--logo-ink)" fill-rule="evenodd"/></svg><span>BETA Cutting Room</span></a>
+    <nav class="nav-desktop" aria-label="Main"><ul class="nav-list"><li><a href="index.html">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html" aria-current="page">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
+    <div class="header-tools">
+      <button type="button" id="theme-toggle" class="theme-toggle" hidden>
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"/></svg>
+        <span data-theme-label>Automatic</span>
+      </button>
+      <details class="nav-mobile">
+        <summary><span class="sr-only">Menu</span><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary>
+        <nav aria-label="Main (small screens)"><ul class="nav-list-mobile"><li><a href="index.html">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html" aria-current="page">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
+      </details>
+    </div>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+
+<div class="page-head"><div class="wrap">
+  <p class="eyebrow">Help</p>
+  <h1>Help and documentation</h1>
+  <p class="lead">Start with the user manual. The technical documents explain how BETA works, how it is tested and what is still missing.</p>
+</div></div>
+
+<section class="section " id="manual" aria-labelledby="manual-title">
+  <div class="wrap">
+    
+    <h2 id="manual-title">User manual</h2>
+    
+    
+<div class="card-grid card-grid-2">
+  <article class="card">
+    <h3>Cutting-room manual</h3>
+    <p>Step-by-step help for the floor screens: orders and rolls import, spreading, tracking, re-cuts and the sewing hand-off.</p>
+    <a class="btn btn-secondary" href="docs/cutting-room-manual.html">Open the manual</a>
+  </article>
+  <article class="card">
+    <h3>Help inside the app</h3>
+    <p>The app has a Help tab with the same information, available offline. Every command-line tool also explains itself: run <code>beta-marker --help</code> or <code>beta-pattern --help</code>.</p>
+  </article>
+</div>
+  </div>
+</section>
+
+<section class="section section-alt" id="technical" aria-labelledby="technical-title">
+  <div class="wrap">
+    
+    <h2 id="technical-title">Technical documents</h2>
+    
+    
+<p class="small muted">These documents are in the source code. Links open the public repository.</p>
+<ul class="doc-list">
+  <li><span class="doc-title"><a href="https://github.com/sohitqwer-del/beta-cutting-room/blob/main/marker/README.md" rel="noopener noreferrer external">BETA Marker overview<span class="sr-only"> (external site)</span></a></span><span>What the marker engine does, how it is built and where each part lives.</span><code>marker/README.md</code></li><li><span class="doc-title"><a href="https://github.com/sohitqwer-del/beta-cutting-room/blob/main/marker/SPEC.md" rel="noopener noreferrer external">Specification<span class="sr-only"> (external site)</span></a></span><span>Data formats, garment rules, units and the validator.</span><code>marker/SPEC.md</code></li><li><span class="doc-title"><a href="https://github.com/sohitqwer-del/beta-cutting-room/blob/main/marker/docs/CUTTING-ROOM-STATUS.md" rel="noopener noreferrer external">Cutting-room module status<span class="sr-only"> (external site)</span></a></span><span>All 14 cutting-room modules: what works, what is tested and what is still missing.</span><code>marker/docs/CUTTING-ROOM-STATUS.md</code></li><li><span class="doc-title"><a href="https://github.com/sohitqwer-del/beta-cutting-room/blob/main/marker/docs/benchmarks.md" rel="noopener noreferrer external">Benchmark method<span class="sr-only"> (external site)</span></a></span><span>Every benchmark rule, assumption, result and command.</span><code>marker/docs/benchmarks.md</code></li><li><span class="doc-title"><a href="https://github.com/sohitqwer-del/beta-cutting-room/blob/main/marker/docs/QA-2026-10-19.md" rel="noopener noreferrer external">Quality report<span class="sr-only"> (external site)</span></a></span><span>End-to-end test of version 0.4 with findings.</span><code>marker/docs/QA-2026-10-19.md</code></li><li><span class="doc-title"><a href="https://github.com/sohitqwer-del/beta-cutting-room/blob/main/marker/docs/V04-RESEARCH.md" rel="noopener noreferrer external">Market and research notes<span class="sr-only"> (external site)</span></a></span><span>What other systems do, with sources, and the plan for version 0.4.</span><code>marker/docs/V04-RESEARCH.md</code></li><li><span class="doc-title"><a href="https://github.com/sohitqwer-del/beta-cutting-room/blob/main/marker/apps/desktop/DESKTOP_REPORT.md" rel="noopener noreferrer external">Desktop app report<span class="sr-only"> (external site)</span></a></span><span>How the Windows app is built and tested.</span><code>marker/apps/desktop/DESKTOP_REPORT.md</code></li><li><span class="doc-title"><a href="https://github.com/sohitqwer-del/beta-cutting-room/blob/main/marker/apps/web/README.md" rel="noopener noreferrer external">App and server build<span class="sr-only"> (external site)</span></a></span><span>How to build the app and run the server.</span><code>marker/apps/web/README.md</code></li><li><span class="doc-title"><a href="https://github.com/sohitqwer-del/beta-cutting-room/blob/main/CONTRIBUTING.md" rel="noopener noreferrer external">Contributing<span class="sr-only"> (external site)</span></a></span><span>How to propose changes and what each change needs.</span><code>CONTRIBUTING.md</code></li>
+</ul>
+  </div>
+</section>
+
+<section class="section " id="faq" aria-labelledby="faq-title">
+  <div class="wrap">
+    
+    <h2 id="faq-title">Common questions</h2>
+    
+    
+<div class="faq">
+  <details class="disclosure"><summary>Do I need an internet connection?</summary><p>No. The desktop app and the server work offline. Install and update from a USB drive if you need to.</p></details><details class="disclosure"><summary>Which pattern files can I open?</summary><p>DXF-AAMA and ASTM pattern files, BETA pattern files, and a supported subset of Seamly2D files. Test a few of your own styles first, because each CAD writes DXF a little differently.</p></details><details class="disclosure"><summary>Can it drive my plotter or cutter?</summary><p>It writes PLT/HPGL and 1:1 PDF for plotters, and a generic ISO file for cutters. Profiles for specific machines are not certified yet. Plot a 1,000 mm test line and check it before production.</p></details><details class="disclosure"><summary>Is BETA better than my current CAD?</summary><p>We do not know yet, and we do not claim it. On the public Lectra data, results depend on the time allowed and the size of the marker, and BETA loses on many tasks. See the <a href="benchmark.html">benchmark</a>, and <a href="index.html#samples">send us your markers</a> for a comparison on your styles.</p></details><details class="disclosure"><summary>What does it cost?</summary><p>The software is free and open source. You pay only for your own hardware, and for any support or training you choose to buy from someone.</p></details><details class="disclosure"><summary>Which languages are supported?</summary><p>English today. Hindi and Tamil are planned.</p></details>
+</div>
+  </div>
+</section>
+
+</main>
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div>
+      <p class="footer-brand"><svg class="logo-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M10 8h7.2c3.3 0 5.4 1.7 5.4 4.3 0 1.8-1 3-2.5 3.6 2 .5 3.3 1.9 3.3 4 0 2.9-2.3 4.6-5.9 4.6H10z M13.3 11v4h3.4c1.5 0 2.4-.8 2.4-2s-.9-2-2.4-2z M13.3 17.9v4.2h3.9c1.6 0 2.6-.8 2.6-2.1s-1-2.1-2.6-2.1z" fill="var(--logo-ink)" fill-rule="evenodd"/></svg><span>BETA Cutting Room 0.4.0</span></p>
+      <p>Open source under the Apache License 2.0. Self-hosted. Your patterns stay in your factory.</p>
+      <p class="muted">This website has no trackers, no cookies and loads nothing from other servers.</p>
+    </div>
+    <nav aria-label="Footer"><ul class="footer-list"><li><a href="index.html">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html" aria-current="page">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
+  </div>
+</footer>
+<script>(function(){var b=document.getElementById('theme-toggle');if(!b)return;var root=document.documentElement;var order=['auto','light','dark'];var names={auto:'Automatic',light:'Light',dark:'Dark'};
+function current(){return root.getAttribute('data-theme')||'auto';}
+function show(){var c=current();b.querySelector('[data-theme-label]').textContent=names[c];b.setAttribute('aria-label','Colour theme: '+names[c]+'. Change theme');}
+b.addEventListener('click',function(){var n=order[(order.indexOf(current())+1)%3];if(n==='auto'){root.removeAttribute('data-theme');try{localStorage.removeItem('beta-site-theme');}catch(e){}}else{root.setAttribute('data-theme',n);try{localStorage.setItem('beta-site-theme',n);}catch(e){}}show();});
+b.hidden=false;show();})();</script>
+</body>
+</html>

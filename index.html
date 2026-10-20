@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BETA Cutting Room: open-source cutting-room software for garment factories</title>
+<meta name="description" content="Open-source, self-hosted cutting-room software for garment factories: pattern, marker, cut planning, rolls, spreading and bundles. Runs offline on your own computers.">
+<meta name="color-scheme" content="light dark">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<script>(function(){try{var t=localStorage.getItem('beta-site-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html"><svg class="logo-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M10 8h7.2c3.3 0 5.4 1.7 5.4 4.3 0 1.8-1 3-2.5 3.6 2 .5 3.3 1.9 3.3 4 0 2.9-2.3 4.6-5.9 4.6H10z M13.3 11v4h3.4c1.5 0 2.4-.8 2.4-2s-.9-2-2.4-2z M13.3 17.9v4.2h3.9c1.6 0 2.6-.8 2.6-2.1s-1-2.1-2.6-2.1z" fill="var(--logo-ink)" fill-rule="evenodd"/></svg><span>BETA Cutting Room</span></a>
+    <nav class="nav-desktop" aria-label="Main"><ul class="nav-list"><li><a href="index.html" aria-current="page">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
+    <div class="header-tools">
+      <button type="button" id="theme-toggle" class="theme-toggle" hidden>
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"/></svg>
+        <span data-theme-label>Automatic</span>
+      </button>
+      <details class="nav-mobile">
+        <summary><span class="sr-only">Menu</span><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary>
+        <nav aria-label="Main (small screens)"><ul class="nav-list-mobile"><li><a href="index.html" aria-current="page">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
+      </details>
+    </div>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+
+<div class="hero">
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow">Version 0.4.0 · Open source · Self-hosted</p>
+      <h1>Cutting-room software for garment factories</h1>
+      <p class="hero-lead">Pattern, marker, cut planning, rolls and bundles in one program. Open source (Apache-2.0). Self-hosted: it runs on your own Windows PC or factory server. Your patterns never leave your factory. It works offline.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_x64-setup.exe">Download for Windows</a>
+        <a class="btn btn-secondary" href="benchmark.html">See the benchmark</a>
+      </div>
+      <ul class="trust-list">
+        <li>No account</li><li>No cloud</li><li>No licence fee</li><li>Works offline</li>
+      </ul>
+    </div>
+    <figure class="hero-figure">
+      <svg class="illus hero-marker" viewBox="0 0 640 270" role="img" aria-labelledby="hero-illus-t">
+<title id="hero-illus-t">Illustration of a marker: shirt fronts, backs, sleeves, collars and pockets in three sizes nested on a strip of fabric.</title>
+<rect class="fabric" x="20" y="30" width="604" height="200" rx="2"/>
+<path class="selvedge" d="M20 30 H624 M20 230 H624"/>
+<g class="pc pc-1" transform="translate(24 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g>
+<g class="pc pc-1" transform="translate(24 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g>
+<g class="pc pc-1" transform="translate(128 106) rotate(180 50 60)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g>
+<g class="pc pc-1" transform="translate(128 34) rotate(180 50 34) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g>
+<g class="pc pc-2" transform="translate(232 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g>
+<g class="pc pc-2" transform="translate(232 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g>
+<g class="pc pc-2" transform="translate(336 106) rotate(180 50 60)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g>
+<g class="pc pc-2" transform="translate(336 34) rotate(180 50 34) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g>
+<g class="pc pc-3" transform="translate(440 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g>
+<g class="pc pc-3" transform="translate(440 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g>
+<rect class="pc pc-1" x="548" y="34" width="13" height="92" rx="5"/>
+<rect class="pc pc-2" x="566" y="34" width="13" height="92" rx="5"/>
+<rect class="pc pc-3" x="584" y="34" width="13" height="92" rx="5"/>
+<rect class="pc pc-1" x="602" y="34" width="13" height="92" rx="5"/>
+<g class="pc pc-1" transform="translate(548 134)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g>
+<g class="pc pc-2" transform="translate(584 134)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g>
+<g class="pc pc-3" transform="translate(548 180)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g>
+<g class="pc pc-1" transform="translate(584 180)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g>
+<g class="dim"><path d="M10 34 V226 M6 38 L10 30 L14 38 M6 222 L10 230 L14 222"/><text x="0" y="0" transform="translate(6 130) rotate(-90)" text-anchor="middle">fabric width</text></g>
+<g class="dim"><path d="M20 250 H624 M28 246 L20 250 L28 254 M616 246 L624 250 L616 254"/><text x="322" y="266" text-anchor="middle">marker length: shorter is better</text></g>
+<g class="legend-sizes" transform="translate(20 8)"><rect class="pc pc-1" width="12" height="12" rx="2"/><text x="18" y="10">S</text><rect class="pc pc-2" x="40" width="12" height="12" rx="2"/><text x="58" y="10">M</text><rect class="pc pc-3" x="80" width="12" height="12" rx="2"/><text x="98" y="10">L</text></g>
+</svg>
+      <figcaption>Illustration. A marker places every pattern piece on the fabric so the lay uses as little length as possible.</figcaption>
+    </figure>
+  </div>
+</div>
+
+<section class="section " id="workflow" aria-labelledby="workflow-title">
+  <div class="wrap">
+    
+    <h2 id="workflow-title">From pattern to sewing line</h2>
+    <p class="lead">One record follows the style through the cutting room. Each step uses the result of the step before, so numbers are not typed twice.</p>
+    
+<ol class="flow-strip" aria-hidden="true"><li><span>Pattern</span></li><li><span>Marker</span></li><li><span>Cut plan</span></li><li><span>Rolls</span></li><li><span>Spread</span></li><li><span>Cut</span></li><li><span>Bundles</span></li><li><span>Sewing</span></li></ol>
+<ol class="workflow">
+  <li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M6 4 L10 3 Q12 6 14 6 Q16 6 18 3 L22 4 L21 9 L19 9 L19 21 L9 21 L9 9 L7 9 Z"/></svg></span><span class="step-num">Step 1</span><h3>Pattern</h3><p>Draft, grade and digitize patterns. Import DXF-AAMA or a supported Seamly2D file.</p><span class="step-module">BETA Pattern</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="2" y="5" width="22" height="16" rx="1.5"/><path d="M6 8 V18 M11 8 V18 M16 8 L20 12 L16 18"/></svg></span><span class="step-num">Step 2</span><h3>Marker</h3><p>Nest all pieces on the fabric width with grain, nap, pairs and size ratio. Edit by hand.</p><span class="step-module">BETA Marker</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="4" width="20" height="18" rx="2"/><path d="M3 9 H23 M3 14 H23 M10 4 V22 M16 4 V22"/></svg></span><span class="step-num">Step 3</span><h3>Cut plan</h3><p>Turn an order into size ratios, ply heights and lay lengths.</p><span class="step-module">BETA Marker</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><ellipse cx="9" cy="13" rx="5" ry="8"/><path d="M9 5 H19 Q24 5 24 13 Q24 21 19 21 H9"/><ellipse cx="9" cy="13" rx="1.5" ry="2.5"/></svg></span><span class="step-num">Step 4</span><h3>Rolls</h3><p>Inspect rolls (4-point), group shade and shrinkage, allocate rolls to lays.</p><span class="step-module">BETA Marker</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M3 18 L13 22 L23 18 M3 14 L13 18 L23 14 M3 10 L13 14 L23 10 L13 6 Z"/></svg></span><span class="step-num">Step 5</span><h3>Spread</h3><p>Print spreading sheets with roll order, plies, splice zones and end allowances.</p><span class="step-module">Floor</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><circle cx="7" cy="18" r="3"/><circle cx="7" cy="8" r="3"/><path d="M9.5 16.5 L23 6 M9.5 9.5 L23 20"/></svg></span><span class="step-num">Step 6</span><h3>Cut</h3><p>Plot the marker 1:1 (PLT/HPGL or PDF) or send a cutter file. Track each lay.</p><span class="step-module">Floor</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="4" y="8" width="18" height="13" rx="1.5"/><path d="M4 12 H22 M13 8 V21 M8 8 L10 3 H16 L18 8"/></svg></span><span class="step-num">Step 7</span><h3>Bundles</h3><p>Number plies, make bundles and print QR tickets and stickers. Plan re-cuts.</p><span class="step-module">Floor</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M4 20 H22 M7 20 V9 Q7 5 11 5 H20 V12 H11 M17 12 V17"/><path d="M17 17 L17 19" /></svg></span><span class="step-num">Step 8</span><h3>Sewing</h3><p>Scan bundles out to sewing lines. Export work-in-progress and fabric use.</p><span class="step-module">Floor</span></li>
+</ol>
+  </div>
+</section>
+
+<section class="section section-alt" id="screens" aria-labelledby="screens-title">
+  <div class="wrap">
+    
+    <h2 id="screens-title">See the screens</h2>
+    
+    <div class="screen-grid"><figure class="screen"><img src="assets/screens/marker-editor.png" alt="Screenshot of the Marker editor screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Marker editor: nest, bump, compact and check every piece.</figcaption></figure><figure class="screen"><img src="assets/screens/pattern.png" alt="Screenshot of the Pattern screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Pattern: draft, grade and check all sizes.</figcaption></figure><figure class="screen"><img src="assets/screens/cut-plan.png" alt="Screenshot of the Cut plan screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Cut plan: ratios, plies and lay lengths for an order.</figcaption></figure><figure class="screen"><img src="assets/screens/rolls.png" alt="Screenshot of the Rolls screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Rolls: inspection, shade groups and allocation.</figcaption></figure><figure class="screen"><img src="assets/screens/spreading.png" alt="Screenshot of the Floor spreading screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Floor: spreading sheets and lay tracking.</figcaption></figure><figure class="screen"><img src="assets/screens/bundles.png" alt="Screenshot of the Bundles screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Bundles: QR tickets, stickers and re-cuts.</figcaption></figure></div>
+<p class="note">The app is being redesigned for version 0.4.0. Real screenshots replace these drawings before release.</p>
+  </div>
+</section>
+
+<section class="section " id="features" aria-labelledby="features-title">
+  <div class="wrap">
+    
+    <h2 id="features-title">What it does today</h2>
+    <p class="lead">Each of these runs on your own computer. The heavy work (nesting, checks, file output) is written in Rust for speed.</p>
+    
+<div class="card-grid">
+  <article class="card"><h3>Pattern making</h3><ul class="check-list"><li>Drafting with measurements and formulas</li><li>Grading and size checks</li><li>Digitize a paper pattern from a photo</li><li>DXF-AAMA export; Seamly2D file subset import</li></ul></article><article class="card"><h3>Marker making</h3><ul class="check-list"><li>Automatic nesting with garment rules: grain, one-way nap, left/right pairs, size ratio, gaps</li><li>Folded and tubular fabric, shade bands, fabric defects</li><li>Manual editing: bump, compact, swap, sections, marker library</li><li>Every marker is checked by an independent validator before export</li></ul></article><article class="card"><h3>Cut planning and costing</h3><ul class="check-list"><li>Size ratios, ply heights and lay lengths from an order</li><li>Fabric consumption and cost estimates</li><li>Compare fabric widths (command line)</li></ul></article><article class="card"><h3>Rolls and spreading</h3><ul class="check-list"><li>4-point roll inspection and defect maps</li><li>Shade and shrinkage groups</li><li>Roll allocation, splice zones and end bits</li></ul></article><article class="card"><h3>Bundles and the floor</h3><ul class="check-list"><li>Ply numbering, bundles, QR tickets and stickers</li><li>Re-cut planning for damaged parts</li><li>Bundle scan-out to sewing lines with a USB scanner</li></ul></article><article class="card"><h3>Files and data</h3><ul class="check-list"><li>Plot: PLT/HPGL and 1:1 PDF; SVG, DXF, generic ISO cutter file</li><li>Import orders and rolls from CSV or Excel</li><li>Export consumption and work-in-progress as CSV</li></ul></article>
+</div>
+<div class="callout callout-plain">
+  <h3>Not yet</h3>
+  <p>We prefer to tell you before you find out.</p>
+  <ul><li>Plotter and cutter profiles are generic. Test them on your machines before production.</li><li>No direct Tally or SAP connector yet. Exchange data with CSV or Excel files.</li><li>The server mode serves one computer in version 0.4. Shared use over the factory network is planned.</li><li>The Windows installer is not code-signed yet. Windows may show a warning.</li><li>English only. Hindi and Tamil are planned.</li></ul>
+</div>
+  </div>
+</section>
+
+<section class="section section-alt" id="who" aria-labelledby="who-title">
+  <div class="wrap">
+    
+    <h2 id="who-title">Who it is for</h2>
+    
+    
+<div class="card-grid card-grid-5">
+  <article class="card"><h3>Garment factories</h3><p>Cutting rooms that want control of their own data and no per-seat licence fees. First users are in India.</p></article>
+  <article class="card"><h3>CAD and marker operators</h3><p>People who make markers every day and need grain, nap, pairs, ratios, folds and shade rules to be right.</p></article>
+  <article class="card"><h3>Merchandisers and planners</h3><p>Fabric consumption, width comparison and cut plans from the same marker the cutting room uses.</p></article>
+  <article class="card"><h3>Factory IT</h3><p>A Windows installer, a command-line server and plain files. No cloud service to approve.</p></article>
+  <article class="card"><h3>Researchers and developers</h3><p>Open code, open benchmark and open data formats. Improve the nesting engine and prove it.</p></article>
+</div>
+  </div>
+</section>
+
+<section class="section " id="download" aria-labelledby="download-title">
+  <div class="wrap">
+    
+    <h2 id="download-title">Download</h2>
+    
+    
+<div class="card-grid card-grid-3">
+  <article class="card download-card">
+    <h3>Windows desktop app</h3>
+    <p>For one PC. Windows 10 or 11, 64-bit. Installer 7.86 MiB. No administrator rights needed.</p>
+    <a class="btn btn-primary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_x64-setup.exe">Download installer</a>
+    <p class="small muted"><a href="install.html#windows">Installation steps</a></p>
+  </article>
+  <article class="card download-card">
+    <h3>Server build</h3>
+    <p>The <code>beta-marker serve</code> command runs the same app in a web browser.</p>
+    <a class="btn btn-primary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_linux-x86_64.tar.gz">Download server build</a>
+    <p class="small muted"><a href="install.html#server">Server steps</a> · build it from source today</p>
+  </article>
+  <article class="card download-card">
+    <h3>Source code</h3>
+    <p>Everything is open source under Apache-2.0. Build it yourself and check every line.</p>
+    <a class="btn btn-secondary" href="https://github.com/sohitqwer-del/beta-cutting-room">View source code</a>
+    <p class="small muted"><a href="open-source.html">Licence and credits</a></p>
+  </article>
+</div>
+  </div>
+</section>
+
+<section class="section section-alt" id="samples" aria-labelledby="samples-title">
+  <div class="wrap">
+    
+    <h2 id="samples-title">Send us your markers</h2>
+    
+    
+<div class="split">
+  <div>
+    <p>We want to compare BETA with your current CAD on your own styles: same pieces, same fabric width, same rules. You get the results, and they stay private.</p>
+    <h3>What to send</h3>
+    <ol class="plain-steps">
+      <li>3 to 5 real styles exported as <strong>DXF-AAMA or ASTM</strong> from your CAD (for example a shirt, trouser, T-shirt or jeans).</li>
+      <li>For each style, the marker your CAD made: fabric width, size ratio, rules (nap, 0/180, gaps), <strong>marker length and efficiency</strong>, and how long the auto-nest ran.</li>
+      <li>If you can, one plotter file (PLT) from your cutting room, so we can check the plot scale on your plotter.</li>
+    </ol>
+  </div>
+  <aside class="callout callout-accent" aria-label="Privacy promise">
+    <h3>Your files stay private</h3>
+    <p>We never commit, publish or share your patterns or markers without your written permission. Published results name no style, buyer or factory unless you agree.</p>
+    <p><strong>Contact:</strong> <a href="mailto:sohitqwer@gmail.com">sohitqwer@gmail.com</a></p>
+  </aside>
+</div>
+  </div>
+</section>
+
+</main>
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div>
+      <p class="footer-brand"><svg class="logo-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M10 8h7.2c3.3 0 5.4 1.7 5.4 4.3 0 1.8-1 3-2.5 3.6 2 .5 3.3 1.9 3.3 4 0 2.9-2.3 4.6-5.9 4.6H10z M13.3 11v4h3.4c1.5 0 2.4-.8 2.4-2s-.9-2-2.4-2z M13.3 17.9v4.2h3.9c1.6 0 2.6-.8 2.6-2.1s-1-2.1-2.6-2.1z" fill="var(--logo-ink)" fill-rule="evenodd"/></svg><span>BETA Cutting Room 0.4.0</span></p>
+      <p>Open source under the Apache License 2.0. Self-hosted. Your patterns stay in your factory.</p>
+      <p class="muted">This website has no trackers, no cookies and loads nothing from other servers.</p>
+    </div>
+    <nav aria-label="Footer"><ul class="footer-list"><li><a href="index.html" aria-current="page">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
+  </div>
+</footer>
+<script>(function(){var b=document.getElementById('theme-toggle');if(!b)return;var root=document.documentElement;var order=['auto','light','dark'];var names={auto:'Automatic',light:'Light',dark:'Dark'};
+function current(){return root.getAttribute('data-theme')||'auto';}
+function show(){var c=current();b.querySelector('[data-theme-label]').textContent=names[c];b.setAttribute('aria-label','Colour theme: '+names[c]+'. Change theme');}
+b.addEventListener('click',function(){var n=order[(order.indexOf(current())+1)%3];if(n==='auto'){root.removeAttribute('data-theme');try{localStorage.removeItem('beta-site-theme');}catch(e){}}else{root.setAttribute('data-theme',n);try{localStorage.setItem('beta-site-theme',n);}catch(e){}}show();});
+b.hidden=false;show();})();</script>
+</body>
+</html>

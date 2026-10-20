@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 const pkg = fileURLToPath(new URL('../../packages/marker-wasm/pkg/', import.meta.url));
 const base = process.env.BETA_WEB_BASE || './';
@@ -41,16 +41,27 @@ export default defineConfig({
         this.emitFile({ type: 'asset', fileName, source: readFileSync(fileURLToPath(new URL(relative, import.meta.url))) });
       }
     },
-  }, {
+  }, (() => {
     // Offline copy for phones: public/sw.js precaches every built file listed here (same server only).
-    name: 'offline-precache',
-    enforce: 'post',
-    generateBundle(_options, bundle) {
-      const pub = fileURLToPath(new URL('./public/', import.meta.url));
-      const files = [...Object.keys(bundle), ...readdirSync(pub)].filter(f => !f.endsWith('.map') && f !== 'sw.js' && f !== 'precache.json').sort();
-      const hash = createHash('sha256');
-      for (const f of files) { hash.update(f); const item = bundle[f]; hash.update(item ? (item.type === 'chunk' ? item.code : item.source) : readFileSync(join(pub, f))); }
-      this.emitFile({ type: 'asset', fileName: 'precache.json', source: JSON.stringify({ version: hash.digest('hex').slice(0, 16), files }) });
-    },
-  }],
+    // Browsers only install a new service worker when sw.js itself changes, so the build stamps its version into it.
+    let outDir = '';
+    let version = '';
+    return {
+      name: 'offline-precache',
+      enforce: 'post',
+      configResolved(config: { root: string; build: { outDir: string } }) { outDir = resolve(config.root, config.build.outDir); },
+      generateBundle(_options, bundle) {
+        const pub = fileURLToPath(new URL('./public/', import.meta.url));
+        const files = [...Object.keys(bundle), ...readdirSync(pub)].filter(f => !f.endsWith('.map') && f !== 'sw.js' && f !== 'precache.json').sort();
+        const hash = createHash('sha256');
+        for (const f of files) { hash.update(f); const item = bundle[f]; hash.update(item ? (item.type === 'chunk' ? item.code : item.source) : readFileSync(join(pub, f))); }
+        version = hash.digest('hex').slice(0, 16);
+        this.emitFile({ type: 'asset', fileName: 'precache.json', source: JSON.stringify({ version, files }) });
+      },
+      closeBundle() {
+        const sw = join(outDir, 'sw.js');
+        if (version && existsSync(sw)) writeFileSync(sw, `${readFileSync(sw, 'utf8').trimEnd()}\n// build ${version}\n`);
+      },
+    };
+  })()],
 });

@@ -63,7 +63,7 @@ app.innerHTML = `
     <div class="canvas-stage">
       <svg id="canvas" role="group" aria-label="Marker. Tab to select pieces. Arrows nudge the selected group. Alt plus arrows bump. R rotates, L locks. Question mark opens keyboard help." tabindex="0"></svg>
       <div id="canvas-empty" class="canvas-empty" hidden>${icon('marker')}<strong>No pieces on the marker yet</strong><span>Check the fabric width and size ratio in Setup, then press <b>Nest marker</b>. You can also place pieces by hand from the piece bin.</span></div>
-      <div id="nest-progress" class="nest-progress" aria-label="Nesting progress" role="status" aria-live="polite" hidden><div class="nest-progress-row"><span id="nest-progress-time">Starting…</span><button type="button" id="nest-cancel" class="small" hidden>${icon('stop')}Cancel search</button></div><progress id="nest-progress-bar" max="1" value="0" aria-label="Search time used"></progress><div class="nest-progress-row"><span>Best so far</span><strong id="nest-progress-best">No valid marker yet</strong></div><span id="nest-cancel-note" class="hint" hidden>The local server stops the search at the time limit.</span></div>
+      <div id="nest-progress" class="nest-progress" aria-label="Nesting progress" role="status" aria-live="polite" hidden><div class="nest-progress-row"><span id="nest-progress-time">Starting…</span><button type="button" id="nest-cancel" class="small" hidden>${icon('stop')}Cancel search</button></div><progress id="nest-progress-bar" max="1" value="0" aria-label="Search time used"></progress><div class="nest-progress-row"><span>Best so far</span><strong id="nest-progress-best">No valid marker yet</strong></div><span id="nest-cancel-note" class="hint" hidden>The search stops at the time limit.</span></div>
     </div>
     <div class="statusbar">
       <section id="stats" class="stats" aria-label="Marker statistics"></section>
@@ -546,7 +546,7 @@ $('#colour-mode').addEventListener('change', event => { features?.setColourByBun
 render(true); fit();
 void loadMarkerCore().then(async loaded => { core = loaded; editorCore = await loadEditorCore(); render(); history = new History(state); }).catch(error => { wasmProblem = `WASM could not load: ${errorText(error)} Build @beta/marker-wasm and reload to enable editing and checks.`; renderStats(); renderSelection(); });
 function checkHealth(): void {
-  if (staticMode()) { serverOnline = false; $('#server-status').textContent = 'Browser mode ? local Rust WASM'; $('#server-status').classList.add('connected'); return; }
+  if (staticMode()) { serverOnline = false; $('#server-status').textContent = 'Browser mode · local Rust WASM'; $('#server-status').classList.add('connected'); return; }
   void apiFetch('/api/health').then(async response => {
     if (response.status === 401 && !isDesktop()) { $('#server-status').textContent = 'Server needs an access token'; $('#server-status').classList.remove('connected'); shell.askToken(); return; }
     if (!response.ok) throw new Error();

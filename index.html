@@ -5,23 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BETA Cutting Room: open-source cutting-room software for garment factories</title>
 <meta name="description" content="Open-source, self-hosted cutting-room software for garment factories: pattern, marker, cut planning, rolls, spreading and bundles. Runs offline on your own computers.">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#fbfaf6">
 <meta name="referrer" content="no-referrer">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BETA Cutting Room">
+<meta property="og:title" content="BETA Cutting Room: open-source cutting-room software for garment factories">
+<meta property="og:description" content="Open-source, self-hosted cutting-room software for garment factories: pattern, marker, cut planning, rolls, spreading and bundles. Runs offline on your own computers.">
+<meta property="og:url" content="https://sohitqwer-del.github.io/beta-cutting-room/">
+<meta property="og:image" content="https://sohitqwer-del.github.io/beta-cutting-room/assets/brand/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="BETA Cutting Room logo with garment pieces nested on fabric">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/brand/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/site.css">
-<script>(function(){try{var t=localStorage.getItem('beta-site-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<script>(function(){var r=document.documentElement;try{if(window.matchMedia&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){r.classList.add('motion');setTimeout(function(){if(!r.classList.contains('motion-ready'))r.classList.remove('motion');},2500);}}catch(e){}})();</script>
+<script src="assets/site.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="brand" href="index.html"><svg class="logo-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M10 8h7.2c3.3 0 5.4 1.7 5.4 4.3 0 1.8-1 3-2.5 3.6 2 .5 3.3 1.9 3.3 4 0 2.9-2.3 4.6-5.9 4.6H10z M13.3 11v4h3.4c1.5 0 2.4-.8 2.4-2s-.9-2-2.4-2z M13.3 17.9v4.2h3.9c1.6 0 2.6-.8 2.6-2.1s-1-2.1-2.6-2.1z" fill="var(--logo-ink)" fill-rule="evenodd"/></svg><span>BETA Cutting Room</span></a>
+    <a class="brand" href="index.html"><svg class="logo-mark" viewBox="0 0 64 64" width="34" height="34" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="15" fill="#176b52"/><path d="M16 11H26V53H16V36L19.5 32L16 28Z" fill="#ffffff"/><path d="M29 11H38.5A10 10 0 0 1 38.5 31H29Z" fill="#f4b740"/><path d="M29 34H40.5A9.5 9.5 0 0 1 40.5 53H29Z" fill="#c9ecd9"/></svg><span class="brand-name"><b>BETA</b> Cutting Room</span></a>
     <nav class="nav-desktop" aria-label="Main"><ul class="nav-list"><li><a href="index.html" aria-current="page">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
     <div class="header-tools">
-      <button type="button" id="theme-toggle" class="theme-toggle" hidden>
-        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"/></svg>
-        <span data-theme-label>Automatic</span>
-      </button>
+      <a class="btn btn-primary btn-small header-cta" href="index.html#download">Download</a>
       <details class="nav-mobile">
         <summary><span class="sr-only">Menu</span><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary>
         <nav aria-label="Main (small screens)"><ul class="nav-list-mobile"><li><a href="index.html" aria-current="page">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
@@ -32,144 +44,284 @@
 <main id="main" tabindex="-1">
 
 <div class="hero">
+  <div class="hero-bg" aria-hidden="true"><span class="blob blob-1"></span><span class="blob blob-2"></span><span class="blob blob-3"></span></div>
   <div class="wrap hero-inner">
     <div class="hero-copy">
-      <p class="eyebrow">Version 0.4.0 · Open source · Self-hosted</p>
-      <h1>Cutting-room software for garment factories</h1>
-      <p class="hero-lead">Pattern, marker, cut planning, rolls and bundles in one program. Open source (Apache-2.0). Self-hosted: it runs on your own Windows PC or factory server. Your patterns never leave your factory. It works offline.</p>
+      <p class="hero-pills"><span class="pill">Version 0.4.0</span><span class="pill">Free and open source</span><a class="pill pill-fun" href="#fun"><span aria-hidden="true">✦</span> A fun project, built with modern AI tools</a></p>
+      <h1 class="hero-title"><span class="nowrap">Open-source,</span> <span class="nowrap">self-hosted</span> <span class="hl"><span class="nowrap">cutting-room</span> software</span> for garment factories</h1>
+      <p class="hero-lead">Pattern, marker, cut planning, rolls, spreading and bundles in one program. It runs on your own Windows PC or factory server and works offline. Your patterns never leave your factory.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_x64-setup.exe">Download for Windows</a>
-        <a class="btn btn-secondary" href="benchmark.html">See the benchmark</a>
+        <a class="btn btn-primary btn-large" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_x64-setup.exe"><span class="btn-label">Download for Windows</span><span class="btn-sub">Installer · 7.86 MiB</span></a>
+        <a class="btn btn-secondary btn-large" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_windows-x64-portable.zip"><span class="btn-label">Portable ZIP</span><span class="btn-sub">No install · 8.42 MiB</span></a>
+        <a class="btn btn-secondary btn-large" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_linux-x86_64.tar.gz"><span class="btn-label">Linux server</span><span class="btn-sub">tar.gz · 7.92 MiB</span></a>
       </div>
       <ul class="trust-list">
         <li>No account</li><li>No cloud</li><li>No licence fee</li><li>Works offline</li>
       </ul>
+      <p class="humble"><span class="humble-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M13 22 Q3 15 3 9 Q3 4 8 4 Q11 4 13 7 Q15 4 18 4 Q23 4 23 9 Q23 15 13 22 Z"/></svg></span><span><strong>BETA is young and not perfect yet.</strong> We need your help to improve it. <a href="#help">Tell us what to fix</a>.</span></p>
     </div>
-    <figure class="hero-figure">
-      <svg class="illus hero-marker" viewBox="0 0 640 270" role="img" aria-labelledby="hero-illus-t">
+    <figure class="hero-figure" data-tilt>
+      <div class="hero-card">
+        <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>Marker · shirt · sizes S, M, L</span><span class="badge">Illustration</span></div>
+        <div class="hero-stage is-playing" id="hero-stage">
+          <svg class="illus hero-marker" viewBox="-10 0 646 280" role="img" aria-labelledby="hero-illus-t">
 <title id="hero-illus-t">Illustration of a marker: shirt fronts, backs, sleeves, collars and pockets in three sizes nested on a strip of fabric.</title>
 <rect class="fabric" x="20" y="30" width="604" height="200" rx="2"/>
 <path class="selvedge" d="M20 30 H624 M20 230 H624"/>
-<g class="pc pc-1" transform="translate(24 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g>
-<g class="pc pc-1" transform="translate(24 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g>
-<g class="pc pc-1" transform="translate(128 106) rotate(180 50 60)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g>
-<g class="pc pc-1" transform="translate(128 34) rotate(180 50 34) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g>
-<g class="pc pc-2" transform="translate(232 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g>
-<g class="pc pc-2" transform="translate(232 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g>
-<g class="pc pc-2" transform="translate(336 106) rotate(180 50 60)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g>
-<g class="pc pc-2" transform="translate(336 34) rotate(180 50 34) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g>
-<g class="pc pc-3" transform="translate(440 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g>
-<g class="pc pc-3" transform="translate(440 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g>
-<rect class="pc pc-1" x="548" y="34" width="13" height="92" rx="5"/>
-<rect class="pc pc-2" x="566" y="34" width="13" height="92" rx="5"/>
-<rect class="pc pc-3" x="584" y="34" width="13" height="92" rx="5"/>
-<rect class="pc pc-1" x="602" y="34" width="13" height="92" rx="5"/>
-<g class="pc pc-1" transform="translate(548 134)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g>
-<g class="pc pc-2" transform="translate(584 134)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g>
-<g class="pc pc-3" transform="translate(548 180)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g>
-<g class="pc pc-1" transform="translate(584 180)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g>
-<g class="dim"><path d="M10 34 V226 M6 38 L10 30 L14 38 M6 222 L10 230 L14 222"/><text x="0" y="0" transform="translate(6 130) rotate(-90)" text-anchor="middle">fabric width</text></g>
-<g class="dim"><path d="M20 250 H624 M28 246 L20 250 L28 254 M616 246 L624 250 L616 254"/><text x="322" y="266" text-anchor="middle">marker length: shorter is better</text></g>
+<g class="pieces"><g class="fly" style="--fx:295px;--fy:-110px;--fr:16deg;--i:0"><g class="pc pc-1" transform="translate(24 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g></g>
+<g class="fly" style="--fx:399px;--fy:-36px;--fr:116deg;--i:1"><g class="pc pc-1" transform="translate(24 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g></g>
+<g class="fly" style="--fx:312px;--fy:-53px;--fr:-73deg;--i:2"><g class="pc pc-1" transform="translate(128 34) rotate(180 50 34) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g></g>
+<g class="fly" style="--fx:416px;--fy:-82px;--fr:-69deg;--i:3"><g class="pc pc-1" transform="translate(128 106) rotate(180 50 60)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g></g>
+<g class="fly" style="--fx:489px;--fy:-111px;--fr:91deg;--i:4"><g class="pc pc-2" transform="translate(232 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g></g>
+<g class="fly" style="--fx:269px;--fy:-151px;--fr:-23deg;--i:5"><g class="pc pc-2" transform="translate(232 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g></g>
+<g class="fly" style="--fx:410px;--fy:119px;--fr:29deg;--i:6"><g class="pc pc-2" transform="translate(336 34) rotate(180 50 34) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g></g>
+<g class="fly" style="--fx:500px;--fy:-77px;--fr:-42deg;--i:7"><g class="pc pc-2" transform="translate(336 106) rotate(180 50 60)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g></g>
+<g class="fly" style="--fx:488px;--fy:-136px;--fr:15deg;--i:8"><g class="pc pc-3" transform="translate(440 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g></g>
+<g class="fly" style="--fx:483px;--fy:-100px;--fr:-89deg;--i:9"><g class="pc pc-3" transform="translate(440 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g></g>
+<g class="fly" style="--fx:279px;--fy:-119px;--fr:2deg;--i:10"><rect class="pc pc-1" x="548" y="34" width="13" height="92" rx="5"/></g>
+<g class="fly" style="--fx:419px;--fy:207px;--fr:-92deg;--i:11"><rect class="pc pc-2" x="566" y="34" width="13" height="92" rx="5"/></g>
+<g class="fly" style="--fx:417px;--fy:11px;--fr:39deg;--i:12"><rect class="pc pc-3" x="584" y="34" width="13" height="92" rx="5"/></g>
+<g class="fly" style="--fx:503px;--fy:-6px;--fr:-81deg;--i:13"><rect class="pc pc-1" x="602" y="34" width="13" height="92" rx="5"/></g>
+<g class="fly" style="--fx:277px;--fy:-123px;--fr:-118deg;--i:14"><g class="pc pc-1" transform="translate(548 134)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g></g>
+<g class="fly" style="--fx:464px;--fy:15px;--fr:-106deg;--i:15"><g class="pc pc-2" transform="translate(584 134)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g></g>
+<g class="fly" style="--fx:332px;--fy:-35px;--fr:30deg;--i:16"><g class="pc pc-3" transform="translate(548 180)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g></g>
+<g class="fly" style="--fx:267px;--fy:98px;--fr:103deg;--i:17"><g class="pc pc-1" transform="translate(584 180)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g></g></g>
+<rect class="scan" x="18" y="26" width="5" height="208" rx="2.5"/>
+<g class="dim dim-width"><path d="M10 34 V226 M6 38 L10 30 L14 38 M6 222 L10 230 L14 222"/><text x="0" y="0" transform="translate(6 130) rotate(-90)" text-anchor="middle">fabric width</text></g>
+<g class="dim dim-length"><path class="dim-line" d="M20 250 H624"/><path d="M28 246 L20 250 L28 254 M616 246 L624 250 L616 254"/><text x="322" y="272" text-anchor="middle">marker length: shorter is better</text></g>
 <g class="legend-sizes" transform="translate(20 8)"><rect class="pc pc-1" width="12" height="12" rx="2"/><text x="18" y="10">S</text><rect class="pc pc-2" x="40" width="12" height="12" rx="2"/><text x="58" y="10">M</text><rect class="pc pc-3" x="80" width="12" height="12" rx="2"/><text x="98" y="10">L</text></g>
 </svg>
+          <p class="hero-status" aria-hidden="true"><span class="st st-1"><span class="spinner"></span>Nesting 18 pieces…</span><span class="st st-2"><span class="tick">✓</span>All pieces placed. Checked by the validator.</span></p>
+        </div>
+        <button type="button" class="replay" data-replay="hero-stage" hidden><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M4 10a6 6 0 1 0 2-4.5M4 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Replay</button>
+      </div>
       <figcaption>Illustration. A marker places every pattern piece on the fabric so the lay uses as little length as possible.</figcaption>
     </figure>
   </div>
 </div>
 
+<section class="stats" aria-label="BETA in numbers">
+  <div class="wrap"><ul class="stat-band" data-reveal data-stagger>
+    <li><span class="stat-big"><span class="count" data-count="8" data-decimals="0">8</span></span><span class="stat-text">steps from pattern to sewing line, in one program</span></li>
+    <li><span class="stat-big"><span class="count" data-count="300" data-decimals="0">300</span></span><span class="stat-text">real Lectra nesting tasks in our public benchmark</span></li>
+    <li><span class="stat-big"><span class="count" data-count="100" data-decimals="0">100</span><small>%</small></span><span class="stat-text">of markers checked by an independent validator before export</span></li>
+    <li><span class="stat-big">0</span><span class="stat-text">accounts, cloud services or licence fees</span></li>
+  </ul></div>
+</section>
+
 <section class="section " id="workflow" aria-labelledby="workflow-title">
   <div class="wrap">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">One program</p>
+      <h2 id="workflow-title">From pattern to sewing line</h2>
+      <p class="lead">One record follows the style through the cutting room. Each step uses the result of the step before, so numbers are not typed twice.</p>
+    </div>
     
-    <h2 id="workflow-title">From pattern to sewing line</h2>
-    <p class="lead">One record follows the style through the cutting room. Each step uses the result of the step before, so numbers are not typed twice.</p>
-    
-<ol class="flow-strip" aria-hidden="true"><li><span>Pattern</span></li><li><span>Marker</span></li><li><span>Cut plan</span></li><li><span>Rolls</span></li><li><span>Spread</span></li><li><span>Cut</span></li><li><span>Bundles</span></li><li><span>Sewing</span></li></ol>
-<ol class="workflow">
-  <li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M6 4 L10 3 Q12 6 14 6 Q16 6 18 3 L22 4 L21 9 L19 9 L19 21 L9 21 L9 9 L7 9 Z"/></svg></span><span class="step-num">Step 1</span><h3>Pattern</h3><p>Draft, grade and digitize patterns. Import DXF-AAMA or a supported Seamly2D file.</p><span class="step-module">BETA Pattern</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="2" y="5" width="22" height="16" rx="1.5"/><path d="M6 8 V18 M11 8 V18 M16 8 L20 12 L16 18"/></svg></span><span class="step-num">Step 2</span><h3>Marker</h3><p>Nest all pieces on the fabric width with grain, nap, pairs and size ratio. Edit by hand.</p><span class="step-module">BETA Marker</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="4" width="20" height="18" rx="2"/><path d="M3 9 H23 M3 14 H23 M10 4 V22 M16 4 V22"/></svg></span><span class="step-num">Step 3</span><h3>Cut plan</h3><p>Turn an order into size ratios, ply heights and lay lengths.</p><span class="step-module">BETA Marker</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><ellipse cx="9" cy="13" rx="5" ry="8"/><path d="M9 5 H19 Q24 5 24 13 Q24 21 19 21 H9"/><ellipse cx="9" cy="13" rx="1.5" ry="2.5"/></svg></span><span class="step-num">Step 4</span><h3>Rolls</h3><p>Inspect rolls (4-point), group shade and shrinkage, allocate rolls to lays.</p><span class="step-module">BETA Marker</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M3 18 L13 22 L23 18 M3 14 L13 18 L23 14 M3 10 L13 14 L23 10 L13 6 Z"/></svg></span><span class="step-num">Step 5</span><h3>Spread</h3><p>Print spreading sheets with roll order, plies, splice zones and end allowances.</p><span class="step-module">Floor</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><circle cx="7" cy="18" r="3"/><circle cx="7" cy="8" r="3"/><path d="M9.5 16.5 L23 6 M9.5 9.5 L23 20"/></svg></span><span class="step-num">Step 6</span><h3>Cut</h3><p>Plot the marker 1:1 (PLT/HPGL or PDF) or send a cutter file. Track each lay.</p><span class="step-module">Floor</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="4" y="8" width="18" height="13" rx="1.5"/><path d="M4 12 H22 M13 8 V21 M8 8 L10 3 H16 L18 8"/></svg></span><span class="step-num">Step 7</span><h3>Bundles</h3><p>Number plies, make bundles and print QR tickets and stickers. Plan re-cuts.</p><span class="step-module">Floor</span></li><li class="step"><span class="step-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M4 20 H22 M7 20 V9 Q7 5 11 5 H20 V12 H11 M17 12 V17"/><path d="M17 17 L17 19" /></svg></span><span class="step-num">Step 8</span><h3>Sewing</h3><p>Scan bundles out to sewing lines. Export work-in-progress and fabric use.</p><span class="step-module">Floor</span></li>
-</ol>
+<div class="flow" data-flow>
+  <div class="flow-track" aria-hidden="true"><span class="flow-fill"></span><span class="flow-runner"></span></div>
+  <ol class="flow-steps">
+    <li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M6 4 L10 3 Q12 6 14 6 Q16 6 18 3 L22 4 L21 9 L19 9 L19 21 L9 21 L9 9 L7 9 Z"/></svg></span></span><span class="step-num">Step 1</span><h3>Pattern</h3><p>Draft, grade and digitize patterns. Import DXF-AAMA or a supported Seamly2D file.</p><span class="step-module">BETA Pattern</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="2" y="5" width="22" height="16" rx="1.5"/><path d="M6 8 V18 M11 8 V18 M16 8 L20 12 L16 18"/></svg></span></span><span class="step-num">Step 2</span><h3>Marker</h3><p>Nest all pieces on the fabric width with grain, nap, pairs and size ratio. Edit by hand.</p><span class="step-module">BETA Marker</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="4" width="20" height="18" rx="2"/><path d="M3 9 H23 M3 14 H23 M10 4 V22 M16 4 V22"/></svg></span></span><span class="step-num">Step 3</span><h3>Cut plan</h3><p>Turn an order into size ratios, ply heights and lay lengths.</p><span class="step-module">BETA Marker</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><ellipse cx="9" cy="13" rx="5" ry="8"/><path d="M9 5 H19 Q24 5 24 13 Q24 21 19 21 H9"/><ellipse cx="9" cy="13" rx="1.5" ry="2.5"/></svg></span></span><span class="step-num">Step 4</span><h3>Rolls</h3><p>Inspect rolls (4-point), group shade and shrinkage, allocate rolls to lays.</p><span class="step-module">BETA Marker</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M3 18 L13 22 L23 18 M3 14 L13 18 L23 14 M3 10 L13 14 L23 10 L13 6 Z"/></svg></span></span><span class="step-num">Step 5</span><h3>Spread</h3><p>Print spreading sheets with roll order, plies, splice zones and end allowances.</p><span class="step-module">Floor</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><circle cx="7" cy="18" r="3"/><circle cx="7" cy="8" r="3"/><path d="M9.5 16.5 L23 6 M9.5 9.5 L23 20"/></svg></span></span><span class="step-num">Step 6</span><h3>Cut</h3><p>Plot the marker 1:1 (PLT/HPGL or PDF) or send a cutter file. Track each lay.</p><span class="step-module">Floor</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="4" y="8" width="18" height="13" rx="1.5"/><path d="M4 12 H22 M13 8 V21 M8 8 L10 3 H16 L18 8"/></svg></span></span><span class="step-num">Step 7</span><h3>Bundles</h3><p>Number plies, make bundles and print QR tickets and stickers. Plan re-cuts.</p><span class="step-module">Floor</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M4 20 H22 M7 20 V9 Q7 5 11 5 H20 V12 H11 M17 12 V17"/><path d="M17 17 L17 19" /></svg></span></span><span class="step-num">Step 8</span><h3>Sewing</h3><p>Scan bundles out to sewing lines. Export work-in-progress and fabric use.</p><span class="step-module">Floor</span></li>
+  </ol>
+  <button type="button" class="replay replay-inline" data-flow-replay hidden><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M4 10a6 6 0 1 0 2-4.5M4 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Play the steps again</button>
+</div>
   </div>
 </section>
 
 <section class="section section-alt" id="screens" aria-labelledby="screens-title">
   <div class="wrap">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Screenshots</p>
+      <h2 id="screens-title">See the real app</h2>
+      
+    </div>
     
-    <h2 id="screens-title">See the screens</h2>
+<div class="showcase" data-carousel data-reveal>
+  <div class="showcase-frame">
+    <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>BETA Cutting Room 0.4.0</span></div>
+    <div class="slides"><figure class="slide is-active" id="slide-marker-editor" data-slide><img src="assets/screens/marker-editor.png" alt="Screenshot of the Marker editor screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Marker editor: nest, bump, compact and check every piece.</figcaption></figure><figure class="slide" id="slide-pattern" data-slide><img src="assets/screens/pattern.png" alt="Screenshot of the Pattern screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Pattern: draft, grade and check all sizes.</figcaption></figure><figure class="slide" id="slide-cut-plan" data-slide><img src="assets/screens/cut-plan.png" alt="Screenshot of the Cut plan screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Cut plan: ratios, plies and lay lengths for an order.</figcaption></figure><figure class="slide" id="slide-rolls" data-slide><img src="assets/screens/rolls.png" alt="Screenshot of the Rolls screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Rolls: inspection, shade groups and allocation.</figcaption></figure><figure class="slide" id="slide-spreading" data-slide><img src="assets/screens/spreading.png" alt="Screenshot of the Spreading screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Floor: spreading sheets and lay tracking.</figcaption></figure><figure class="slide" id="slide-bundles" data-slide><img src="assets/screens/bundles.png" alt="Screenshot of the Bundles screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Bundles: QR tickets, stickers and re-cuts.</figcaption></figure></div>
+  </div>
+  <div class="showcase-controls">
+    <div class="tabs" data-tablist aria-label="App screens" hidden><button type="button" class="tab" id="tab-marker-editor" data-tab aria-selected="true"><span>Marker editor</span><i class="tab-progress" aria-hidden="true"></i></button><button type="button" class="tab" id="tab-pattern" data-tab aria-selected="false"><span>Pattern</span><i class="tab-progress" aria-hidden="true"></i></button><button type="button" class="tab" id="tab-cut-plan" data-tab aria-selected="false"><span>Cut plan</span><i class="tab-progress" aria-hidden="true"></i></button><button type="button" class="tab" id="tab-rolls" data-tab aria-selected="false"><span>Rolls</span><i class="tab-progress" aria-hidden="true"></i></button><button type="button" class="tab" id="tab-spreading" data-tab aria-selected="false"><span>Spreading</span><i class="tab-progress" aria-hidden="true"></i></button><button type="button" class="tab" id="tab-bundles" data-tab aria-selected="false"><span>Bundles</span><i class="tab-progress" aria-hidden="true"></i></button></div>
+    <button type="button" class="btn-icon" data-toggle hidden aria-pressed="false"><svg class="i-pause" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><svg class="i-play" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M7 4.5v11l9-5.5z" fill="currentColor"/></svg><span class="sr-only" data-toggle-label>Pause slideshow</span></button>
+  </div>
+</div>
+<p class="note">Real screens from version 0.4.0, with original sample data. No factory data.</p>
+  </div>
+</section>
+
+<section class="section section-alt" id="benchmark" aria-labelledby="benchmark-title">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Public benchmark</p>
+      <h2 id="benchmark-title">Honest numbers, not big claims</h2>
+      <p class="lead">We test BETA on the public Lectra dataset: real nesting tasks from fashion companies, with the efficiency that Lectra’s own engine reached on each one.</p>
+    </div>
     
-    <div class="screen-grid"><figure class="screen"><img src="assets/screens/marker-editor.png" alt="Screenshot of the Marker editor screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Marker editor: nest, bump, compact and check every piece.</figcaption></figure><figure class="screen"><img src="assets/screens/pattern.png" alt="Screenshot of the Pattern screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Pattern: draft, grade and check all sizes.</figcaption></figure><figure class="screen"><img src="assets/screens/cut-plan.png" alt="Screenshot of the Cut plan screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Cut plan: ratios, plies and lay lengths for an order.</figcaption></figure><figure class="screen"><img src="assets/screens/rolls.png" alt="Screenshot of the Rolls screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Rolls: inspection, shade groups and allocation.</figcaption></figure><figure class="screen"><img src="assets/screens/spreading.png" alt="Screenshot of the Floor spreading screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Floor: spreading sheets and lay tracking.</figcaption></figure><figure class="screen"><img src="assets/screens/bundles.png" alt="Screenshot of the Bundles screen in BETA Cutting Room" loading="lazy" decoding="async"><figcaption>Bundles: QR tickets, stickers and re-cuts.</figcaption></figure></div>
-<p class="note">The app is being redesigned for version 0.4.0. Real screenshots replace these drawings before release.</p>
+<div class="bench-grid"><article class="bench-card" data-reveal>
+  <header><h3>With Lectra’s own time per task</h3><p class="muted small">About 5 minutes per task · 60 tasks</p></header>
+  <div class="bench-numbers">
+    <div class="bench-stat"><span class="bench-value"><span class="count" data-count="0.42081770123333334" data-decimals="2" data-signed="1">+0.42</span><small> pp</small></span><span class="bench-label">Mean difference</span></div>
+    <div class="bench-stat"><span class="bench-value is-neg"><span class="count" data-count="-0.30439356900000003" data-decimals="2" data-signed="1">−0.30</span><small> pp</small></span><span class="bench-label">Median task</span></div>
+  </div>
+  <div class="wtl-block">
+  <div class="wtl-bar" aria-hidden="true"><span class="wtl-win" style="width:41.67%"></span><span class="wtl-tie" style="width:5.00%"></span><span class="wtl-loss" style="width:53.33%"></span></div>
+  <p class="wtl-legend"><span><i class="dot dot-win"></i>25 wins</span><span><i class="dot dot-tie"></i>3 ties</span><span><i class="dot dot-loss"></i>32 losses</span></p>
+</div>
+  <p class="small muted">60 of 60 BETA layouts passed the independent validator. A tie is within 0.1 points.</p>
+</article><article class="bench-card" data-reveal>
+  <header><h3>With 60 seconds per task</h3><p class="muted small">300 tasks</p></header>
+  <div class="bench-numbers">
+    <div class="bench-stat"><span class="bench-value is-neg"><span class="count" data-count="-0.7295743608366668" data-decimals="2" data-signed="1">−0.73</span><small> pp</small></span><span class="bench-label">Mean difference</span></div>
+    <div class="bench-stat"><span class="bench-value is-neg"><span class="count" data-count="-1.220970932" data-decimals="2" data-signed="1">−1.22</span><small> pp</small></span><span class="bench-label">Median task</span></div>
+  </div>
+  <div class="wtl-block">
+  <div class="wtl-bar" aria-hidden="true"><span class="wtl-win" style="width:28.00%"></span><span class="wtl-tie" style="width:4.00%"></span><span class="wtl-loss" style="width:68.00%"></span></div>
+  <p class="wtl-legend"><span><i class="dot dot-win"></i>84 wins</span><span><i class="dot dot-tie"></i>12 ties</span><span><i class="dot dot-loss"></i>204 losses</span></p>
+</div>
+  <p class="small muted">300 of 300 BETA layouts passed the independent validator. A tie is within 0.1 points.</p>
+</article></div>
+<div class="bench-foot" data-reveal>
+  <p><strong>No general win over Lectra.</strong> BETA is close to Lectra’s recorded results, but it still loses more tasks than it wins. We publish every number so you can check. Points (pp) are BETA’s marker efficiency minus Lectra’s; below zero means BETA’s marker was longer.</p>
+  <a class="link-arrow" href="benchmark.html">Method, assumptions and all results<span aria-hidden="true"> →</span></a>
+</div>
   </div>
 </section>
 
 <section class="section " id="features" aria-labelledby="features-title">
   <div class="wrap">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Features</p>
+      <h2 id="features-title">What it does today</h2>
+      <p class="lead">Each of these runs on your own computer. The heavy work (nesting, checks, file output) is written in Rust for speed.</p>
+    </div>
     
-    <h2 id="features-title">What it does today</h2>
-    <p class="lead">Each of these runs on your own computer. The heavy work (nesting, checks, file output) is written in Rust for speed.</p>
-    
-<div class="card-grid">
-  <article class="card"><h3>Pattern making</h3><ul class="check-list"><li>Drafting with measurements and formulas</li><li>Grading and size checks</li><li>Digitize a paper pattern from a photo</li><li>DXF-AAMA export; Seamly2D file subset import</li></ul></article><article class="card"><h3>Marker making</h3><ul class="check-list"><li>Automatic nesting with garment rules: grain, one-way nap, left/right pairs, size ratio, gaps</li><li>Folded and tubular fabric, shade bands, fabric defects</li><li>Manual editing: bump, compact, swap, sections, marker library</li><li>Every marker is checked by an independent validator before export</li></ul></article><article class="card"><h3>Cut planning and costing</h3><ul class="check-list"><li>Size ratios, ply heights and lay lengths from an order</li><li>Fabric consumption and cost estimates</li><li>Compare fabric widths (command line)</li></ul></article><article class="card"><h3>Rolls and spreading</h3><ul class="check-list"><li>4-point roll inspection and defect maps</li><li>Shade and shrinkage groups</li><li>Roll allocation, splice zones and end bits</li></ul></article><article class="card"><h3>Bundles and the floor</h3><ul class="check-list"><li>Ply numbering, bundles, QR tickets and stickers</li><li>Re-cut planning for damaged parts</li><li>Bundle scan-out to sewing lines with a USB scanner</li></ul></article><article class="card"><h3>Files and data</h3><ul class="check-list"><li>Plot: PLT/HPGL and 1:1 PDF; SVG, DXF, generic ISO cutter file</li><li>Import orders and rolls from CSV or Excel</li><li>Export consumption and work-in-progress as CSV</li></ul></article>
+<div class="card-grid" data-reveal data-stagger>
+  <article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M6 4 L10 3 Q12 6 14 6 Q16 6 18 3 L22 4 L21 9 L19 9 L19 21 L9 21 L9 9 L7 9 Z"/></svg></span><h3>Pattern making</h3><ul class="check-list"><li>Drafting with measurements and formulas</li><li>Grading and size checks</li><li>Digitize a paper pattern from a photo</li><li>DXF-AAMA export; Seamly2D file subset import</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="2" y="5" width="22" height="16" rx="1.5"/><path d="M6 8 V18 M11 8 V18 M16 8 L20 12 L16 18"/></svg></span><h3>Marker making</h3><ul class="check-list"><li>Automatic nesting with garment rules: grain, one-way nap, left/right pairs, size ratio, gaps</li><li>Folded and tubular fabric, shade bands, fabric defects</li><li>Manual editing: bump, compact, swap, sections, marker library</li><li>Every marker is checked by an independent validator before export</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="4" width="20" height="18" rx="2"/><path d="M3 9 H23 M3 14 H23 M10 4 V22 M16 4 V22"/></svg></span><h3>Cut planning and costing</h3><ul class="check-list"><li>Size ratios, ply heights and lay lengths from an order</li><li>Fabric consumption and cost estimates</li><li>Compare fabric widths (command line)</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><ellipse cx="9" cy="13" rx="5" ry="8"/><path d="M9 5 H19 Q24 5 24 13 Q24 21 19 21 H9"/><ellipse cx="9" cy="13" rx="1.5" ry="2.5"/></svg></span><h3>Rolls and spreading</h3><ul class="check-list"><li>4-point roll inspection and defect maps</li><li>Shade and shrinkage groups</li><li>Roll allocation, splice zones and end bits</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="4" y="8" width="18" height="13" rx="1.5"/><path d="M4 12 H22 M13 8 V21 M8 8 L10 3 H16 L18 8"/></svg></span><h3>Bundles and the floor</h3><ul class="check-list"><li>Ply numbering, bundles, QR tickets and stickers</li><li>Re-cut planning for damaged parts</li><li>Bundle scan-out to sewing lines with a USB scanner</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M7 3 H16 L21 8 V23 H7 Z M16 3 V8 H21"/><path d="M10 13 H18 M10 17 H18"/></svg></span><h3>Files and data</h3><ul class="check-list"><li>Plot: PLT/HPGL and 1:1 PDF; SVG, DXF, generic ISO cutter file</li><li>Import orders and rolls from CSV or Excel</li><li>Export consumption and work-in-progress as CSV</li></ul></article>
 </div>
-<div class="callout callout-plain">
+<div class="callout callout-plain not-yet" data-reveal>
   <h3>Not yet</h3>
   <p>We prefer to tell you before you find out.</p>
-  <ul><li>Plotter and cutter profiles are generic. Test them on your machines before production.</li><li>No direct Tally or SAP connector yet. Exchange data with CSV or Excel files.</li><li>The server mode serves one computer in version 0.4. Shared use over the factory network is planned.</li><li>The Windows installer is not code-signed yet. Windows may show a warning.</li><li>English only. Hindi and Tamil are planned.</li></ul>
+  <ul><li>Plotter and cutter profiles are generic. Test them on your machines before production.</li><li>Folded and tubular fabric work, but results are weaker than on open fabric.</li><li>No direct Tally or SAP connector yet. Exchange data with CSV or Excel files.</li><li>The server mode serves one computer in version 0.4. Shared use over the factory network is planned.</li><li>The Windows installer is not code-signed yet. Windows may show a warning.</li><li>English only. Hindi and Tamil are planned.</li></ul>
 </div>
+  </div>
+</section>
+
+<section class="section section-data" id="privacy" aria-labelledby="privacy-title">
+  <div class="wrap split split-even">
+    <div data-reveal>
+      <p class="eyebrow">Privacy</p>
+      <h2 id="privacy-title">Your data stays in your factory</h2>
+      <p class="lead">BETA runs on computers you control. There is no BETA cloud to send your patterns to.</p>
+      <ul class="check-list check-list-big">
+        <li>Patterns, markers, orders and roll data stay on your PCs and your server.</li>
+        <li>No account, no tracking, no usage data and no crash reports sent anywhere.</li>
+        <li>Works with no internet. Install and update from a USB drive.</li>
+        <li>The server listens only on its own computer unless you turn on factory network access with a token.</li>
+      </ul>
+      <p><a class="link-arrow" href="install.html#privacy">Read about privacy and self-hosting<span aria-hidden="true"> →</span></a></p>
+    </div>
+    <div class="factory-wrap" data-reveal><svg class="illus factory" viewBox="0 0 560 320" role="img" aria-labelledby="factory-t">
+<title id="factory-t">Diagram: inside your factory, a PC, a server and a plotter share data. There is no link to a cloud service.</title>
+<path class="f-wall" d="M30 296 V132 L95 92 V132 L160 92 V132 L225 92 V132 L290 92 V132 L355 92 V132 L420 92 V296 Z"/>
+<path class="f-floor" d="M14 296 H436"/>
+<text class="f-label" x="48" y="160">Your factory</text>
+<g class="f-node" style="--i:0"><g transform="translate(64 196)"><rect class="f-box" x="0" y="0" width="76" height="52" rx="6"/><rect class="f-screen" x="7" y="7" width="62" height="36" rx="3"/><path class="f-stroke" d="M28 52 V64 M18 66 H58"/><text class="f-cap" x="38" y="86" text-anchor="middle">PC</text></g></g>
+<g class="f-node" style="--i:1"><g transform="translate(186 180)"><rect class="f-box" x="0" y="0" width="64" height="80" rx="6"/><path class="f-stroke" d="M10 18 H54 M10 36 H54 M10 54 H54"/><circle class="f-led" cx="48" cy="11" r="3"/><circle class="f-led" cx="48" cy="29" r="3"/><circle class="f-led" cx="48" cy="47" r="3"/><text class="f-cap" x="32" y="102" text-anchor="middle">Server</text></g></g>
+<g class="f-node" style="--i:2"><g transform="translate(296 204)"><rect class="f-box" x="0" y="0" width="100" height="40" rx="6"/><rect class="f-paper" x="12" y="-14" width="76" height="16" rx="2"/><path class="f-stroke" d="M10 28 H90"/><path class="f-stroke" d="M8 40 V58 M92 40 V58"/><text class="f-cap" x="50" y="78" text-anchor="middle">Plotter</text></g></g>
+<path class="f-link" d="M140 222 H186"/><path class="f-link" d="M250 222 H296"/>
+<circle class="f-packet" style="--i:0" cx="143" cy="222" r="5"/><circle class="f-packet" style="--i:1" cx="253" cy="222" r="5"/>
+<g class="f-cloud"><path class="f-cloud-shape" d="M456 118 a24 24 0 0 1 2 -47 a32 32 0 0 1 60 -8 a24 24 0 0 1 10 55 Z"/><text class="f-cap" x="492" y="146" text-anchor="middle">Cloud</text>
+<g class="f-no"><circle cx="526" cy="112" r="16"/><path d="M519 105 L533 119 M533 105 L519 119"/></g></g>
+<path class="f-cut" d="M420 140 L448 124"/>
+</svg></div>
   </div>
 </section>
 
 <section class="section section-alt" id="who" aria-labelledby="who-title">
   <div class="wrap">
+    <div class="section-head" data-reveal>
+      
+      <h2 id="who-title">Who it is for</h2>
+      
+    </div>
     
-    <h2 id="who-title">Who it is for</h2>
-    
-    
-<div class="card-grid card-grid-5">
-  <article class="card"><h3>Garment factories</h3><p>Cutting rooms that want control of their own data and no per-seat licence fees. First users are in India.</p></article>
-  <article class="card"><h3>CAD and marker operators</h3><p>People who make markers every day and need grain, nap, pairs, ratios, folds and shade rules to be right.</p></article>
-  <article class="card"><h3>Merchandisers and planners</h3><p>Fabric consumption, width comparison and cut plans from the same marker the cutting room uses.</p></article>
-  <article class="card"><h3>Factory IT</h3><p>A Windows installer, a command-line server and plain files. No cloud service to approve.</p></article>
-  <article class="card"><h3>Researchers and developers</h3><p>Open code, open benchmark and open data formats. Improve the nesting engine and prove it.</p></article>
+<div class="card-grid card-grid-5" data-reveal data-stagger>
+  <article class="card audience-card"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><circle cx="18" cy="9" r="2.8"/><path d="M2.5 22 Q3 14 9 14 Q15 14 15.5 22 M15 15 Q22 13.5 23.5 21"/></svg></span><h3>Garment factories</h3><p>Cutting rooms that want control of their own data and no per-seat licence fees. First users are in India.</p></article><article class="card audience-card"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="2" y="5" width="22" height="16" rx="1.5"/><path d="M6 8 V18 M11 8 V18 M16 8 L20 12 L16 18"/></svg></span><h3>CAD and marker operators</h3><p>People who make markers every day and need grain, nap, pairs, ratios, folds and shade rules to be right.</p></article><article class="card audience-card"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="4" width="20" height="18" rx="2"/><path d="M3 9 H23 M3 14 H23 M10 4 V22 M16 4 V22"/></svg></span><h3>Merchandisers and planners</h3><p>Fabric consumption, width comparison and cut plans from the same marker the cutting room uses.</p></article><article class="card audience-card"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="4" y="3" width="18" height="8" rx="1.5"/><rect x="4" y="15" width="18" height="8" rx="1.5"/><path d="M8 7 H12 M8 19 H12"/><circle cx="18" cy="7" r="0.8"/><circle cx="18" cy="19" r="0.8"/></svg></span><h3>Factory IT</h3><p>A Windows installer, a command-line server and plain files. No cloud service to approve.</p></article><article class="card audience-card"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M9 7 L3 13 L9 19 M17 7 L23 13 L17 19 M15 4 L11 22"/></svg></span><h3>Researchers and developers</h3><p>Open code, open benchmark and open data formats. Improve the nesting engine and prove it.</p></article>
 </div>
   </div>
 </section>
 
 <section class="section " id="download" aria-labelledby="download-title">
   <div class="wrap">
+    <div class="section-head" data-reveal>
+      
+      <h2 id="download-title">Download</h2>
+      
+    </div>
     
-    <h2 id="download-title">Download</h2>
-    
-    
-<div class="card-grid card-grid-3">
-  <article class="card download-card">
-    <h3>Windows desktop app</h3>
-    <p>For one PC. Windows 10 or 11, 64-bit. Installer 7.86 MiB. No administrator rights needed.</p>
-    <a class="btn btn-primary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_x64-setup.exe">Download installer</a>
+<div class="card-grid card-grid-4" data-reveal data-stagger>
+  <article class="card download-card download-main">
+    <span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M13 3 V16 M8 11 L13 16 L18 11 M4 20 V23 H22 V20"/></svg></span>
+    <h3>Windows installer</h3>
+    <p>For one PC. Windows 10 or 11, 64-bit. 7.86 MiB. No administrator rights needed.</p>
+    <a class="btn btn-primary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_x64-setup.exe"><span class="btn-label">Download installer</span></a>
     <p class="small muted"><a href="install.html#windows">Installation steps</a></p>
   </article>
   <article class="card download-card">
-    <h3>Server build</h3>
-    <p>The <code>beta-marker serve</code> command runs the same app in a web browser.</p>
-    <a class="btn btn-primary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_linux-x86_64.tar.gz">Download server build</a>
-    <p class="small muted"><a href="install.html#server">Server steps</a> · build it from source today</p>
+    <span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M6 3 H20 V23 H6 Z"/><path d="M13 3 V5 M11 6 H13 M13 7 H15 M11 8 H13 M13 9 H15 M11 10 H13"/><rect x="10.5" y="12" width="5" height="5" rx="1"/></svg></span>
+    <h3>Portable ZIP</h3>
+    <p>No installation. Unzip, run <code>start-server.cmd</code> and open the app in your browser. 8.42 MiB.</p>
+    <a class="btn btn-secondary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_windows-x64-portable.zip"><span class="btn-label">Download ZIP</span></a>
+    <p class="small muted"><a href="install.html#portable">Portable steps</a></p>
   </article>
   <article class="card download-card">
+    <span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="4" y="3" width="18" height="8" rx="1.5"/><rect x="4" y="15" width="18" height="8" rx="1.5"/><path d="M8 7 H12 M8 19 H12"/><circle cx="18" cy="7" r="0.8"/><circle cx="18" cy="19" r="0.8"/></svg></span>
+    <h3>Linux server</h3>
+    <p>The <code>beta-marker serve</code> command runs the same app in a web browser. 7.92 MiB. Needs glibc 2.43 or newer.</p>
+    <a class="btn btn-secondary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.4.0/BETA-Cutting-Room_0.4.0_linux-x86_64.tar.gz"><span class="btn-label">Download server</span></a>
+    <p class="small muted"><a href="install.html#server">Server steps</a></p>
+  </article>
+  <article class="card download-card">
+    <span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M9 7 L3 13 L9 19 M17 7 L23 13 L17 19 M15 4 L11 22"/></svg></span>
     <h3>Source code</h3>
     <p>Everything is open source under Apache-2.0. Build it yourself and check every line.</p>
-    <a class="btn btn-secondary" href="https://github.com/sohitqwer-del/beta-cutting-room">View source code</a>
+    <a class="btn btn-secondary" href="https://github.com/sohitqwer-del/beta-cutting-room"><span class="btn-label">View on GitHub</span></a>
     <p class="small muted"><a href="open-source.html">Licence and credits</a></p>
   </article>
 </div>
   </div>
 </section>
 
-<section class="section section-alt" id="samples" aria-labelledby="samples-title">
+<section class="section section-alt" id="fun" aria-labelledby="fun-title">
+  <div class="wrap fun-grid">
+    <div class="fun-card" data-reveal>
+      <span class="fun-badge"><span aria-hidden="true">✦</span> A fun project</span>
+      <h2 id="fun-title">Built for fun, with the help of modern AI tools</h2>
+      <p>BETA Cutting Room is a fun project by a small team. We build it with the help of modern AI coding assistants, and we test it like serious software: an independent validator checks every marker before you can export it.</p>
+      <p>The code is open. You are welcome to read it, try it and help us make it better.</p>
+      <a href="https://github.com/sohitqwer-del/beta-cutting-room" rel="noopener noreferrer external">See the code on GitHub<span aria-hidden="true"> →</span><span class="sr-only"> (external site)</span></a>
+    </div>
+    <div class="help-block" id="help" data-reveal>
+      <h2 id="help-title" class="h-help">Help us improve</h2>
+      <p>BETA is young and not perfect yet. We need your help to improve it. A short note is enough, and every report helps.</p>
+      <ul class="help-links " data-stagger>
+  <li><a class="help-link" href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=bug" rel="noopener noreferrer external"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="8" y="8" width="10" height="13" rx="5"/><path d="M10 8 Q10 5 13 5 Q16 5 16 8 M8 12 H4 M18 12 H22 M8 17 H4 M18 17 H22 M13 11 V21 M9 4 L10.5 6 M17 4 L15.5 6"/></svg></span><span><strong>Report a bug</strong><span class="help-text">Something broke or gave a wrong result? Tell us what you did and what happened.</span></span><span class="sr-only"> (GitHub, external site)</span></a></li><li><a class="help-link" href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=missing-feature" rel="noopener noreferrer external"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="15" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="15" width="8" height="8" rx="1.5"/><path d="M19 15 V23 M15 19 H23" /></svg></span><span><strong>Tell us what is missing</strong><span class="help-text">A step your cutting room needs that BETA cannot do yet.</span></span><span class="sr-only"> (GitHub, external site)</span></a></li><li><a class="help-link" href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=feedback" rel="noopener noreferrer external"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M9 17 Q5 14 5 10 Q5 3 13 3 Q21 3 21 10 Q21 14 17 17 V19 H9 Z M10 22 H16"/></svg></span><span><strong>Share feedback</strong><span class="help-text">Anything else: ideas, confusing screens, words that are hard to read.</span></span><span class="sr-only"> (GitHub, external site)</span></a></li>
+  <li><a class="help-link" href="mailto:sohitqwer@gmail.com"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="6" width="20" height="15" rx="2"/><path d="M3 8 L13 15 L23 8"/></svg></span><span><strong>Email us</strong><span class="help-text">No GitHub account? Write to sohitqwer@gmail.com.</span></span></a></li>
+</ul>
+    </div>
+  </div>
+</section>
+
+<section class="section " id="samples" aria-labelledby="samples-title">
   <div class="wrap">
-    
-    <h2 id="samples-title">Send us your markers</h2>
-    
+    <div class="section-head" data-reveal>
+      
+      <h2 id="samples-title">Send us your markers</h2>
+      
+    </div>
     
 <div class="split">
-  <div>
+  <div data-reveal>
     <p>We want to compare BETA with your current CAD on your own styles: same pieces, same fabric width, same rules. You get the results, and they stay private.</p>
     <h3>What to send</h3>
     <ol class="plain-steps">
@@ -178,7 +330,7 @@
       <li>If you can, one plotter file (PLT) from your cutting room, so we can check the plot scale on your plotter.</li>
     </ol>
   </div>
-  <aside class="callout callout-accent" aria-label="Privacy promise">
+  <aside class="callout callout-accent" aria-label="Privacy promise" data-reveal>
     <h3>Your files stay private</h3>
     <p>We never commit, publish or share your patterns or markers without your written permission. Published results name no style, buyer or factory unless you agree.</p>
     <p><strong>Contact:</strong> <a href="mailto:sohitqwer@gmail.com">sohitqwer@gmail.com</a></p>
@@ -190,18 +342,23 @@
 </main>
 <footer class="site-footer">
   <div class="wrap footer-inner">
-    <div>
-      <p class="footer-brand"><svg class="logo-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M10 8h7.2c3.3 0 5.4 1.7 5.4 4.3 0 1.8-1 3-2.5 3.6 2 .5 3.3 1.9 3.3 4 0 2.9-2.3 4.6-5.9 4.6H10z M13.3 11v4h3.4c1.5 0 2.4-.8 2.4-2s-.9-2-2.4-2z M13.3 17.9v4.2h3.9c1.6 0 2.6-.8 2.6-2.1s-1-2.1-2.6-2.1z" fill="var(--logo-ink)" fill-rule="evenodd"/></svg><span>BETA Cutting Room 0.4.0</span></p>
-      <p>Open source under the Apache License 2.0. Self-hosted. Your patterns stay in your factory.</p>
-      <p class="muted">This website has no trackers, no cookies and loads nothing from other servers.</p>
+    <div class="footer-about">
+      <p class="footer-brand"><svg class="logo-mark" viewBox="0 0 64 64" width="34" height="34" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="15" fill="#176b52"/><path d="M16 11H26V53H16V36L19.5 32L16 28Z" fill="#ffffff"/><path d="M29 11H38.5A10 10 0 0 1 38.5 31H29Z" fill="#f4b740"/><path d="M29 34H40.5A9.5 9.5 0 0 1 40.5 53H29Z" fill="#c9ecd9"/></svg><span class="brand-name"><b>BETA</b> Cutting Room</span></p>
+      <p>Open-source cutting-room software for garment factories. Version 0.4.0. Self-hosted: your patterns stay in your factory.</p>
+      <p class="footer-fun"><span aria-hidden="true">✦</span> A fun project, built with the help of modern AI tools.</p>
+      <p class="muted small">This website has no trackers and no cookies, and it loads nothing from other servers.</p>
     </div>
-    <nav aria-label="Footer"><ul class="footer-list"><li><a href="index.html" aria-current="page">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
+    <nav class="footer-col" aria-label="Pages"><h2 class="footer-h">Pages</h2><ul class="footer-list"><li><a href="index.html" aria-current="page">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
+    <div class="footer-col"><h2 class="footer-h">Help us improve</h2><ul class="footer-list">
+      <li><a href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=bug" rel="noopener noreferrer external">Report a bug<span class="sr-only"> (GitHub, external site)</span></a></li><li><a href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=missing-feature" rel="noopener noreferrer external">Tell us what is missing<span class="sr-only"> (GitHub, external site)</span></a></li><li><a href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=feedback" rel="noopener noreferrer external">Share feedback<span class="sr-only"> (GitHub, external site)</span></a></li>
+      <li><a href="mailto:sohitqwer@gmail.com">Email us</a></li>
+    </ul></div>
+    <div class="footer-col"><h2 class="footer-h">Project</h2><ul class="footer-list">
+      <li><a href="https://github.com/sohitqwer-del/beta-cutting-room" rel="noopener noreferrer external">Source code on GitHub<span class="sr-only"> (external site)</span></a></li>
+      <li><a href="open-source.html#licence">Licence: Apache-2.0</a></li>
+      <li><a href="mailto:sohitqwer@gmail.com">sohitqwer@gmail.com</a></li>
+    </ul></div>
   </div>
 </footer>
-<script>(function(){var b=document.getElementById('theme-toggle');if(!b)return;var root=document.documentElement;var order=['auto','light','dark'];var names={auto:'Automatic',light:'Light',dark:'Dark'};
-function current(){return root.getAttribute('data-theme')||'auto';}
-function show(){var c=current();b.querySelector('[data-theme-label]').textContent=names[c];b.setAttribute('aria-label','Colour theme: '+names[c]+'. Change theme');}
-b.addEventListener('click',function(){var n=order[(order.indexOf(current())+1)%3];if(n==='auto'){root.removeAttribute('data-theme');try{localStorage.removeItem('beta-site-theme');}catch(e){}}else{root.setAttribute('data-theme',n);try{localStorage.setItem('beta-site-theme',n);}catch(e){}}show();});
-b.hidden=false;show();})();</script>
 </body>
 </html>

@@ -50,3 +50,4 @@ export async function loadMarkerCore(moduleUrl: string | URL = new URL('wasm/bet
 }
 
 export * from './quick';
+export * from './style';

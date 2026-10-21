@@ -1,6 +1,6 @@
 /* Feedback, welcome and the one-time ask. Uses only the shared design tokens, so a new theme maps automatically. */
 
-.fb-offscreen { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.fb-offscreen { position: absolute !important; top: 0; left: 0; margin: 0; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* Top bar button: always shows its word, even on narrow screens. */
 .topbar-tools .fb-topbar-button { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); font-weight: 650; }

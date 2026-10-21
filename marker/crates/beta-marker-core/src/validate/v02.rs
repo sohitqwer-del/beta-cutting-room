@@ -183,7 +183,7 @@ pub(super) fn bundles(job: &Job, result: &MarkerResult, report: &mut ValidationR
                 ));
             }
         }
-        matching(job, bundle, placements, report);
+
     }
     // `rules::bundle_sizes` defines the garments with or without an order.
     let mut expected_sizes = BTreeMap::<Option<&str>, u64>::new();
@@ -197,81 +197,5 @@ pub(super) fn bundles(job: &Job, result: &MarkerResult, report: &mut ValidationR
             "Garment bundle counts do not match the size ratio.".into(),
             &[],
         ));
-    }
-}
-
-fn matching(
-    job: &Job,
-    bundle: u32,
-    placements: &[(&Piece, &Placement)],
-    report: &mut ValidationReport,
-) {
-    let Some(repeat) = job.fabric.repeat else {
-        return;
-    };
-    let tolerance = if repeat.tolerance_mm == 0.0 {
-        1.0
-    } else {
-        repeat.tolerance_mm
-    };
-    let points = |reference: &PointRef| -> Vec<Pt> {
-        placements
-            .iter()
-            .filter(|(p, _)| p.id == reference.piece_id)
-            .filter_map(|(p, pl)| {
-                p.match_points
-                    .iter()
-                    .find(|m| m.id == reference.point_id)
-                    .map(|m| place(&[m.point], pl)[0])
-            })
-            .collect()
-    };
-    for rule in &job.match_rules {
-        let a = points(&rule.a);
-        let b = rule
-            .b
-            .as_ref()
-            .map(&points)
-            .unwrap_or_else(|| vec![[repeat.offset_x, repeat.offset_y]]);
-        // A rule for a different size has no endpoints in this bundle.
-        if a.is_empty() && rule.b.as_ref().is_some_and(|_| b.is_empty()) {
-            continue;
-        }
-        if a.is_empty() && rule.b.is_none() {
-            continue;
-        }
-        let mut valid = !a.is_empty() && !b.is_empty() && tolerance.is_finite() && tolerance >= 0.0;
-        for axis in 0..2 {
-            if (axis == 0 && rule.axes == MatchAxes::Y) || (axis == 1 && rule.axes == MatchAxes::X)
-            {
-                continue;
-            }
-            let period = if axis == 0 {
-                repeat.period_x
-            } else {
-                repeat.period_y
-            };
-            let Some(period) = period.filter(|v| v.is_finite() && *v > 0.0) else {
-                valid = false;
-                continue;
-            };
-            // All copies of each endpoint participate, including left/right pairs.
-            for x in &a {
-                for y in &b {
-                    let phase = (x[axis] - y[axis] - rule.offset[axis]).rem_euclid(period);
-                    valid &= phase.is_finite() && phase.min(period - phase) <= tolerance + 1e-9;
-                }
-            }
-        }
-        if !valid {
-            report.errors.push(issue(
-                "match",
-                format!(
-                    "Bundle {bundle} does not satisfy matching point {}/{}.",
-                    rule.a.piece_id, rule.a.point_id
-                ),
-                &[&rule.a.piece_id],
-            ));
-        }
     }
 }

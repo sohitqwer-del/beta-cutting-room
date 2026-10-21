@@ -346,6 +346,13 @@ dialog h2 { font-size: var(--fs-xl); margin: 0; }
   .nav-rail .screen-tabs button:hover .nav-label, .nav-rail .screen-tabs button:focus-visible .nav-label,
   .nav-rail .rail-toggle:hover .nav-label, .nav-rail .rail-toggle:focus-visible .nav-label { opacity: 1; }
 }
+/* Short windows (768 px laptops): the rail must fit, or the whole page scrolls and the top bar slides away. */
+@media (min-width: 901px) and (max-height: 820px) {
+  .nav-rail .sidebar { padding-top: 8px; padding-bottom: 8px; }
+  .nav-rail .sidebar .brand { min-height: 40px; padding-bottom: 6px; }
+  .nav-rail .nav-group { margin: 4px 6px; }
+  .nav-rail .sidebar-foot { padding-top: 6px; }
+}
 
 .app-main { min-width: 0; display: flex; flex-direction: column; }
 header.topbar { position: sticky; top: 0; z-index: 25; min-height: var(--topbar-h); display: flex; align-items: center; gap: var(--sp-3); padding: 0 var(--sp-5); background: var(--surface); border-bottom: 1px solid var(--line); }

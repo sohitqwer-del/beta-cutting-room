@@ -69,11 +69,11 @@ try {
   await evaluate(`document.querySelector('#token-input').value = 'wrong-0123456789abcdef0123456789abcdef'; document.querySelector('#token-save').click();`);
   await until('document.querySelector("#token-dialog")?.open === true && !document.querySelector("#server-status")?.classList.contains("connected")', 'wrong token stays unauthenticated');
   await evaluate(`document.querySelector('#token-input').value = ${JSON.stringify(token)}; document.querySelector('#token-save').click();`);
-  await until('document.querySelector("#server-status")?.classList.contains("connected") && document.querySelector("#server-status").textContent.includes("0.5.0")', 'correct token connects to real Hyper server');
+  await until('document.querySelector("#server-status")?.classList.contains("connected") && document.querySelector("#server-status").textContent.includes("0.6.0")', 'correct token connects to real Hyper server');
   if (!await evaluate(`sessionStorage.getItem('beta-server-token') === ${JSON.stringify(token)} && !Object.values(localStorage).includes(${JSON.stringify(token)})`)) throw new Error('Token storage scope failed.');
   report.cases.push('token is session-only; absent from localStorage');
   await evaluate(`document.querySelector('#about-button').click()`);
-  await until('document.querySelector("#about-dialog")?.open && document.querySelector("#about-dialog").textContent.includes("0.5.0")', 'About displays package version 0.5.0');
+  await until('document.querySelector("#about-dialog")?.open && document.querySelector("#about-dialog").textContent.includes("0.6.0")', 'About displays package version 0.6.0');
   await shot('connected-about.png');
   await evaluate(`document.querySelector('#about-dialog [data-close]').click()`);
   await send('Page.reload');

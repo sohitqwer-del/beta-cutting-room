@@ -623,13 +623,37 @@ pub fn union_pieces(
     // Preserve evaluated marks as fixed drawing references. Notches on the
     // removed shared seam are dropped; exterior notches and internal guides stay.
     let mut annotations = vec![];
-    for (i, mark) in ga.piece.marks.iter().chain(&gb.piece.marks).enumerate() {
+    for (i, (source, mark)) in [ga, gb]
+        .into_iter()
+        .flat_map(|g| g.piece.marks.iter().map(move |m| (g, m)))
+        .enumerate()
+    {
         if mark.kind == MarkKind::Notch
             && let Some(q) = mark.points.first()
         {
+            // Notches are now on the allowance cut edge. Recover their nearest
+            // source stitch position to decide whether the shared seam vanished.
+            let mut nearest = (f64::INFINITY, *q);
+            for j in 0..source.seam.len() {
+                let a = source.seam[j];
+                let b = source.seam[(j + 1) % source.seam.len()];
+                let v = sub(b, a);
+                let n = dot(v, v);
+                let t = if n > 1e-18 {
+                    (dot(sub(*q, a), v) / n).clamp(0., 1.)
+                } else {
+                    0.
+                };
+                let point = add(a, mul(v, t));
+                let d = distance(*q, point);
+                if d < nearest.0 {
+                    nearest = (d, point);
+                }
+            }
+            let q = nearest.1;
             let on_boundary = poly.iter().enumerate().any(|(j, a)| {
                 let b = poly[(j + 1) % poly.len()];
-                (distance(*a, *q) + distance(*q, b) - distance(*a, b)).abs() < 1e-6
+                (distance(*a, q) + distance(q, b) - distance(*a, b)).abs() < 1e-6
             });
             if !on_boundary {
                 continue;

@@ -1,10 +1,30 @@
 //! Worker-facing nesting session. The JS host yields between `step` calls.
-use beta_marker_nest::browser::{BrowserOptions, BrowserSession};
+use beta_marker_match::browser::MatchingSession;
+use beta_marker_nest::browser::{BrowserOptions, BrowserProgress, BrowserSession};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct NestSession {
-    inner: BrowserSession,
+    inner: Session,
+}
+enum Session {
+    Plain(BrowserSession),
+    Matching(MatchingSession),
+}
+impl Session {
+    fn step(&mut self) -> Result<BrowserProgress, String> {
+        match self {
+            Self::Plain(s) => s.step(),
+            Self::Matching(s) => s.step(),
+        }
+        .map_err(|e| e.to_string())
+    }
+    fn cancel(&mut self) {
+        match self {
+            Self::Plain(s) => s.cancel(),
+            Self::Matching(s) => s.cancel(),
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -14,7 +34,11 @@ impl NestSession {
         let job = super::read_job(job)?;
         let options: BrowserOptions = super::read(options)?;
         Ok(Self {
-            inner: BrowserSession::new(job, options).map_err(|e| e.to_string())?,
+            inner: if beta_marker_match::needs_rules(&job) {
+                Session::Matching(MatchingSession::new(job, options).map_err(|e| e.to_string())?)
+            } else {
+                Session::Plain(BrowserSession::new(job, options).map_err(|e| e.to_string())?)
+            },
         })
     }
 

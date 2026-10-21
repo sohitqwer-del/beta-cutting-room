@@ -10,6 +10,56 @@ fn opts() -> NestOptions {
     }
 }
 
+#[test]
+fn shared_layer_matching_and_shade_include_the_second_garment() {
+    let mut j = job();
+    j.fabric.layout = Layout::Folded;
+    let mut r = result(&j, &[[0., 0.], [80., 40.]]);
+    r.placements[0].layer_allocations = vec![
+        Some(LayerAllocation {
+            bundle: 0,
+            mirrored: false,
+        }),
+        Some(LayerAllocation {
+            bundle: 1,
+            mirrored: true,
+        }),
+    ];
+    r.placements[1].layer_allocations = vec![
+        Some(LayerAllocation {
+            bundle: 0,
+            mirrored: false,
+        }),
+        Some(LayerAllocation {
+            bundle: 1,
+            mirrored: true,
+        }),
+    ];
+    assert!(match_errors(&j, &r).is_empty());
+    r.placements[1].layer_allocations[1] = None;
+    assert!(
+        match_errors(&j, &r)
+            .iter()
+            .any(|e| e.code == "match_partner")
+    );
+    let mut second = r.placements[1].clone();
+    second.copy = 1;
+    second.bundle = Some(1);
+    second.layer_allocations.clear();
+    second.translate = [165., 40.];
+    r.placements.push(second);
+    assert!(match_errors(&j, &r).iter().any(|e| e.code == "match"));
+    j.fabric.shade = Some(ShadeRule {
+        axis: ShadeAxis::Length,
+        band_mm: 150.,
+    });
+    assert!(
+        checks::shade_errors(&j, &r)
+            .iter()
+            .any(|e| e.code == "shade")
+    );
+}
+
 fn rect(id: &str, width: f64, height: f64) -> Piece {
     Piece {
         id: id.into(),
@@ -32,7 +82,7 @@ fn reference(id: &str) -> PointRef {
     }
 }
 
-fn job() -> Job {
+pub(crate) fn job() -> Job {
     Job {
         format: JOB_FORMAT.into(),
         name: "matching rectangles".into(),
@@ -461,6 +511,16 @@ fn absolute_matching_stays_in_global_phase_after_band_shift() -> anyhow::Result<
 
 #[test]
 fn malformed_repeat_and_nonfinite_offsets_return_errors() {
+    assert!(
+        nest_with_rules(
+            &job(),
+            &NestOptions {
+                time_limit_s: f64::MAX,
+                ..opts()
+            }
+        )
+        .is_err()
+    );
     let mut j = job();
     j.fabric.repeat.as_mut().expect("repeat").period_x = Some(f64::INFINITY);
     assert!(nest_with_rules(&j, &opts()).is_err());

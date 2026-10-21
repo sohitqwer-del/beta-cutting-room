@@ -1,8 +1,11 @@
 //! Offline parametric pattern drafting. Millimetres, y up, angles in degrees.
 #![doc = include_str!("../README.md")]
 #![warn(missing_docs)]
+pub mod derived;
 pub mod model;
+mod paths;
 pub use model::*;
+pub mod blocks;
 pub mod catalog;
 pub mod editor;
 pub mod evaluate;
@@ -17,5 +20,6 @@ pub mod production;
 pub mod rule_exchange;
 pub mod seamly;
 pub mod starters;
+pub mod style;
 pub mod symmetry;
 pub mod tools;

@@ -66,6 +66,14 @@ pub fn catalog() -> Vec<ToolSpec> {
     use ParameterType::*;
     let mut rows = vec![
         (
+            "offset_path",
+            "Paths",
+            "Parallel path",
+            "Copy a path at a signed normal distance.",
+            false,
+            vec![("source", CurveRef), ("distance", Formula)],
+        ),
+        (
             "absolute",
             "Points",
             "Coordinates",

@@ -68,6 +68,45 @@ Example job: `examples/jobs/*.json` (agent `nest` creates them).
 
 ## 4. Nesting (agent `nest`)
 
+### Style-flow spreading, gaps and repeat drawing
+
+The existing `Fabric`, `Spacing`, `Piece`, `Repeat` and layer-allocation fields
+remain the nesting contract. `beta_marker_core::style` adds validated typed
+spreading metadata without changing old job JSON:
+
+- `meta.beta_style_lay = {face,plies,end_allowance_mm}`. Face is `up`, `down`
+  or `face_to_face`. It describes physical spreading and never grants a piece
+  mirror permission. Plies count physical layers; folded/tubular and
+  face-to-face lays require an even count. The marker ratio remains the ratio
+  for one spread repetition. Layer demand uses the established fold allocator.
+- End allowance is waste at each end: spread length is cut extent plus twice
+  this value. It does not change placement coordinates, pair gaps, useful area
+  or occupied efficiency. `fabric.max_length` limits cut extent; reserve end
+  allowance separately from table length when setting that value.
+- The gap between two cut envelopes is `piece_gap + buffer_a + buffer_b`.
+  At start/cut selvedges use `edge_gap + buffer`. Folded high Y and both
+  tubular Y edges are fold boundaries and have zero edge clearance. A fusing
+  block uses its grain-aligned bounding box expanded by block margin, then
+  ordinary gaps/buffers apply. Gap and block waste never count as useful area.
+- `meta.beta_repeat_bands` stores `{axis,offset_mm,width_mm,colour}` entries.
+  X is length, Y is width. An X period produces transverse stripe lines;
+  two periods produce checks. Colours use `#RRGGBB`. Band drawing does not
+  alter the repeat phase constraints or matching tolerance.
+- `beta_marker_core::style::overlay` clips repeat centre lines to displayed
+  cut outlines (including fold halves and fusing blocks), returns graded
+  outlines, and compares previous/current placement identities and geometry.
+  Band widths are display widths; clip painted strokes to the piece outline
+  in the UI. Export guides are thin centre lines.
+- Set `meta.beta_stripe_guides=true` on an export copy of a job, or call
+  `beta_marker_export::export_with_stripe_guides`, to draw PDF/PLT guides on
+  pen 3 / internal layer 8. Default output is unchanged. ISO cutter output
+  excludes those guides.
+
+Validation rejects non-finite gaps/buffers/repeats, invalid band colours,
+bad plies and overflowing demand counts before geometry allocation. Matching
+checks include every garment served by explicit physical-layer assignments.
+See `../pattern/docs/STYLE-API.md` for the style-document to job adapter.
+
 - `beta_marker_nest::nest(&Job, &NestOptions) -> MarkerResult`, on sparrow 0.3.0 (MIT) and jagua-rs 1.0.0 (MPL-2.0).
 - Convert each demand (piece, mirrored) into one jagua-rs item with its count. Pre-transform the shape (mirror, then grain alignment) so the engine only sees the allowed rotation steps. Tilt: add discrete angles inside the tilt range (for example steps of 0.5 degrees), or report that tilt is not used.
 - Gaps: inflate each shape by half of the needed gap (or use `min_item_separation` when all buffers are equal), and shrink the strip by `edge_gap`. Map placements back to the original, un-inflated piece coordinates.

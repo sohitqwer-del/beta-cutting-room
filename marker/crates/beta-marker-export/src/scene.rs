@@ -159,7 +159,10 @@ fn build_inner(
                 let Some(&anchor) = mark.points.first() else {
                     continue;
                 };
-                if !visible(p, pl, anchor) && mark.kind != MarkKind::Line {
+                let explicit_notch = mark.kind == MarkKind::Notch
+                    && (mark.points.len() >= 3
+                        || matches!(mark.text.as_deref(), Some("slit" | "v" | "t" | "castle")));
+                if !visible(p, pl, anchor) && mark.kind != MarkKind::Line && !explicit_notch {
                     continue;
                 }
                 match mark.kind {
@@ -196,6 +199,19 @@ fn build_inner(
                         }
                     }
                     MarkKind::Notch => {
+                        if explicit_notch {
+                            for segment in clipped_lines(p, pl, &mark.points) {
+                                scene.paths.push(Path {
+                                    points: place(&segment, pl),
+                                    closed: false,
+                                    pen: 2,
+                                    colour: "#555555",
+                                    layer: 4,
+                                    fold_edge: None,
+                                });
+                            }
+                            continue;
+                        }
                         let direction = mark.points.get(1).copied().unwrap_or_else(|| {
                             // The closest outline segment supplies an inward normal for
                             // notches that carry only an anchor.
@@ -282,6 +298,25 @@ fn build_inner(
     }
     if show_guides {
         guides(job, &mut scene)?;
+        if job
+            .meta
+            .get("beta_stripe_guides")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false)
+        {
+            let overlay = beta_marker_core::style::overlay(job, result, &Default::default())
+                .map_err(anyhow::Error::msg)?;
+            for stripe in overlay.stripes {
+                scene.paths.push(Path {
+                    points: stripe.points.to_vec(),
+                    closed: false,
+                    pen: 3,
+                    colour: "#64748b",
+                    layer: 8,
+                    fold_edge: None,
+                });
+            }
+        }
     }
     let length = if result.placements.is_empty() {
         0.0

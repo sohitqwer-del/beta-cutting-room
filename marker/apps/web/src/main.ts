@@ -14,9 +14,12 @@ import { seamlyWarnings, warningsHtml } from './import-warnings';
 import { installShell } from './shell';
 import { icon } from './icons';
 import { staticMode, installStaticNotices } from './static-mode';
+import { label } from './floor-i18n';
+import type { FloorLanguage } from './floor-types';
 import './style.css';
 // Screen styles after the design system so they can refine it.
 import './quick/quick.css';
+import './style/style.css';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const tool = (id: string, name: string, label: string, tip: string, keys = '', extra = ''): string =>
@@ -546,14 +549,21 @@ $('#colour-mode').addEventListener('change', event => { features?.setColourByBun
 render(true); fit();
 void loadMarkerCore().then(async loaded => { core = loaded; editorCore = await loadEditorCore(); render(); history = new History(state); }).catch(error => { wasmProblem = `WASM could not load: ${errorText(error)} Build @beta/marker-wasm and reload to enable editing and checks.`; renderStats(); renderSelection(); });
 function checkHealth(): void {
-  if (staticMode()) { serverOnline = false; $('#server-status').textContent = 'Browser mode · local Rust WASM'; $('#server-status').classList.add('connected'); return; }
+  if (staticMode()) { serverOnline = false; browserStatus(); return; }
   void apiFetch('/api/health').then(async response => {
     if (response.status === 401 && !isDesktop()) { $('#server-status').textContent = 'Server needs an access token'; $('#server-status').classList.remove('connected'); shell.askToken(); return; }
     if (!response.ok) throw new Error();
     const health = await response.json() as { ok: boolean; version: string }; if (!health.ok) throw new Error();
     serverOnline = true;
+    delete $('#server-status').dataset.floorLabel; $('#server-status').removeAttribute('title');
     $('#server-status').textContent = `${isDesktop() ? 'Desktop · Rust engine' : 'Local server'} · v${health.version}`; $('#server-status').classList.add('connected');
-  }).catch(() => { $('#server-status').textContent = 'Viewer mode · local server offline'; $('#server-status').classList.remove('connected'); });
+  }).catch(() => { serverOnline = false; browserStatus(); });
+}
+/** No server: the Rust engine runs in this browser (drawing, grading, checks and nesting). One plain status, translated. */
+function browserStatus(): void {
+  const status = $('#server-status'), language = (document.documentElement.dataset.language ?? 'en') as FloorLanguage;
+  status.dataset.floorLabel = 'status_browser'; status.textContent = label(['en', 'hi', 'ta'].includes(language) ? language : 'en', 'status_browser');
+  status.title = label(['en', 'hi', 'ta'].includes(language) ? language : 'en', 'status_browser_tip'); status.classList.add('connected');
 }
 checkHealth();
 installStaticNotices();

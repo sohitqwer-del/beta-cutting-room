@@ -1,0 +1,146 @@
+[
+  {
+    "file": "kokoro-v1.0.onnx",
+    "url": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx",
+    "license": "Apache-2.0",
+    "group": "kokoro",
+    "bytes": 325532387,
+    "sha256": "7d5df8ecf7d4b1878015a32686053fd0eebe2bc377234608764cc0ef3636a6c5"
+  },
+  {
+    "file": "voices-v1.0.bin",
+    "url": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin",
+    "license": "Apache-2.0",
+    "group": "kokoro",
+    "bytes": 28214398,
+    "sha256": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+  },
+  {
+    "file": "config.json",
+    "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/config.json",
+    "license": "Apache-2.0",
+    "group": "kokoro",
+    "bytes": 2351,
+    "sha256": "5abb01e2403b072bf03d04fde160443e209d7a0dad49a423be15196b9b43c17f"
+  },
+  {
+    "file": "en_US-ljspeech-high.onnx",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/5041a7a49ae5b3a0f30e6837769eb03fdbb231bd/en/en_US/ljspeech/high/en_US-ljspeech-high.onnx",
+    "license": "MIT",
+    "group": "piper",
+    "bytes": 114199011,
+    "sha256": "5d4f08ba6a2a48c44592eed3ce56bf85e9de3dd4e20df90541ae68a8310c029a"
+  },
+  {
+    "file": "en_US-ljspeech-high.onnx.json",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/5041a7a49ae5b3a0f30e6837769eb03fdbb231bd/en/en_US/ljspeech/high/en_US-ljspeech-high.onnx.json",
+    "license": "MIT",
+    "group": "piper",
+    "bytes": 4970,
+    "sha256": "7e1f4634af596d83cca997fb7a931ba80b70f8a316a2655ee69c55365e0ace14"
+  },
+  {
+    "file": "PIPER-MODEL-CARD",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/5041a7a49ae5b3a0f30e6837769eb03fdbb231bd/en/en_US/ljspeech/high/MODEL_CARD",
+    "license": "MIT repository; public-domain LJ Speech data",
+    "group": "piper",
+    "bytes": 513,
+    "sha256": "289f7421072d689a3d91f6c632f486af46f9b8b04417536104a4ea667b8a394b"
+  },
+  {
+    "file": "PIPER-README.md",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/5041a7a49ae5b3a0f30e6837769eb03fdbb231bd/README.md",
+    "license": "MIT declaration",
+    "group": "piper",
+    "bytes": 497,
+    "sha256": "33e93643fce5180886300f9f0070eeeab8af148efb8e84361f8904def80fd9fb"
+  },
+  {
+    "file": "KOKORO-MODEL-CARD.md",
+    "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/README.md",
+    "license": "Apache-2.0 declaration",
+    "group": "kokoro",
+    "bytes": 6348,
+    "sha256": "91dcabced89db6f109b8786642f50402d3ee87450e8189589b6f85520e7f4d78"
+  },
+  {
+    "file": "KOKORO-VOICES.md",
+    "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/VOICES.md",
+    "license": "Apache-2.0",
+    "group": "kokoro",
+    "bytes": 7625,
+    "sha256": "ec7e4941ad7e194af61e3455928528a9ff5360c7c505e412efab27d6a69ea106"
+  },
+  {
+    "file": "MISAKI-LICENSE",
+    "url": "https://raw.githubusercontent.com/hexgrad/misaki/fba1236595f2d2bf21d414ba6e57d25256afada3/LICENSE",
+    "license": "Apache-2.0",
+    "group": "common",
+    "bytes": 11357,
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+    "file": "gb_gold.json",
+    "url": "https://raw.githubusercontent.com/hexgrad/misaki/fba1236595f2d2bf21d414ba6e57d25256afada3/misaki/data/gb_gold.json",
+    "license": "Apache-2.0",
+    "group": "common",
+    "bytes": 2838552,
+    "sha256": "29e62f4b60261c88f7f3c2c7811ca3825978948090b72d2b27d565b729282f71"
+  },
+  {
+    "file": "gb_silver.json",
+    "url": "https://raw.githubusercontent.com/hexgrad/misaki/fba1236595f2d2bf21d414ba6e57d25256afada3/misaki/data/gb_silver.json",
+    "license": "Apache-2.0",
+    "group": "common",
+    "bytes": 3663898,
+    "sha256": "48131e2d92ccc41655f4543e87e0f938e71463eb5a54be7f0693bb712ebb6bce"
+  },
+  {
+    "file": "us_gold.json",
+    "url": "https://raw.githubusercontent.com/hexgrad/misaki/fba1236595f2d2bf21d414ba6e57d25256afada3/misaki/data/us_gold.json",
+    "license": "Apache-2.0",
+    "group": "common",
+    "bytes": 3000469,
+    "sha256": "dc414872a49a28ae6c141463d502fd945f3b2fde040484fdc47d00cc4612686f"
+  },
+  {
+    "file": "us_silver.json",
+    "url": "https://raw.githubusercontent.com/hexgrad/misaki/fba1236595f2d2bf21d414ba6e57d25256afada3/misaki/data/us_silver.json",
+    "license": "Apache-2.0",
+    "group": "common",
+    "bytes": 3099517,
+    "sha256": "de8f67be911bb6c659187b4a65fd966b6a30e56350e0f790d763210b053ac475"
+  },
+  {
+    "file": "KOKORO-CODE-LICENSE",
+    "url": "https://raw.githubusercontent.com/hexgrad/kokoro/main/LICENSE",
+    "license": "Apache-2.0",
+    "group": "common",
+    "bytes": 11357,
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+    "file": "ONNX-EXPORT-LICENSE",
+    "url": "https://raw.githubusercontent.com/thewh1teagle/kokoro-onnx/main/LICENSE",
+    "license": "MIT",
+    "group": "common",
+    "bytes": 1080,
+    "sha256": "f61fdd0217de9ece8fa699912848d91187d84879fc2e689f0906d0c1299e955e"
+  },
+  {
+    "file": "PIPER-CODE-LICENSE",
+    "url": "https://raw.githubusercontent.com/rhasspy/piper/master/LICENSE.md",
+    "license": "MIT",
+    "group": "common",
+    "bytes": 1071,
+    "sha256": "4cd71dece7037f1d6d93cce7570c57ab75ea9ac566fd4990be2f3ab08d15b47f"
+  },
+  {
+    "file": "ONNXRUNTIME-LICENSE",
+    "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.23.2/LICENSE",
+    "license": "MIT",
+    "group": "common",
+    "bytes": 1073,
+    "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+  }
+]

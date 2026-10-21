@@ -10,12 +10,18 @@ Nothing opens on screen, and nothing is downloaded at run time.
 | `SCRIPT.md` | Storyboard and narration, written from `scenes.mjs` (`make-video.mjs script`). Do not edit by hand. |
 | `cards.mjs` | Title cards, the animated "basics" explainer, phone and vertical backgrounds, the poster and the one-page explainer image. Original SVG and HTML; the logo and font come from `apps/site/public/assets`. |
 | `record.mjs` | Drives the real app with Playwright and captures frames with the DevTools screencast (full-resolution JPEG with timestamps). Adds a cursor, tap marks, highlight rings and zooms to the recording page only. |
-| `tts.ps1` | Offline narration with a Windows OneCore voice (WinRT `Windows.Media.SpeechSynthesis`). Prefers an en-IN voice. |
+| `neural-tts.py` | Local Kokoro/Piper ONNX inference with permissive dictionary data and explicit pronunciations. |
+| `audio.mjs` | Shared cleaning, loudness checks, phone-recording import and timing. |
+| `tts.ps1` | Existing Windows OneCore baseline, available with `--engine onecore`. |
+| `AUDIO-SOURCES.md`, `audio-models.json`, `setup-audio.py` | Official download URLs, licences, SHA-256 hashes and explicit setup. |
+| `AUDIO-COMPARISON.md` | Sample results and the voice choice. |
+| `RECORD-YOUR-VOICE.md` | One-page phone recording guide. |
 | `make-video.mjs` | Runs the steps and does the editing with ffmpeg. |
 
 ## What you need
 
-- Windows 10 or 11 with an English OneCore voice. The default is **Microsoft Heera (en-IN)**; `--voice-name "Microsoft Ravi"` picks the male en-IN voice.
+- Python 3.11 in an external venv and local model files prepared with `setup-audio.py`. See [AUDIO-SOURCES.md](AUDIO-SOURCES.md). The default voice is **Kokoro Heart (`af_heart`)**, Apache-2.0 weights, CPU-only ONNX Runtime. No runtime downloads.
+- Windows 10 or 11 for the existing recording tools. OneCore is optional and used only with `--engine onecore`.
 - `ffmpeg` and `ffprobe` on PATH, built with libx264, libass and libfreetype.
 - Chrome or Edge (`--chrome <exe>` or `CHROME_PATH`).
 - `playwright-core` installed **outside the repository** (`--playwright <dir>` or `PLAYWRIGHT_CORE`). It is not a dependency of BETA.
@@ -27,12 +33,15 @@ Nothing opens on screen, and nothing is downloaded at run time.
 From the repository root:
 
 ```sh
-node marker/deploy/video/make-video.mjs all --out <output folder> --app http://127.0.0.1:7891/ --playwright <dir with playwright-core>
+node marker/deploy/video/make-video.mjs all --out <new output folder> --app http://127.0.0.1:7891/ --playwright <dir with playwright-core> --python <audio-data>/venv/Scripts/python.exe --models <audio-data>/models
 ```
 
-Steps can run one at a time: `tts`, `record`, `build`, `stills`, `check`, `script`.
+Steps can run one at a time: `tts`, `record`, `retime`, `build`, `stills`, `check`, `script`.
+To reuse the original synthetic demo capture, run `tts,retime,build,check --source <previous output folder> --out <new output folder>` with the same Python, models and Playwright arguments. `retime` reads the original frames and grows each beat interval when narration needs more time. It never speeds up the recorded actions or overwrites the source frames. Scene ends snap to 30 fps boundaries to prevent accumulated drift.
 `record --only marker,quick` re-records some scenes and merges them into the existing timeline.
-`--music 0` leaves out the soft background pad. `--rate 1.12` is the speaking rate.
+Music is off by default. `--music 1` adds the quiet self-generated pad. `--wpm 145` sets neural speech pace. `--neural-voice bf_emma` selects the British review alternative; `--engine piper` selects LJ Speech. English is the default. `--lang hi` makes `beta-demo-hi.mp4` with Hindi captions in `work-hi/`; it leaves the English outputs intact. **Hindi script needs native review.** The hand-written Hindi phonemes cover only this script and fail if a caption line changes.
+
+`--voice-dir <folder>` imports phone recordings instead of TTS. See [RECORD-YOUR-VOICE.md](RECORD-YOUR-VOICE.md). It uses the same cleaning, measured timing and final loudness checks. The original OneCore comparison remains available with `--engine onecore --voice-name "Microsoft Heera" --rate 1.12`. `--rate` affects OneCore only. `--preset veryfast` trades file size for a faster local review encode; the default is `slow`.
 
 How timing works: `tts` measures each narration line. `record` starts each line's action when the line
 starts and holds the scene until the line ends (or longer when the app is busy), and it writes the real
@@ -50,13 +59,14 @@ editor cuts out.
 | `beta-teaser-vertical.mp4` | 1080 x 1920, about 60 s, for WhatsApp status and Shorts |
 | `clips/beta-<feature>.mp4` | Basics, marker, cut plan and floor, Quick Marker, pattern, for the Help page |
 | `beta-demo-en.srt`, `.vtt` | English captions |
+| `beta-demo-hi.mp4`, `.srt`, `.vtt`, `build-info-hi.json` | Optional Hindi review video, Hindi burned-in captions, with native-review watermark |
 | `beta-demo-hi.draft-needs-native-review.srt/.vtt`, `beta-demo-ta...` | Hindi and Tamil drafts. **A native speaker must review them before publishing.** |
 | `beta-demo-poster.jpg` | Poster: a real frame of the checked marker with the title |
 | `beta-explainer-en.png/.jpg`, `beta-explainer-hi.draft-needs-native-review.png/.jpg` | 1080 x 1350 one-page "What is BETA?" image for WhatsApp |
 | `contact-sheet-main.png`, `contact-sheet-teaser.png` | One frame every 10 s, for a quick visual check |
 | `build-info.json` | Lengths, sizes, loudness, scene start times |
 
-Never commit the video files. The `work/` folder holds frames and intermediate files and can be deleted.
+Never commit the video files. The `work/` and `work-hi/` folders hold intermediate files. Retimed builds still reference their source frame folder; retain that source when rebuilding. No model, recording or video belongs in git.
 
 ## Data and honesty rules
 
@@ -78,11 +88,30 @@ poster as a link. Update `demoVideo.length` and `size` in the same file.
 
 ## Known limits
 
-- The narration is a computer voice. A human voice-over in Hindi or Tamil would reach more people.
-- Burned-in captions are English only. Hindi and Tamil are separate subtitle files (drafts).
+- Heart is a US-English voice, not an Indian-accent model. Brand pronunciations are explicit editorial choices. A person should listen before release; automated measurements cannot establish naturalness or pronunciation quality.
+- The Hindi review version uses Kokoro Omega and original, script-specific phonemes. Its script, pronunciation and number reading need native review. Tamil remains a caption draft only.
+- This dictionary frontend fails on unknown English words. Add and review a pronunciation instead of silently guessing. It has no statistical homograph disambiguation.
 - The nest in the video runs 6 seconds on the local server, so its numbers can differ slightly between runs.
 - The DevTools screencast delivers frames at CSS-pixel size, whatever the device scale. The app is laid out at
   1440 x 810 (so its text is large on a phone) and scaled 1.33x to 1080p; the phone screen is captured at
   390 x 844 and scaled 1.2x (main video) or 1.5x (teaser). Sharp device-pixel screenshots
   (`Page.captureScreenshot` with a scaled clip) reach only about 11 fps on the desktop page, which makes the
   cursor jerky. Cards are rendered natively at 1920 x 1080 and 1080 x 1920.
+
+## Audio checks
+
+Each line gets an 80 Hz high-pass, a small low-mid cut and presence lift, gentle gate,
+de-essing and 2:1 compression. Internal sentence pauses stay intact. Masters use measured
+two-pass loudness normalization. Every final AAC file (main, web, teaser and each clip)
+is measured again and must be within 0.2 LU of -16 LUFS and at or below -1.5 dBTP.
+The normalizer targets -1.8 dBTP to leave AAC headroom. Results and the exact voice metadata
+are written to the build-info files. Clips are normalized independently.
+
+```sh
+node marker/deploy/video/check-audio.mjs <external audio-test folder>
+node marker/deploy/video/compare-audio.mjs <external samples folder>
+```
+
+The first command checks import and timing with synthetic local audio. The second expects
+the same three test WAVs per candidate and makes level-matched `*.review.wav` copies,
+`listen-first.wav` playlists and `comparison.json`. No audio is played automatically.

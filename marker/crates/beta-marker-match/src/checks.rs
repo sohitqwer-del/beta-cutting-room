@@ -79,14 +79,16 @@ pub fn match_errors(job: &Job, result: &MarkerResult) -> Vec<Issue> {
     };
     let mut by_bundle = BTreeMap::<u32, Vec<&Placement>>::new();
     for pl in &result.placements {
-        if let Some(bundle) = pl.bundle {
-            by_bundle.entry(bundle).or_default().push(pl);
-        } else {
+        let bundles = beta_marker_core::rules::placement_bundles(pl);
+        if bundles.is_empty() {
             out.push(issue(
                 "bundle",
                 format!("Piece {} has no garment bundle.", pl.piece_id),
                 vec![pl.piece_id.clone()],
             ));
+        }
+        for bundle in bundles {
+            by_bundle.entry(bundle).or_default().push(pl);
         }
     }
     for (ri, rule) in job.match_rules.iter().enumerate() {
@@ -182,22 +184,25 @@ pub(crate) fn shade_errors(job: &Job, result: &MarkerResult) -> Vec<Issue> {
             continue;
         };
         let band = ((b[axis] + 1e-7) / shade.band_mm).floor() as i64;
-        let Some(bundle) = pl.bundle else {
+        let bundles = beta_marker_core::rules::placement_bundles(pl);
+        if bundles.is_empty() {
             errors.push(issue(
                 "bundle",
                 "Shade bands need garment bundle IDs.".into(),
                 vec![piece.id.clone()],
             ));
             continue;
-        };
-        if b[axis + 2] > (band + 1) as f64 * shade.band_mm + 1e-7
-            || bands.insert(bundle, band).is_some_and(|old| old != band)
-        {
-            errors.push(issue(
-                "shade",
-                format!("Bundle {bundle} crosses a shade band."),
-                vec![piece.id.clone()],
-            ));
+        }
+        for bundle in bundles {
+            if b[axis + 2] > (band + 1) as f64 * shade.band_mm + 1e-7
+                || bands.insert(bundle, band).is_some_and(|old| old != band)
+            {
+                errors.push(issue(
+                    "shade",
+                    format!("Bundle {bundle} crosses a shade band."),
+                    vec![piece.id.clone()],
+                ));
+            }
         }
     }
     errors

@@ -82,6 +82,36 @@ fn fixture() -> (Job, MarkerResult) {
     (j, r)
 }
 
+#[test]
+fn shaped_notches_keep_all_vertices_and_explicit_slit_depth() {
+    let (mut job, result) = fixture();
+    job.pieces[0].marks = vec![
+        Mark {
+            kind: MarkKind::Notch,
+            points: vec![[49., 0.], [50., 5.], [51., 0.]],
+            text: Some("v".into()),
+        },
+        Mark {
+            kind: MarkKind::Notch,
+            points: vec![[60., 0.], [60., 5.]],
+            text: Some("slit".into()),
+        },
+    ];
+    let s = scene::build(
+        &job,
+        &result,
+        &ExportOptions {
+            labels: false,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let marks: Vec<_> = s.paths.iter().filter(|p| p.layer == 4).collect();
+    assert_eq!(marks.len(), 2);
+    assert_eq!(marks[0].points, job.pieces[0].marks[0].points);
+    assert_eq!(marks[1].points, job.pieces[0].marks[1].points);
+}
+
 // Small absolute-coordinate HPGL reader. LB consumes its declared terminator,
 // so semicolons inside labels cannot be mistaken for plotter commands.
 #[derive(Default)]
@@ -471,21 +501,41 @@ fn xlsx_assigns_layer_copies_to_each_garment_and_excludes_surplus() {
     j.pieces[0].fold_line = Some([[0., 50.], [100., 50.]]);
     r.placements[0].bundle = Some(0);
     r.placements[0].layer_allocations = vec![
-        Some(LayerAllocation { bundle: 0, mirrored: false }),
-        Some(LayerAllocation { bundle: 1, mirrored: false }),
+        Some(LayerAllocation {
+            bundle: 0,
+            mirrored: false,
+        }),
+        Some(LayerAllocation {
+            bundle: 1,
+            mirrored: false,
+        }),
     ];
     let mut last = r.placements[0].clone();
     last.copy = 1;
     last.bundle = Some(2);
     last.translate = [100., 0.];
-    last.layer_allocations = vec![Some(LayerAllocation { bundle: 2, mirrored: false }), None];
+    last.layer_allocations = vec![
+        Some(LayerAllocation {
+            bundle: 2,
+            mirrored: false,
+        }),
+        None,
+    ];
     r.placements.push(last);
     let sheet = unzip(&to_xlsx(&j, &r, None).unwrap(), "xl/worksheets/sheet2.xml");
     for (row, bundle) in [(2, 0), (3, 1), (4, 2)] {
         for (column, expected) in [("B", bundle), ("E", 1), ("F", 1), ("G", 0)] {
-            let cell = sheet.split(&format!("r=\"{column}{row}\"")).nth(1).unwrap()
-                .split("</c>").next().unwrap();
-            assert!(cell.contains(&format!("<v>{expected}</v>")), "{column}{row}: {cell}");
+            let cell = sheet
+                .split(&format!("r=\"{column}{row}\""))
+                .nth(1)
+                .unwrap()
+                .split("</c>")
+                .next()
+                .unwrap();
+            assert!(
+                cell.contains(&format!("<v>{expected}</v>")),
+                "{column}{row}: {cell}"
+            );
         }
     }
     assert!(!sheet.contains("r=\"B5\""));

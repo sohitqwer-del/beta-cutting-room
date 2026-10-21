@@ -183,6 +183,18 @@ pub fn piece_action(document: &str, request: &str) -> Result<String, String> {
     .map_err(error)
 }
 mod operations;
+use operations as pattern_operations;
+pub mod style;
+
+/// Versioned style workflow commands. The transport returns one JSON value or a plain error.
+#[wasm_bindgen]
+pub fn style_command(request: &str) -> Result<String, String> {
+    if request.len() > 64 * 1024 * 1024 {
+        return Err("Style request exceeds 64 MB.".into());
+    }
+    let request = serde_json::from_str(request).map_err(error)?;
+    serde_json::to_string(&style::dispatch(&request)?).map_err(error)
+}
 
 /// Import measurements with native CSV/XML validation.
 #[wasm_bindgen]

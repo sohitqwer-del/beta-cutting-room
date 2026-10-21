@@ -11,8 +11,9 @@ mod tests;
 use anyhow::{Result, ensure};
 use beta_marker_core::{Job, MarkerResult, Placement};
 use beta_marker_nest::NestOptions;
+use jagua_rs::Instant;
 use std::collections::BTreeMap;
-use std::time::Instant;
+pub mod browser;
 
 pub use checks::match_errors;
 
@@ -106,6 +107,14 @@ fn identity(pl: &Placement) -> (&str, bool, u32) {
 }
 
 fn nest_matching(job: &Job, opts: &NestOptions) -> Result<MarkerResult> {
+    let started = Instant::now();
+    // A bounded setup allowance keeps sub-second interactive requests useful.
+    // Optimization still receives only the remaining requested time.
+    let allowance = std::time::Duration::try_from_secs_f64(opts.time_limit_s + 2.)
+        .map_err(|_| anyhow::anyhow!("Matching time limit is too large."))?;
+    let deadline = started
+        .checked_add(allowance)
+        .ok_or_else(|| anyhow::anyhow!("Matching time limit is too large."))?;
     // The engine validates its intermediate result. Matching is checked after
     // our fixed placements have been installed, not on the free baseline.
     let mut free_job = job.clone();
@@ -124,7 +133,9 @@ fn nest_matching(job: &Job, opts: &NestOptions) -> Result<MarkerResult> {
             .any(|r| r.a.piece_id == id || r.b.as_ref().is_some_and(|b| b.piece_id == id))
     };
     let mut buffered_job = free_job.clone();
-    let use_buffer = opts.fixed.is_empty() && job.fabric.layout == beta_marker_core::Layout::Open;
+    let use_buffer = opts.fixed.is_empty()
+        && opts.warm_start.is_none()
+        && job.fabric.layout == beta_marker_core::Layout::Open;
     if use_buffer {
         let repeat = job
             .fabric
@@ -174,10 +185,10 @@ fn nest_matching(job: &Job, opts: &NestOptions) -> Result<MarkerResult> {
             .cloned()
             .collect()
     } else {
-        search::place_matched(job, &baseline, &opts.fixed)?
+        search::place_matched_until(job, &baseline, &opts.fixed, Some(deadline))?
     };
     let mut finish_opts = opts.clone();
-    finish_opts.time_limit_s = (opts.time_limit_s * 0.55).max(0.01);
+    finish_opts.time_limit_s = (opts.time_limit_s - started.elapsed().as_secs_f64()).max(0.01);
     finish_opts.fixed = fixed;
     // The snapped layout is already complete and checked. Keep it available
     // while bounded fixed-piece compaction searches for a shorter marker.

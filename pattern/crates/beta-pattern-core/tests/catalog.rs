@@ -163,6 +163,12 @@ fn every_catalog_tool_has_known_coordinates() {
         ),
     ];
     let paths = vec![
+        (
+            "offset_path",
+            json!({"source":"horizontal","distance":2}),
+            [0., 2.],
+            [6., 2.],
+        ),
         ("line", json!({"from":"A","to":"B"}), [0., 0.], [6., 0.]),
         (
             "cubic",
@@ -364,9 +370,41 @@ fn group_transforms_and_piece_union_metadata() {
     let g = beta_pattern_core::evaluate::grade(&u, "M", 0.01).unwrap();
     assert_eq!(area(&g[2].seam), 200.);
     assert_eq!(g[2].piece.marks.len(), 2);
-    assert_eq!(g[2].piece.marks[0].points[0], [5., 0.]);
+    assert_eq!(g[2].piece.marks[0].points[0], [5., -2.]);
     assert_eq!(area(&g[2].piece.outline), 336.);
     assert_eq!(g[2].piece.match_points[0].point, [0., 0.]);
+    let linked = style::edit(
+        &d,
+        &[style::Operation::JoinPieces {
+            pieces: ["left".into(), "right".into()],
+            id: "linked".into(),
+            size: "M".into(),
+        }],
+    )
+    .unwrap();
+    let lg = evaluate::grade(&linked, "M", 0.01).unwrap();
+    assert_eq!(lg[2].piece.marks, g[2].piece.marks);
+    assert_eq!(lg[2].piece.match_points, g[2].piece.match_points);
+    assert_eq!(area(&lg[2].piece.outline), area(&g[2].piece.outline));
+    let edited = style::edit(
+        &linked,
+        &[style::Operation::SetAllowance {
+            piece: "linked".into(),
+            edges: vec![0],
+            width: 3.0.into(),
+            corner: Corner::Miter,
+        }],
+    )
+    .unwrap();
+    assert!(
+        (area(
+            &evaluate::grade(&edited, "M", 0.01).unwrap()[2]
+                .piece
+                .outline
+        ) - 416.)
+            .abs()
+            < 1e-8
+    );
     assert!(
         tools::union_shared_seam(
             &[[0., 0.], [10., 0.], [10., 10.], [0., 10.]],

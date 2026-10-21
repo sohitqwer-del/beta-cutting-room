@@ -310,7 +310,7 @@ checksum = "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5"
 
 [[package]]
 name = "beta-cutting-room"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -341,7 +341,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-cli"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -369,7 +369,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-cluster"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -382,7 +382,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-core"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -390,7 +390,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-cutroom"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -408,7 +408,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-dxf"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -421,7 +421,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-edit"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "beta-marker-core",
  "serde",
@@ -430,7 +430,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-export"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -444,7 +444,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-floor"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -463,7 +463,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-learn"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -473,19 +473,23 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-match"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
+ "beta-marker-dxf",
+ "beta-marker-export",
  "beta-marker-nest",
+ "beta-pattern-core",
  "geo",
+ "jagua-rs",
  "serde",
  "serde_json",
 ]
 
 [[package]]
 name = "beta-marker-nest"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -499,7 +503,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-plan"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -512,7 +516,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-queue"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -529,7 +533,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-roll"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -539,11 +543,12 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-wasm"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "beta-marker-core",
  "beta-marker-edit",
  "beta-marker-export",
+ "beta-marker-match",
  "beta-marker-nest",
  "beta-pattern-digitize",
  "js-sys",
@@ -554,7 +559,7 @@ dependencies = [
 
 [[package]]
 name = "beta-pattern-core"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -566,7 +571,7 @@ dependencies = [
 
 [[package]]
 name = "beta-pattern-digitize"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",

@@ -9,10 +9,12 @@ use crate::rules::{
     allowed_rotations, check_job, demands, effective_job, flip_allowed, layer_copies,
 };
 
+mod matching;
 mod polygon;
 #[cfg(test)]
 mod tests;
 mod v02;
+pub use matching::match_reports;
 
 const TOLERANCE: f64 = 0.01;
 
@@ -30,6 +32,14 @@ pub use crate::rules::cut_outline;
 /// Validate a marker independently of the nesting engine. Distances are in mm.
 /// Boundary contact is allowed; positive interior intersection is always an error.
 pub fn validate(job: &Job, result: &MarkerResult) -> ValidationReport {
+    // Reject malformed numeric/count inputs before constructing effective geometry or bundles.
+    let errors = check_job(job);
+    if !errors.is_empty() {
+        return ValidationReport {
+            errors,
+            ..ValidationReport::default()
+        };
+    }
     let effective = effective_job(job);
     let job = &effective;
     let m = compute_metrics(job, &result.placements);
@@ -68,7 +78,10 @@ pub fn validate(job: &Job, result: &MarkerResult) -> ValidationReport {
     let mut actual = BTreeMap::new();
     let mut copies = BTreeSet::new();
     let mut shapes = Vec::new();
-    let explicit_layers = result.placements.iter().any(|p| !p.layer_allocations.is_empty());
+    let explicit_layers = result
+        .placements
+        .iter()
+        .any(|p| !p.layer_allocations.is_empty());
     for pl in &result.placements {
         let Some(&p) = by_id.get(pl.piece_id.as_str()) else {
             report.errors.push(issue(
@@ -99,7 +112,9 @@ pub fn validate(job: &Job, result: &MarkerResult) -> ValidationReport {
                 &[&p.id],
             ));
         }
-        if pl.mirrored && p.mirror_quantity == 0 && !flip_allowed(job, p)
+        if pl.mirrored
+            && p.mirror_quantity == 0
+            && !flip_allowed(job, p)
             && !(pl.on_fold && p.fold_line.is_some() && job.fabric.layout != Layout::Open)
         {
             report.errors.push(issue(
@@ -229,6 +244,25 @@ pub fn validate(job: &Job, result: &MarkerResult) -> ValidationReport {
         }
     }
     v02::bundles(job, result, &mut report);
+    match matching::evaluate(job, result) {
+        Ok(rows) => report.matches = rows,
+        Err(message) => report
+            .errors
+            .push(issue("match_report_limit", message, &[])),
+    }
+    let mut failed = BTreeSet::new();
+    for row in &report.matches {
+        if !row.pass && failed.insert((row.rule, row.garment)) {
+            report.errors.push(issue(
+                "match",
+                format!(
+                    "Bundle {} does not satisfy matching rule {} ({}/{}).",
+                    row.garment, row.rule, row.a_ref.piece_id, row.a_ref.point_id
+                ),
+                &[&row.a_ref.piece_id],
+            ));
+        }
+    }
     let cut_length = shapes.iter().map(|s| s.0[2]).fold(m.length, f64::max);
     report.length = cut_length;
     report.efficiency = if cut_length > 0.0 && job.fabric.width > 0.0 {

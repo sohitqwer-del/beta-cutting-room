@@ -28,3 +28,18 @@ cd pattern
 cargo test --workspace
 cargo clippy --workspace --all-targets
 ```
+
+## 4. Style workflow
+
+`beta-pattern-core::{blocks,style}` supplies original measurement-driven
+blocks, validated snapshot edits, chart grading, hit testing and measurements.
+The document stays `beta-pattern.doc/v1`; construction and production metadata
+use the existing types. The native/WASM `style_command` dispatcher and
+`@beta/marker-wasm` loader share [STYLE-API.md](docs/STYLE-API.md).
+
+Every committed edit validates all sizes. Fold declarations require symmetric
+cut geometry. Seam-distance notches project onto the cut allowance boundary.
+Generated blocks retain sewing checks with explicit ease and tolerance.
+Marker handoff selects one fabric group and validates lay, gap and repeat
+settings. [BLOCKS.md](docs/BLOCKS.md) documents original formulas and fit limits;
+[STYLE-REPORT.md](docs/STYLE-REPORT.md) records executed tests.

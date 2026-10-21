@@ -55,7 +55,7 @@ export type PointOperation = {
     index?: number;
 };
 export type DrawingObject = {
-    kind: 'arc_length' | 'elliptical_arc' | 'cubic_path' | 'cut_path' | 'move' | 'rotate' | 'mirror_line' | 'mirror_axis';
+    kind: 'offset_path' | 'derived_path' | 'arc_length' | 'elliptical_arc' | 'cubic_path' | 'cut_path' | 'move' | 'rotate' | 'mirror_line' | 'mirror_axis';
     [field: string]: Json;
 } | {
     kind: 'point';
@@ -175,6 +175,8 @@ export interface PatternDocument {
     meta?: Record<string, Json>;
 }
 export interface GradedPiece {
+    /** Actual graded stitch paths in piece edge order, without allowances. */
+    seam_edges?: Pt[][];
     piece: Piece;
     seam: Pt[];
     points: Record<string, Pt>;

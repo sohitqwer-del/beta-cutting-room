@@ -1,13 +1,13 @@
-# Install BETA Cutting Room 0.5.0
+# Install BETA Cutting Room 0.6.0
 
-Version 0.5.0 packages and their checks are recorded in [the release record](RELEASE-0.5.0.md).
+Version 0.6.0 packages and their checks are recorded in [the release record](RELEASE-0.6.0.md).
 The [release checklist](RELEASE-CHECKLIST.md) records remaining installation and
 factory-acceptance checks. Publication alone does not complete those checks.
 Nothing here installs a service or publishes a release automatically.
 
 ## Windows desktop
 
-Use the x64 NSIS installer `BETA-Cutting-Room_0.5.0_x64-setup.exe`. It installs
+Use the x64 NSIS installer `BETA-Cutting-Room_0.6.0_x64-setup.exe`. It installs
 for the current user. Compare its SHA-256 with the release record before running
 it. The installer is unsigned; signing and clean-PC acceptance remain gates.
 
@@ -27,7 +27,7 @@ account. Hindi and Tamil text need native-speaker review.
 
 ## Windows portable CLI and browser app
 
-Extract `BETA-Cutting-Room_0.5.0_windows-x64-portable.zip` to a writable folder.
+Extract `BETA-Cutting-Room_0.6.0_windows-x64-portable.zip` to a writable folder.
 Run `start-server.cmd`, then open `http://127.0.0.1:7878`. Leave the console open;
 Ctrl+C stops it. Do not open `web/index.html` directly from disk. The CLI also
 runs as `.\beta-marker.exe --help` in PowerShell.
@@ -42,7 +42,7 @@ The Linux package is the CLI plus static browser assets. The Windows desktop
 installer is separate. A Linux desktop GUI is not part of this release's package
 or permissive-licence claim.
 
-Extract `BETA-Cutting-Room_0.5.0_linux-x86_64.tar.gz`, enter the extracted folder,
+Extract `BETA-Cutting-Room_0.6.0_linux-x86_64.tar.gz`, enter the extracted folder,
 then run:
 
 ```sh

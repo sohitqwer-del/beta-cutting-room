@@ -5,11 +5,14 @@ pub mod geometry;
 pub mod metrics;
 pub mod model;
 pub mod rules;
+pub mod style;
+#[cfg(test)]
+mod style_tests;
 pub mod validate;
 
-pub use metrics::{compute_metrics, Metrics};
+pub use metrics::{Metrics, compute_metrics};
 pub use model::*;
-pub use rules::{allowed_rotations, check_job, demands, AllowedRotations, Demand};
+pub use rules::{AllowedRotations, Demand, allowed_rotations, check_job, demands};
 pub use validate::validate;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

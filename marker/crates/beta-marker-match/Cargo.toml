@@ -8,7 +8,13 @@ license.workspace = true
 [dependencies]
 beta-marker-core.workspace = true
 beta-marker-nest.workspace = true
+jagua-rs.workspace = true
 anyhow.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 geo = { version = "0.33", default-features = false }
+
+[dev-dependencies]
+beta-pattern-core = { path = "../../../pattern/crates/beta-pattern-core" }
+beta-marker-export.workspace = true
+beta-marker-dxf.workspace = true

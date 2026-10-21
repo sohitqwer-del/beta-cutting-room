@@ -43,7 +43,20 @@ export interface MarkerResult {
   placements: Placement[]; warnings?: string[];
 }
 export interface Issue { code: string; message: string; piece_ids?: string[] }
-export interface ValidationReport { ok: boolean; errors: Issue[]; warnings: Issue[]; length: number; piece_area: number; efficiency: number }
+/** Common match summary, also accepted from older UI adapters. */
+export interface MatchSummary {
+  rule: number; garment: number | null; a: Pt | null; b: Pt | null;
+  error_mm: number | null; pass: boolean;
+}
+export interface MatchReport extends MatchSummary {
+  garment: number; status: 'matched' | 'off' | 'not_placed';
+  a_ref: PointRef; b_ref: PointRef | null;
+  a_placement: number | null; b_placement: number | null;
+  /** Signed shortest phase residual per checked axis; null if unchecked or missing. */
+  offset_mm: [number | null, number | null];
+  tolerance_mm: number;
+}
+export interface ValidationReport { matches?: MatchReport[]; ok: boolean; errors: Issue[]; warnings: Issue[]; length: number; piece_area: number; efficiency: number }
 export type Units = 'auto' | 'mm' | 'cm' | 'inch';
 /** beta-marker-dxf::ImportReport. */
 export interface ImportReport { pieces: Piece[]; sizes: string[]; dialect: string; units: Units; warnings: string[] }

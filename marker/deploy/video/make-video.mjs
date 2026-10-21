@@ -1,53 +1,79 @@
 // Builds the BETA demo video from scenes.mjs: narration, recording, editing, captions and all deliverables.
 // Usage (from the repository root):
 //   node marker/deploy/video/make-video.mjs <step> --out <output dir> [--app http://127.0.0.1:7878/] [--playwright <dir>]
-// Steps: tts | record | build | stills | check | all  (all = tts, record, build, stills, check)
-// Needs: Windows (OneCore voices via tts.ps1), ffmpeg/ffprobe on PATH, Chrome or Edge, playwright-core (outside the repo),
+// Steps: tts | record | retime | build | stills | check | all  (all = tts, record, build, stills, check)
+// Needs: a local neural voice or phone recordings, ffmpeg/ffprobe, Chrome or Edge, playwright-core (outside the repo),
 // and a running `beta-marker serve` built from this checkout for the record step. See README.md.
 import { execFileSync, spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { allBeats, clips, GAP, scenes, SITE_URL } from './scenes.mjs';
+import { cleanVoice, importRecordings, loudness, normalize, retimeTimeline } from './audio.mjs';
 import { explainerImage, page, PHONE_BOX, phoneBackground, verticalBackground, verticalPhoneBackground, VBOX, VPHONE, LOGO, C } from './cards.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const args = Object.fromEntries(process.argv.slice(3).reduce((a, v, i, all) => (v.startsWith('--') ? [...a, [v.slice(2), all[i + 1]?.startsWith('--') || all[i + 1] === undefined ? '1' : all[i + 1]]] : a), []));
 const step = process.argv[2] ?? 'all';
 const out = resolve(args.out ?? 'demo-video');
-const work = join(out, 'work');
+const language = args.lang ?? 'en';
+if (!['en', 'hi'].includes(language)) throw new Error('Supported narration languages: en, hi');
+const work = join(out, language === 'hi' ? 'work-hi' : 'work');
 const FPS = 30;
 const VOICE = args.voice ?? 'en-IN', VOICE_NAME = args['voice-name'] ?? 'Microsoft Heera', RATE = args.rate ?? '1.12';
 const playwright = resolve(args.playwright ?? process.env.PLAYWRIGHT_CORE ?? 'node_modules/playwright-core');
 const chrome = args.chrome ?? process.env.CHROME_PATH ?? 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const music = args.music !== '0';
+const music = args.music === '1';
 mkdirSync(work, { recursive: true });
 
-const ff = (a, opts = {}) => { const r = spawnSync('ffmpeg', ['-hide_banner', '-v', 'error', '-y', ...a], { encoding: 'utf8', maxBuffer: 1 << 26, windowsHide: true, ...opts }); if (r.status !== 0) throw new Error(`ffmpeg failed: ${r.stderr}\n${a.join(' ')}`); return r.stderr; };
-const probe = (f) => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f], { encoding: 'utf8' }).trim());
+const ff = (a, opts = {}) => { const r = spawnSync('ffmpeg', ['-hide_banner', '-v', 'error', '-y', '-threads', '3', '-filter_threads', '2', '-filter_complex_threads', '2', ...a], { encoding: 'utf8', maxBuffer: 1 << 26, windowsHide: true, ...opts }); if (r.status !== 0) throw new Error(`ffmpeg failed: ${r.stderr}\n${a.join(' ')}`); return r.stderr; };
+const probe = (f) => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f], { encoding: 'utf8', windowsHide: true }).trim());
 const mb = (f) => (statSync(f).size / 1048576).toFixed(1);
 const fwd = (p) => p.replaceAll('\\', '/');
 const esc = (p) => fwd(p).replace(/:/g, '\\:').replace(/'/g, "\\'");
 
 // ---------------- TTS ----------------
 function tts() {
-  const dir = join(work, 'tts'); rmSync(dir, { recursive: true, force: true }); mkdirSync(dir, { recursive: true });
+  const dir = join(work, 'tts'), raw = join(dir, 'raw'); mkdirSync(raw, { recursive: true });
   const lines = join(work, 'lines.json');
-  writeFileSync(lines, JSON.stringify(allBeats().map((b) => ({ id: b.id, say: b.say }))));
-  const r = spawnSync('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', join(here, 'tts.ps1'), '-Lines', lines, '-OutDir', join(dir, 'raw'), '-Voice', VOICE, '-VoiceName', VOICE_NAME, '-Rate', RATE], { encoding: 'utf8', windowsHide: true });
-  if (r.status !== 0) throw new Error(r.stderr || r.stdout);
-  console.log(r.stdout.trim());
+  writeFileSync(lines, JSON.stringify(allBeats().map((b) => ({ id: b.id, say: language === 'hi' ? b.hi : b.say }))));
+  if (args['voice-dir']) importRecordings(resolve(args['voice-dir']), raw, scenes);
+  else {
+    const engine = args.engine ?? 'kokoro';
+    if (language === 'hi' && engine !== 'kokoro') throw new Error('Hindi needs Kokoro with the curated draft phonemes, or --voice-dir recordings.');
+    let command, params;
+    if (engine === 'onecore') {
+      command = 'powershell';
+      params = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', join(here, 'tts.ps1'), '-Lines', lines, '-OutDir', raw, '-Voice', VOICE, '-VoiceName', VOICE_NAME, '-Rate', RATE];
+    } else {
+      if (!['kokoro', 'piper'].includes(engine)) throw new Error(`Unknown voice engine: ${engine}`);
+      const models = args.models ?? process.env.NARRATION_MODELS;
+      if (!models) throw new Error('Pass --models <local model folder>. See AUDIO-SOURCES.md; inference never downloads files.');
+      command = args.python ?? process.env.NARRATION_PYTHON ?? 'python';
+      params = [join(here, 'neural-tts.py'), '--models', resolve(models), '--lines', lines, '--out', raw, '--engine', engine, '--voice', args['neural-voice'] ?? (language === 'hi' ? 'hm_omega' : 'af_heart'), '--wpm', args.wpm ?? '145', ...(language === 'hi' ? ['--phonemes', join(here, 'hindi-phonemes.json')] : [])];
+    }
+    const r = spawnSync(command, params, { stdio: 'inherit', windowsHide: true });
+    if (r.status !== 0) throw new Error(`Narration failed: ${r.error ?? r.status}`);
+  }
   const durations = {};
   for (const b of allBeats()) {
-    // Trim the voice's silence at both ends, then 48 kHz mono.
     const f = join(dir, `${b.id}.wav`);
-    ff(['-i', join(dir, 'raw', `${b.id}.wav`), '-af', 'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,aresample=48000', '-ac', '1', f]);
+    cleanVoice(join(raw, `${b.id}.wav`), f);
     durations[b.id] = +probe(f).toFixed(3);
   }
   writeFileSync(join(dir, 'durations.json'), JSON.stringify(durations, null, 1));
-  copyFileSync(join(dir, 'raw', 'voice.json'), join(dir, 'voice.json'));
-  const total = Object.values(durations).reduce((a, b) => a + b, 0);
-  console.log(`TTS: ${Object.keys(durations).length} lines, ${total.toFixed(1)} s of speech.`);
+  copyFileSync(join(raw, 'voice.json'), join(dir, 'voice.json'));
+  console.log(`Narration: ${Object.keys(durations).length} lines, ${Object.values(durations).reduce((a, b) => a + b, 0).toFixed(1)} s of speech.`);
+}
+function retime() {
+  if (!args.source) throw new Error('retime needs --source <existing output folder>; it reads the original timeline and frames.');
+  const source = resolve(args.source);
+  if (source === out) throw new Error('Retiming needs a separate output folder.');
+  const timeline = JSON.parse(readFileSync(join(source, 'work', 'timeline.json'), 'utf8'));
+  const durations = JSON.parse(readFileSync(join(work, 'tts', 'durations.json'), 'utf8'));
+  const result = retimeTimeline(timeline, durations, join(source, 'work', 'frames'));
+  writeFileSync(join(work, 'timeline.json'), JSON.stringify(result));
+  console.log(`Retimed ${result.scenes.length} scenes from existing synthetic footage.`);
 }
 
 // ---------------- Record ----------------
@@ -130,10 +156,10 @@ function concatList(s, dir) {
   const f = join(work, 'lists', `${s.id}.ffconcat`); mkdirSync(dirname(f), { recursive: true }); writeFileSync(f, lines.join('\n'));
   return f;
 }
-const X264_MID = ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '12', '-pix_fmt', 'yuv420p', '-r', String(FPS)];
+const X264_MID = ['-c:v', 'libx264', '-threads', '3', '-preset', 'veryfast', '-crf', '12', '-pix_fmt', 'yuv420p', '-r', String(FPS)];
 /** Raw scene video at its capture size, and a 1920 x 1080 composed version. */
 function encodeScene(s) {
-  const dir = join(work, 'frames', s.id), list = concatList(s, dir);
+  const dir = s.frameDir ?? join(work, 'frames', s.id), list = concatList(s, dir);
   const raw = join(work, 'scenes', `${s.id}.raw.mp4`), comp = join(work, 'scenes', `${s.id}.mp4`);
   mkdirSync(dirname(raw), { recursive: true });
   ff(['-f', 'concat', '-safe', '0', '-i', list, '-vf', `fps=${FPS},scale=trunc(iw/2)*2:trunc(ih/2)*2:flags=lanczos`, '-t', s.duration.toFixed(3), ...X264_MID, raw]);
@@ -162,20 +188,23 @@ function narration(events, total, file, withMusic = music) {
     ff(['-i', voice, '-filter_complex', `${pad};[0:a]asplit=2[v1][v2];[pad][v2]sidechaincompress=threshold=0.02:ratio=6:attack=20:release=400[duck];[v1][duck]amix=inputs=2:normalize=0[m]`, '-map', '[m]', '-ar', '48000', '-ac', '1', mixed]);
     pre = mixed;
   }
-  // Two-pass EBU R128 loudness normalisation to -16 LUFS, true peak -1.5 dBTP.
-  const r = spawnSync('ffmpeg', ['-hide_banner', '-i', pre, '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11:print_format=json', '-f', 'null', '-'], { encoding: 'utf8', windowsHide: true });
-  const m = JSON.parse(r.stderr.slice(r.stderr.lastIndexOf('{'), r.stderr.lastIndexOf('}') + 1));
   const outWav = join(work, `${file}.audio.wav`);
-  ff(['-i', pre, '-af', `loudnorm=I=-16:TP=-1.5:LRA=11:measured_I=${m.input_i}:measured_TP=${m.input_tp}:measured_LRA=${m.input_lra}:measured_thresh=${m.input_thresh}:offset=${m.target_offset}:linear=true,aresample=48000`, '-ar', '48000', '-ac', '2', outWav]);
+  normalize(pre, outWav);
   return outWav;
 }
-function loudness(file) {
-  const r = spawnSync('ffmpeg', ['-hide_banner', '-i', file, '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11:print_format=json', '-f', 'null', '-'], { encoding: 'utf8', windowsHide: true });
-  const m = JSON.parse(r.stderr.slice(r.stderr.lastIndexOf('{'), r.stderr.lastIndexOf('}') + 1));
-  return { lufs: +m.input_i, truePeak: +m.input_tp };
+/** Measure delivery files after AAC encoding, and correct codec overshoot. */
+function verifyAudio(file) {
+  for (let pass = 0; pass < 3; pass++) {
+    const m = loudness(file);
+    if (Math.abs(m.lufs + 16) <= .2 && m.truePeak <= -1.5) return m;
+    const temporary = file.replace(/\.mp4$/, '.normalizing.mp4');
+    normalize(file, temporary, { aac: true });
+    copyFileSync(temporary, file); rmSync(temporary);
+  }
+  throw new Error(`Delivery audio outside limits: ${file}: ${JSON.stringify(loudness(file))}`);
 }
 
-const X264_FINAL = (crf) => ['-c:v', 'libx264', '-preset', 'slow', '-crf', String(crf), '-profile:v', 'high', '-level', '4.1', '-pix_fmt', 'yuv420p', '-r', String(FPS), '-g', String(FPS * 2), '-movflags', '+faststart'];
+const X264_FINAL = (crf) => ['-c:v', 'libx264', '-threads', '3', '-preset', args.preset ?? 'slow', '-crf', String(crf), '-profile:v', 'high', '-level', '4.1', '-pix_fmt', 'yuv420p', '-r', String(FPS), '-g', String(FPS * 2), '-movflags', '+faststart'];
 const AAC = ['-c:a', 'aac', '-b:a', '128k', '-ar', '48000'];
 
 // ---------------- Build ----------------
@@ -194,24 +223,32 @@ async function build() {
   writeFileSync(list, ['ffconcat version 1.0', ...order.map((s) => `file '${fwd(join(work, 'scenes', `${s.id}.mp4`))}'`)].join('\n'));
   const rawMain = join(work, 'main.video.mp4');
   ff(['-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', rawMain]);
-  const ev = captionEvents(seq, 'en');
+  const ev = captionEvents(seq, language);
   const sceneDef = Object.fromEntries(scenes.map((s) => [s.id, s]));
   const capStyle = (sceneId) => ({ marker: 'CapTop', pattern: 'CapTop', phone: 'CapPhone' })[sceneDef[sceneId].take === 'phone' ? 'phone' : sceneId] ?? 'Cap';
   const assLines = ev.map((e) => `Dialogue: 0,${assTime(e.start)},${assTime(e.end)},${capStyle(e.scene)},,0,0,0,,${assText(wrap2(e.text, capStyle(e.scene) === 'CapPhone' ? 30 : 44))}`);
   for (const { s, offset } of seq) {
     const def = sceneDef[s.id];
-    if (!def.section || def.take === 'card') continue;
+    if (language === 'hi' || !def.section || def.take === 'card') continue;
     const chip = capStyle(s.id) === 'CapTop' ? 'ChipLow' : 'Chip';
     assLines.push(`Dialogue: 1,${assTime(offset + 0.2)},${assTime(offset + 4.2)},${chip},,0,0,0,,{\\fad(250,300)}${assText(def.section)}`);
   }
+  if (language === 'hi') assLines.push(`Dialogue: 2,0:00:00.00,${assTime(total)},Review,,0,0,0,,Hindi script needs native review`);
   const ass = join(work, 'main.ass');
-  writeFileSync(ass, ASS_HEAD(1920, 1080, [style('Cap', 70, 2, 120, 120, 40), style('CapTop', 70, 8, 120, 120, 24), style('CapPhone', 62, 2, 850, 60, 40), style('Chip', 44, 7, 34, 34, 30, '&H00526B17'), style('ChipLow', 44, 1, 34, 34, 30, '&H00526B17')]) + assLines.join('\n') + '\n', 'utf8');
+  writeFileSync(ass, ASS_HEAD(1920, 1080, [style('Cap', 70, 2, 120, 120, 40), style('CapTop', 70, 8, 120, 120, 24), style('CapPhone', 62, 2, 850, 60, 40), style('Chip', 44, 7, 34, 34, 30, '&H00526B17'), style('ChipLow', 44, 1, 34, 34, 30, '&H00526B17'), style('Review', 26, 9, 30, 30, 4)]) + assLines.join('\n') + '\n', 'utf8');
+  if (language === 'hi') writeFileSync(ass, readFileSync(ass, 'utf8').replaceAll('Segoe UI Semibold', 'Nirmala UI'));
   console.log(`Main timeline: ${total.toFixed(1)} s. Mixing audio...`);
   const audio = narration(ev, total, 'main');
-  const main = join(out, 'beta-demo-en.mp4');
+  const main = join(out, `beta-demo-${language}.mp4`);
   ff(['-i', rawMain, '-i', audio, '-filter_complex', `[0:v]subtitles='${esc(ass)}'[v]`, '-map', '[v]', '-map', '1:a', ...X264_FINAL(20), ...AAC, '-shortest', '-metadata', 'title=BETA Cutting Room - demo', main]);
-  writeSrt(join(out, 'beta-demo-en.srt'), ev);
-  writeVtt(join(out, 'beta-demo-en.vtt'), ev);
+  writeSrt(join(out, `beta-demo-${language}.srt`), ev);
+  writeVtt(join(out, `beta-demo-${language}.vtt`), ev, language === 'hi' ? 'Hindi script needs native review.' : undefined);
+  if (language === 'hi') {
+    const info = { total: +total.toFixed(2), main: { file: main, mb: +mb(main), loudness: verifyAudio(main) }, review: 'Hindi script needs native review', voice: JSON.parse(readFileSync(join(work, 'tts', 'voice.json'), 'utf8')), scenes: seq.map(({s, offset}) => ({id:s.id, start:offset, seconds:s.duration})) };
+    writeFileSync(join(out, 'build-info-hi.json'), JSON.stringify(info, null, 2));
+    console.log(JSON.stringify({total: info.total, main: info.main, review: info.review}, null, 2));
+    return;
+  }
   writeSrt(join(out, 'beta-demo-hi.draft-needs-native-review.srt'), captionEvents(seq, 'hi'));
   writeSrt(join(out, 'beta-demo-ta.draft-needs-native-review.srt'), captionEvents(seq, 'ta'));
   writeVtt(join(out, 'beta-demo-hi.draft-needs-native-review.vtt'), captionEvents(seq, 'hi'), 'Hindi draft translation. Needs review by a native speaker.');
@@ -219,7 +256,7 @@ async function build() {
   // Web copy for the website (must stay under 25 MB to be self-hosted on the site).
   const web = join(out, 'beta-demo-en.web.mp4');
   if (statSync(main).size < 24 * 1048576) copyFileSync(main, web);
-  else ff(['-i', main, ...X264_FINAL(27), '-maxrate', '700k', '-bufsize', '1400k', ...AAC, web]);
+  else ff(['-i', main, ...X264_FINAL(27), '-maxrate', '700k', '-bufsize', '1400k', '-c:a', 'copy', web]);
 
   // ---- Feature clips for the Help page ----
   const clipDir = join(out, 'clips'); mkdirSync(clipDir, { recursive: true });
@@ -236,8 +273,14 @@ async function build() {
   await teaser(byId);
 
   const info = { total: +total.toFixed(1), main: { file: main, mb: +mb(main), loudness: loudness(main) }, web: { file: web, mb: +mb(web) }, clips: clipInfo, scenes: seq.map(({ s, offset }) => ({ id: s.id, start: +offset.toFixed(2), seconds: +s.duration.toFixed(2) })) };
+  info.voice = JSON.parse(readFileSync(join(work, 'tts', 'voice.json'), 'utf8'));
+  info.audio = { targetLufs: -16, toleranceLu: .2, maxTruePeak: -1.5, music };
+  info.main.loudness = verifyAudio(main);
+  info.web.loudness = verifyAudio(web);
+  info.teaser = { file: join(out, 'beta-teaser-vertical.mp4'), loudness: verifyAudio(join(out, 'beta-teaser-vertical.mp4')) };
+  for (const clip of Object.values(info.clips)) clip.loudness = verifyAudio(clip.file);
   writeFileSync(join(out, 'build-info.json'), JSON.stringify(info, null, 2));
-  console.log(JSON.stringify(info, null, 2));
+  console.log(JSON.stringify({ total: info.total, main: info.main, web: info.web, teaser: info.teaser, clips: info.clips }, null, 2));
 }
 
 async function teaser(byId) {
@@ -317,7 +360,7 @@ p { font-size: 40px; font-weight: 600; color: ${C.muted}; }
 // ---------------- Self-check: contact sheet ----------------
 function check() {
   const font = 'C\\:/Windows/Fonts/segoeuib.ttf';
-  const sheets = [['beta-demo-en.mp4', 'contact-sheet-main.png', 5], ['beta-teaser-vertical.mp4', 'contact-sheet-teaser.png', 6]];
+  const sheets = [['beta-demo-en.mp4', 'contact-sheet-main.png', 5], ['beta-teaser-vertical.mp4', 'contact-sheet-teaser.png', 6], ['beta-demo-hi.mp4', 'contact-sheet-hindi.png', 5]];
   for (const [src, dst, cols] of sheets) {
     const f = join(out, src); if (!existsSync(f)) continue;
     const d = probe(f), n = Math.floor(d / 10) + 1, rows = Math.ceil(n / cols);
@@ -360,7 +403,7 @@ function script() {
   console.log('Wrote SCRIPT.md');
 }
 
-const steps = { tts, record, build, stills, check, script };
+const steps = { tts, record, retime, build, stills, check, script };
 for (const s of step === 'all' ? ['tts', 'record', 'build', 'stills', 'check'] : step.split(',')) {
   if (!steps[s]) throw new Error(`Unknown step ${s}`);
   console.log(`== ${s}`); await steps[s]();

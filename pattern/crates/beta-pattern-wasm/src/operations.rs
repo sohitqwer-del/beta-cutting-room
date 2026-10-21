@@ -11,6 +11,22 @@ use serde_json::{Value as Json, json};
 pub fn apply(doc: &Document, request: &Json) -> Result<Json, String> {
     let s = |key: &str| request[key].as_str().ok_or_else(|| format!("Choose {key}"));
     let action = s("action")?;
+    let linked_dart = matches!(action, "dart_transfer" | "dart_close")
+        && request["piece"].as_str().is_some_and(|id| {
+            doc.pieces
+                .iter()
+                .find(|p| p.id == id)
+                .and_then(|p| p.edges.first())
+                .and_then(|e| doc.drawing.get(&e.object))
+                .is_some_and(|o| matches!(o, beta_pattern_core::Object::DerivedPath { .. }))
+        });
+    if matches!(action, "split" | "dart" | "pleat") || linked_dart {
+        let next =
+            beta_pattern_core::derived::piece_action(doc, request).map_err(|e| format!("{e:#}"))?;
+        return Ok(
+            json!({"document":next,"message":"Linked piece added. It regrades from the source and size chart. Review allowances, marks and grain before cutting."}),
+        );
+    }
     // Production commands share this existing native/WASM transport. They do
     // not need a selected piece unless their typed Rust request requires one.
     if let Some(result) = production_action(doc, request, action) {

@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.6.0 - From scratch to cut
+
+- Start a style with a blank sheet or one of seven editable basic blocks.
+  Follow eight steps: Style, Pattern, Grade, Lay, Gaps, Stripes, Marker and Cut.
+- Draw and edit patterns on a canvas. Grade from a size chart, view sizes
+  together, and check seam lengths before making a marker.
+- Set fabric lay, cutting gaps and stripe or check repeats. See the overlay
+  and each match rule's measured error in millimetres.
+- Rust now handles edge picking, line and curve offsets, line-to-line extend
+  and trim, linked-piece grading, and missing fold marks. Browser workers
+  can nest jobs with matching rules. Servers accept `/api/pattern/style`.
+- The video tools support local Kokoro narration and recording your own voice.
+  The website keeps its existing demo until a voice is chosen.
+- Browser status is clearer and the service worker follows the app version.
+
+Basic blocks need a fit review by a pattern master. Extend and trim currently
+work between straight lines. In the browser, marker PLT, full-size PDF and DXF
+need the desktop app or a server; tiled PDF works locally. Browser nesting is
+weaker on big jobs. Quick Marker real-photo accuracy is untested. Hindi and
+Tamil drafts need native review. The Windows installer is unsigned.
+
+
 ## 0.5.0 - 21 October 2026
 
 - Redesigned the app screens, navigation and welcome. Added feedback on every screen, a new logo, and a new website. Desktop feedback links use a scoped opener.

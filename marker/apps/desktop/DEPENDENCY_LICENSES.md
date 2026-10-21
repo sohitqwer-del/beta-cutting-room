@@ -1,4 +1,4 @@
-# Windows dependency licence audit: 0.5.0
+# Windows dependency licence audit: 0.6.0
 
 Generated from the release target graph. The complete target-scoped inventory
 is [THIRD-PARTY-LICENSES.md](../../THIRD-PARTY-LICENSES.md). Full upstream texts
@@ -28,24 +28,24 @@ The separate WebView2 SDK loader licence is in the complete inventory.
 | autocfg | 1.5.1 | Apache-2.0 OR MIT |
 | base64 | 0.22.1 | MIT OR Apache-2.0 |
 | base64 | 0.23.1 | MIT OR Apache-2.0 |
-| beta-cutting-room | 0.5.0 | Apache-2.0 |
-| beta-marker-cli | 0.5.0 | Apache-2.0 |
-| beta-marker-cluster | 0.5.0 | Apache-2.0 |
-| beta-marker-core | 0.5.0 | Apache-2.0 |
-| beta-marker-cutroom | 0.5.0 | Apache-2.0 |
-| beta-marker-dxf | 0.5.0 | Apache-2.0 |
-| beta-marker-edit | 0.5.0 | Apache-2.0 |
-| beta-marker-export | 0.5.0 | Apache-2.0 |
-| beta-marker-floor | 0.5.0 | Apache-2.0 |
-| beta-marker-learn | 0.5.0 | Apache-2.0 |
-| beta-marker-match | 0.5.0 | Apache-2.0 |
-| beta-marker-nest | 0.5.0 | Apache-2.0 |
-| beta-marker-plan | 0.5.0 | Apache-2.0 |
-| beta-marker-queue | 0.5.0 | Apache-2.0 |
-| beta-marker-roll | 0.5.0 | Apache-2.0 |
-| beta-marker-wasm | 0.5.0 | Apache-2.0 |
-| beta-pattern-core | 0.5.0 | Apache-2.0 |
-| beta-pattern-digitize | 0.5.0 | Apache-2.0 |
+| beta-cutting-room | 0.6.0 | Apache-2.0 |
+| beta-marker-cli | 0.6.0 | Apache-2.0 |
+| beta-marker-cluster | 0.6.0 | Apache-2.0 |
+| beta-marker-core | 0.6.0 | Apache-2.0 |
+| beta-marker-cutroom | 0.6.0 | Apache-2.0 |
+| beta-marker-dxf | 0.6.0 | Apache-2.0 |
+| beta-marker-edit | 0.6.0 | Apache-2.0 |
+| beta-marker-export | 0.6.0 | Apache-2.0 |
+| beta-marker-floor | 0.6.0 | Apache-2.0 |
+| beta-marker-learn | 0.6.0 | Apache-2.0 |
+| beta-marker-match | 0.6.0 | Apache-2.0 |
+| beta-marker-nest | 0.6.0 | Apache-2.0 |
+| beta-marker-plan | 0.6.0 | Apache-2.0 |
+| beta-marker-queue | 0.6.0 | Apache-2.0 |
+| beta-marker-roll | 0.6.0 | Apache-2.0 |
+| beta-marker-wasm | 0.6.0 | Apache-2.0 |
+| beta-pattern-core | 0.6.0 | Apache-2.0 |
+| beta-pattern-digitize | 0.6.0 | Apache-2.0 |
 | bitflags | 1.3.2 | MIT/Apache-2.0 |
 | bitflags | 2.13.2 | MIT OR Apache-2.0 |
 | block-buffer | 0.10.4 | MIT OR Apache-2.0 |

@@ -6,6 +6,8 @@ mod pattern_editor;
 mod pattern_operations;
 #[path = "../../../../../pattern/crates/beta-pattern-wasm/src/output.rs"]
 mod pattern_output;
+#[path = "../../../../../pattern/crates/beta-pattern-wasm/src/style.rs"]
+mod pattern_style;
 
 use anyhow::Context;
 use beta_marker_core::{Job, MarkerResult};
@@ -513,6 +515,7 @@ fn physical_lay(input: PhysicalLayRequest) -> anyhow::Result<beta_marker_cutroom
 fn cutting_route(path: &str, body: &[u8]) -> Option<anyhow::Result<Reply>> {
     let known = [
         "/api/pattern/starter",
+        "/api/pattern/style",
         "/api/pattern/catalog",
         "/api/pattern/inspect",
         "/api/pattern/formula",
@@ -550,6 +553,12 @@ fn cutting_route(path: &str, body: &[u8]) -> Option<anyhow::Result<Reply>> {
     }
     Some((|| -> anyhow::Result<Reply> {
         match path {
+            "/api/pattern/style" => {
+                let request: serde_json::Value = serde_json::from_slice(body)?;
+                Ok(Reply::json(
+                    pattern_style::dispatch(&request).map_err(anyhow::Error::msg)?,
+                ))
+            }
             "/api/pattern/catalog" => Ok(Reply::json(beta_pattern_core::tools::catalog())),
             "/api/pattern/inspect"
             | "/api/pattern/formula"
@@ -2162,6 +2171,30 @@ mod tests {
         reply(Method::POST, path, body.to_string().as_bytes())
     }
     #[test]
+    fn style_route_uses_the_shared_dispatcher_and_rejects_bad_edits() {
+        let created = post(
+            "/api/pattern/style",
+            json!({"action":"create","request":{"block":"t_shirt"}}),
+        );
+        assert_eq!(created.status, 200);
+        let doc: serde_json::Value = serde_json::from_slice(&created.body).unwrap();
+        assert_eq!(doc["pieces"].as_array().unwrap().len(), 4);
+        let graded = post(
+            "/api/pattern/style",
+            json!({"action":"grade","document":doc}),
+        );
+        assert_eq!(graded.status, 200);
+        let bad = post(
+            "/api/pattern/style",
+            json!({"action":"edit","document":doc,"operations":[{"op":"delete_object","id":"front.A"}]}),
+        );
+        assert_eq!(bad.status, 400);
+        assert_eq!(
+            post("/api/pattern/style", json!({"action":"unknown"})).status,
+            400
+        );
+    }
+    #[test]
     fn pattern_editor_routes_validate_catalog_forms_and_physical_exports() {
         let doc = beta_pattern_core::starters::bodice();
         let catalog = post("/api/pattern/catalog", json!({}));
@@ -2393,13 +2426,25 @@ mod tests {
         last["translate"] = json!([21, 1]);
         last["layer_allocations"] = json!([{"bundle":2,"mirrored":false}, null]);
         f["result"]["placements"] = json!([first, last]);
-        let response = post("/api/cutroom/lay", json!({
-            "job": f["job"], "result": f["result"], "id":"LAY-01",
-            "order":"ORDER-01", "colour":"Blue", "plies":f["lay"]["plies"]
-        }));
-        assert_eq!(response.status, 200, "{}", String::from_utf8_lossy(&response.body));
-        let lay: beta_marker_cutroom::bundles::Lay = serde_json::from_slice(&response.body).unwrap();
-        assert_eq!(lay.parts.iter().map(|p| p.garment).collect::<Vec<_>>(), vec![0, 1, 2]);
+        let response = post(
+            "/api/cutroom/lay",
+            json!({
+                "job": f["job"], "result": f["result"], "id":"LAY-01",
+                "order":"ORDER-01", "colour":"Blue", "plies":f["lay"]["plies"]
+            }),
+        );
+        assert_eq!(
+            response.status,
+            200,
+            "{}",
+            String::from_utf8_lossy(&response.body)
+        );
+        let lay: beta_marker_cutroom::bundles::Lay =
+            serde_json::from_slice(&response.body).unwrap();
+        assert_eq!(
+            lay.parts.iter().map(|p| p.garment).collect::<Vec<_>>(),
+            vec![0, 1, 2]
+        );
         assert!(lay.parts.iter().all(|p| p.slot == 0 && !p.mirrored));
     }
 

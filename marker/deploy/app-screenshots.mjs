@@ -105,7 +105,14 @@ try {
   await click('[data-screen="7"]'); await click('#make-bundles');
   await until('document.querySelector("#bundle-status").textContent.includes("bundles ready")', 'real bundle tickets ready');
   await screenshot('bundles');
-  report.sampleData = 'Original built-in shirt demo and teaching bodice; synthetic rolls DEMO-001/002. No factory data.';
+  await click('[data-screen="12"]');
+  await until('!!document.querySelector("[data-block=t_shirt]") && !document.querySelector("[data-block=t_shirt]").disabled', 'style blocks ready');
+  await click('[data-block="t_shirt"]');
+  await until('JSON.parse(localStorage.getItem("beta-style-v1") || "null")?.doc?.pieces?.length === 4', 'style T-shirt created');
+  await click('#st-next');
+  await until('!document.querySelector("#st-canvas").hidden && document.querySelectorAll("#sc-static path").length > 3', 'style pattern canvas ready');
+  await click('#sc-fit'); await screenshot('style-pattern');
+  report.sampleData = 'Original built-in shirt demo, teaching bodice and editable T-shirt block; synthetic rolls DEMO-001/002. No factory data.';
   if (report.requests.some(r => !r.path.startsWith('/api/') && r.status >= 400)) throw new Error('A bundled web asset failed to load.');
   if (report.externalRequests.length || report.exceptions.length) throw new Error('External request or uncaught browser exception.');
   report.passed = true;

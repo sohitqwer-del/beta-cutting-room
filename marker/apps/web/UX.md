@@ -146,3 +146,90 @@ For tailoring shops and small units with paper patterns, no CAD and often only a
 **Accessibility and language:** all controls 48 px (44 px for segmented choices), names for every control (checked headlessly on every step), focus kept after each re-render, a live region announces results, reduced motion respected, Hindi and Tamil drafts for every new string (`src/quick/locales`, marked for native review).
 
 **Honest limits:** shape reading, assist, job building, tiled/chalk PDFs and the projector layout are Rust WASM (`@beta/marker-wasm` Quick Marker API v1). Nesting and PLT/full-size PDF export need the desktop app or the shop's `beta-marker serve` on the same network; the browser WASM has no nester yet, so a phone alone cannot make the marker. Practice mode is labelled on every step and its layouts are marked "not a real marker".
+
+## Style flow: from scratch to cut (round 0.6)
+
+The factory owner: "The app is half-baked. I need to make patterns from scratch and work with patterns, then size-scale them, then select the lay and the cut gaps, the stripes, the overlay." Screen `#/style` (sidebar "Style: pattern to cut", first card on Home, workflow step 1). Code: `src/style/` (see its README).
+
+**Users:** pattern masters and cutting masters. They know garments, grading and lays well. They are not CAD experts and do not think in formulas or object ids. They work in cm or inch, at a 1366 x 768 PC or a 10-inch tablet.
+
+### Audit of the Pattern tab and the Pattern → Marker path (before)
+
+Walk-through as a pattern master: make a T-shirt in S–XL, add notches and seam allowance, choose a folded lay with 1 cm stripes, and get a marker. Before shots: `<data-dir>/style-ui-shots/before/`.
+
+| # | Half-baked or blocked | Where | Priority |
+|---|---|---|---|
+| 1 | The drawing starts 660 px down at 1366 x 768, under file inputs, a status line, a toolbar and 7 mode buttons. | Pattern | P1 |
+| 2 | No garment blocks. The only start is a blank formula draft or a teaching bodice. | Pattern | P1 |
+| 3 | Drawing a point opens a dialog that asks for an "Object ID", empty x/y text and a "measurement / variable picker". 35 tools are text buttons named after geometry ("Perpendicular foot", "Two circles", "Circle tangent contact"); none has an icon. | Draft | P1 |
+| 4 | No direct drawing: no click-click lines, no rubber band, no typed length at the cursor, no curve handles to drag (only fixed numeric points move). Snapping is two check boxes with no guides. | Draft | P1 |
+| 5 | A piece is made by "Start a new piece", then clicking paths in order and reversing edges by hand. | Piece | P1 |
+| 6 | Notch, drill and button marks need the edge number ("starts at 1") and the distance along it typed in a form. Dart, pleat, split and mirror share one 13-field form. | Piece | P2 |
+| 7 | Sizes and measurements are in mm only, in a raw table under "Measurements"; grading is a separate mode with dx/dy fields and a "Nest reference point" list of ids. | Measurements, Grading | P2 |
+| 8 | The status line keeps saying "Loading local draft tools…" after the tools have loaded. | Pattern | P3 |
+| 9 | "Send sizes to marker" sits in Output. The marker opens as a thin empty strip with "4 issues · 4 not placed" and no lay, gap or stripe settings carried over. | Pattern → Marker | P1 |
+| 10 | Lay, gaps, stripes and match points are spread over three Setup tabs of the marker editor. Spread is a plain list ("open", "folded", "tubular"); match points are typed as x/y or clicked on a small outline; rules read "front/seam-1 → back/seam-1". | Marker setup | P2 |
+| 11 | Stripes show only as faint lines behind the marker, not on the pieces. There is no "matched / not matched". | Marker | P2 |
+| 12 | The hand-off is one way. The editor has no way back to the pattern, and sending again replaces the marker. | Marker | P2 |
+| 13 | Nothing guides the user from pattern to lay to gaps to stripes. The workflow bar jumps from Pattern to Marker. | Shell | P2 |
+
+What already worked and is kept: the Rust engine (formulas, grading, piece tools, DXF/PDF/PLT, seam lengths), the formula Pattern screen for advanced users (now "Pattern formulas" in the sidebar), the marker editor and the cut plan.
+
+### Design
+
+One guided job in 8 steps with the same step bar as the cutting-room workflow and a "Next" on every step. Every step can be revisited; a blocked step says why next to the Next button.
+
+| Step | What the user does | Design choices |
+|---|---|---|
+| 1 Style | Name (only required field), style number, garment, season, fabric, notes; size chart preset and the sizes to include; start from a block gallery (T-shirt, shirt, trouser, skirt, kurta, polo, track pant) or a blank sheet, or open a style file | Pictures for every block. Buyer and order details stay out. The name defaults to the block name. |
+| 2 Pattern | Draw and change pieces on a CAD-like sheet | Left: 19 tools with icon, name and key (V P L C A R · O M X J D K · N H B T S G F) plus "Rectangle piece". Centre: grid paper, rulers in cm or inch, live guides for point, line-up and 15° snaps, a rubber band with live length and angle, curve handles to drag, box select. The exact-value popover sits in the corner of the drawing (length and angle for lines; width for seam allowance, dart, pleat; count for button rows) so it never covers the next click. Under the drawing: what to do next for the current tool, and the cursor position. Right: inspector for the selected point, line or piece (name, X/Y, "Free this point", quantity, pair, fabric, seam allowance per edge, marks) and a Pieces list. Closing a line chain makes a piece. |
+| 3 Grade | Edit the size chart; see all sizes stacked; click a corner for a per-point rule; read the seam check | Chart in cm/inch with base size, add and remove size (a new size starts one grade step on). Seam check shows the length difference per size as a pass/fail chip. |
+| 4 Lay | Width (inch/cm with preset chips), spread (open / folded / tube), face (up / down / face to face), nap (any / one way / one way per garment), plies with steppers, garments per size and order | Big picture cards. Even plies enforced where two layers are cut together. "Lays needed" per size. Fabric group chooser when a style mixes fabrics. |
+| 5 Gaps | Piece gap, edge gap, end allowance, per-piece buffer and fusing block | Live preview to scale with two real pieces, dimension arrows, shaded end allowances. |
+| 6 Stripes | Plain / stripes / checks, direction, repeat, offset, tolerance, stripe colours; match points | Stripes drawn over the real pieces with graded sizes dashed on top. Match: tap a point on piece A, then on piece B; each rule shows "Not checked yet", "Matched" or "Not matched by …". |
+| 7 Marker | Choose Fast / Better / Best and make the marker | The marker fills the view with stripe lines clipped to the pieces, match circles (green matched, red not) and the previous marker as a ghost. Status: length, efficiency, per garment, spread length, checks, stripe match. Changing a setting marks the marker out of date. |
+| 8 Cut | Files and the next floor steps | Pattern PDF (A4/A3, 1:1), DXF-AAMA, PLT; marker PLT, PDF, DXF (desktop or server) and tiled PDF (everywhere); stripe guide lines as an option. "Make a cut plan" fills the order and plies; "Print a spreading sheet", "Open in marker editor". |
+
+**Seamless hand-off:** the marker goes to the editor, cut plan, spreading and bundles screens directly (no file). In the editor a banner offers "Back to style" and "Use this edited marker".
+
+**Language and access:** every string is in `src/style/locales` with Hindi and Tamil drafts marked for review. All controls have names; pictures are decorative with text labels; the drawing has a role description and a keyboard path (tool keys, arrows move selected points by 1 mm or 10 mm with Shift, Delete, Esc, +/−/0) and the inspector gives exact values for every point; touch: one finger pans, two fingers zoom, 48 px targets.
+
+**Engine:** `src/style/adapter.ts` is the only file that calls the engine (STYLE-API v1, `pattern/docs/STYLE-API.md`): the Rust Style, Pattern and Marker cores in WASM and the Rust nester (browser worker with matched nesting, or the desktop app / `beta-marker serve`). If the local Pattern WASM has no style tools, the screen says so and gives the build command; there is no stand-in engine in the app (`mock.ts` is a test double for unit tests).
+
+### Checks (Style flow)
+
+- Vitest: `npx vitest run marker/apps/web/src/style`: units and inch fractions, view maths and ruler ticks, snapping (points, 15° angles, line-up guides, grid), edge picking, loop chaining, the step state machine and its guards, engine settings, spread fabric, saving, the adapter (real engine, preview fallback, missing WASM, validator-based match status), stripe clipping, and string drafts (same placeholders in Hindi and Tamil). `preview.test.ts` runs the preview engine on the local Rust WASM: all 7 blocks valid in all sizes, formula-preserving point moves, blank-sheet piece, job with gaps/buffers/per-size match rules, stripe overlay.
+- Web, WASM and desktop typecheck; web build; `npm run build:static -w @beta/marker-web`.
+- Headless end-to-end with real mouse and keyboard input (Chrome DevTools protocol) against the real Style engine and the real Rust browser nester, in the dev app and in the static browser build. Steps: blank-sheet piece drawn with the Line tool and a typed length/angle, closed into a piece; T-shirt block in S–XL; armhole curve handle dragged (formula kept); notches on front and back side seams (with their fold twins); 1.5 cm seam allowance (both fold twin edges); size chart edit; folded 60-inch lay; 0.5 cm piece gap and a sleeve buffer; 1 cm stripes along the length with front/back side hems matched; 20 s nest; cut-step files; editor hand-off and back. Real engine result: all marker checks passed, 4 of 4 side-hem matches, stripes clipped to the pieces; pattern PDF, DXF-AAMA and PLT and a tiled marker PDF exported and checked by file signature. No console errors, no external requests.
+- Accessibility spot check on every step: no unnamed controls; hit areas at least 32 px (chart base-size radios and table check boxes were enlarged after the first run).
+- Screenshots: `<data-dir>/style-ui-shots/before/` (old Pattern tab and hand-off), `after-1366`, `after-1920`, `after-1024-touch`, `lang-hi`, `lang-ta`, `dark-1366`, `static-1366` (browser edition).
+
+### Open issues (Style flow)
+
+1. Per-rule match status with the phase error in mm is not in the overlay yet (contract question 1). The UI shows "Matched / Not matched" from the Rust validator and marks the points; it shows no mm for real-engine markers.
+2. The engine's blocks start with all pieces at the origin. The UI lays them apart once with "Arrange" (move_point, formulas kept, undoable). If the engine lays blocks out itself, Arrange does nothing.
+3. "Offset" works on whole pieces only (offset_piece); offsetting a single line or curve needs an engine operation (contract question 3).
+4. Edge picks (notch, dart, seam allowance, fold) are worked out in the browser from the engine's stitch paths (contract question 2). On fold pieces the twin edge is i ↔ n−1−i and the twin notch sits at the twin length minus the distance; removing one of a pair by hand makes a folded hand-off fail with the engine's message.
+5. Hindi and Tamil strings are drafts for native review.
+6. Marker PLT, DXF and full-size PDF need the desktop app or the shop server; the browser edition offers the tiled PDF.
+7. The previous-marker overlay lasts for the session; markers are not stored with the style.
+8. The formula Pattern screen ("Pattern formulas") stays for advanced drafting and is not merged with the new canvas.
+9. The desktop window was not opened this round (typecheck and shared web build only).
+
+## Style flow polish (round 0.6, polish)
+
+The lead walked the Style flow on the screenshots and asked for it to "feel finished". Before shots: `<data-dir>/style-polish-shots/before-1366/` and `before-1024-touch/` (real engine, same smoke as round 0.6).
+
+| # | Rough edge (before) | Fix |
+|---|---|---|
+| 1 | Pattern canvas: the engine's production label ("Front \| size M \| cut 1 + 0 mirrored \| fabric shell") ran across other pieces; small pieces had names wider than the piece. | `labels.ts` places the name and "M · cut 1 (+ 1 mirrored, fabric if not shell)" at the roomiest point inside the piece, sized for the zoom (10–17 px). Too small: name only, then shortened with "…", then hidden (the piece keeps a tooltip and its row in Pieces). The production label is not drawn on the canvas (it is still in the exported files). User text marks are shortened to the piece width. |
+| 2 | "Viewer mode · local server offline" next to a green "Rust style engine" chip. | One status in the top bar: "Working offline in this browser" (tooltip: what needs the desktop app or a shop server), in Hindi and Tamil too. The Style header shows a chip only while loading or on failure. |
+| 3 | Match rules showed "Not checked yet" or "Not matched" with raw point ids. | Stripes step: "Pairs to match" with a summary and a colour key; each pair shows Matched (green), Off by up to N mm (red, from the engine's match report when present), Not in the marker (amber) or Out of date, plus **Show on marker**. Point names read "Front · Side hem". |
+| 4 | Marker: 1 cm stripes merged into grey; match dots without a key; no way to find one pair. | Dense stripes are thinned so drawn lines stay 6 px apart (the key says "every 5th line shown"); pieces are paler under stripes; outlines on top. Match points are rings with a light halo (green matched, red off). The overlay switches carry their key swatch, followed by sizes and the fold edge, in one row. Show on marker highlights that pair (others dimmed, partners linked) with a banner and "Show all". The drawing takes the free height, so length, efficiency and checks stay in view at 1366 x 768. |
+| 5 | No hints beyond one long line; empty and error states were bare. | "How this works" strip per step: the step's purpose and three numbered actions. It opens the first time a step is shown and folds into a header button after that. Empty states for no match pairs, previews without a closed piece, the size nest, loading blocks and a running search. Engine and export errors in plain words (a JSON list of issues becomes "N problems, for example: …"); a failed marker says what to check. |
+| 6 | Walk as a new pattern master at 1366 x 768 and 1024 touch. | The whole page scrolled by about 20 px at 768 px height (icon rail and an off-screen live region were taller than the window), so the top bar slid away when a field got focus. Fixed in the shell. The step bar shows numbers only for the other steps whenever names would overflow (1024 px, Tamil). The size chart and gap tables no longer have their own scroll inside the page. The stacked sizes stay in view while the chart scrolls. Gap table headers wrap; the edge-gap label sits below the fabric. Focus stays on a grade or match point after a re-render. |
+| 7 | Strings. | Every new string has Hindi and Tamil drafts (`src/style/locales`, `src/locales` for the status), marked for native review. |
+
+Engine polish (`marker/polish-engine`, merged on mvp bb79b01, STYLE-API "Polish additions") is wired in: the per-garment match report (`overlay.matches`, or the validator's `matches`) gives each pair its status and offset in mm ("Matched · 4 of 4 · within 0.2 mm", "Off by up to 3 mm"); all canvas picking (points, lines, piece edges with `edge` and `along_mm`, piece interiors) is the Rust `hit_test`, and the browser edge maths is gone; darts pass `seam_edge`; Offset on a line, cubic or arc makes a linked parallel copy (`offset_path`) and the inspector says what it follows; a new **Extend / trim** tool (key E) makes a copy of a straight line that ends on another line (`extend_trim`); linked derived pieces say they regrade from their source; blocks arrive laid out (Arrange stays for later edits); the canvas no longer adds twin notches and drill holes on fold pieces because the engine adds the mirrored partners on a folded or tube hand-off (seam allowance still changes both twin edges, as the engine requires symmetric widths).
+
+Checks: Vitest (`polish.test.ts`: label placement inside L shapes, zoom levels, width limits, shortening; match report grouping, worst mm, not placed, engine report shape; stripe thinning; plain error text), web typecheck, web build and `build:static`, real-engine smoke 14/14 (the 11 round-0.6 steps plus Offset on a line, Extend / trim, and "match report and Show on marker") at 1366 x 768, 1024 touch, Hindi, Tamil and dark. Screenshots: `<data-dir>/style-polish-shots/after-*`, `lang-*`, `dark-1366`, `static-1366`.

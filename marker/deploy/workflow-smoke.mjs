@@ -93,6 +93,9 @@ try {
     ['pattern', 'pattern-smoke.mjs', ['runPatternSwitchChecks','runPatternSmoke','runPatternChecks','runPatternTraceChecks'], ''],
     ['production', 'pattern-production-smoke.mjs', ['runProductionSeams','runProductionLibraryPreview','applyProductionLibrary','runProductionMarksAndFold','runProductionHandoff'], ''],
     ['quick', 'quick/quick-smoke.mjs', ['runQuickSmoke'], '?quick-mock=1#/quick'],
+    ['roll-audit', 'audit-smoke.mjs', ['runRollAuditChecks'], ''],
+    ['incomplete-plan', 'audit-smoke.mjs', ['runIncompletePlanCheck'], ''],
+    ['compare', 'audit-smoke.mjs', ['runCompareChecks'], ''],
   ]) {
     await fresh(query);
     const results = {};
@@ -101,6 +104,15 @@ try {
     await shot(`${name}.png`);
     console.log(`PASS ${name}`);
   }
+  await fresh();
+  const feedback = await evaluate(`(async () => {
+    const frame = document.createElement('iframe'); document.body.append(frame);
+    frame.contentDocument.body.innerHTML = '<div class="topbar-tools"><button id="about-button">About</button></div><section id="screen-3"></section><dialog id="about-dialog"><div class="dialog-body"></div></dialog>';
+    try { return await frame.contentWindow.eval("import('/src/feedback/opener-smoke.mjs').then(m => m.runDesktopFeedbackChecks())"); }
+    finally { frame.remove(); }
+  })()`);
+  report.cases.push({ name: 'feedback-opener', results: feedback });
+  console.log('PASS feedback-opener');
   if (report.externalRequests.length || report.exceptions.length) throw new Error('External request or uncaught browser exception.');
   report.passed = true;
 } finally {

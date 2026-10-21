@@ -5,6 +5,8 @@ import { isDesktop, serverToken, setServerToken } from './transport';
 import type { DocumentState } from './state';
 import { installFeedback } from './feedback';
 import { installQuick, QUICK_SCREEN } from './quick/ui';
+import { installStyle, STYLE_SCREEN } from './style/ui';
+import { t as styleText } from './style/i18n';
 
 /** App frame: sidebar navigation (full or icon rail), top bar, workflow steps with "Next", Home, Reports, About,
  * theme, language and server token. It moves the existing screens into one layout and never changes their behaviour. */
@@ -18,11 +20,12 @@ export interface ShellHost {
 const esc = (v: unknown): string => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 
 interface Screen { index: number; key: string; title: string; group: string; icon: string; hash: string }
-/** Screen indexes are fixed by existing modules: 0 editor, 1 plan, 2 compare, 3 help, 4 pattern, 5 digitize, 6 rolls, 7 bundles, 8 floor, 11 quick marker. */
+/** Screen indexes are fixed by existing modules: 0 editor, 1 plan, 2 compare, 3 help, 4 pattern, 5 digitize, 6 rolls, 7 bundles, 8 floor, 11 quick marker, 12 style flow. */
 const SCREENS: Screen[] = [
   { index: 9, key: 'home', title: 'Home', group: '', icon: 'home', hash: 'home' },
   { index: QUICK_SCREEN, key: 'quick', title: 'Photo to marker', group: '', icon: 'photo-marker', hash: 'quick' },
-  { index: 4, key: 'pattern', title: 'Pattern', group: 'design', icon: 'pattern', hash: 'pattern' },
+  { index: STYLE_SCREEN, key: 'style', title: 'Style: pattern to cut', group: 'design', icon: 'style', hash: 'style' },
+  { index: 4, key: 'pattern', title: 'Pattern formulas', group: 'design', icon: 'pattern', hash: 'pattern' },
   { index: 5, key: 'digitize', title: 'Digitize', group: 'design', icon: 'digitize', hash: 'digitize' },
   { index: 0, key: 'editor', title: 'Marker editor', group: 'planning', icon: 'marker', hash: 'marker' },
   { index: 1, key: 'cut_plan', title: 'Cut plan', group: 'planning', icon: 'plan', hash: 'cut-plan' },
@@ -35,9 +38,10 @@ const SCREENS: Screen[] = [
 ];
 const GROUPS: Record<string, string> = { design: 'Design', planning: 'Marker and planning', cutting_floor: 'Cutting floor', insight: 'Reports and help' };
 
-/** Pattern → marker → plan → rolls → spread → cut → bundles → sewing. Floor steps open a Floor page. */
-const STEPS: Array<{ key: string; label: string; screen: number; floorPage?: string; hint: string; icon: string }> = [
-  { key: 'pattern', label: 'Pattern', screen: 4, hint: 'Draft or import pieces and grade sizes.', icon: 'pattern' },
+/** Pattern → marker → plan → rolls → spread → cut → bundles → sewing. Floor steps open a Floor page.
+ * Step 1 opens the Style flow (draft to marker); the formula Pattern screen also counts as step 1. */
+const STEPS: Array<{ key: string; label: string; screen: number; also?: number[]; floorPage?: string; hint: string; icon: string }> = [
+  { key: 'pattern', label: 'Pattern', screen: STYLE_SCREEN, also: [4], hint: 'Draft or import pieces and grade sizes.', icon: 'pattern' },
   { key: 'marker', label: 'Marker', screen: 0, hint: 'Nest pieces across the fabric width.', icon: 'marker' },
   { key: 'cut_plan', label: 'Cut plan', screen: 1, hint: 'Split an order into lays and plies.', icon: 'plan' },
   { key: 'rolls', label: 'Rolls', screen: 6, hint: 'Inspect cloth and group shades.', icon: 'rolls' },
@@ -148,6 +152,8 @@ export function installShell(host: ShellHost) {
   const homeScreen = $<HTMLElement>('#screen-9');
   // Quick Marker: phone flow for small units (self-contained module in src/quick/).
   installQuick({ message: host.message }, content);
+  // Style flow: from a new style to a cut-ready marker (self-contained module in src/style/).
+  installStyle({ message: host.message, editorState: host.state }, content);
 
   // ----- Dialogs -----
   document.body.insertAdjacentHTML('beforeend', `
@@ -193,14 +199,14 @@ export function installShell(host: ShellHost) {
     $('#print-title').textContent = s?.title ?? '';
     $('#print-date').textContent = new Date().toLocaleDateString();
     document.title = `${s?.title ?? ''} · ${PRODUCT}`;
-    workflow.hidden = index === 9 || index === QUICK_SCREEN;
+    workflow.hidden = index === 9 || index === QUICK_SCREEN || index === STYLE_SCREEN;
     app.dataset.activeScreen = String(index);
     if (index === 9) renderHome();
     const page = document.querySelector<HTMLElement>('[data-floor-page][aria-pressed=true]')?.dataset.floorPage;
     let active = -1;
     workflow.querySelectorAll<HTMLButtonElement>('[data-step]').forEach(b => {
       const step = STEPS[Number(b.dataset.step)]!;
-      const on = step.screen === index && (!step.floorPage || step.floorPage === page);
+      const on = (step.screen === index || !!step.also?.includes(index)) && (!step.floorPage || step.floorPage === page);
       if (on) { b.setAttribute('aria-current', 'step'); active = Number(b.dataset.step); } else b.removeAttribute('aria-current');
     });
     // Keep the current step in view when the step list scrolls (narrow screens).
@@ -295,9 +301,10 @@ export function installShell(host: ShellHost) {
     <div class="home-columns">
       <section class="home-section" aria-labelledby="home-start"><h2 id="home-start">Start</h2><div class="start-grid">
         ${card(`data-go="${QUICK_SCREEN}"`, 'photo-marker', 'Photo to marker', 'No CAD? Take a photo of your paper pattern pieces with your phone. BETA finds the shapes and plans the marker.', ' quick-card')}
-        ${card('data-act="new-marker"', 'marker', 'Start a new marker', 'Open DXF pattern pieces, set the fabric width and nest.', ' primary-card')}
+        ${card(`data-go="${STYLE_SCREEN}"`, 'style', esc(styleText('home_title')), esc(styleText('home_text')), ' primary-card style-card')}
+        ${card('data-act="new-marker"', 'marker', 'Start a new marker', 'Open DXF pattern pieces, set the fabric width and nest.')}
         ${card('data-act="demo"', 'demo', 'Try the demo', 'A small sample shirt. Safe to try every tool.')}
-        ${card('data-act="new-pattern"', 'new', 'Start a new pattern', 'A blank draft with measurements and sizes.')}
+        ${card('data-act="new-pattern"', 'new', 'Formula pattern (advanced)', 'A blank formula draft with measurements, like Seamly2D.')}
         ${isDesktop() ? card('data-act="open-project"', 'open', 'Open a project', 'A saved .betaproj folder with all screens.') : card('data-act="open-file"', 'open', 'Open a saved marker', 'Marker job or result JSON, or DXF pieces.')}
       </div></section>
       <section class="home-section" aria-labelledby="home-continue"><h2 id="home-continue">Continue</h2><div id="home-recent"></div></section>

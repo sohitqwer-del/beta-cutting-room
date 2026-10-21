@@ -125,6 +125,12 @@ fn shared_layers_participate_in_both_garments_shade_nap_and_match_checks() {
         b: None, axes: MatchAxes::X, offset: [0., 0.],
     }];
     assert!(has(&j, &r, "match"));
+    let rows = validate(&j, &r).matches;
+    assert_eq!(rows.len(), 4);
+    for garment in 0..2 {
+        assert_eq!(rows.iter().filter(|m| m.garment == garment).count(), 2);
+        assert!(rows.iter().any(|m| m.garment == garment && m.status == MatchStatus::Off));
+    }
 }
 
 #[test]

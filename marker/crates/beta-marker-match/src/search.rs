@@ -73,7 +73,11 @@ fn edges(job: &Job, nodes: &[Placement], axis: usize) -> Result<Vec<Edge>> {
                 let partners: Vec<_> = nodes
                     .iter()
                     .enumerate()
-                    .filter(|(_, p)| p.piece_id == bref.piece_id && p.bundle == a.bundle)
+                    .filter(|(_, p)| {
+                        p.piece_id == bref.piece_id
+                            && !beta_marker_core::rules::placement_bundles(p)
+                                .is_disjoint(&beta_marker_core::rules::placement_bundles(a))
+                    })
                     .collect();
                 ensure!(
                     !partners.is_empty(),
@@ -224,6 +228,7 @@ fn place(
     phases: &Phases,
     fixed: &[Placement],
     baseline_length: f64,
+    deadline: Option<crate::Instant>,
 ) -> Result<Vec<Placement>> {
     let repeat = job.fabric.repeat.context("matching needs repeat")?;
     let mut placed = fixed.to_vec();
@@ -257,6 +262,10 @@ fn place(
         baseline_length + extra + repeat.period_x.unwrap_or(0.0) * nodes.len() as f64 + 10.0,
     );
     for i in order {
+        ensure!(
+            deadline.is_none_or(|d| crate::Instant::now() < d),
+            "Matching search reached its time limit before finding a complete marker."
+        );
         let node = &nodes[i];
         if placed.iter().any(|p| identity(p) == identity(node)) {
             continue;
@@ -299,6 +308,10 @@ fn place(
         };
         let mut found = None;
         'search: for &x in &xs {
+            ensure!(
+                deadline.is_none_or(|d| crate::Instant::now() < d),
+                "Matching search reached its time limit before finding a complete marker."
+            );
             for &y in &ys {
                 let mut candidate = local.clone();
                 candidate.translate = [x, y];
@@ -323,10 +336,19 @@ fn place(
     Ok(placed)
 }
 
+#[cfg(test)]
 pub(crate) fn place_matched(
     job: &Job,
     baseline: &MarkerResult,
     fixed: &[Placement],
+) -> Result<Vec<Placement>> {
+    place_matched_until(job, baseline, fixed, None)
+}
+pub(crate) fn place_matched_until(
+    job: &Job,
+    baseline: &MarkerResult,
+    fixed: &[Placement],
+    deadline: Option<crate::Instant>,
 ) -> Result<Vec<Placement>> {
     let ids: BTreeSet<_> = job
         .match_rules
@@ -370,6 +392,10 @@ pub(crate) fn place_matched(
     let mut digits = vec![0; nodes.len()];
     let mut last = "translation phase cycles disagree for every tried rotation".to_owned();
     for _ in 0..512 {
+        ensure!(
+            deadline.is_none_or(|d| crate::Instant::now() < d),
+            "Matching search reached its time limit before finding a complete marker."
+        );
         for (i, n) in nodes.iter_mut().enumerate() {
             n.rotation_deg = rotations[i][digits[i]];
         }
@@ -377,7 +403,7 @@ pub(crate) fn place_matched(
             let Some(phases) = phases(job, &nodes, fixed, variant)? else {
                 continue;
             };
-            match place(job, &nodes, &phases, fixed, baseline.length) {
+            match place(job, &nodes, &phases, fixed, baseline.length, deadline) {
                 Ok(placements) => {
                     let mut candidate = baseline.clone();
                     candidate.placements = placements.clone();

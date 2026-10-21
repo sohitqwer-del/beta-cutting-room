@@ -1,4 +1,4 @@
-BETA Cutting Room 0.5.0 - third-party licence and notice texts
+BETA Cutting Room 0.6.0 - third-party licence and notice texts
 
 Mozilla Public License 2.0 (jagua-rs 1.0.0, unmodified)
 Mozilla Public License Version 2.0
@@ -4383,7 +4383,7 @@ THE SOFTWARE.
 
 
 ========================================================================
-Rust: beta-cutting-room 0.5.0
+Rust: beta-cutting-room 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -4595,7 +4595,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-cli 0.5.0
+Rust: beta-marker-cli 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -4807,7 +4807,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-cluster 0.5.0
+Rust: beta-marker-cluster 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -5019,7 +5019,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-core 0.5.0
+Rust: beta-marker-core 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -5231,7 +5231,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-cutroom 0.5.0
+Rust: beta-marker-cutroom 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -5443,7 +5443,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-dxf 0.5.0
+Rust: beta-marker-dxf 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -5655,7 +5655,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-edit 0.5.0
+Rust: beta-marker-edit 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -5867,7 +5867,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-export 0.5.0
+Rust: beta-marker-export 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -6079,7 +6079,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-floor 0.5.0
+Rust: beta-marker-floor 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -6291,7 +6291,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-gpu 0.5.0
+Rust: beta-marker-gpu 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -6503,7 +6503,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-learn 0.5.0
+Rust: beta-marker-learn 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -6715,7 +6715,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-match 0.5.0
+Rust: beta-marker-match 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -6927,7 +6927,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-nest 0.5.0
+Rust: beta-marker-nest 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -7139,7 +7139,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-plan 0.5.0
+Rust: beta-marker-plan 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -7351,7 +7351,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-queue 0.5.0
+Rust: beta-marker-queue 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -7563,7 +7563,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-roll 0.5.0
+Rust: beta-marker-roll 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -7775,7 +7775,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-marker-wasm 0.5.0
+Rust: beta-marker-wasm 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -7987,7 +7987,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-open-patterns-check 0.5.0
+Rust: beta-open-patterns-check 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -8199,7 +8199,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-pattern-core 0.5.0
+Rust: beta-pattern-core 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -8411,7 +8411,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-pattern-digitize 0.5.0
+Rust: beta-pattern-digitize 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -8623,7 +8623,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-pattern-wasm 0.5.0
+Rust: beta-pattern-wasm 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -8835,7 +8835,7 @@ Repository: null
 
 
 ========================================================================
-Rust: beta-public-bench 0.5.0
+Rust: beta-public-bench 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -73658,7 +73658,7 @@ Repository: "https://github.com/etemesi254/zune-image/tree/dev/crates/zune-jpeg"
 No root licence file in the local package; see its source distribution and declared SPDX terms.
 
 ========================================================================
-npm: @beta/marker-desktop 0.5.0
+npm: @beta/marker-desktop 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -73870,7 +73870,7 @@ Repository: null
 
 
 ========================================================================
-npm: @beta/marker-site 0.5.0
+npm: @beta/marker-site 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -74082,7 +74082,7 @@ Repository: null
 
 
 ========================================================================
-npm: @beta/marker-wasm 0.5.0
+npm: @beta/marker-wasm 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -74294,7 +74294,7 @@ Repository: null
 
 
 ========================================================================
-npm: @beta/marker-web 0.5.0
+npm: @beta/marker-web 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -75352,7 +75352,7 @@ SOFTWARE.
 
 
 ========================================================================
-npm: beta-open-patterns-freesewing 0.5.0
+npm: beta-open-patterns-freesewing 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []
@@ -75564,7 +75564,7 @@ Repository: null
 
 
 ========================================================================
-npm: beta-open-patterns-garmentcode 0.5.0
+npm: beta-open-patterns-garmentcode 0.6.0
 Licence: Apache-2.0
 Source: local BETA source
 Authors (package manifest): []

@@ -1,6 +1,6 @@
 # BETA Cutting Room
 
-**Open-source, self-hosted cutting-room software for garment factories. Version 0.5.0.**
+**Open-source, self-hosted cutting-room software for garment factories. Version 0.6.0.**
 
 BETA takes a style from pattern to sewing line: draft and grade patterns, nest
 markers, plan cuts, inspect rolls, print spreading sheets, cut and make bundles.
@@ -25,6 +25,10 @@ no cloud, no licence fee. Your patterns never leave your factory.
 >
 > Please do not attach factory patterns unless you agree to make them public.
 > The app also has a **Feedback** button on every screen; it never sends anything by itself.
+
+## New in 0.6.0: pattern to cut in one flow
+
+Start from a blank sheet or a ready block (T-shirt, shirt, trouser, skirt, kurta, polo, track pant), draw and edit the pattern, grade it from a size chart, choose the lay (open, folded or tube), set the cut gaps, add stripes or checks with a live overlay and match points, make the marker and export the cut files. Blocks are starting drafts: check the fit before production.
 
 ## What is inside
 
@@ -54,7 +58,7 @@ Tukatech, Gerber and Optitex are not yet compared. Details and caveats:
 ## Install
 
 - **Browser:** open the app link above on a PC or phone. It works offline after the first visit and keeps your data on the device. Best for trying and small jobs; for big markers use the desktop app.
-- **Windows:** download `BETA-Cutting-Room_0.5.0_x64-setup.exe` from Releases
+- **Windows:** download `BETA-Cutting-Room_0.6.0_x64-setup.exe` from Releases
   and check its SHA-256. The installer is not code-signed yet, so SmartScreen
   may warn you. See [marker/docs/INSTALL.md](marker/docs/INSTALL.md).
 - **Server:** see [marker/docs/SELF-HOSTING.md](marker/docs/SELF-HOSTING.md).

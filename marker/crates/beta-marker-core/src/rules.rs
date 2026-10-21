@@ -1,7 +1,9 @@
 //! Garment rules: how many copies to cut, and which rotations each copy may take.
 
-use crate::geometry::{angle_diff_deg, area, clip_left_of_line, grain_alignment_deg, norm_deg, transform_points};
-use crate::model::{Issue, Job, Layout, Nap, Piece, Placement, Pt, RotationRule, JOB_FORMAT};
+use crate::geometry::{
+    angle_diff_deg, area, clip_left_of_line, grain_alignment_deg, norm_deg, transform_points,
+};
+use crate::model::{Issue, JOB_FORMAT, Job, Layout, Nap, Piece, Placement, Pt, RotationRule};
 use std::collections::BTreeSet;
 
 /// Copies of one piece shape to place (normal or mirrored).
@@ -32,9 +34,15 @@ pub fn demands(job: &Job) -> Vec<Demand> {
     for (i, p) in job.pieces.iter().enumerate() {
         let m = multiplier(job, p);
         for (mirrored, q) in [(false, p.quantity), (true, p.mirror_quantity)] {
-            let count = q * m;
+            // Invalid overflow is reported by check_job; keep this helper total.
+            let count = q.saturating_mul(m);
             if count > 0 {
-                out.push(Demand { piece_index: i, piece_id: p.id.clone(), mirrored, count });
+                out.push(Demand {
+                    piece_index: i,
+                    piece_id: p.id.clone(),
+                    mirrored,
+                    count,
+                });
             }
         }
     }
@@ -66,7 +74,11 @@ pub struct AllowedRotations {
 impl AllowedRotations {
     /// `true` if `rotation_deg` is within tilt (plus a small tolerance) of an allowed angle.
     pub fn allows(&self, rotation_deg: f64) -> bool {
-        self.free || self.angles.iter().any(|&a| angle_diff_deg(a, rotation_deg) <= self.tilt_deg + 1e-3)
+        self.free
+            || self
+                .angles
+                .iter()
+                .any(|&a| angle_diff_deg(a, rotation_deg) <= self.tilt_deg + 1e-3)
     }
 }
 
@@ -79,7 +91,11 @@ pub fn allowed_rotations(job: &Job, piece: &Piece, mirrored: bool) -> AllowedRot
     let one_way = job.fabric.nap == Nap::OneWay;
     let steps: &[f64] = match effective_rule(job, piece) {
         RotationRule::Free => {
-            return AllowedRotations { angles: vec![], tilt_deg: 0.0, free: true };
+            return AllowedRotations {
+                angles: vec![],
+                tilt_deg: 0.0,
+                free: true,
+            };
         }
         RotationRule::Fixed | RotationRule::Inherit => &[0.0],
         RotationRule::Flip180 if one_way => &[0.0],
@@ -103,9 +119,16 @@ pub fn allowed_rotations(job: &Job, piece: &Piece, mirrored: bool) -> AllowedRot
 /// demanded hands and exclude null (surplus) layers.
 pub fn layer_copies(layout: Layout, placement: &Placement) -> (u32, u32) {
     if !placement.layer_allocations.is_empty() {
-        return placement.layer_allocations.iter().flatten().fold((0, 0), |(a, b), layer| {
-            (a + u32::from(!layer.mirrored), b + u32::from(layer.mirrored))
-        });
+        return placement
+            .layer_allocations
+            .iter()
+            .flatten()
+            .fold((0, 0), |(a, b), layer| {
+                (
+                    a + u32::from(!layer.mirrored),
+                    b + u32::from(layer.mirrored),
+                )
+            });
     }
     match layout {
         Layout::Open if placement.mirrored => (0, 1),
@@ -119,10 +142,23 @@ pub fn layer_copies(layout: Layout, placement: &Placement) -> (u32, u32) {
 /// Legacy placements retain their original two-layer, single-bundle semantics.
 pub fn bundle_layer_copies(layout: Layout, placement: &Placement, bundle: u32) -> (u32, u32) {
     if placement.layer_allocations.is_empty() {
-        return if placement.bundle == Some(bundle) { layer_copies(layout, placement) } else { (0, 0) };
+        return if placement.bundle == Some(bundle) {
+            layer_copies(layout, placement)
+        } else {
+            (0, 0)
+        };
     }
-    placement.layer_allocations.iter().flatten().filter(|a| a.bundle == bundle)
-        .fold((0, 0), |(a, b), layer| (a + u32::from(!layer.mirrored), b + u32::from(layer.mirrored)))
+    placement
+        .layer_allocations
+        .iter()
+        .flatten()
+        .filter(|a| a.bundle == bundle)
+        .fold((0, 0), |(a, b), layer| {
+            (
+                a + u32::from(!layer.mirrored),
+                b + u32::from(layer.mirrored),
+            )
+        })
 }
 
 /// Garments served by a placement, without duplicates.
@@ -130,7 +166,12 @@ pub fn placement_bundles(placement: &Placement) -> BTreeSet<u32> {
     if placement.layer_allocations.is_empty() {
         placement.bundle.into_iter().collect()
     } else {
-        placement.layer_allocations.iter().flatten().map(|a| a.bundle).collect()
+        placement
+            .layer_allocations
+            .iter()
+            .flatten()
+            .map(|a| a.bundle)
+            .collect()
     }
 }
 
@@ -139,12 +180,20 @@ pub fn placement_bundles(placement: &Placement) -> BTreeSet<u32> {
 /// original `bundle` (which may be unassigned in a hand-made marker).
 pub fn layer_assignments(layout: Layout, placement: &Placement) -> Vec<(Option<u32>, bool)> {
     if !placement.layer_allocations.is_empty() {
-        return placement.layer_allocations.iter().flatten()
-            .map(|a| (Some(a.bundle), a.mirrored)).collect();
+        return placement
+            .layer_allocations
+            .iter()
+            .flatten()
+            .map(|a| (Some(a.bundle), a.mirrored))
+            .collect();
     }
     let (normal, mirrored) = layer_copies(layout, placement);
     std::iter::repeat_n((placement.bundle, false), normal as usize)
-        .chain(std::iter::repeat_n((placement.bundle, true), mirrored as usize)).collect()
+        .chain(std::iter::repeat_n(
+            (placement.bundle, true),
+            mirrored as usize,
+        ))
+        .collect()
 }
 
 /// The outline a placement puts on the marker, in marker coordinates: the full outline, or
@@ -154,7 +203,12 @@ pub fn placed_outline(piece: &Piece, placement: &Placement) -> Vec<Pt> {
         (true, Some([a, b])) => clip_left_of_line(&piece.outline, a, b),
         _ => piece.outline.clone(),
     };
-    transform_points(&local, placement.mirrored, placement.rotation_deg, placement.translate)
+    transform_points(
+        &local,
+        placement.mirrored,
+        placement.rotation_deg,
+        placement.translate,
+    )
 }
 
 /// Physical cut boundary, including a grain-aligned fusing block margin.
@@ -229,7 +283,9 @@ pub fn flip_allowed(job: &Job, piece: &Piece) -> bool {
 /// Sort key for size labels: standard letter sizes in garment order, then numeric sizes
 /// by value, then any other label alphabetically.
 pub fn size_order_key(size: &str) -> (u8, f64, String) {
-    const LETTERS: [&str; 11] = ["XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
+    const LETTERS: [&str; 11] = [
+        "XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL",
+    ];
     let upper = size.trim().to_ascii_uppercase();
     if let Some(i) = LETTERS.iter().position(|s| *s == upper) {
         return (0, i as f64, upper);
@@ -249,7 +305,9 @@ pub fn size_order_key(size: &str) -> (u8, f64, String) {
 pub fn bundle_sizes(job: &Job) -> Vec<Option<String>> {
     let cmp = |a: &str, b: &str| {
         let (ka, kb) = (size_order_key(a), size_order_key(b));
-        ka.0.cmp(&kb.0).then(ka.1.total_cmp(&kb.1)).then(ka.2.cmp(&kb.2))
+        ka.0.cmp(&kb.0)
+            .then(ka.1.total_cmp(&kb.1))
+            .then(ka.2.cmp(&kb.2))
     };
     let Some(order) = &job.order else {
         let mut sizes: Vec<Option<String>> = job
@@ -277,43 +335,197 @@ pub fn bundle_sizes(job: &Job) -> Vec<Option<String>> {
 pub fn check_job(job: &Job) -> Vec<Issue> {
     let mut issues = Vec::new();
     let mut push = |code: &str, message: String, ids: Vec<String>| {
-        issues.push(Issue { code: code.into(), message, piece_ids: ids });
+        issues.push(Issue {
+            code: code.into(),
+            message,
+            piece_ids: ids,
+        });
     };
     if job.format != JOB_FORMAT {
-        push("format", format!("format must be \"{JOB_FORMAT}\", found \"{}\"", job.format), vec![]);
+        push(
+            "format",
+            format!("format must be \"{JOB_FORMAT}\", found \"{}\"", job.format),
+            vec![],
+        );
     }
-    if job.fabric.width.is_nan() || job.fabric.width <= 0.0 {
-        push("fabric_width", "fabric width must be greater than 0".into(), vec![]);
+    if !job.fabric.width.is_finite() || job.fabric.width <= 0.0 {
+        push(
+            "fabric_width",
+            "fabric width must be greater than 0".into(),
+            vec![],
+        );
     }
-    if job.spacing.piece_gap < 0.0 || job.spacing.edge_gap < 0.0 {
-        push("spacing", "gaps must not be negative".into(), vec![]);
+    if !job.spacing.piece_gap.is_finite()
+        || !job.spacing.edge_gap.is_finite()
+        || job.spacing.piece_gap < 0.0
+        || job.spacing.edge_gap < 0.0
+    {
+        push(
+            "spacing",
+            "Gaps must be finite and non-negative.".into(),
+            vec![],
+        );
+    }
+    if job
+        .fabric
+        .max_length
+        .is_some_and(|v| !v.is_finite() || v <= 0.)
+    {
+        push(
+            "fabric_length",
+            "Maximum marker length must be finite and positive.".into(),
+            vec![],
+        );
+    }
+    if let Err(message) = crate::style::lay_settings(job) {
+        push("lay", message, vec![]);
+    }
+    if let Err(message) = crate::style::repeat_bands(job) {
+        push("repeat_bands", message, vec![]);
+    }
+    if !job.fabric.tilt_deg.is_finite() || !(0. ..=180.).contains(&job.fabric.tilt_deg) {
+        push(
+            "grain",
+            "Fabric tilt must be finite, from 0 to 180 degrees.".into(),
+            vec![],
+        );
+    }
+    if [
+        job.fabric.shrinkage.length_pct,
+        job.fabric.shrinkage.width_pct,
+    ]
+    .iter()
+    .any(|v| !v.is_finite() || *v <= -100.)
+    {
+        push(
+            "shrinkage",
+            "Shrinkage compensation must be finite and greater than -100 percent.".into(),
+            vec![],
+        );
+    }
+    if job
+        .order
+        .as_ref()
+        .is_some_and(|o| o.sizes.values().map(|n| u64::from(*n)).sum::<u64>() > 100000)
+    {
+        push(
+            "quantity",
+            "Use at most 100000 garment bundles per marker.".into(),
+            vec![],
+        );
     }
     let mut seen = BTreeSet::new();
     for p in &job.pieces {
         if !seen.insert(p.id.as_str()) {
-            push("duplicate_id", format!("piece id \"{}\" is used more than once", p.id), vec![p.id.clone()]);
+            push(
+                "duplicate_id",
+                format!("piece id \"{}\" is used more than once", p.id),
+                vec![p.id.clone()],
+            );
         }
         if p.outline.len() < 3 || area(&p.outline) <= 0.0 {
-            push("bad_outline", format!("piece \"{}\" has no usable outline", p.id), vec![p.id.clone()]);
+            push(
+                "bad_outline",
+                format!("piece \"{}\" has no usable outline", p.id),
+                vec![p.id.clone()],
+            );
         }
-        if p.outline.iter().any(|q| !q[0].is_finite() || !q[1].is_finite()) {
-            push("bad_outline", format!("piece \"{}\" has a non-finite point", p.id), vec![p.id.clone()]);
+        if p.outline
+            .iter()
+            .any(|q| !q[0].is_finite() || !q[1].is_finite())
+        {
+            push(
+                "bad_outline",
+                format!("piece \"{}\" has a non-finite point", p.id),
+                vec![p.id.clone()],
+            );
         }
-        if p.buffer < 0.0 {
-            push("spacing", format!("piece \"{}\" has a negative buffer", p.id), vec![p.id.clone()]);
+        if !p.buffer.is_finite() || p.buffer < 0.0 {
+            push(
+                "spacing",
+                format!("piece \"{}\" has a negative buffer", p.id),
+                vec![p.id.clone()],
+            );
+        }
+        if p.block_margin.is_some_and(|v| !v.is_finite() || v < 0.) {
+            push(
+                "block",
+                format!("Piece '{}' needs a finite non-negative block margin.", p.id),
+                vec![p.id.clone()],
+            );
+        }
+        if p.quantity.checked_add(p.mirror_quantity).is_none()
+            || p.quantity.checked_mul(multiplier(job, p)).is_none()
+            || p.mirror_quantity.checked_mul(multiplier(job, p)).is_none()
+        {
+            push(
+                "quantity",
+                format!("Copy count is too large for '{}'.", p.id),
+                vec![p.id.clone()],
+            );
+        }
+        if p.tilt_deg
+            .is_some_and(|v| !v.is_finite() || !(0. ..=180.).contains(&v))
+        {
+            push(
+                "grain",
+                format!("Piece '{}' has invalid tilt.", p.id),
+                vec![p.id.clone()],
+            );
+        }
+        for (name, line) in [("grain", p.grain), ("fold", p.fold_line)] {
+            if line.is_some_and(|l| {
+                l.iter().flatten().any(|v| !v.is_finite())
+                    || (l[0][0] - l[1][0]).hypot(l[0][1] - l[1][1]) < 1e-8
+            }) {
+                push(
+                    name,
+                    format!(
+                        "Piece '{}' needs a finite line with two different endpoints.",
+                        p.id
+                    ),
+                    vec![p.id.clone()],
+                );
+            }
+        }
+        let mut match_ids = BTreeSet::new();
+        if p.match_points.iter().any(|m| {
+            m.id.is_empty() || !match_ids.insert(&m.id) || m.point.iter().any(|v| !v.is_finite())
+        }) {
+            push(
+                "match_point",
+                format!("Piece '{}' has invalid or duplicate match points.", p.id),
+                vec![p.id.clone()],
+            );
         }
     }
     if let Some(sh) = job.fabric.shade
-        && (sh.band_mm.is_nan() || sh.band_mm <= 0.0)
+        && (!sh.band_mm.is_finite() || sh.band_mm <= 0.0)
     {
-        push("shade", "shade band size must be greater than 0".into(), vec![]);
+        push(
+            "shade",
+            "shade band size must be greater than 0".into(),
+            vec![],
+        );
     }
     if let Some(r) = job.fabric.repeat
-        && (r.period_x.is_some_and(|v| v.is_nan() || v <= 0.0) || r.period_y.is_some_and(|v| v.is_nan() || v <= 0.0))
+        && (r.period_x.is_some_and(|v| !v.is_finite() || v <= 0.0)
+            || r.period_y.is_some_and(|v| !v.is_finite() || v <= 0.0)
+            || !r.offset_x.is_finite()
+            || !r.offset_y.is_finite()
+            || !r.tolerance_mm.is_finite()
+            || r.tolerance_mm < 0.)
     {
-        push("repeat", "repeat periods must be greater than 0".into(), vec![]);
+        push(
+            "repeat",
+            "repeat periods must be greater than 0".into(),
+            vec![],
+        );
     }
     for rule in &job.match_rules {
+        if rule.offset.iter().any(|v| !v.is_finite()) {
+            push("match_rule", "Match offsets must be finite.".into(), vec![]);
+        }
         for pr in std::iter::once(&rule.a).chain(rule.b.as_ref()) {
             let found = job
                 .pieces
@@ -323,17 +535,40 @@ pub fn check_job(job: &Job) -> Vec<Issue> {
             if !found {
                 push(
                     "match_rule",
-                    format!("match rule refers to unknown point {}/{}", pr.piece_id, pr.point_id),
+                    format!(
+                        "match rule refers to unknown point {}/{}",
+                        pr.piece_id, pr.point_id
+                    ),
                     vec![pr.piece_id.clone()],
                 );
             }
         }
     }
     if !job.match_rules.is_empty() && job.fabric.repeat.is_none() {
-        push("match_rule", "match rules need fabric.repeat".into(), vec![]);
+        push(
+            "match_rule",
+            "match rules need fabric.repeat".into(),
+            vec![],
+        );
     }
-    if demands(job).is_empty() {
-        push("empty", "no pieces to place (check quantities and the size ratio)".into(), vec![]);
+    let requested = demands(job);
+    if requested
+        .iter()
+        .try_fold(0_u64, |sum, d| sum.checked_add(u64::from(d.count)))
+        .is_none_or(|total| total > 100000)
+    {
+        push(
+            "quantity",
+            "Use at most 100000 requested piece copies per marker.".into(),
+            vec![],
+        );
+    }
+    if requested.is_empty() {
+        push(
+            "empty",
+            "no pieces to place (check quantities and the size ratio)".into(),
+            vec![],
+        );
     }
     issues
 }
@@ -361,13 +596,26 @@ mod tests {
             ..Default::default()
         };
         Job {
-        match_rules: Vec::new(),
+            match_rules: Vec::new(),
             format: JOB_FORMAT.into(),
             name: "t".into(),
-            fabric: Fabric { width: 1500.0, max_length: None, nap, allow_flip: false, tilt_deg: 0.0, ..Default::default() },
+            fabric: Fabric {
+                width: 1500.0,
+                max_length: None,
+                nap,
+                allow_flip: false,
+                tilt_deg: 0.0,
+                ..Default::default()
+            },
             spacing: Spacing::default(),
-            pieces: vec![piece("FRONT-M", "M"), piece("FRONT-L", "L"), piece("FRONT-XL", "XL")],
-            order: Some(Order { sizes: BTreeMap::from([("M".into(), 2), ("L".into(), 1)]) }),
+            pieces: vec![
+                piece("FRONT-M", "M"),
+                piece("FRONT-L", "L"),
+                piece("FRONT-XL", "XL"),
+            ],
+            order: Some(Order {
+                sizes: BTreeMap::from([("M".into(), 2), ("L".into(), 1)]),
+            }),
             meta: BTreeMap::new(),
         }
     }
@@ -375,10 +623,18 @@ mod tests {
     #[test]
     fn demand_follows_size_ratio_and_pairs() {
         let d = demands(&job(Nap::None));
-        let counts: Vec<_> = d.iter().map(|d| (d.piece_id.as_str(), d.mirrored, d.count)).collect();
+        let counts: Vec<_> = d
+            .iter()
+            .map(|d| (d.piece_id.as_str(), d.mirrored, d.count))
+            .collect();
         assert_eq!(
             counts,
-            vec![("FRONT-M", false, 2), ("FRONT-M", true, 2), ("FRONT-L", false, 1), ("FRONT-L", true, 1)]
+            vec![
+                ("FRONT-M", false, 2),
+                ("FRONT-M", true, 2),
+                ("FRONT-L", false, 1),
+                ("FRONT-L", true, 1)
+            ]
         );
     }
 
@@ -396,14 +652,27 @@ mod tests {
     #[test]
     fn bundles_use_garment_size_order() {
         let mut j = job(Nap::None);
-        j.order = Some(Order { sizes: BTreeMap::from([("XL".into(), 1), ("M".into(), 2), ("S".into(), 1)]) });
-        let b: Vec<_> = bundle_sizes(&j).into_iter().map(|s| s.unwrap_or_default()).collect();
+        j.order = Some(Order {
+            sizes: BTreeMap::from([("XL".into(), 1), ("M".into(), 2), ("S".into(), 1)]),
+        });
+        let b: Vec<_> = bundle_sizes(&j)
+            .into_iter()
+            .map(|s| s.unwrap_or_default())
+            .collect();
         assert_eq!(b, vec!["S", "M", "M", "XL"]);
-        j.order = Some(Order { sizes: BTreeMap::from([("34".into(), 1), ("30".into(), 1), ("100".into(), 1)]) });
-        let b: Vec<_> = bundle_sizes(&j).into_iter().map(|s| s.unwrap_or_default()).collect();
+        j.order = Some(Order {
+            sizes: BTreeMap::from([("34".into(), 1), ("30".into(), 1), ("100".into(), 1)]),
+        });
+        let b: Vec<_> = bundle_sizes(&j)
+            .into_iter()
+            .map(|s| s.unwrap_or_default())
+            .collect();
         assert_eq!(b, vec!["30", "34", "100"]);
         j.order = None;
-        assert_eq!(bundle_sizes(&j), vec![Some("M".into()), Some("L".into()), Some("XL".into())]);
+        assert_eq!(
+            bundle_sizes(&j),
+            vec![Some("M".into()), Some("L".into()), Some("XL".into())]
+        );
     }
 
     #[test]
@@ -413,6 +682,9 @@ mod tests {
         j.pieces[1].id = "FRONT-M".into();
         j.fabric.width = 0.0;
         let codes: Vec<_> = check_job(&j).into_iter().map(|i| i.code).collect();
-        assert!(codes.contains(&"duplicate_id".to_string()) && codes.contains(&"fabric_width".to_string()));
+        assert!(
+            codes.contains(&"duplicate_id".to_string())
+                && codes.contains(&"fabric_width".to_string())
+        );
     }
 }

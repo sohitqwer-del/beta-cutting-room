@@ -82,6 +82,30 @@ fn reference_kind(kind: &crate::catalog::ParameterType) -> bool {
     )
 }
 fn object_dependencies(doc: &Document, object: &Object) -> Result<BTreeSet<String>> {
+    if let Object::DerivedPath { recipe, .. } = object {
+        let mut refs = BTreeSet::new();
+        let mut sources = vec![recipe.source.as_str()];
+        if let crate::derived::Shape::Join { other } = &recipe.operation {
+            sources.push(other);
+        }
+        for source in sources {
+            let p = doc
+                .pieces
+                .iter()
+                .find(|p| p.id == source)
+                .context("Derived source piece missing")?;
+            refs.extend(p.edges.iter().map(|e| e.object.clone()));
+        }
+        strings(&serde_json::to_value(&recipe.operation)?, &mut |s| {
+            if doc.drawing.contains_key(s) {
+                refs.insert(s.into());
+            }
+            if let Ok((ids, _)) = formula::references(s) {
+                refs.extend(ids);
+            }
+        });
+        return Ok(refs);
+    }
     let json = serde_json::to_value(object)?;
     let fields = if json["kind"] == "point" {
         &json["operation"]

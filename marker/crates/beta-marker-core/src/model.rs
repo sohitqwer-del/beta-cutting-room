@@ -376,6 +376,9 @@ pub struct LayerAllocation {
 /// Output of the independent validator (`beta_marker_core::validate`).
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct ValidationReport {
+    /// Per-rule, garment and endpoint-copy measurements from the same validation check.
+    #[serde(default)]
+    pub matches: Vec<MatchReport>,
     /// `true` when `errors` is empty.
     pub ok: bool,
     pub errors: Vec<Issue>,
@@ -414,4 +417,32 @@ mod json_precision_tests {
         assert_eq!(restored.translate, placement.translate);
         assert!(restored.locked);
     }
+}
+
+/// Outcome of one repeat-rule endpoint pair. Missing placements are never a pass.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MatchStatus {
+    Matched,
+    Off,
+    NotPlaced,
+}
+/// Repeat phase check in marker coordinates, including every physical garment.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct MatchReport {
+    pub rule: usize,
+    pub garment: u32,
+    pub status: MatchStatus,
+    pub a_ref: PointRef,
+    pub b_ref: Option<PointRef>,
+    pub a: Option<Pt>,
+    pub b: Option<Pt>,
+    pub a_placement: Option<usize>,
+    pub b_placement: Option<usize>,
+    /// Signed shortest residual (A - B - required offset), null on unchecked/missing axes.
+    pub offset_mm: [Option<f64>; 2],
+    /// Largest absolute checked residual; null when an endpoint/period is missing.
+    pub error_mm: Option<f64>,
+    pub tolerance_mm: f64,
+    pub pass: bool,
 }

@@ -184,7 +184,7 @@ pub(crate) fn nest_bands_search(
     if attempts == 1 {
         return nest_bands_once(job, opts, 0, None);
     }
-    let started = std::time::Instant::now();
+    let started = crate::Instant::now();
     let mut best: Option<MarkerResult> = None;
     let mut failures = Vec::new();
     for variant in 0..attempts {

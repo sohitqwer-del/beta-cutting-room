@@ -163,6 +163,21 @@ pub enum Object {
         /// Positive interval length.
         length: Value,
     },
+    /// Size-dependent boundary or guide from retained source pieces.
+    DerivedPath {
+        /// Linked construction; source pieces must remain in the document.
+        recipe: Box<crate::derived::Recipe>,
+        /// None selects the closed boundary; an index selects a pleat fold guide.
+        #[serde(default)]
+        guide: Option<usize>,
+    },
+    /// Parallel path at a signed normal distance: positive is left of traversal.
+    OffsetPath {
+        /// Source line or curve ID.
+        source: String,
+        /// Normal distance in mm; negative selects the right side.
+        distance: Value,
+    },
     /// Translate any point or path without changing its source.
     Move {
         /// Source drawing object.

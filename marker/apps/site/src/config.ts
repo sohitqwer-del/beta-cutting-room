@@ -2,7 +2,7 @@
 
 export const site = {
   name: 'BETA Cutting Room',
-  version: '0.5.0',
+  version: '0.6.0',
   /** Public source repository, e.g. "https://github.com/<org>/project-beta". */
   repoUrl: 'https://github.com/sohitqwer-del/beta-cutting-room' as string | null,
   /** Public address of this website, used for social preview tags. */
@@ -15,22 +15,22 @@ export const site = {
   contactEmail: 'sohitqwer@gmail.com' as string | null,
   downloads: {
     windows: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.5.0/BETA-Cutting-Room_0.5.0_x64-setup.exe' as string | null,
-      file: 'BETA-Cutting-Room_0.5.0_x64-setup.exe',
-      size: '9.18 MiB',
-      sha256: '4ceb1058ba57eb244594900be7b472005b279a299a2a670038c18ffa1581f2ea' as string | null,
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.6.0/BETA-Cutting-Room_0.6.0_x64-setup.exe' as string | null,
+      file: 'BETA-Cutting-Room_0.6.0_x64-setup.exe',
+      size: '9.61 MiB',
+      sha256: 'd9e6e1f887db829d842579b5ebc3f96ec3905e285387d71cd8fc571f984aed98' as string | null,
     },
     portable: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.5.0/BETA-Cutting-Room_0.5.0_windows-x64-portable.zip' as string | null,
-      file: 'BETA-Cutting-Room_0.5.0_windows-x64-portable.zip',
-      size: '9.90 MiB',
-      sha256: 'bb67647fa1b5f35dccfb75cc04f96077166e44788e50a04d05b78d127c60d566' as string | null,
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.6.0/BETA-Cutting-Room_0.6.0_windows-x64-portable.zip' as string | null,
+      file: 'BETA-Cutting-Room_0.6.0_windows-x64-portable.zip',
+      size: '10.93 MiB',
+      sha256: '6ee86bb77ad9ff6bfe303edee1373bc6760f22d5f3c530bde44efb67ad5efb7a' as string | null,
     },
     server: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.5.0/BETA-Cutting-Room_0.5.0_linux-x86_64.tar.gz' as string | null,
-      file: 'BETA-Cutting-Room_0.5.0_linux-x86_64.tar.gz (Linux server, glibc 2.31 target; tested with 2.31 and 2.43)',
-      size: '8.91 MiB',
-      sha256: '4854f75bcc3293939d554e59f0274b32d5c975a3cb75888a6b917ee842584694' as string | null,
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.6.0/BETA-Cutting-Room_0.6.0_linux-x86_64.tar.gz' as string | null,
+      file: 'BETA-Cutting-Room_0.6.0_linux-x86_64.tar.gz (Linux server, glibc 2.31 target; tested with 2.31 and 2.43)',
+      size: '9.84 MiB',
+      sha256: 'd5b3e98d9298b33eaa7b7906058baaff4410d80b7d924735a63a62882030368b' as string | null,
     },
   },
   /**

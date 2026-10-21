@@ -19,6 +19,7 @@ const steps = [
 
 const screens: { slot: string; label: string; kind: Parameters<typeof screenPlaceholder>[0]; tab: number; caption: string }[] = [
   { slot: 'marker-editor', label: 'Marker editor', kind: 'marker', tab: 2, caption: 'Marker editor: nest, bump, compact and check every piece.' },
+  { slot: 'style-pattern', label: 'Style pattern canvas', kind: 'pattern', tab: 0, caption: 'Style: start with a block or blank sheet, then draft, grade and prepare the cut.' },
   { slot: 'pattern', label: 'Pattern', kind: 'pattern', tab: 0, caption: 'Pattern: draft, grade and check all sizes.' },
   { slot: 'cut-plan', label: 'Cut plan', kind: 'table', tab: 3, caption: 'Cut plan: ratios, plies and lay lengths for an order.' },
   { slot: 'rolls', label: 'Rolls', kind: 'rolls', tab: 4, caption: 'Rolls: inspection, shade groups and allocation.' },
@@ -27,7 +28,7 @@ const screens: { slot: string; label: string; kind: Parameters<typeof screenPlac
 ];
 
 const features = [
-  { icon: 'pattern', title: 'Pattern making', items: ['Drafting with measurements and formulas', 'Grading and size checks', 'Digitize a paper pattern from a photo', 'DXF-AAMA export; Seamly2D file subset import'] },
+  { icon: 'pattern', title: 'Pattern making', items: ['Seven editable basic blocks or a blank sheet, with a drafting canvas', 'Size-chart grading, stacked sizes and seam checks', 'Digitize a paper pattern from a photo', 'DXF-AAMA export; Seamly2D file subset import'] },
   { icon: 'marker', title: 'Marker making', items: ['Automatic nesting with garment rules: grain, one-way nap, left/right pairs, size ratio, gaps', 'Folded and tubular fabric, shade bands, fabric defects', 'Manual editing: bump, compact, swap, sections, marker library', 'Every marker is checked by an independent validator before export'] },
   { icon: 'plan', title: 'Cut planning and costing', items: ['Size ratios, ply heights and lay lengths from an order', 'Fabric consumption and cost estimates', 'Compare fabric widths (command line)'] },
   { icon: 'rolls', title: 'Rolls and spreading', items: ['4-point roll inspection and defect maps', 'Shade and shrinkage groups', 'Roll allocation, splice zones and end bits'] },
@@ -36,10 +37,13 @@ const features = [
 ];
 
 const notYet = [
+  'Basic blocks need a fit review by a pattern master. Extend and trim work between straight lines.',
+  'In the browser, marker PLT, full-size PDF and DXF need the desktop app or a server. Tiled PDF works locally.',
+  'Quick Marker real-photo accuracy is untested. Check dimensions against the paper before cutting.',
   'Plotter and cutter profiles are generic. Test them on your machines before production.',
   'Folded and tubular fabric work. Folded results improved a lot in 0.5 (T-shirt test 43% to 63%) but are still below open fabric.',
   'No direct Tally or SAP connector yet. Exchange data with CSV or Excel files.',
-  'The server mode serves one computer in version 0.5. Shared use over the factory network is planned.',
+  'Server access is local by default. Factory-network use needs an access token and an HTTPS proxy.',
   'The Windows installer is not code-signed yet. Windows may show a warning.',
   'Hindi and Tamil are drafts and need native review.',
 ];

@@ -18,13 +18,13 @@ import type { BuildContext } from './pages/context.ts';
 const srcDir = fileURLToPath(new URL('./', import.meta.url));
 const dataDir = fileURLToPath(new URL('../data/benchmark/', import.meta.url));
 const files = readdirSync(dataDir).filter((f) => f.endsWith('.json')).map((name) => ({ name, text: readFileSync(dataDir + name, 'utf8') }));
-const ctx: BuildContext = { runs: loadRuns(files).runs, screens: new Set(['marker-editor.png', 'pattern.png', 'cut-plan.png', 'rolls.png', 'spreading.png', 'bundles.png']) };
+const ctx: BuildContext = { runs: loadRuns(files).runs, screens: new Set(['marker-editor.png', 'style-pattern.png', 'pattern.png', 'cut-plan.png', 'rolls.png', 'spreading.png', 'bundles.png']) };
 const home = homePage(ctx).value;
 
 describe('config', () => {
   it('has a complete portable ZIP download', () => {
     const p = site.downloads.portable;
-    expect(p.url).toMatch(/^https:\/\/github\.com\/.+\/releases\/download\/v0\.5\.0\/BETA-Cutting-Room_0\.5\.0_windows-x64-portable\.zip$/);
+    expect(p.url).toMatch(/^https:\/\/github\.com\/.+\/releases\/download\/v0\.6\.0\/BETA-Cutting-Room_0\.6\.0_windows-x64-portable\.zip$/);
     expect(p.url!.endsWith(p.file)).toBe(true);
     expect(p.size).toMatch(/^\d+(\.\d+)? MiB$/);
     expect(p.sha256).toMatch(/^[0-9a-f]{64}$/);
@@ -161,7 +161,7 @@ describe('home page', () => {
 
   it('gives every screenshot alt text and a fixed size (no layout shift)', () => {
     const imgs = home.match(/<img [^>]+>/g) ?? [];
-    expect(imgs.length).toBe(6);
+    expect(imgs.length).toBe(7);
     for (const img of imgs) {
       expect(img).toMatch(/alt="Screenshot of the .+ screen in BETA Cutting Room"/);
       expect(img).toContain('width="1920" height="1200"');
@@ -227,7 +227,7 @@ describe('all pages', () => {
   it('install page explains the portable ZIP with its checksum', () => {
     const install = rendered['install.html']!;
     expect(install).toContain('id="portable"');
-    expect(install).toContain(site.downloads.portable.sha256!);
+    for (const download of Object.values(site.downloads)) expect(install).toContain(download.sha256!);
     expect(install).toContain(`'.\\${site.downloads.portable.file}'`);
   });
 });

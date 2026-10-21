@@ -23,6 +23,7 @@ pub struct Evaluator<'a> {
     size: &'a str,
     tolerance: f64,
     objects: BTreeMap<String, Geometry>,
+    derived_pieces: BTreeMap<String, GradedPiece>,
     variables: BTreeMap<String, f64>,
     point_snapshot: Option<BTreeMap<String, Pt>>,
     stack: Vec<String>,
@@ -45,10 +46,88 @@ impl<'a> Evaluator<'a> {
             size,
             tolerance,
             objects: BTreeMap::new(),
+            derived_pieces: BTreeMap::new(),
             variables: BTreeMap::new(),
             point_snapshot: None,
             stack: vec![],
         })
+    }
+    pub(crate) fn derived_allowances(&mut self, id: &str) -> Result<Vec<(Pt, Pt, f64)>> {
+        let g = self.derived_source(id)?;
+        let p = self
+            .doc
+            .pieces
+            .iter()
+            .find(|p| p.id == id)
+            .context("Source piece missing")?
+            .clone();
+        let mut out = vec![];
+        for (edge, path) in p.edges.iter().zip(&g.seam_edges) {
+            let inherited = match self.doc.drawing.get(&edge.object) {
+                Some(Object::DerivedPath { recipe, .. }) if recipe.inherit_allowances => {
+                    let recipe = recipe.clone();
+                    self.recipe_allowances(&recipe)?
+                }
+                _ => vec![],
+            };
+            let w = self.value(&edge.allowance)?;
+            for pair in path.windows(2) {
+                let mid = mul(add(pair[0], pair[1]), 0.5);
+                let width = inherited
+                    .iter()
+                    .find(|(a, b, _)| {
+                        (distance(*a, mid) + distance(mid, *b) - distance(*a, *b)).abs() < 1e-6
+                    })
+                    .map_or(w, |s| s.2);
+                out.push((pair[0], pair[1], width));
+            }
+        }
+        Ok(out)
+    }
+    fn recipe_allowances(&mut self, recipe: &crate::derived::Recipe) -> Result<Vec<(Pt, Pt, f64)>> {
+        let mut segments = self.derived_allowances(&recipe.source)?;
+        if let crate::derived::Shape::Join { other } = &recipe.operation {
+            segments.extend(self.derived_allowances(other)?);
+        }
+        Ok(segments)
+    }
+    pub(crate) fn derived_recipe(&self, id: &str) -> Result<crate::derived::Recipe> {
+        let p = self
+            .doc
+            .pieces
+            .iter()
+            .find(|p| p.id == id)
+            .context("Dart source piece missing")?;
+        let edge = p.edges.first().context("Dart source boundary missing")?;
+        let Some(Object::DerivedPath { recipe, .. }) = self.doc.drawing.get(&edge.object) else {
+            bail!("Choose a linked dart piece");
+        };
+        Ok(recipe.as_ref().clone())
+    }
+    pub(crate) fn derived_source(&mut self, id: &str) -> Result<GradedPiece> {
+        if let Some(piece) = self.derived_pieces.get(id) {
+            return Ok(piece.clone());
+        }
+        let doc = self.doc;
+        let p = doc
+            .pieces
+            .iter()
+            .find(|p| p.id == id)
+            .context("Derived source piece missing")?
+            .clone();
+        self.enter(format!("piece:{id}"))?;
+        let result = if p.grade_points.is_empty() {
+            grade_piece(doc, &p, self.size, self, false)
+        } else {
+            let mut base = Evaluator::new(doc, &doc.base_size, self.tolerance)?;
+            base.stack = self.stack.clone();
+            grade_piece(doc, &p, self.size, &mut base, false)
+        };
+        self.stack.pop();
+        if let Ok(piece) = &result {
+            self.derived_pieces.insert(id.into(), piece.clone());
+        }
+        result
     }
     fn enter(&mut self, name: String) -> Result<()> {
         ensure!(
@@ -483,6 +562,19 @@ impl<'a> Evaluator<'a> {
                 let interval = self.value(&interval)?;
                 Geometry::Path(cut_path(&self.path(&curve)?, start, interval)?)
             }
+            Object::DerivedPath { recipe, guide } => {
+                Geometry::Path(crate::derived::construct(self, &recipe, guide)?)
+            }
+            Object::OffsetPath {
+                source,
+                distance: amount,
+            } => {
+                // Resolve first so cycles participate in the normal evaluator guard.
+                self.path(&source)?;
+                let amount = self.value(&amount)?;
+                let curve = crate::paths::Curve::from_evaluator(self.doc, self, &source)?;
+                Geometry::Path(curve.offset(amount, self.tolerance)?)
+            }
             Object::Move { source, dx, dy } => {
                 let delta = [self.value(&dx)?, self.value(&dy)?];
                 map_geometry(self.object(&source)?, |p| add(p, delta))
@@ -619,6 +711,29 @@ fn is_point_object(doc: &Document, o: &Object, depth: usize) -> bool {
         _ => false,
     }
 }
+fn cut_notch_anchor(q: Pt, tangent: Pt, cut: &[Pt], ccw: bool) -> Result<Pt> {
+    let outward = mul([tangent[1], -tangent[0]], if ccw { 1. } else { -1. });
+    let mut nearest = f64::INFINITY;
+    for i in 0..cut.len() {
+        let a = cut[i];
+        let v = sub(cut[(i + 1) % cut.len()], a);
+        let denominator = cross(outward, v);
+        if denominator.abs() < 1e-12 {
+            continue;
+        }
+        let delta = sub(a, q);
+        let distance = cross(delta, v) / denominator;
+        let along = cross(delta, outward) / denominator;
+        if distance >= -1e-6 && (-1e-8..=1. + 1e-8).contains(&along) {
+            nearest = nearest.min(distance.max(0.));
+        }
+    }
+    ensure!(
+        nearest.is_finite(),
+        "The notch cannot reach the cut edge. Move it away from the corner."
+    );
+    Ok(add(q, mul(outward, nearest)))
+}
 fn shaped_notch(q: Pt, t: Pt, depth: f64, width: f64, shape: NotchType, ccw: bool) -> Result<Mark> {
     ensure!(
         depth.is_finite()
@@ -745,6 +860,14 @@ fn grade_piece(
 ) -> Result<GradedPiece> {
     ensure!(doc.sizes.iter().any(|s| s == size), "unknown size '{size}'");
     ensure!(!p.edges.is_empty(), "piece has no edges");
+    ensure!(
+        p.grade_points.is_empty()
+            || !p.edges.iter().any(|edge| matches!(
+                doc.drawing.get(&edge.object),
+                Some(Object::DerivedPath { .. })
+            )),
+        "Attach factory grade rules to the source piece of a linked derivative."
+    );
     let mut paths = vec![];
     let mut seam = vec![];
     let mut widths = vec![];
@@ -762,11 +885,25 @@ fn grade_piece(
                 edge.object
             );
         }
+        let inherited = match doc.drawing.get(&edge.object) {
+            Some(Object::DerivedPath { recipe, .. }) if recipe.inherit_allowances => {
+                e.recipe_allowances(recipe)?
+            }
+            _ => vec![],
+        };
         let w = e.value(&edge.allowance)?;
         ensure!(w >= 0., "negative allowance on '{}'", edge.object);
         for (i, q) in path.iter().take(path.len() - 1).enumerate() {
             seam.push(*q);
-            widths.push(w);
+            let mid = mul(add(*q, path[i + 1]), 0.5);
+            widths.push(
+                inherited
+                    .iter()
+                    .find(|(a, b, _)| {
+                        (distance(*a, mid) + distance(mid, *b) - distance(*a, *b)).abs() < 1e-6
+                    })
+                    .map_or(w, |s| s.2),
+            );
             corners.push(if i == 0 { edge.corner } else { Corner::Miter });
         }
         paths.push(path);
@@ -778,7 +915,7 @@ fn grade_piece(
         ) < 1e-6,
         "piece path is not closed"
     );
-    validate_polygon(&seam)?;
+    validate_polygon(&seam).context("The stitch outline is invalid")?;
     let mut points = if include_drawing_points {
         e.all_points()?
     } else {
@@ -835,7 +972,8 @@ fn grade_piece(
     if !stationary {
         validate_polygon(&graded_seam)?;
     }
-    let cut = offset(&graded_seam, &widths, &corners)?;
+    let cut = offset(&graded_seam, &widths, &corners)
+        .context("The seam allowance crosses itself. Reduce the width or adjust the curve")?;
     let line = |ids: &[String; 2], points: &BTreeMap<String, Pt>| -> Result<[Pt; 2]> {
         Ok([
             move_p(*points.get(&ids[0]).context("line start point missing")?),
@@ -874,7 +1012,7 @@ fn grade_piece(
                         seen.push(q);
                         let t = unit(sub(w[1], w[0]))?;
                         marks.push(shaped_notch(
-                            q,
+                            cut_notch_anchor(q, t, &cut, signed_area(&graded_seam) > 0.)?,
                             t,
                             e.value(depth)?,
                             e.value(width)?,
@@ -899,7 +1037,7 @@ fn grade_piece(
                 let path: Vec<_> = path.iter().copied().map(move_p).collect();
                 let (q, t) = at_distance(&path, e.value(distance)?)?;
                 shaped_notch(
-                    q,
+                    cut_notch_anchor(q, t, &cut, signed_area(&graded_seam) > 0.)?,
                     t,
                     e.value(depth)?,
                     e.value(width)?,
@@ -944,13 +1082,14 @@ fn grade_piece(
                 let path = paths.get(*edge).context("notch edge index out of range")?;
                 let path: Vec<_> = path.iter().map(|q| move_p(*q)).collect();
                 let (q, t) = at_distance(&path, e.value(distance)?)?;
+                let q = cut_notch_anchor(q, t, &cut, signed_area(&graded_seam) > 0.)?;
                 let d = e.value(depth)?;
                 ensure!(d > 0., "notch depth must be positive");
                 let inward = mul([-t[1], t[0]], signed_area(&graded_seam).signum() * d);
                 Mark {
                     kind: MarkKind::Notch,
                     points: vec![q, add(q, inward)],
-                    text: None,
+                    text: Some("slit".into()),
                 }
             }
         });
@@ -1003,7 +1142,50 @@ fn grade_piece(
             text: Some(text),
         });
     }
-    let grain = if let Some(ids) = &p.grain {
+    // Join marks remain associated with their source. Drop notches whose source
+    // stitch position lies on the removed seam, as in the original union tool.
+    if let Some(Object::DerivedPath {
+        recipe,
+        guide: None,
+    }) = doc.drawing.get(&p.edges[0].object)
+        && let crate::derived::Shape::Join { other } = &recipe.operation
+    {
+        for id in [&recipe.source, other] {
+            let source = e.derived_source(id)?;
+            for source_mark in &source.piece.marks {
+                let mut mark = source_mark.clone();
+                if mark.kind == MarkKind::Notch
+                    && let Some(q) = mark.points.first()
+                {
+                    let source_closed: Vec<_> = source
+                        .seam
+                        .iter()
+                        .copied()
+                        .chain(source.seam.first().copied())
+                        .collect();
+                    let original = *q;
+                    let (anchor, along) = crate::paths::project(&source_closed, original)?;
+                    let closed: Vec<_> = graded_seam
+                        .iter()
+                        .copied()
+                        .chain(graded_seam.first().copied())
+                        .collect();
+                    if distance(crate::paths::project(&closed, anchor)?.0, anchor) > 1e-6 {
+                        continue;
+                    }
+                    let tangent = at_distance(&source_closed, along)?.1;
+                    let target =
+                        cut_notch_anchor(anchor, tangent, &cut, signed_area(&graded_seam) > 0.)?;
+                    let delta = sub(target, original);
+                    for point in &mut mark.points {
+                        *point = add(*point, delta);
+                    }
+                }
+                marks.push(mark);
+            }
+        }
+    }
+    let mut grain = if let Some(ids) = &p.grain {
         Some(line(ids, &points)?)
     } else if let Some(g) = &p.grain_angle {
         let origin = e.point(&g.origin)?;
@@ -1017,7 +1199,17 @@ fn grade_piece(
     } else {
         None
     };
-    let match_points = p
+    if let Some(Object::DerivedPath {
+        recipe,
+        guide: None,
+    }) = doc.drawing.get(&p.edges[0].object)
+        && let Some(source) = doc.pieces.iter().find(|s| s.id == recipe.source)
+        && p.grain == source.grain
+        && p.grain_angle == source.grain_angle
+    {
+        grain = e.derived_source(&recipe.source)?.piece.grain;
+    }
+    let mut match_points = p
         .anchors
         .iter()
         .map(|(id, point)| {
@@ -1027,6 +1219,28 @@ fn grade_piece(
             })
         })
         .collect::<Result<Vec<_>>>()?;
+    if let Some(Object::DerivedPath {
+        recipe,
+        guide: None,
+    }) = doc.drawing.get(&p.edges[0].object)
+        && let crate::derived::Shape::Join { other } = &recipe.operation
+    {
+        for id in [&recipe.source, other] {
+            let source = doc
+                .pieces
+                .iter()
+                .find(|s| s.id == *id)
+                .context("Join source missing")?;
+            for point in e.derived_source(id)?.piece.match_points {
+                let name = format!("{id}.{}", point.id);
+                if p.anchors.get(&name) == source.anchors.get(&point.id)
+                    && let Some(target) = match_points.iter_mut().find(|m| m.id == name)
+                {
+                    target.point = point.point;
+                }
+            }
+        }
+    }
     let buffer = e.value(&p.buffer)?;
     ensure!(buffer >= 0., "negative piece buffer");
     let piece = Piece {

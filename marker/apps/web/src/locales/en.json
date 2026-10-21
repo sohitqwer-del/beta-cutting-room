@@ -11,6 +11,7 @@
   "language": "Language",
   "draft": "Hindi and Tamil are machine-translated drafts. Review with operators before production use. Detailed instructions remain in English.",
   "pattern": "Pattern",
+  "pattern_formulas": "Pattern formulas",
   "digitize": "Digitize",
   "editor": "Marker editor",
   "cut_plan": "Cut plan",
@@ -55,5 +56,7 @@
   "planning": "Marker and planning",
   "cutting_floor": "Cutting floor",
   "insight": "Reports and help",
-  "next": "Next"
+  "next": "Next",
+  "status_browser": "Working offline in this browser",
+  "status_browser_tip": "Pattern, grading, checks and nesting run in this browser. Plotter, DXF and full-size PDF files need the desktop app or a shop server."
 }

@@ -65,6 +65,27 @@ pub fn to_hpgl(job: &Job, result: &MarkerResult, opts: &ExportOptions) -> anyhow
 pub fn to_pdf(job: &Job, result: &MarkerResult, opts: &ExportOptions) -> anyhow::Result<Vec<u8>> {
     pdf::render(&scene::build(job, result, opts)?, opts.pdf_tile_mm)
 }
+/// Plot/print export with clipped stripe centre guides. Cutter output is not accepted here.
+/// The existing options contract remains unchanged for CLI callers.
+pub fn export_with_stripe_guides(
+    format: &str,
+    job: &Job,
+    result: &MarkerResult,
+    opts: &ExportOptions,
+) -> anyhow::Result<(Vec<u8>, &'static str, &'static str)> {
+    anyhow::ensure!(
+        matches!(
+            format.to_ascii_lowercase().as_str(),
+            "pdf" | "plt" | "hpgl" | "svg"
+        ),
+        "Stripe guide export supports PDF, PLT and SVG."
+    );
+    let mut guided = job.clone();
+    guided
+        .meta
+        .insert("beta_stripe_guides".into(), serde_json::json!(true));
+    export(format, &guided, result, opts)
+}
 /// Make a plain-text cutting report. Consumption is marker metres divided by
 /// the total garments in the size ratio (one per distinct size without an order).
 pub fn to_report(job: &Job, result: &MarkerResult) -> String {

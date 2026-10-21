@@ -1,6 +1,6 @@
 {
   "name": "beta-cutting-room",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "BETA Cutting Room: open-source, self-hosted cutting-room software for garment factories (BETA Pattern and BETA Marker).",
   "license": "Apache-2.0",

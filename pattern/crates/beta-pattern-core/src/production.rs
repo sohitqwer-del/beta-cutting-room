@@ -40,6 +40,9 @@ pub struct SeamRow {
     pub b_mm: f64,
     /// Actual first minus second length.
     pub difference_mm: f64,
+    /// Requested ease for this size (can differ in a formula-driven block report).
+    #[serde(default)]
+    pub required_ease_mm: f64,
     /// Actual difference minus requested ease.
     pub error_mm: f64,
     /// Whether error is within the supplied tolerance.
@@ -124,6 +127,7 @@ pub fn check_seams(doc: &Document, check: &SeamCheck, sampling_mm: f64) -> Resul
             a_mm,
             b_mm,
             difference_mm: a_mm - b_mm,
+            required_ease_mm: check.ease_mm,
             error_mm,
             pass: error_mm.abs() <= check.tolerance_mm + 1e-9,
             a_path: a.iter().map(|p| sub(*p, a[0])).collect(),
@@ -155,7 +159,7 @@ pub fn seam_csv(report: &SeamReport) -> String {
             r.a_mm,
             r.b_mm,
             r.difference_mm,
-            report.check.ease_mm,
+            r.required_ease_mm,
             r.error_mm,
             report.check.tolerance_mm,
             if r.pass { "PASS" } else { "CHECK" }

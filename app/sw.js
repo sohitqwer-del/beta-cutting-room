@@ -49,4 +49,4 @@ self.addEventListener('fetch', event => {
     }
   })());
 });
-// build 2be7bb26d61842b5
+// build 1a6c541b6595e0a7

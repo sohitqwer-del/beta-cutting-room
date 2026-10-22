@@ -26,12 +26,11 @@ export const site = {
       size: '12.85 MiB',
       sha256: 'ffb220923617fa9e0a5f590ddb71e84bd4b8d438d535dac33bc5bfecb4159eee' as string | null,
     },
-    // Linux: the 0.7.0 glibc 2.31 build needs the lead's isolated Linux builder; until then this is the published 0.6.0 server package.
     server: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.6.0/BETA-Cutting-Room_0.6.0_linux-x86_64.tar.gz' as string | null,
-      file: 'BETA-Cutting-Room_0.6.0_linux-x86_64.tar.gz (Linux server, glibc 2.31 target; tested with 2.31 and 2.43)',
-      size: '9.84 MiB',
-      sha256: 'd5b3e98d9298b33eaa7b7906058baaff4410d80b7d924735a63a62882030368b' as string | null,
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_linux-x86_64.tar.gz' as string | null,
+      file: 'BETA-Cutting-Room_0.7.0_linux-x86_64.tar.gz (Linux server, glibc 2.31 target; tested with 2.31 and 2.43)',
+      size: '11.74 MiB',
+      sha256: 'de8d76fc78eef39d205ee8638be281d62adb48f3db4adebefb24eea9d5d74ae5' as string | null,
     },
   },
   /**

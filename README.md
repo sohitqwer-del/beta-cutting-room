@@ -73,7 +73,7 @@ Tukatech, Gerber and Optitex are not yet compared. Details and caveats:
   and check its SHA-256. The installer is not code-signed yet, so SmartScreen
   may warn you. See [marker/docs/INSTALL.md](marker/docs/INSTALL.md).
 - **Server:** see [marker/docs/SELF-HOSTING.md](marker/docs/SELF-HOSTING.md).
-  The ready-made Linux build needs glibc 2.31 or newer (for example Ubuntu 20.04+). The 0.7.0 Linux build follows shortly; until then use 0.6.0 or build from source.
+  The ready-made Linux build needs glibc 2.31 or newer (for example Ubuntu 20.04+).
 
 ## Build from source
 

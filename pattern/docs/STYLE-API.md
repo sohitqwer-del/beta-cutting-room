@@ -314,3 +314,79 @@ boundary is one linked path; source control points remain the way to reshape
 it. Attach factory rules to the retained source; a second factory rule table
 on the linked output is rejected to avoid applying grade movements twice. Existing saved polygon derivatives are not automatically converted because
 they do not contain enough construction history.
+
+## Block quality and measurement specifications (round 0.7)
+
+The additive `StyleQualityCore` methods are present on `NativeStyleCore`, from
+`bindStyleCore` / `loadStyleCore`. Existing `StyleCore` test doubles are unchanged.
+All requests use the existing `style_command` JSON envelope and native endpoint.
+
+```ts
+const engine = await loadStyleCore();
+const checks = engine.block_checks(doc);
+const spec = engine.spec_sheet(doc);
+const file = engine.export_spec_sheet(doc, 'pdf'); // also csv or xlsx
+const blob = new Blob([new Uint8Array(file.bytes)], { type: file.mime });
+// UI downloads blob using file.filename. Rust supplies all measurements.
+```
+
+| Action | Input after `action` | Output |
+|---|---|---|
+| `block_checks` | `document` | `BlockReport` |
+| `spec_sheet` | `document` | `SpecSheet` |
+| `export_spec_sheet` | `document`, `format:'pdf'|'csv'|'xlsx'` | `{filename,mime,bytes:number[]}` |
+
+`BlockReport` has `block`, `sampling_mm`, `pass`, `limitations`, and ordered
+`sizes`. Each size has `size`, `pass`, `checks`, and `errors`. A check has `id`,
+`category`, `value`, `unit`, inclusive `min`/`max`, `pass`, and `note`. Errors
+stay visible as failed size rows; no failing size is silently dropped. Categories
+cover seams, ease, tangent continuity across joins, grain, assembly notches,
+allowances, simple boundaries, finished dimensions, chart plausibility, and
+`proportion` (crotch extension, thigh, back/front rise, yoke depth). The
+`geometry` category includes `concave_radius` (tight curve versus allowance).
+A report is not a physical fit certificate. See BLOCKS.md for ranges and scope.
+
+`SpecSheet` is `{schema:'beta-pattern.spec/v1',style,block,unit:'mm',sizes,
+base_size,rows,notes}`. Each row (a `PointOfMeasure`) has `id`, `name`, `method`,
+`tolerance_mm` and ordered `values`. A value is `{size,measured_mm,body_mm,
+ease_mm,target_mm,grade_step_mm,pass}`. Nullable fields are **explicit nulls**.
+`target_mm=body_mm+ease_mm` when that relationship is specified; design-only
+measurements have null body/ease/target/pass. Grade step is actual measured
+change from the preceding ordered size; the first is null. QC tolerances are
+proposed buyer approval values, separate from 1 mm drafting tolerances.
+
+Measurements use actual **graded stitch paths**, including point rules, and
+exclude seam/hem allowances. Upper-body POMs include half chest 10 mm below
+armhole, HPS body length, half hem, neck width, shoulder, armhole depth, curved
+armhole, across shoulder, front and back neck drops, sleeve length including
+folded shirt cuff, half bicep and half opening. Lower-body POMs include half
+waist, hip at 200 below waist seam, length below waistband, band depth, hem,
+and trouser inseam, outseam, half thigh 25 mm below the crotch, front/back
+rises. Row order is stable; new rows may be added, so look rows up by `id`. Track-pant waist is the extended
+casing, not relaxed elastic. Shrinkage, stretch recovery and wash are excluded.
+
+PDF has one A4 table page per size, plus measurement methods and notes. It
+reuses Pattern's offline PDF writer and its ASCII fallback for unsupported
+characters. CSV is UTF-8 with BOM, quoted fields and CRLF, one POM/size row;
+formula-like user text is escaped for spreadsheet safety. XLSX comes from a small
+dependency-free Rust writer (stored ZIP) with Measurements, Targets, Grade steps,
+Methods and Data sheets. Measurements are numeric cells shown with two decimals;
+names, methods and notes are inline text and never formulas. Exports share the
+same unrounded source report and display 0.01 mm. No runtime network,
+server-only dependency, external font or UI calculation is required.
+
+These POM mappings apply to generated blocks retaining their original active
+piece set and seam topology. A blank/custom pattern, archived/replaced piece,
+or linked topology change cannot produce a misleading original-block spec.
+Such a spec returns a plain-English error; `block_checks` returns failed size
+rows with the review reason. Renaming/replacing block pieces requires reviewed
+custom seam/POM mappings, which are not yet a general POM authoring interface.
+
+Style `piece_action` for split/dart/pleat/dart_transfer/dart_close/slash_spread
+now defaults to `request.production_mode:'replace'`. The retained source's
+`quantity` and `mirror_quantity` become 0. Set `'additional'` explicitly when
+both pieces are intended to be cut. Linked construction is retained in either
+mode. `meta.block_review_required` is user-facing review text. After topology
+changes `block_seams` returns no stale green source checks; custom `seam_report`
+remains available for operator-reviewed runs. Show the review text and distinguish
+zero-quantity construction sources from active production pieces.

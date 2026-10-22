@@ -6,6 +6,7 @@ mod integration;
 mod optimizer;
 mod quality;
 pub use integration::{apply_roll_group, spreading_requests};
+pub use quality::checked_nest;
 #[cfg(test)]
 mod cost_tests;
 #[cfg(test)]
@@ -13,24 +14,44 @@ mod tests;
 
 use anyhow::{Result, ensure};
 use beta_marker_core::{Job, MarkerResult, Order};
+use jagua_rs::Instant;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use std::time::Instant;
 
 /// Application-owned nesting executor. The planner independently validates all
 /// returned geometry. A queue can add bounded work, cancellation and disk saves.
 pub type NestExecutor<'a> =
     dyn FnMut(&Job, &beta_marker_nest::NestOptions) -> Result<MarkerResult> + 'a;
 
-/// Cut order JSON identifier.
-pub const CUT_ORDER_FORMAT: &str = "beta-marker.cutorder/v1";
-/// Cut plan JSON identifier.
-pub const CUT_PLAN_FORMAT: &str = "beta-marker.cutplan/v1";
+/// Cut order JSON identifier. In v2, `max_plies` counts fabric plies (layers).
+pub const CUT_ORDER_FORMAT: &str = "beta-marker.cutorder/v2";
+/// Earlier cut orders. Their `max_plies` counted passes; it is read with that meaning.
+pub const CUT_ORDER_FORMAT_V1: &str = "beta-marker.cutorder/v1";
+/// Cut plan JSON identifier. In v2, each lay reports `plies` (layers) and `passes`.
+pub const CUT_PLAN_FORMAT: &str = "beta-marker.cutplan/v2";
+/// Earlier cut plans. Their lay `plies` counted passes; it is read as `passes`.
+pub const CUT_PLAN_FORMAT_V1: &str = "beta-marker.cutplan/v1";
+
+/// Fabric plies laid in one pass. Words used everywhere in BETA:
+///
+/// - **ply**: one layer of fabric.
+/// - **pass**: one length of fabric laid from the roll. Open fabric gives one ply per
+///   pass. Folded and tubular fabric arrive doubled, so one pass lays two plies.
+/// - **lay** (spread): one marker spread over a number of plies. Garments per lay are
+///   the marker ratio times the passes, because a two-layer marker already places
+///   each garment across both layers.
+pub fn plies_per_pass(layout: beta_marker_core::Layout) -> u32 {
+    if layout == beta_marker_core::Layout::Open {
+        1
+    } else {
+        2
+    }
+}
 
 /// Pieces, quantities, and cutting-room limits. The job's original ratio is ignored.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CutOrder {
-    /// Must be [`CUT_ORDER_FORMAT`].
+    /// [`CUT_ORDER_FORMAT`] or the older [`CUT_ORDER_FORMAT_V1`].
     pub format: String,
     /// Human-readable order name.
     pub name: String,
@@ -38,7 +59,9 @@ pub struct CutOrder {
     pub job: Job,
     /// Garments required per size.
     pub quantities: BTreeMap<String, u32>,
-    /// Maximum fabric plies in one lay.
+    /// Maximum fabric plies (layers) in one lay: the table or cutting-knife limit.
+    /// On folded and tubular fabric one pass lays two plies, so the planner uses at
+    /// most `max_plies / 2` passes. (v1 orders counted passes here.)
     pub max_plies: u32,
     /// Maximum garments in a marker ratio.
     pub max_garments_per_marker: u32,
@@ -58,7 +81,7 @@ pub struct CutPlan {
     pub options: PlanOptions,
     /// Each entry is one spreading and cutting operation.
     pub lays: Vec<Lay>,
-    /// Sum of `(marker length + two end allowances) * plies`, in metres.
+    /// Sum of `(marker length + two end allowances) * passes`, in metres.
     pub total_fabric_m: f64,
     /// Fabric plus the configured cost per lay, in metre equivalents.
     pub objective_m: f64,
@@ -82,13 +105,17 @@ pub struct CutPlan {
     pub warnings: Vec<String>,
 }
 
-/// One marker spread over a number of fabric plies.
+/// One marker spread over a number of fabric plies. See [`plies_per_pass`].
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(from = "LayWire")]
 pub struct Lay {
-    /// Garments per size in one ply.
+    /// Garments per size in one pass (the marker ratio).
     pub ratio: BTreeMap<String, u32>,
-    /// Number of fabric plies.
+    /// Fabric plies (layers) in this lay: `passes * plies_per_pass(layout)`.
     pub plies: u32,
+    /// Lengths of fabric laid from the roll. Garments are `ratio * passes`, and
+    /// fabric is `(marker length + two end allowances) * passes`.
+    pub passes: u32,
     /// Validated marker length, millimetres.
     pub marker_length_mm: f64,
     /// Fraction of the marker occupied by pattern pieces.
@@ -98,6 +125,48 @@ pub struct Lay {
     /// The validated marker used by this lay.
     #[serde(default)]
     pub result: Option<MarkerResult>,
+}
+
+/// Reads v2 lays and v1 lays, whose `plies` counted passes.
+#[derive(Deserialize)]
+struct LayWire {
+    ratio: BTreeMap<String, u32>,
+    plies: u32,
+    #[serde(default)]
+    passes: Option<u32>,
+    marker_length_mm: f64,
+    efficiency: f64,
+    fabric_m: f64,
+    #[serde(default)]
+    result: Option<MarkerResult>,
+}
+impl From<LayWire> for Lay {
+    fn from(w: LayWire) -> Self {
+        Self {
+            ratio: w.ratio,
+            plies: w.plies,
+            passes: w.passes.unwrap_or(w.plies),
+            marker_length_mm: w.marker_length_mm,
+            efficiency: w.efficiency,
+            fabric_m: w.fabric_m,
+            result: w.result,
+        }
+    }
+}
+
+impl CutOrder {
+    /// Plies laid per pass for this order's fabric layout.
+    pub fn plies_per_pass(&self) -> u32 {
+        plies_per_pass(self.job.fabric.layout)
+    }
+    /// Most passes allowed in one lay. v1 orders stated this number directly.
+    pub fn max_passes(&self) -> u32 {
+        if self.format == CUT_ORDER_FORMAT_V1 {
+            self.max_plies
+        } else {
+            self.max_plies / self.plies_per_pass()
+        }
+    }
 }
 
 /// Search and costing controls. Defaults suit a small order with four sizes.
@@ -158,12 +227,16 @@ pub(crate) fn ratio_map(sizes: &[String], ratio: &[u32]) -> BTreeMap<String, u32
 
 fn validate_input(order: &CutOrder, opts: &PlanOptions) -> Result<()> {
     ensure!(
-        order.format == CUT_ORDER_FORMAT,
+        order.format == CUT_ORDER_FORMAT || order.format == CUT_ORDER_FORMAT_V1,
         "unsupported cut order format"
     );
     ensure!(
         order.max_plies > 0 && order.max_garments_per_marker > 0,
         "ply and marker limits must be positive"
+    );
+    ensure!(
+        order.max_passes() > 0,
+        "Folded and tube fabric lays two plies in each pass: allow at least 2 plies per lay."
     );
     ensure!(
         order.quantities.len() <= 16,
@@ -520,7 +593,8 @@ fn plan_impl(
     let mut evaluations = 0;
     while evaluations < opts.max_refinements {
         if pending.is_empty() {
-            let estimated = optimizer::solve(&candidates, &required, &upper, order.max_plies, opts);
+            let estimated =
+                optimizer::solve(&candidates, &required, &upper, order.max_passes(), opts);
             pending = estimated
                 .actions
                 .iter()
@@ -575,6 +649,9 @@ fn plan_impl(
             result.length = report.length;
             result.piece_area = report.piece_area;
             result.efficiency = report.efficiency;
+            result.useful_piece_area = report.useful_piece_area;
+            result.useful_yield = report.useful_yield;
+            result.surplus_copies = report.surplus_copies;
             result
                 .warnings
                 .extend(report.warnings.into_iter().map(|w| w.message));
@@ -617,7 +694,8 @@ fn plan_impl(
                 .filter(|c| c.result.is_some())
                 .cloned()
                 .collect();
-            let checkpoint = optimizer::solve(&measured, &required, &upper, order.max_plies, opts);
+            let checkpoint =
+                optimizer::solve(&measured, &required, &upper, order.max_passes(), opts);
             let mut partial = assemble(
                 order,
                 opts,
@@ -684,12 +762,12 @@ fn assemble(
         warnings,
         ..Default::default()
     };
-    for &(i, plies) in actions {
+    for &(i, passes) in actions {
         let c = &candidates[i];
         for (s, n) in ratio_map(sizes, &c.ratio) {
-            *out.planned.entry(s).or_default() += n * plies;
+            *out.planned.entry(s).or_default() += n * passes;
         }
-        let fabric_m = (c.length + 2.0 * opts.end_allowance_mm) * f64::from(plies) / 1000.0;
+        let fabric_m = (c.length + 2.0 * opts.end_allowance_mm) * f64::from(passes) / 1000.0;
         out.total_fabric_m += fabric_m;
         if let Some(result) = &c.result {
             for w in &result.warnings {
@@ -700,7 +778,8 @@ fn assemble(
         }
         out.lays.push(Lay {
             ratio: ratio_map(sizes, &c.ratio),
-            plies,
+            plies: passes * order.plies_per_pass(),
+            passes,
             marker_length_mm: c.length,
             efficiency: c.result.as_ref().map_or(0.0, |r| r.efficiency),
             fabric_m,
@@ -809,14 +888,14 @@ pub fn refine_plan_with_engine(
                 lay.result = c.result.clone();
                 lay.efficiency = c.result.as_ref().map_or(0.0, |r| r.efficiency);
                 lay.fabric_m =
-                    (c.length + 2.0 * opts.end_allowance_mm) * f64::from(lay.plies) / 1000.0;
+                    (c.length + 2.0 * opts.end_allowance_mm) * f64::from(lay.passes) / 1000.0;
             }
         }
         partial.total_fabric_m = partial.lays.iter().map(|l| l.fabric_m).sum();
         partial.objective_m = partial.total_fabric_m + opts.lay_cost_m * partial.lays.len() as f64;
         progress(&partial)?;
     }
-    let solution = optimizer::solve(&measured, &required, &upper, order.max_plies, opts);
+    let solution = optimizer::solve(&measured, &required, &upper, order.max_passes(), opts);
     let mut out = assemble(
         order,
         opts,
@@ -839,7 +918,7 @@ pub fn refine_plan_with_engine(
             measured
                 .iter()
                 .position(|c| c.ratio == ratio)
-                .map(|i| (i, lay.plies))
+                .map(|i| (i, lay.passes))
                 .ok_or_else(|| anyhow::anyhow!("Missing incumbent ratio"))
         })
         .collect::<Result<_>>()?;

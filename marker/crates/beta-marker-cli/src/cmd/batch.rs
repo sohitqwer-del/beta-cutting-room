@@ -176,6 +176,9 @@ fn trial(index: usize, path: &Path, width: Option<f64>, args: &Args) -> Row {
                         r.length = report.length;
                         r.piece_area = report.piece_area;
                         r.efficiency = report.efficiency;
+                        r.useful_piece_area = report.useful_piece_area;
+                        r.useful_yield = report.useful_yield;
+                        r.surplus_copies = report.surplus_copies;
                         r.warnings
                             .extend(report.warnings.into_iter().map(|w| w.message));
                         row.successful_runs += 1;

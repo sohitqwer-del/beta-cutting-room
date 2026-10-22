@@ -40,6 +40,12 @@ export interface Placement {
 export interface MarkerResult {
   format: string; job_name: string; width: number; length: number; piece_area: number;
   efficiency: number; engine: string; seed?: number | null; runtime_s?: number;
+  /** Useful full-copy area in mm², excluding surplus. Optional only for older saved results. */
+  useful_piece_area?: number;
+  /** Useful area / (physical layers × flat width × length), fraction, not percent. */
+  useful_yield?: number;
+  /** Physical full copies cut but not used by the requested garments. */
+  surplus_copies?: number;
   placements: Placement[]; warnings?: string[];
 }
 export interface Issue { code: string; message: string; piece_ids?: string[] }
@@ -56,16 +62,21 @@ export interface MatchReport extends MatchSummary {
   offset_mm: [number | null, number | null];
   tolerance_mm: number;
 }
-export interface ValidationReport { matches?: MatchReport[]; ok: boolean; errors: Issue[]; warnings: Issue[]; length: number; piece_area: number; efficiency: number }
+export interface ValidationReport { matches?: MatchReport[]; ok: boolean; errors: Issue[]; warnings: Issue[]; length: number; piece_area: number; efficiency: number; useful_piece_area?: number; useful_yield?: number; surplus_copies?: number }
 export type Units = 'auto' | 'mm' | 'cm' | 'inch';
 /** beta-marker-dxf::ImportReport. */
-export interface ImportReport { pieces: Piece[]; sizes: string[]; dialect: string; units: Units; warnings: string[] }
+export interface ImportReport { pieces: Piece[]; sizes: string[]; dialect: string; units: Units; warnings: string[]; pairs_assumed?: boolean }
 /** beta-marker-nest::NestOptions. Seeds must be safe integers in JavaScript. */
 export interface NestOptions { time_limit_s: number; seed?: number | null; workers?: number | null; early_termination?: boolean;
   fixed?: Placement[]; runs?: number; warm_start?: MarkerResult | null }
-/** beta-marker-plan wire types. Fabric lengths are mm unless marked _m. */
+/** beta-marker-plan wire types. Fabric lengths are mm unless marked _m.
+ * Words: a ply is one layer of fabric. A pass is one length laid from the roll:
+ * open fabric lays 1 ply per pass, folded and tube fabric 2. A lay is one marker
+ * spread over its plies. Garments in a lay = ratio x passes. */
+/** `max_plies` counts plies (layers): the table or knife limit. v1 orders counted passes. */
 export interface CutOrder { format: string; name: string; job: Job; quantities: Record<string, number>; max_plies: number; max_garments_per_marker: number; overcut_pct?: number }
-export interface Lay { ratio: Record<string, number>; plies: number; marker_length_mm: number; efficiency: number; fabric_m: number; result?: MarkerResult | null }
+/** `plies` = layers in the lay; `passes` = lengths laid (v1 plans: passes are missing and `plies` counted passes). */
+export interface Lay { ratio: Record<string, number>; plies: number; passes?: number; marker_length_mm: number; efficiency: number; fabric_m: number; result?: MarkerResult | null }
 export interface CutPlan {
   format: string; order_name: string; options: PlanOptions; lays: Lay[];
   total_fabric_m: number; objective_m: number;
@@ -88,7 +99,7 @@ export interface PlanOptions {
   search_nodes?: number;
   seed?: number;
 }
-export interface Metrics { length: number; piece_area: number; efficiency: number }
+export interface Metrics { length: number; piece_area: number; efficiency: number; useful_piece_area?: number; useful_yield?: number; surplus_copies?: number }
 /** Drawing helpers from Rust; one outline per placement, in the same order. */
 export interface MarkerDrawing { outlines: Pt[][]; cut_copies: number }
 export interface AllowedRotations { angles: number[]; tilt_deg: number; free: boolean }
@@ -137,12 +148,15 @@ export interface DigitizeResponse {pieces:Piece[];report:{detected_markers:numbe
 export type DigitizeRequest = Blob;
 export interface MarkerRequest {job:Job;result:MarkerResult}
 export interface NestRequest {job:Job;options:NestOptions}
-export interface PlanRequest {order:CutOrder;options:PlanOptions}
+/** A marker already measured for one ratio. The planner reuses it only if it validates for the order. */
+export interface KnownMarker {ratio:Record<string,number>;result:MarkerResult}
+export interface PlanRequest {order:CutOrder;options:PlanOptions;markers?:KnownMarker[]}
 export interface ExportOptions {marks?:boolean;labels?:boolean;pdf_tile_mm?:number|null;rotate?:boolean}
 export interface ExportRequest extends MarkerRequest {options?:ExportOptions}
 
 export interface MarkerActualsRequest {source:PhysicalLayRequest;issued_mm:number;end_bits_mm:number;actual_piece_area_mm2:number;actual_pieces:number;recut_count:number;end_allowance_per_ply_mm:number}
 
-export interface SpreadMarker {id:string;job:Job;result:MarkerResult;plies:number;end_allowance_mm?:number}
+/** `passes` (older name `plies`): lengths laid from rolls. A folded or tube pass is two plies. */
+export interface SpreadMarker {id:string;job:Job;result:MarkerResult;passes?:number;plies?:number;end_allowance_mm?:number}
 
 export interface FromSpreadRequest {job:Job;result:MarkerResult;register:RollRegister;spread:SpreadingPlan;lay_id:string;order:string;colour:string}

@@ -129,8 +129,8 @@ fn checked_plan(order: &CutOrder, plan: &CutPlan) -> Result<()> {
     let mut fabric = 0.0;
     for lay in &plan.lays {
         ensure!(
-            lay.plies > 0
-                && lay.plies <= order.max_plies
+            lay.passes > 0
+                && lay.passes <= order.max_passes()
                 && lay.ratio.values().map(|n| u64::from(*n)).sum::<u64>()
                     <= u64::from(order.max_garments_per_marker),
             "Checkpoint lay exceeds order limits."
@@ -149,10 +149,10 @@ fn checked_plan(order: &CutOrder, plan: &CutPlan) -> Result<()> {
             "Checkpoint lay length mismatch."
         );
         for (size, n) in &lay.ratio {
-            *totals.entry(size.clone()).or_default() += u64::from(*n) * u64::from(lay.plies);
+            *totals.entry(size.clone()).or_default() += u64::from(*n) * u64::from(lay.passes);
         }
         fabric +=
-            (result.length + 2.0 * plan.options.end_allowance_mm) * f64::from(lay.plies) / 1000.0;
+            (result.length + 2.0 * plan.options.end_allowance_mm) * f64::from(lay.passes) / 1000.0;
     }
     ensure!(
         (fabric - plan.total_fabric_m).abs() <= 1e-6 * (1.0 + fabric),
@@ -730,6 +730,7 @@ pub(crate) fn execute(
                         "Lay",
                         "Ratio",
                         "Plies",
+                        "Passes",
                         "Marker m",
                         "Efficiency %",
                         "Planned fabric m",
@@ -749,6 +750,7 @@ pub(crate) fn execute(
                                     .collect::<Vec<_>>()
                                     .join(" "),
                                 l.plies.to_string(),
+                                l.passes.to_string(),
                                 (l.marker_length_mm / 1000.0).to_string(),
                                 (l.efficiency * 100.0).to_string(),
                                 l.fabric_m.to_string(),

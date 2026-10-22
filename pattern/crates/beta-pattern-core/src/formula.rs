@@ -181,6 +181,10 @@ fn run(e: &Expr, ctx: &mut impl Context) -> Result<f64> {
                 .collect::<Result<Vec<_>>>()?;
             match (n.as_str(), a.as_slice()) {
                 ("sqrt", [x]) => x.sqrt(),
+                ("cap_height", [width, half_length, max_height]) => {
+                    crate::block_solvers::cap_height(*width, *half_length, *max_height)?
+                }
+                ("seam_height", [dx, target]) => crate::block_solvers::seam_height(*dx, *target)?,
                 ("sin", [x]) => x.to_radians().sin(),
                 ("cos", [x]) => x.to_radians().cos(),
                 ("tan", [x]) => {

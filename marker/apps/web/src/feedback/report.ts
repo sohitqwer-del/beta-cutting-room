@@ -22,7 +22,7 @@ const KIND_NAME: Record<FeedbackKind, string> = { bug: 'Bug report', missing: 'S
 const KIND_PREFIX: Record<FeedbackKind, string> = { bug: '[Bug]', missing: '[Missing]', idea: '[Idea]' };
 const DETAILS_HEADING: Record<FeedbackKind, string> = { bug: 'What happened', missing: 'What I need', idea: 'My feedback' };
 const STEPS_HEADING: Record<FeedbackKind, string> = { bug: 'Steps to repeat the problem', missing: 'How I would use it', idea: 'Example' };
-const PLATFORM_NAME: Record<Platform, string> = { desktop: 'Desktop app', server: 'Browser with a BETA server', browser: 'Browser only (viewer mode)' };
+const PLATFORM_NAME: Record<Platform, string> = { desktop: 'Desktop app', server: 'Browser with a BETA server', browser: 'Browser only (runs on this device)' };
 const LANGUAGE_NAME: Record<string, string> = { en: 'English', hi: 'Hindi', ta: 'Tamil' };
 export const TITLE_MAX = 120;
 

@@ -1,6 +1,6 @@
 import type { NestProgress, NestWorkerRequest, NestWorkerResponse } from './nest-types';
 
-export interface RawNestSession { step(): string; cancel(): void; free(): void }
+export interface RawNestSession { step(): string; step_with_progress?(callback: (json: string) => void): string; cancel(): void; free(): void }
 export interface NestRuntime {
   NestSession: new (job: string, options: string) => RawNestSession;
   memory: { buffer: { byteLength: number } };
@@ -53,7 +53,13 @@ export function installNestWorker(
           session = new raw.NestSession(JSON.stringify(data.job), JSON.stringify(data.options));
           for (;;) {
             if (active.cancelled) session.cancel();
-            const progress = JSON.parse(session.step()) as NestProgress;
+            const checkpoint = (json: string) => {
+              const progress = JSON.parse(json) as NestProgress;
+              progress.checkpoint = true;
+              progress.memory_bytes = raw.memory.buffer.byteLength;
+              port.postMessage({ type: 'progress', id: data.id, progress });
+            };
+            const progress = JSON.parse(session.step_with_progress ? session.step_with_progress(checkpoint) : session.step()) as NestProgress;
             progress.memory_bytes = raw.memory.buffer.byteLength;
             active.round = progress.round;
             const acknowledged = new Promise<void>(resolve => { active.resume = resolve; });

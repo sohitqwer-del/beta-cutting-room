@@ -15,6 +15,8 @@ members = [
     "crates/beta-marker-learn",
     "crates/beta-marker-cluster",
     "crates/beta-marker-floor",
+    "crates/beta-marker-api",
+    "crates/beta-marker-cutroom-wasm",
     "crates/beta-marker-cli",
     "apps/desktop/src-tauri",
     "apps/desktop/src-tauri/permissive/dom-query",
@@ -22,7 +24,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.6.0"
+version = "0.7.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/sohitqwer-del/beta-cutting-room"
@@ -41,6 +43,7 @@ beta-marker-edit = { path = "crates/beta-marker-edit" }
 beta-marker-queue = { path = "crates/beta-marker-queue" }
 beta-marker-learn = { path = "crates/beta-marker-learn" }
 beta-marker-cluster = { path = "crates/beta-marker-cluster" }
+beta-marker-api = { path = "crates/beta-marker-api" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 anyhow = "1.0"

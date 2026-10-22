@@ -28,7 +28,145 @@ fn text(value: &str) -> String {
     format!("0\nTEXT\n8\n15\n10\n5\n20\n5\n1\n{value}\n")
 }
 fn read(s: &str) -> ImportReport {
-    import_dxf(s.as_bytes(), &ImportOptions::default()).expect("valid test DXF")
+    import_dxf(s.as_bytes(), &ImportOptions { pairs: false, ..Default::default() }).expect("valid test DXF")
+}
+
+fn polygon(layer: i32, points: &[[f64; 2]]) -> String {
+    let mut s = format!("0\nLWPOLYLINE\n8\n{layer}\n90\n{}\n70\n1\n", points.len());
+    for p in points {
+        s += &format!("10\n{}\n20\n{}\n", p[0], p[1]);
+    }
+    s
+}
+
+#[test]
+fn default_pairs_split_only_asymmetric_pieces_and_can_be_disabled() {
+    // A front with a sloped shoulder has left and right versions.
+    let front = polygon(1, &[[0., 0.], [100., 0.], [100., 80.], [30., 100.], [0., 100.]]);
+    let s = document(mm(), &block("Front", &(front + &text("Quantity: 2"))), &insert("Front", ""));
+    for options in [ImportOptions::default(), serde_json::from_str("{}").unwrap()] {
+        let report = import_dxf(s.as_bytes(), &options).unwrap();
+        assert!(report.pairs_assumed);
+        assert_eq!((report.pieces[0].quantity, report.pieces[0].mirror_quantity), (1, 1));
+        assert!(report.warnings.iter().any(|w| w.starts_with("Pairs: 1 asymmetric")));
+    }
+    let report = read(&s);
+    assert!(!report.pairs_assumed);
+    assert_eq!((report.pieces[0].quantity, report.pieces[0].mirror_quantity), (2, 0));
+    // A symmetric cuff (here symmetric about both axes) is never split.
+    let cuff = document(mm(), &block("Cuff", &(square(1, 100., true) + &text("Quantity: 2"))), &insert("Cuff", ""));
+    let report = import_dxf(cuff.as_bytes(), &ImportOptions::default()).unwrap();
+    assert!(!report.pairs_assumed);
+    assert_eq!((report.pieces[0].quantity, report.pieces[0].mirror_quantity), (2, 0));
+    assert!(!report.warnings.iter().any(|w| w.starts_with("Pairs:")));
+}
+
+#[test]
+fn block_library_without_inserts_imports_root_pieces_once() {
+    let helper = block("geometry", &square(1, 100., true));
+    let panel = block(
+        "panel",
+        &(insert("geometry", "") + &text("Piece Name: Panel") + &text("Size: M")),
+    );
+    let reserved = block("*Paper_Space", &square(1, 1000., true));
+    let report = read(&document(
+        mm(),
+        &(helper.clone() + &panel + &reserved),
+        &text("Units: MM"),
+    ));
+    assert_eq!(report.pieces.len(), 1);
+    assert_eq!(report.pieces[0].name, "Panel");
+    assert_eq!(area(&report.pieces[0].outline), 10000.);
+    assert!(report.warnings.iter().any(|w| w.contains("root BLOCK")));
+    // With explicit INSERTs, unused definitions are not imported.
+    let report = read(&document(
+        mm(),
+        &(helper + &panel + &block("unused", &square(1, 300., true))),
+        &insert("panel", ""),
+    ));
+    assert_eq!(report.pieces.len(), 1);
+}
+
+#[test]
+fn attributes_override_defaults_case_insensitively_and_accept_tag_separators() {
+    let definition =
+        "0\nATTDEF\n8\n15\n2\nPIECE_NAME\n1\nDefault panel\n0\nATTDEF\n8\n15\n2\nSIZE\n1\nS\n";
+    let attributes = "66\n1\n0\nATTRIB\n8\n15\n2\npiece_name\n1\nCut panel\n0\nATTRIB\n8\n15\n2\nsize\n1\nXL\n0\nSEQEND\n";
+    let source = document(
+        mm(),
+        &block("panel", &(square(1, 100., true) + definition)),
+        &insert("panel", attributes),
+    );
+    let report = read(&source);
+    assert_eq!(report.pieces[0].name, "Cut panel");
+    assert_eq!(report.pieces[0].size.as_deref(), Some("XL"));
+}
+
+#[test]
+fn synthetic_aama_astm_units_and_mirrored_marks_matrix() {
+    for astm in [false, true] {
+        for inch in [false, true] {
+            for mirrored in [false, true] {
+                let side = if inch { 4.0 } else { 101.6 };
+                let k = if inch { 1.0 } else { 25.4 };
+                let mut entities =
+                    square(1, side, true) + &text("Piece Name: Synthetic panel") + &text("Size: M");
+                entities += &format!(
+                    "0\nLINE\n8\n7\n10\n0\n20\n0\n11\n{side}\n21\n0\n0\nPOINT\n8\n13\n10\n{k}\n20\n{k}\n0\nLINE\n8\n8\n10\n{k}\n20\n{k}\n11\n{}\n21\n{k}\n0\nPOINT\n8\n4\n10\n{k}\n20\n0\n",
+                    2.0 * k
+                );
+                let header = if inch { "9\n$INSUNITS\n70\n1\n" } else { mm() };
+                let source = document(
+                    header,
+                    &block("panel", &entities),
+                    &(if astm {
+                        "999\nASTM synthetic test\n"
+                    } else {
+                        ""
+                    }
+                    .to_string()
+                        + &insert("panel", if mirrored { "41\n-1\n" } else { "" })),
+                );
+                let report = read(&source);
+                let p = &report.pieces[0];
+                assert_eq!(report.dialect, if astm { "astm" } else { "aama" });
+                assert!((area(&p.outline) - 101.6_f64.powi(2)).abs() < 1e-6);
+                assert!(p.marks.iter().any(|m| m.kind == MarkKind::Drill));
+                assert!(p.marks.iter().any(|m| m.kind == MarkKind::Notch));
+                assert!(p.marks.iter().any(|m| m.kind == MarkKind::Line));
+                let grain = p.grain.unwrap();
+                assert_eq!(grain[1][0] < grain[0][0], mirrored);
+            }
+        }
+    }
+}
+
+#[test]
+fn synthetic_boundary_encodings_and_rule_table_agree() {
+    let points = [[0., 0.], [100., 0.], [100., 100.], [0., 100.]];
+    let mut classic = "0\nPOLYLINE\n8\n1\n70\n1\n".to_string();
+    let mut lines = String::new();
+    let mut anchors = text("Size: M");
+    for (i, [x, y]) in points.into_iter().enumerate() {
+        classic += &format!("0\nVERTEX\n10\n{x}\n20\n{y}\n");
+        let [xx, yy] = points[(i + 1) % points.len()];
+        lines += &format!("0\nLINE\n8\n1\n10\n{x}\n20\n{y}\n11\n{xx}\n21\n{yy}\n");
+        anchors += &format!("0\nTEXT\n8\n2\n10\n{x}\n20\n{y}\n1\n#{}\n", i + 1);
+    }
+    classic += "0\nSEQEND\n";
+    let table = GradeTable::parse(b"SIZES: M L\nBASE: M\nUNITS: MM\nMODE: CUMULATIVE\nRULE: 1 0,0 1,2\nRULE: 2 0,0 1,2\nRULE: 3 0,0 1,2\nRULE: 4 0,0 1,2\n").unwrap();
+    for outline in [square(1, 100., true), classic, lines] {
+        let source = document(
+            mm(),
+            &block("panel", &(outline + &anchors)),
+            &insert("panel", ""),
+        );
+        let report =
+            import_dxf_with_rules(source.as_bytes(), &ImportOptions::default(), &table).unwrap();
+        assert_eq!(report.sizes, ["M", "L"]);
+        assert_eq!(bbox(&report.pieces[0].outline), Some([0., 0., 100., 100.]));
+        assert_eq!(bbox(&report.pieces[1].outline), Some([1., 2., 101., 102.]));
+    }
 }
 
 #[test]
@@ -332,10 +470,12 @@ fn mirror_unfold_and_explicit_pairs() {
         },
     )
     .expect("pairs");
+    // An unfolded half pattern is symmetric: it has no left and right versions.
     assert_eq!(
         (paired.pieces[0].quantity, paired.pieces[0].mirror_quantity),
-        (2, 2)
+        (4, 0)
     );
+    assert!(!paired.pairs_assumed);
     assert!(report.warnings.iter().any(|w| w.contains("unfolded")));
 }
 
@@ -507,7 +647,7 @@ fn original_fixtures_counts_areas_grain_notches_and_drills() {
             assert_eq!(piece.name, reference["name"].as_str().expect("name"));
             assert_eq!(piece.size.as_deref(), reference["size"].as_str());
             assert_eq!(
-                piece.quantity,
+                piece.quantity + piece.mirror_quantity,
                 u32::try_from(reference["quantity"].as_u64().expect("quantity"))
                     .expect("quantity u32")
             );

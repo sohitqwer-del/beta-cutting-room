@@ -82,7 +82,7 @@ pub fn run(args: Args) -> Result<()> {
     serde_json::to_writer_pretty(&mut writer, &p)?;
     writer.write_all(b"\n")?;
     writer.flush()?;
-    println!("Lay | Ratio | Plies | Length (m) | Efficiency | Fabric (m)");
+    println!("Lay | Ratio | Plies | Passes | Length (m) | Efficiency | Fabric (m)");
     for (i, l) in p.lays.iter().enumerate() {
         let ratio = l
             .ratio
@@ -91,10 +91,11 @@ pub fn run(args: Args) -> Result<()> {
             .collect::<Vec<_>>()
             .join(" ");
         println!(
-            "{} | {} | {} | {:.3} | {:.2}% | {:.3}",
+            "{} | {} | {} | {} | {:.3} | {:.2}% | {:.3}",
             i + 1,
             ratio,
             l.plies,
+            l.passes,
             l.marker_length_mm / 1000.0,
             l.efficiency * 100.0,
             l.fabric_m

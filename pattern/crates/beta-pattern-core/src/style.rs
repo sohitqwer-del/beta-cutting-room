@@ -575,6 +575,22 @@ pub fn validate(doc: &Document) -> Result<()> {
     }
     Ok(())
 }
+
+/// Keep linked construction geometry, but stop cutting a replaced source.
+/// Explicit additional components can retain both counts through the style dispatcher.
+pub fn archive_replaced_sources(doc: &mut Document, sources: &[&str]) -> Result<()> {
+    for source in sources {
+        let p = doc
+            .pieces
+            .iter_mut()
+            .find(|p| p.id == *source)
+            .context("Replacement source missing")?;
+        p.quantity = 0;
+        p.mirror_quantity = 0;
+    }
+    doc.meta.insert("block_review_required".into(),serde_json::json!("Topology changed. Source pieces are construction only. Review replacement seams, allowances, marks and points of measure before cutting."));
+    Ok(())
+}
 /// Apply a batch, then validate it. The input is never changed.
 pub fn edit(doc: &Document, operations: &[Operation]) -> Result<Document> {
     ensure!(

@@ -189,8 +189,9 @@ fn native_against_real_seamly_exports() {
                     "exports/{}-{size}.dxf",
                     file.trim_end_matches(".sm2d")
                 ));
-                let reference =
-                    beta_marker_dxf::import_dxf(dxf.as_bytes(), &Default::default()).unwrap();
+                // Same-hand quantities, as in the .sm2d file (pairs default to on).
+                let options = beta_marker_dxf::ImportOptions { pairs: false, ..Default::default() };
+                let reference = beta_marker_dxf::import_dxf(dxf.as_bytes(), &options).unwrap();
                 assert_eq!(reference.units, beta_marker_dxf::Units::Mm);
                 assert_eq!(native.len(), case["pieces"].as_array().unwrap().len());
                 assert_eq!(reference.pieces.len(), native.len());

@@ -2,7 +2,8 @@
 // (await import('/src/audit-smoke.mjs')).runRollAuditChecks()
 // Uses public original fixtures, actual form handlers and Rust responses. No API mocks.
 import fixture from '../../../packages/marker-wasm/test/fixtures/cutting-room.json';
-const $ = id => document.getElementById(id);
+import { byId } from './screens';
+const $ = id => byId(id);
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const checks = [];
 function assert(value, label) { if (!value) throw new Error(`${label}: ${$('roll-status')?.textContent}; ${$('spread-status')?.textContent}; ${$('bundle-status')?.textContent}`); checks.push(label); }

@@ -166,6 +166,7 @@ pub(super) fn refresh_metrics(job: &Job, result: &mut MarkerResult) {
     result.length = metrics.length;
     result.piece_area = metrics.piece_area;
     result.efficiency = metrics.efficiency;
+    metrics.apply(result);
 }
 
 /// Try small lengthwise nudges first. If contacts persist, move only the

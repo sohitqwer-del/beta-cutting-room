@@ -1,7 +1,6 @@
-import type { BlockInfo, BlockKind, GradedPiece, Job, MarkerResult, MatchRule, PatternDocument, PatternInspection, Pt, RepeatBand, SeamCheck, SeamReport, SizeChart, StyleOperation, ValidationReport } from '@beta/marker-wasm';
+import type { BlockInfo, BlockKind, GradedPiece, Job, MarkerOverlay, SpecSheet, MarkerResult, MatchRule, PatternDocument, PatternInspection, Pt, RepeatBand, SeamCheck, SeamReport, SizeChart, StyleOperation, ValidationReport } from '@beta/marker-wasm';
 import { icon } from '../icons';
-import { downloadFile, isDesktop } from '../transport';
-import { staticMode } from '../static-mode';
+import { downloadFile } from '../transport';
 import { PatternHistory } from '../pattern-state';
 import type { DocumentState } from '../state';
 import { exportMarker, isPracticeResult, loadStyleEngine, nestMarker, practiceRequested, type StyleEngine } from './adapter';
@@ -11,7 +10,13 @@ import { arrangeOps, installCanvas } from './canvas';
 import { currentLanguage, t, type StyleKey } from './i18n';
 import * as S from './state';
 import { boundsOf } from './view';
-import { formatLength, fromMm, metres, parseLength, percent, step as stepCount, toMm, WIDTH_PRESETS, widthProblem, type LengthUnit } from './units';
+import { formatLength, fromMm, parseLength, percent, step as stepCount, toMm, WIDTH_PRESETS, widthProblem, type LengthUnit } from './units';
+import { byId, find, refreshTitle, setScreenTitle } from '../screens';
+import { appUnit, longLength, onUnit } from '../units-pref';
+import { boxText, fitMarker, mmPerPx, panBox, pieceFacts, readableMarker, zoomBox, type Box } from './marker-view';
+import { bySize } from '../sizes';
+import { labelsSvg, placedLabels, prepareLabels } from '../marker-labels';
+import { foldEdgeWarning, markerYield } from '../yield';
 
 /** Style: from scratch to cut. One guided flow in 8 steps (Style, Pattern, Grade, Lay, Gaps, Stripes, Marker, Cut).
  * Each step has a clear Next and can be revisited. All garment geometry and checks call Rust through adapter.ts. */
@@ -39,6 +44,8 @@ const human = (name: string) => name.replaceAll('_', ' ').replace(/^./, c => c.t
 
 export function installStyle(host: StyleHost, content: HTMLElement): { root: HTMLElement } {
   let state: S.Session = S.restore() ?? S.initialSession();
+  // One unit for the whole app (top bar). The saved session follows it.
+  state = { ...state, unit: appUnit(), lay: { ...state.lay, widthUnit: appUnit() } };
   let engine: StyleEngine | null = null, engineError = '', loading: Promise<void> | null = null;
   let history = new PatternHistory(state.doc ?? emptyDoc());
   let blocks: BlockInfo[] = [], chart: SizeChart | null = null, chartPreset: 'indian_adult' | 'iso_example' = 'indian_adult';
@@ -46,7 +53,7 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   let gradePiece = '', gradePoint = '', nest: Record<string, GradedPiece[]> = {}, hiddenSizes = new Set<string>();
   let matchPick: { a?: { piece: string; point: string }; pieceA: string; pieceB: string } = { pieceA: '', pieceB: '' };
   let budget = 20, abort: AbortController | null = null, progress = { elapsed: 0, best: null as MarkerResult | null };
-  let layers = { stripes: true, matches: true, previous: false, sizes: true };
+  let layers = { stripes: true, matches: true, previous: false, sizes: true, labels: true };
   /** Style match rule picked with "Show on marker"; its points are highlighted and the others dimmed. */
   let focusRule: number | null = null;
   let graded: Record<string, GradedPiece[]> = {}, gradedKey = '';
@@ -56,17 +63,21 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
 
   const root = document.createElement('section');
   root.id = `screen-${STYLE_SCREEN}`; root.className = 'screen style'; root.hidden = true;
-  root.setAttribute('aria-labelledby', 'st-title');
-  root.innerHTML = `<nav class="workflow st-steps" aria-label="${tx('steps_label')}"><ol id="st-steps"></ol><button type="button" class="workflow-next" id="st-next-top"><span class="next-word">${tx('next')}</span><span class="next-name"></span>${icon('arrow-right')}</button></nav>
-    <div class="st-head" id="st-head"></div>
-    <div class="st-how" id="st-how" hidden></div>
+  root.setAttribute('aria-labelledby', 'topbar-title');
+  // One compact bar: Back · the 8 steps · tools · Next. The step title is the page heading in the top bar.
+  root.innerHTML = `<div class="st-bar" id="st-bar">
+      <button type="button" class="ghost st-back" data-st="back" id="st-back"></button>
+      <nav class="workflow st-steps" aria-label="${tx('steps_label')}"><ol id="st-steps"></ol></nav>
+      <div class="st-bar-tools" id="st-bar-tools"></div>
+      <div class="st-next-wrap"><button type="button" class="primary st-next" data-st="next" id="st-next"></button><p class="st-why" id="st-why" aria-hidden="true"></p></div>
+    </div>
+    <section class="st-how" id="st-how" hidden aria-labelledby="st-how-title"></section>
     <div class="st-body" id="st-body"></div>
     <div class="st-canvas" id="st-canvas" hidden></div>
-    <div class="st-dock" id="st-dock"></div>
     <p id="st-live" class="sr-only" role="status" aria-live="polite"></p>
     <input type="file" id="st-open-file" accept=".json,.betastyle,application/json" hidden>`;
   content.append(root);
-  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => byId(id) as T;
   const body = $('st-body');
   const say = (text: string) => { const live = $('st-live'); live.textContent = ''; window.setTimeout(() => { live.textContent = text; }, 30); };
   const unit = (): LengthUnit => state.unit;
@@ -74,6 +85,9 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   const uName = () => (unit() === 'inch' ? 'in' : 'cm');
   /** Match offsets are a few millimetres, so they are always shown in mm with one decimal. */
   const MM = (mm: number) => `${(Math.round(mm * 10) / 10).toFixed(1)} mm`;
+  /** Long lengths (marker, fabric) in the app unit: metres for cm, yards for inch; the unit word is translated. */
+  const LL = (mm: number) => { const v = longLength(mm, unit()); return { m: v.value, u: t(v.unit === 'yd' ? 'unit_yd' : 'unit_m') }; };
+  const LLtile = (mm: number, digits = 3) => { const v = longLength(mm, unit(), digits); return `${v.value}<small>${v.unit}</small>`; };
 
   function emptyDoc(): PatternDocument { return { format: 'beta-pattern.doc/v1', name: '', sizes: ['M'], base_size: 'M', measurements: { M: {} }, variables: {}, drawing: {}, pieces: [] }; }
   function persist(): void { window.clearTimeout(saveTimer); saveTimer = window.setTimeout(() => { if (!S.save(state)) host.message(t('storage_full'), true); }, 300); }
@@ -126,54 +140,74 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   });
 
   // ---------- Frame ----------
-  function goStep(step: S.Step): void {
+  function goStep(step: S.Step, fromHistory = false): void {
     const why = S.blocker(state, step);
     if (why) { flashWhy(t(`why_${why}` as StyleKey)); return; }
-    if (step !== state.step) { markHowSeen(state.step); delete howToggled[state.step]; }
+    if (step !== state.step) {
+      markHowSeen(state.step); delete howToggled[state.step];
+      if (!fromHistory && !root.hidden) window.history.pushState({ betaStyleStep: step }, '', location.hash);
+    }
     state = S.go(state, step); persist(); render(true);
   }
+  // Phone back gesture and browser Back: return to the previous Style step before leaving the screen.
+  window.addEventListener('popstate', event => {
+    const step = (event.state as { betaStyleStep?: S.Step } | null)?.betaStyleStep;
+    if (step && !root.hidden && S.STEPS.includes(step) && step !== state.step) goStep(step, true);
+  });
+  let whyTimer = 0;
   function flashWhy(text: string): void {
-    say(text); const why = root.querySelector<HTMLElement>('.st-why');
-    if (why) { why.textContent = text; why.classList.remove('st-flash'); void why.offsetWidth; why.classList.add('st-flash'); } else host.message(text);
+    say(text); const why = byId('st-why');
+    if (!why) { host.message(text); return; }
+    why.textContent = text; why.classList.remove('st-flash'); void why.offsetWidth; why.classList.add('st-flash');
+    window.clearTimeout(whyTimer); whyTimer = window.setTimeout(() => { why.textContent = ''; }, 5000);
   }
   function renderChrome(): void {
     const at = S.STEPS.indexOf(state.step);
     $('st-steps').innerHTML = S.STEPS.map((s, i) => {
       const open = !S.blocker(state, s), done = i < at && open;
-      return `<li><button type="button" data-st-step="${s}" ${s === state.step ? 'aria-current="step"' : ''} aria-disabled="${!open}" aria-description="${tx(`step_${s}_hint`)}" title="${tx(`step_${s}`)}"><span class="step-no" aria-hidden="true">${done ? icon('check') : i + 1}</span><span class="step-name">${tx(`step_${s}`)}</span></button></li>`;
+      return `<li><button type="button" id="st-step-${s}" data-st-step="${s}" ${s === state.step ? 'aria-current="step"' : ''} aria-disabled="${!open}" aria-description="${tx(`step_${s}_hint`)}" title="${tx(`step_${s}`)}"><span class="step-no" aria-hidden="true">${done ? icon('check') : i + 1}</span><span class="step-name">${tx(`step_${s}`)}</span></button></li>`;
     }).join('');
-    // Keep the current step in view when the bar scrolls sideways (narrow screens).
-    const list = $('st-steps'); list.parentElement!.classList.remove('compact');
-    if (list.scrollWidth > list.clientWidth + 2) list.parentElement!.classList.add('compact');
-    const cur = list.querySelector<HTMLElement>('[aria-current=step]')?.parentElement;
-    if (cur && (cur.offsetLeft < list.scrollLeft || cur.offsetLeft + cur.offsetWidth > list.scrollLeft + list.clientWidth)) list.scrollLeft = cur.offsetLeft - 24;
-    const next = S.nextStep(state.step);
-    const top = $<HTMLButtonElement>('st-next-top'); top.hidden = !next;
-    top.querySelector('.next-word')!.textContent = t('next');
-    if (next) { top.querySelector('.next-name')!.textContent = t(`step_${next}`); top.setAttribute('aria-label', t('next_aria', { step: t(`step_${next}`) })); }
-    const prev = S.prevStep(state.step);
-    $('st-dock').innerHTML = `${prev ? `<button type="button" class="ghost" data-st="back">${icon('arrow-left')}${tx('back_to', { step: t(`step_${prev}`) })}</button>` : '<span></span>'}
-      <p class="st-why hint" aria-hidden="true"></p>
-      ${next ? `<button type="button" class="primary large" data-st="next" id="st-next">${tx('next_to', { step: t(`step_${next}`) })}${icon('arrow-right')}</button>` : `<button type="button" class="primary large" data-st="home">${icon('check')}${tx('finish')}</button>`}`;
+    // Layout reads only while the screen is shown: on a hidden or parked screen they would force a whole-page layout.
+    const list = $('st-steps');
+    if (!root.hidden && root.isConnected) {
+      list.parentElement!.classList.remove('compact');
+      if (list.scrollWidth > list.clientWidth + 2) list.parentElement!.classList.add('compact');
+      const cur = list.querySelector<HTMLElement>('[aria-current=step]')?.parentElement;
+      if (cur && (cur.offsetLeft < list.scrollLeft || cur.offsetLeft + cur.offsetWidth > list.scrollLeft + list.clientWidth)) list.scrollLeft = cur.offsetLeft - 24;
+    }
+    // Back and Next are updated in place (not re-created), so keyboard focus stays on them between steps.
+    const next = S.nextStep(state.step), prev = S.prevStep(state.step);
+    const back = $<HTMLButtonElement>('st-back'); back.hidden = !prev;
+    if (prev) { back.innerHTML = `${icon('arrow-left')}<span class="st-back-text">${tx('back_to', { step: t(`step_${prev}`) })}</span>`; back.setAttribute('aria-label', t('back_to', { step: t(`step_${prev}`) })); }
+    const nextBtn = $<HTMLButtonElement>('st-next');
+    nextBtn.dataset.st = next ? 'next' : 'home';
+    nextBtn.innerHTML = next ? `<span>${tx('next_to', { step: t(`step_${next}`) })}</span>${icon('arrow-right')}` : `${icon('check')}<span>${tx('finish')}</span>`;
+    if (next) nextBtn.setAttribute('aria-label', t('next_aria', { step: t(`step_${next}`) })); else nextBtn.removeAttribute('aria-label');
     // One status for the whole app sits in the top bar; here only loading or a failure is shown.
     const engineChip = engine ? '' : engineError ? `<span class="chip bad">${icon('alert')}${tx('engine_failed')}</span>` : `<span class="chip">${tx('engine_loading')}</span>`;
     const how = howOpen();
-    $('st-head').innerHTML = `<div class="st-title"><span class="icon-tile">${icon(STEP_ICON[state.step])}</span><div><span class="eyebrow">${tx('step_of', { n: at + 1, total: S.STEPS.length })}${state.info.name ? ` · <span class="st-style-name">${esc(state.info.name)}</span>` : ''}</span><h1 id="st-title" tabindex="-1">${tx(`step_${state.step}_title`)}</h1></div></div>
-      <div class="st-head-tools">${engineChip}<button type="button" class="small ghost st-how-btn" data-st="how" aria-expanded="${how}" aria-controls="st-how">${icon('help')}<span>${tx('how_title')}</span></button>
-        <div class="segmented" role="group" aria-label="${tx('units')}"><button type="button" data-unit="cm" aria-pressed="${unit() === 'cm'}">cm</button><button type="button" data-unit="inch" aria-pressed="${unit() === 'inch'}">inch</button></div>
-        <details class="menu"><summary>${icon('save')}${tx('file_menu')}</summary><div class="menu-panel" role="group" aria-label="${tx('file_menu')}">
+    $('st-bar-tools').innerHTML = `${engineChip}<button type="button" class="icon-btn ghost st-how-btn" data-st="how" aria-expanded="${how}" aria-controls="st-how" aria-label="${tx('how_title')}" data-tip="${tx('how_title')}">${icon('help')}</button>
+        <details class="menu st-file-menu"><summary aria-label="${tx('file_menu')}">${icon('save')}<span class="st-file-text">${tx('file_menu')}</span></summary><div class="menu-panel" role="group" aria-label="${tx('file_menu')}">
           <button type="button" data-st="save-file" ${state.doc ? '' : 'disabled'}>${tx('save_style')}<small>.json</small></button><button type="button" data-st="open-file">${tx('open_style')}</button>
-          <hr><button type="button" data-st="restart">${tx('start_again')}</button></div></details></div>`;
+          <hr><button type="button" data-st="restart">${tx('start_again')}</button></div></details>`;
     root.dataset.step = state.step;
     renderHow(how);
+    if (!root.hidden) refreshTitle();
   }
+  // Top-bar title while this screen is shown: "Make a style · <name> · Step n of 8" above the step's own title.
+  setScreenTitle(STYLE_SCREEN, () => {
+    const at = S.STEPS.indexOf(state.step);
+    return { eyebrow: [t('nav'), state.info.name, t('step_of', { n: at + 1, total: S.STEPS.length })].filter(Boolean).join(' · '), title: t(`step_${state.step}_title`), heading: true };
+  });
   // The step bar may start or stop overflowing when the window or the language changes.
-  new ResizeObserver(() => { const list = document.getElementById('st-steps'); if (!list || root.hidden) return; list.parentElement!.classList.remove('compact'); if (list.scrollWidth > list.clientWidth + 2) list.parentElement!.classList.add('compact'); }).observe(root.querySelector('.st-steps')!);
+  new ResizeObserver(() => { const list = byId('st-steps'); if (!list || root.hidden) return; list.parentElement!.classList.remove('compact'); if (list.scrollWidth > list.clientWidth + 2) list.parentElement!.classList.add('compact'); }).observe(root.querySelector('.st-steps')!);
   // ---------- How this works (one short strip per step; open the first time a step is shown) ----------
   const HOW_KEY = 'beta-style-how-seen';
   let howSeen = new Set<string>(), howToggled: Partial<Record<S.Step, boolean>> = {};
   try { howSeen = new Set(JSON.parse(localStorage.getItem(HOW_KEY) ?? '[]') as string[]); } catch { /* first visit */ }
   function howOpen(): boolean { return howToggled[state.step] ?? !howSeen.has(state.step); }
+  /** The three numbered actions are folded on a first visit (one line of help) and shown when opened with "?". */
+  const howSteps: Partial<Record<S.Step, boolean>> = {};
   function markHowSeen(step: S.Step): void {
     if (howSeen.has(step)) return;
     howSeen.add(step); try { localStorage.setItem(HOW_KEY, JSON.stringify([...howSeen])); } catch { /* session only */ }
@@ -181,7 +215,10 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   function renderHow(open: boolean): void {
     const box = $('st-how'); box.hidden = !open; if (!open) { box.innerHTML = ''; return; }
     const s = state.step;
-    box.innerHTML = `<h2 class="sr-only">${tx('how_title')}</h2><p class="st-how-lead">${tx(`step_${s}_lead`)}</p><ol>${([1, 2, 3] as const).map(n => `<li>${tx(`how_${s}_${n}` as StyleKey)}</li>`).join('')}</ol><button type="button" class="small ghost" data-st="how-close">${tx('how_got_it')}</button>`;
+    const steps = howSteps[s] ?? !!howToggled[s];
+    box.innerHTML = `<h2 id="st-how-title" class="sr-only">${tx('how_title')}</h2>${icon('help', 'st-how-icon')}<p class="st-how-lead">${tx(`step_${s}_lead`)}</p>
+      <button type="button" class="small ghost st-how-more" data-st="how-steps" aria-expanded="${steps}" aria-controls="st-how-list">${tx(steps ? 'how_less' : 'how_more')}</button><button type="button" class="small" data-st="how-close">${tx('how_got_it')}</button>
+      <ol id="st-how-list" ${steps ? '' : 'hidden'}>${([1, 2, 3] as const).map(n => `<li>${tx(`how_${s}_${n}` as StyleKey)}</li>`).join('')}</ol>`;
   }
   function render(focusTitle = false): void {
     const active = document.activeElement as HTMLElement | null, keep = active && root.contains(active) && active.id ? active.id : '';
@@ -191,9 +228,17 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     if (!pattern) body.innerHTML = engineError && state.step !== 'style' ? engineNotice() : ({ style: styleHtml, pattern: () => '', grade: gradeHtml, lay: layHtml, gaps: gapsHtml, stripes: stripesHtml, marker: markerHtml, cut: cutHtml } as Record<S.Step, () => string>)[state.step]();
     if (pattern) canvas.refresh();
     markerSize = ''; if (state.step === 'marker') window.requestAnimationFrame(redrawMarker);
-    if (focusTitle) { root.querySelector<HTMLElement>('#st-title')?.focus({ preventScroll: true }); window.scrollTo(0, 0); document.getElementById('content')?.scrollTo(0, 0); }
-    else if (keep) { const el = document.getElementById(keep); if (el) el.focus({ preventScroll: true }); else pendingFocus = keep; }
-    if (state.step === 'grade') void loadNest();
+    if (focusTitle) {
+      const bar = byId('st-bar'), was = document.activeElement as HTMLElement | null;
+      if (was && bar?.contains(was) && was.isConnected) was.focus({ preventScroll: true });
+      else if (keep.startsWith('st-step-') && byId(keep)) byId(keep)!.focus({ preventScroll: true });
+      else byId('topbar-title')?.focus({ preventScroll: true });
+      say(`${t('step_of', { n: S.STEPS.indexOf(state.step) + 1, total: S.STEPS.length })}: ${t(`step_${state.step}_title`)}`);
+      window.scrollTo(0, 0); byId('content')?.scrollTo(0, 0);
+    }
+    else if (keep) { const el = byId(keep); if (el) el.focus({ preventScroll: true }); else pendingFocus = keep; }
+    // The spec sheet is measured after the step has painted (the engine call takes a moment on big styles).
+    if (state.step === 'grade') { void loadNest(); window.requestAnimationFrame(() => window.setTimeout(loadSpec, 0)); }
     if (state.step === 'stripes' && layers.sizes) void loadGraded();
   }
   const engineNotice = () => `<div class="notice error st-engine-error" role="alert">${icon('alert')}<div><strong>${tx('engine_failed')}</strong><p>${tx('engine_failed_hint')}</p><details><summary>${tx('details')}</summary><p><code>${esc(engineError)}</code></p><p>${tx('engine_failed_dev')}</p></details></div></div>`;
@@ -249,16 +294,68 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     const ruleBox = gradePoint ? `<div class="st-rule"><h3>${tx('rule_for', { point: gradePoint })}</h3><p class="hint">${tx('rule_hint')}</p>
       <table class="st-rule-table"><thead><tr><th scope="col">${tx('size')}</th><th scope="col">${tx('move_x')} (${uName()})</th><th scope="col">${tx('move_y')} (${uName()})</th></tr></thead><tbody>${d.sizes.map(s => `<tr><th scope="row">${esc(s)}${s === d.base_size ? ` · ${tx('base')}` : ''}</th><td><input inputmode="decimal" data-rule-x="${esc(s)}" value="${esc(formatLength(rule?.deltas[s]?.[0] ?? 0, unit()))}" ${s === d.base_size ? 'disabled' : ''} aria-label="${tx('move_x')} ${esc(s)}"></td><td><input inputmode="decimal" data-rule-y="${esc(s)}" value="${esc(formatLength(rule?.deltas[s]?.[1] ?? 0, unit()))}" ${s === d.base_size ? 'disabled' : ''} aria-label="${tx('move_y')} ${esc(s)}"></td></tr>`).join('')}</tbody></table>
       <div class="st-row"><button type="button" class="primary" data-st="save-rule">${tx('use_rule')}</button>${piece.grade_points?.[gradePoint] ? `<button type="button" class="danger" data-st="remove-rule">${tx('remove_rule')}</button>` : ''}<button type="button" class="ghost" data-st="close-rule">${tx('close')}</button></div></div>` : `<p class="hint">${tx('pick_point_for_rule')}</p>`;
-    const reports = [...seams, ...extraReports];
+    const reports = [...seams, ...extraReports], review = reviewText();
     const seamTable = reports.length ? `<div class="table-scroll"><table class="st-seams"><caption>${tx('seam_caption')}</caption><thead><tr><th scope="col">${tx('seam')}</th>${d.sizes.map(s => `<th scope="col">${esc(s)}</th>`).join('')}</tr></thead><tbody>${reports.map(r => `<tr><th scope="row">${esc(r.check.name)}<small>${esc(pieceName(r.check.a.piece))} ↔ ${esc(pieceName(r.check.b.piece))}</small></th>${r.rows.map(row => `<td><span class="chip ${row.pass ? 'ok' : 'bad'}">${row.pass ? icon('check') : icon('alert')}${esc(signed(row.difference_mm))}</span></td>`).join('')}</tr>`).join('')}</tbody></table></div>` : `<p class="hint">${tx('no_seam_checks')}</p>`;
     const opts = d.pieces.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
     return `<div class="st-grid grade">
       ${card(tx('size_chart'), table, 'st-chart-card')}
-      ${card(tx('nest_view'), `<div class="st-row st-piece-tabs" role="group" aria-label="${tx('piece')}">${d.pieces.map(p => `<button type="button" class="small" data-grade-piece="${esc(p.id)}" aria-pressed="${p.id === gradePiece}">${esc(p.name)}</button>`).join('')}</div>
+      ${card(tx('nest_view'), `<div class="st-row st-piece-tabs" role="group" aria-label="${tx('piece')}">${d.pieces.map(p => `<button type="button" class="small" data-grade-piece="${esc(p.id)}" aria-pressed="${p.id === gradePiece}">${esc(p.name)}${constructionOnly(p) ? ` <small>${tx('construction_only')}</small>` : ''}</button>`).join('')}</div>
         <div class="st-row st-size-keys">${sizesKey}</div><svg class="st-nest" id="st-nest" role="img" aria-label="${tx('nest_aria', { piece: piece.name })}"></svg>${ruleBox}`, 'st-nest-card')}
     </div>
-    ${card(tx('seam_check'), `${seamTable}<details class="advanced"><summary>${tx('add_seam_check')}</summary><div class="st-row"><label class="st-field">${tx('piece_a')}<select id="st-check-a">${opts}</select></label><label class="st-field">${tx('edges_a')}<input id="st-check-ea" placeholder="2" inputmode="numeric"></label>
+    ${specHtml()}
+    ${card(tx('seam_check'), `${review ? reviewNotice(review) : ''}${review && !reports.length ? '' : seamTable}<details class="advanced"><summary>${tx('add_seam_check')}</summary><div class="st-row"><label class="st-field">${tx('piece_a')}<select id="st-check-a">${opts}</select></label><label class="st-field">${tx('edges_a')}<input id="st-check-ea" placeholder="2" inputmode="numeric"></label>
       <label class="st-field">${tx('piece_b')}<select id="st-check-b">${opts}</select></label><label class="st-field">${tx('edges_b')}<input id="st-check-eb" placeholder="2" inputmode="numeric"></label>${lengthField('st-check-ease', tx('ease'), 0)}<button type="button" data-st="add-check">${icon('plus')}${tx('add_check')}</button></div><p class="hint">${tx('edges_hint')}</p></details>`)}`;
+  }
+  /** Engine text after a dart, split or pleat replaced a block piece: its seam checks and spec need review. */
+  const reviewText = (): string => { const v = (state.doc?.meta as Record<string, unknown> | undefined)?.block_review_required; return typeof v === 'string' ? v : ''; };
+  const reviewNotice = (text: string) => `<div class="notice warn st-review" role="status">${icon('alert')}<div><strong>${tx('review_title')}</strong><p>${esc(text)}</p><button type="button" class="small" data-st="recheck">${icon('rotate')}${tx('check_again')}</button></div></div>`;
+  /** Pieces kept only as construction (both quantities 0 after a replacing dart or split). */
+  const constructionOnly = (p: { quantity?: number; mirror_quantity?: number }) => (p.quantity ?? 1) === 0 && (p.mirror_quantity ?? 0) === 0;
+
+  // ---------- Spec sheet: points of measure per size, measured by Rust on the graded stitch paths ----------
+  let spec: SpecSheet | null = null, specError = '', specFor: PatternDocument | null = null, specGrade = false;
+  function loadSpec(): void {
+    const d = state.doc; if (!engine?.specSheet || !d || specFor === d) return;
+    specFor = d; spec = null; specError = '';
+    void engine.specSheet(d).then(v => { if (specFor === d) spec = v; }, e => { if (specFor === d) specError = errorText(e); })
+      .finally(() => { const box = byId('st-spec'); if (box && specFor === d) box.innerHTML = specInner(); });
+  }
+  function specHtml(): string {
+    if (!engine?.specSheet) return '';
+    return card(tx('spec_title'), `<div id="st-spec">${specInner()}</div>`, 'st-spec-card');
+  }
+  function specInner(): string {
+    if (specError) return `<div class="notice warn st-review" role="status">${icon('alert')}<div><strong>${tx('spec_unavailable')}</strong><p>${esc(specError)}</p>${reviewText() && !specError.includes(reviewText()) ? `<p>${esc(reviewText())}</p>` : ''}</div></div>`;
+    if (!spec) return `<p class="st-loading"><span class="st-spinner" aria-hidden="true"></span>${tx('spec_loading')}</p>`;
+    const sv = spec, mm = (v: number | null) => v == null ? '' : formatLength(v, unit());
+    const head = `<tr><th scope="col">${tx('spec_pom')}</th><th scope="col">${tx('spec_tolerance')}</th>${sv.sizes.map(z => `<th scope="col"${z === sv.base_size ? ' class="st-spec-base"' : ''}>${esc(z)}${z === sv.base_size ? ` <small>${tx('base')}</small>` : ''}</th>`).join('')}</tr>`;
+    const rows = sv.rows.map(r => {
+      const design = r.values.every(v => v.pass == null);
+      const cells = sv.sizes.map(z => {
+        const v = r.values.find(x => x.size === z); if (!v) return '<td></td>';
+        if (specGrade) return `<td${z === sv.base_size ? ' class="st-spec-base"' : ''}>${v.grade_step_mm == null ? '' : `${v.grade_step_mm > 0.05 ? '+' : ''}${mm(v.grade_step_mm)}`}</td>`;
+        const tip = v.target_mm != null ? t('spec_target', { target: mm(v.target_mm), u: uName() }) : '';
+        const mark = v.pass == null || design ? '' : v.pass ? `<span class="st-pass" aria-label="${tx('spec_pass')}">✓</span>` : `<span class="st-fail" aria-label="${tx('spec_fail')}">✗</span>`;
+        return `<td class="${z === sv.base_size ? 'st-spec-base ' : ''}${v.pass === false ? 'st-bad' : ''}"${tip ? ` title="${esc(tip)}"` : ''}>${mm(v.measured_mm)}${mark}</td>`;
+      }).join('');
+      return `<tr><th scope="row"><details class="st-pom"><summary>${esc(r.name)}</summary><p>${esc(r.method)}</p></details></th><td>±${mm(r.tolerance_mm)}${design ? ` <span class="chip">${tx('spec_design')}</span>` : ''}</td>${cells}</tr>`;
+    }).join('');
+    const fails = sv.rows.reduce((n, r) => n + r.values.filter(v => v.pass === false).length, 0);
+    return `<div class="st-row st-spec-bar"><div class="segmented" role="group" aria-label="${tx('spec_show')}"><button type="button" data-spec-view="values" aria-pressed="${!specGrade}">${tx('spec_values')}</button><button type="button" data-spec-view="grade" aria-pressed="${specGrade}">${tx('spec_grade')}</button></div>
+        <span class="st-spec-sum ${fails ? 'error-text' : ''}">${fails ? tx('spec_fails', { n: fails }) : tx('spec_all_ok')}</span><span class="push"></span>
+        <button type="button" class="small" data-spec-export="pdf">${icon('print')}PDF</button><button type="button" class="small" data-spec-export="xlsx">${icon('download')}Excel</button><button type="button" class="small" data-spec-export="csv">${icon('download')}CSV</button></div>
+      <div class="table-scroll"><table class="st-spec"><caption>${tx(specGrade ? 'spec_caption_grade' : 'spec_caption', { unit: uName() })}</caption><thead>${head}</thead><tbody>${rows}</tbody></table></div>
+      ${sv.notes.length ? `<ul class="hint st-spec-notes">${sv.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}`;
+  }
+  async function exportSpec(format: 'pdf' | 'csv' | 'xlsx', button: HTMLButtonElement): Promise<void> {
+    if (!engine?.exportSpecSheet || !state.doc) return;
+    button.disabled = true;
+    try {
+      const file = await engine.exportSpecSheet(state.doc, format);
+      const path = await downloadFile(new Blob([new Uint8Array(file.bytes)], { type: file.mime }), file.filename);
+      host.message(path ? t('saved_file', { file: path }) : t('save_cancelled'));
+    } catch (error) { host.message(errorText(error), true); }
+    finally { button.disabled = false; }
   }
   const signed = (mm: number) => `${mm > 0.05 ? '+' : ''}${formatLength(mm, unit())} ${uName()}`;
   const pieceName = (id: string) => state.doc?.pieces.find(p => p.id === id)?.name ?? id;
@@ -285,7 +382,7 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     const key = JSON.stringify(state.doc); if (key === gradedKey) return;
     gradedKey = key;
     try { graded = (await engine.grade(state.doc)).sizes; } catch { graded = {}; }
-    if (state.step === 'stripes') { const svgEl = document.getElementById('st-stripe-preview'); if (svgEl) svgEl.innerHTML = stripePreview(); }
+    if (state.step === 'stripes') { const svgEl = byId('st-stripe-preview'); if (svgEl) svgEl.innerHTML = stripePreview(); }
   }
   async function loadNest(): Promise<void> {
     if (!engine || !state.doc || !gradePiece) return;
@@ -295,7 +392,7 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     drawNest();
   }
   function drawNest(): void {
-    const svgEl = document.getElementById('st-nest'); if (!svgEl || !state.doc) return;
+    const svgEl = byId('st-nest'); if (!svgEl || !state.doc) return;
     const d = state.doc, list = d.sizes.map((s, i) => ({ s, i, p: nest[s]?.find(g => g.piece.id === gradePiece || g.piece.id === `${gradePiece}-${s}` || g.piece.name === d.pieces.find(q => q.id === gradePiece)?.name) }));
     const all = list.flatMap(x => x.p?.seam ?? []), b = boundsOf(all);
     if (!b) { svgEl.innerHTML = `<text x="50%" y="50%" text-anchor="middle" class="st-svg-empty">${tx('nest_empty')}</text>`; svgEl.removeAttribute('viewBox'); return; }
@@ -303,34 +400,34 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     svgEl.setAttribute('viewBox', `${b[0] - pad} ${-b[3] - pad} ${b[2] - b[0] + 2 * pad} ${b[3] - b[1] + 2 * pad}`);
     const baseP = list.find(x => x.s === d.base_size)?.p, outlinePoints = outlineIds(d, gradePiece);
     const restore = pendingFocus; pendingFocus = '';
-    window.setTimeout(() => { if (restore) document.getElementById(restore)?.focus({ preventScroll: true }); }, 0);
+    window.setTimeout(() => { if (restore) byId(restore)?.focus({ preventScroll: true }); }, 0);
     svgEl.innerHTML = list.filter(x => x.p && !hiddenSizes.has(x.s)).map(x => `<polygon class="st-nest-size${x.s === d.base_size ? ' base' : ''}" points="${pts(x.p!.seam)}" style="stroke:var(--size-${x.i % 6})"><title>${esc(x.s)}</title></polygon>`).join('')
       + Object.entries(baseP?.points ?? {}).filter(([id]) => outlinePoints.has(id)).map(([id, p]) => `<circle id="st-gp-${esc(id.replace(/[^\w-]/g, '_'))}" class="st-nest-point${id === gradePoint ? ' selected' : ''}${d.pieces.find(q => q.id === gradePiece)?.grade_points?.[id] ? ' ruled' : ''}" data-grade-point="${esc(id)}" cx="${p[0]}" cy="${-p[1]}" r="${id === gradePoint ? r * 1.6 : r}" tabindex="0" role="button" aria-label="${tx('point_rule_aria', { point: id })}"><title>${esc(id)}</title></circle>`).join('');
   }
 
   // ---------- 4 Lay ----------
   function layHtml(): string {
-    const l = state.lay, groups = S.materials(state.doc), presets = WIDTH_PRESETS[l.widthUnit], even = S.pliesMustBeEven(l);
-    const wv = formatLength(l.widthMm, l.widthUnit === 'inch' ? 'inch' : 'cm');
+    // Fabric is sold by inch width (36, 44, 58, 60): the presets keep those names and show the value in the chosen unit.
+    const l = state.lay, groups = S.materials(state.doc), presets = WIDTH_PRESETS.inch, even = S.pliesMustBeEven(l);
+    const wv = formatLength(l.widthMm, unit());
     const widthBad = widthProblem(l.widthMm);
-    const gm = S.garmentsPerMarker(l), spreads = l.layout === 'open' ? l.plies : Math.ceil(l.plies / 2);
+    const gm = S.garmentsPerMarker(l), passes = S.layFabric(0, l).passes;
     return `<div class="st-grid two">
-      ${card(tx('fabric_width'), `<div class="st-row"><label class="st-field st-big">${tx('usable_width')}<span class="sc-num big"><input id="st-width" inputmode="decimal" value="${esc(wv)}" aria-describedby="st-width-other" ${widthBad ? 'aria-invalid="true"' : ''}><span>${l.widthUnit === 'inch' ? 'in' : 'cm'}</span></span></label>
-        <div class="segmented" role="group" aria-label="${tx('width_unit')}"><button type="button" data-width-unit="inch" aria-pressed="${l.widthUnit === 'inch'}">inch</button><button type="button" data-width-unit="cm" aria-pressed="${l.widthUnit === 'cm'}">cm</button></div></div>
-        <p class="hint" id="st-width-other">${widthBad ? `<span class="error-text">${tx(`width_${widthBad}` as StyleKey)}</span>` : tx('width_other', { value: formatLength(l.widthMm, l.widthUnit === 'inch' ? 'cm' : 'inch', true) })}</p>
-        <div class="st-row st-presets" role="group" aria-label="${tx('common_widths')}">${presets.map(p => `<button type="button" class="small" data-width-preset="${p}" aria-pressed="${Math.abs(toMm(p, l.widthUnit) - l.widthMm) < 0.5}">${p} ${l.widthUnit === 'inch' ? 'in' : 'cm'}</button>`).join('')}</div>
+      ${card(tx('fabric_width'), `<div class="st-row"><label class="st-field st-big">${tx('usable_width')}<span class="sc-num big"><input id="st-width" inputmode="decimal" value="${esc(wv)}" aria-describedby="st-width-other" ${widthBad ? 'aria-invalid="true"' : ''}><span>${uName()}</span></span></label></div>
+        <p class="hint" id="st-width-other">${widthBad ? `<span class="error-text">${tx(`width_${widthBad}` as StyleKey)}</span>` : tx('width_other', { value: formatLength(l.widthMm, unit() === 'inch' ? 'cm' : 'inch', true) })}</p>
+        <div class="st-row st-presets" role="group" aria-label="${tx('common_widths')}">${presets.map(p => `<button type="button" class="small" data-width-preset="${p}" aria-pressed="${Math.abs(toMm(p, 'inch') - l.widthMm) < 0.5}">${unit() === 'inch' ? `${p} in` : `${formatLength(toMm(p, 'inch'), 'cm', true)} <small>(${p}″)</small>`}</button>`).join('')}</div>
         ${l.layout !== 'open' ? `<p class="hint">${tx('folded_width_hint')}</p>` : ''}
         ${groups.length > 1 ? `<label class="st-field">${tx('fabric_for_marker')}<select id="st-material">${groups.map(g => `<option value="${esc(g)}" ${g === l.material ? 'selected' : ''}>${tx(`material_${g}` as StyleKey) || esc(g)} · ${state.doc!.pieces.filter(p => (p.material || 'shell') === g).length} ${tx('pieces_word')}</option>`).join('')}</select></label><p class="hint">${tx('fabric_for_marker_hint')}</p>` : ''}`)}
       ${card(tx('spread_mode'), radioCards('layout', [['open', LAYOUT_ART.open, t('layout_open')], ['folded', LAYOUT_ART.folded, t('layout_folded')], ['tubular', LAYOUT_ART.tubular, t('layout_tubular')]], l.layout))}
       ${card(tx('face'), radioCards('face', [['up', FACE_ART.up, t('face_up')], ['down', FACE_ART.down, t('face_down')], ['face_to_face', FACE_ART.face_to_face, t('face_to_face')]], l.face) + `<p class="hint">${tx('face_hint')}</p>`)}
       ${card(tx('nap'), radioCards('nap', [['none', NAP_ART.none, t('nap_none')], ['one_way', NAP_ART.one_way, t('nap_one_way')], ['one_way_per_bundle', NAP_ART.one_way_per_bundle, t('nap_per_garment')]], l.nap) + `<label class="check"><input type="checkbox" id="st-flip" ${l.allowFlip ? 'checked' : ''}>${tx('allow_flip')}</label>`)}
     </div>
-    ${card(tx('plies_ratio'), `<div class="st-row"><div class="st-field"><span id="st-plies-label">${tx('plies')}</span><span class="st-stepper" role="group" aria-labelledby="st-plies-label"><button type="button" class="icon-btn" data-plies="-${even ? 2 : 1}" aria-label="${tx('fewer_plies')}">${icon('minus')}</button><input id="st-plies" type="number" min="1" max="500" step="${even ? 2 : 1}" value="${l.plies}" aria-labelledby="st-plies-label" ${S.layProblem(l) === 'lay_plies' ? 'aria-invalid="true"' : ''}><button type="button" class="icon-btn" data-plies="${even ? 2 : 1}" aria-label="${tx('more_plies')}">${icon('plus')}</button></span></div>
-        ${lengthField('st-end', tx('end_allowance'), l.endAllowanceMm)}<p class="hint">${even ? tx('plies_even') : tx('plies_hint')}</p></div>
+    ${card(tx('plies_ratio'), `<div class="st-row"><div class="st-field"><span id="st-plies-label">${tx('plies')}</span><span class="st-stepper" role="group" aria-labelledby="st-plies-label"><button type="button" class="icon-btn" data-plies="-${even ? 2 : 1}" aria-label="${tx('fewer_plies')}">${icon('minus')}</button><input id="st-plies" type="number" min="1" max="${S.MAX_PLIES}" step="${even ? 2 : 1}" value="${l.plies}" aria-labelledby="st-plies-label" aria-describedby="st-plies-error" ${S.layProblem(l) === 'lay_plies' ? 'aria-invalid="true"' : ''}><button type="button" class="icon-btn" data-plies="${even ? 2 : 1}" aria-label="${tx('more_plies')}">${icon('plus')}</button></span></div>
+        ${lengthField('st-end', tx('end_allowance'), l.endAllowanceMm)}<p class="hint">${even ? tx('plies_even') : tx('plies_hint')}</p><p class="error-text st-field-error" id="st-plies-error" role="alert">${S.pliesProblem(l.plies, l) ? tx(S.pliesProblem(l.plies, l)!, { max: S.MAX_PLIES }) : ''}</p></div>
       <div class="table-scroll"><table class="st-ratio"><caption>${tx('ratio_caption')}</caption><thead><tr><th scope="col">${tx('size')}</th><th scope="col">${tx('in_marker')}</th><th scope="col">${tx('order_qty')}</th><th scope="col">${tx('lays_needed')}</th></tr></thead><tbody>
-      ${state.doc!.sizes.map(s => { const r = l.ratio[s] ?? 0, o = l.order[s] ?? 0, per = r * spreads; return `<tr><th scope="row">${esc(s)}</th><td><span class="st-stepper"><button type="button" class="icon-btn small" data-ratio="${esc(s)}" data-delta="-1" aria-label="${tx('fewer_size', { size: s })}">${icon('minus')}</button><output aria-label="${tx('in_marker')} ${esc(s)}">${r}</output><button type="button" class="icon-btn small" data-ratio="${esc(s)}" data-delta="1" aria-label="${tx('more_size', { size: s })}">${icon('plus')}</button></span></td>
+      ${state.doc!.sizes.map(s => { const r = l.ratio[s] ?? 0, o = l.order[s] ?? 0, per = r * passes; return `<tr><th scope="row">${esc(s)}</th><td><span class="st-stepper"><button type="button" class="icon-btn small" data-ratio="${esc(s)}" data-delta="-1" aria-label="${tx('fewer_size', { size: s })}">${icon('minus')}</button><output aria-label="${tx('in_marker')} ${esc(s)}">${r}</output><button type="button" class="icon-btn small" data-ratio="${esc(s)}" data-delta="1" aria-label="${tx('more_size', { size: s })}">${icon('plus')}</button></span></td>
         <td><input class="st-order" type="number" min="0" max="1000000" step="1" data-order="${esc(s)}" value="${o}" aria-label="${tx('order_qty')} ${esc(s)}"></td><td>${o > 0 && per > 0 ? (o / per).toFixed(1) : '—'}</td></tr>`; }).join('')}</tbody></table></div>
-      <p class="st-summary">${tx('lay_summary', { garments: gm, plies: l.plies, total: gm * spreads })}</p>`)}`;
+      <p class="st-summary">${tx('lay_summary', { garments: gm, plies: l.plies, total: gm * passes })}${passes !== l.plies ? ` ${tx('lay_passes', { passes, plies: l.plies })}` : ''}</p>`)}`;
   }
 
   // ---------- 5 Gaps ----------
@@ -481,72 +578,142 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     const ops: StyleOperation[] = a.piece === b.piece ? [{ op: 'put_piece', replace: true, piece: { ...pa, anchors: { ...pa.anchors, [nameA]: a.point, [nameB]: b.point } } }]
       : [{ op: 'put_piece', replace: true, piece: { ...pa, anchors: { ...pa.anchors, [nameA]: a.point } } }, { op: 'put_piece', replace: true, piece: { ...pb, anchors: { ...pb.anchors, [nameB]: b.point } } }];
     if (!(await commit(ops, t('match_added')))) return;
-    const rule: MatchRule = { a: { piece_id: a.piece, point_id: nameA }, b: { piece_id: b.piece, point_id: nameB }, axes: ((document.getElementById('st-match-axes') as HTMLSelectElement | null)?.value ?? 'y') as MatchRule['axes'] };
+    const rule: MatchRule = { a: { piece_id: a.piece, point_id: nameA }, b: { piece_id: b.piece, point_id: nameB }, axes: ((byId('st-match-axes') as HTMLSelectElement | null)?.value ?? 'y') as MatchRule['axes'] };
     matchPick.a = undefined; update(S.setRepeat(state, { matches: [...state.repeat.matches, rule] }));
     say(t('match_added'));
   }
 
   // ---------- 7 Marker ----------
+  /** While the search runs, the best marker found so far is drawn and improves live (each round, and each
+   * within-round checkpoint from engines that send them). Stop keeps it. Afterwards the final marker is shown. */
+  let live: { job: Job; result: MarkerResult; overlay?: MarkerOverlay } | null = null;
+  let liveNext: { job: Job; result: MarkerResult } | null = null, liveBusy = false;
+  /** Marker view in mm (SVG user units); null = fit the whole marker. Kept while the user stays on the marker. */
+  let mbox: Box | null = null, showWhole = false;
+  type Shown = { job: Job; result: MarkerResult; overlay?: MarkerOverlay; live: boolean };
+  function shown(): Shown | null {
+    const m = state.marker;
+    if (m.status === 'running' && live) return { ...live, live: true };
+    return m.job && m.result ? { job: m.job, result: m.result, overlay: m.overlay as MarkerOverlay | undefined, live: false } : null;
+  }
+  function queueLive(job: Job, best: MarkerResult | null): void {
+    if (!best || !engine || best === live?.result) return;
+    liveNext = { job, result: best };
+    if (liveBusy) return;
+    liveBusy = true;
+    void (async () => {
+      try {
+        while (liveNext) {
+          const next = liveNext; liveNext = null;
+          const overlay = await engine!.overlay(next.job, next.result, {}).catch(() => undefined);
+          if (state.marker.status !== 'running') break;
+          const first = !live; live = { job: next.job, result: next.result, overlay };
+          if (state.step === 'marker') { if (first) render(); else liveRedraw(); }
+        }
+      } finally { liveBusy = false; }
+    })();
+  }
+  /** New best layout while searching: redraw the drawing and the numbers in place (the Stop button is not re-created). */
+  function liveRedraw(): void {
+    const el = byId('st-marker-svg'); if (!el) { render(); return; }
+    markerSize = ''; redrawMarker();
+    const stats = root.querySelector('.st-marker .st-stats'); if (stats) stats.outerHTML = statsHtml();
+  }
+  function statsHtml(): string {
+    const src = shown(); if (!src) return '';
+    const l = state.lay, r = src.result, rep = src.live ? undefined : state.marker.report, ov = src.overlay as (MarkerOverlay & { matches?: MarkerMatch[] }) | undefined;
+    const matched = src.live ? [] : ov?.matches ?? [], bad = matched.filter(x => !x.pass).length;
+    const y = markerYield(src.job.fabric.layout, r, rep), surplus = y.surplus;
+    const gm = S.garmentsPerMarker(l), len = longLength(r.length, unit());
+    const tile = (label: string, value: string, cls = '') => `<div><span>${label}</span><strong class="${cls}">${value}</strong></div>`;
+    return `<div class="st-stats${src.live ? ' live' : ''}" aria-label="${tx('marker_stats')}">
+        ${tile(src.live ? tx('best_length_so_far') : tx('marker_length'), `${len.value}<small>${len.unit}</small>`)}
+        ${y.headline === 'yield'
+          // Folded/tube: useful yield (fabric that ends up in garments) leads; the footprint is the smaller second figure (fold7).
+          ? `${tile(`<abbr title="${tx('yield_tip')}">${tx('yield_word')}</abbr>`, `${percent(y.usefulYield!)}<small>%</small>`)}<div class="secondary"><span><abbr title="${tx('footprint_tip')}">${tx('footprint')}</abbr></span><strong>${percent(y.efficiency)}<small>%</small></strong></div>`
+          : tile(tx('efficiency'), `${percent(r.efficiency)}<small>%</small>`)}
+        ${tile(tx('per_garment'), gm ? `${longLength(r.length / gm, unit()).value}<small>${len.unit}</small>` : '—')}
+        ${tile(tx('spread_length'), `${longLength(ov?.spread_length_mm ?? r.length + 2 * l.endAllowanceMm, unit()).value}<small>${len.unit}</small>`)}
+        ${src.live ? '' : tile(tx('checks'), rep ? !rep.ok ? tx('checks_bad', { n: rep.errors.length }) : surplus ? tx('checks_surplus', { n: surplus }) : tx('checks_ok') : '—', rep && !rep.ok ? 'error-text' : surplus ? 'warn-text' : '')}
+        ${matched.length ? tile(tx('stripe_match'), bad ? tx('matched_some', { ok: matched.length - bad, total: matched.length }) : tx('matched_all', { total: matched.length }), bad ? 'error-text' : '') : ''}</div>`;
+  }
+  /** Copies cut but used by no garment (folded or tube lays can waste a layer): Rust's surplus_copies, else the validator warnings. */
+  const surplusCopies = (rep: ValidationReport | undefined) => markerYield(state.lay.layout, state.marker.result ?? { efficiency: 0 }, rep).surplus;
+  /** The engine's "Fold edge:" warning in plain words; its own text stays as the detail. */
+  function foldEdgeHtml(r: MarkerResult): string {
+    const w = foldEdgeWarning(r.warnings); if (!w) return '';
+    return `<div class="notice warn st-note st-fold-edge" role="note">${icon('alert')}<div><strong>${tx('fold_edge_note')}</strong><br><span class="hint">${esc(w)}</span></div></div>`;
+  }
   function markerHtml(): string {
     const m = state.marker, l = state.lay, running = m.status === 'running';
     const chips = [
-      [t('chip_width', { v: formatLength(l.widthMm, l.widthUnit === 'inch' ? 'inch' : 'cm', true) }), 'lay'], [t(`layout_${l.layout}`), 'lay'], [t('chip_plies', { n: l.plies }), 'lay'],
+      [t('chip_width', { v: formatLength(l.widthMm, unit(), true) }), 'lay'], [t(`layout_${l.layout}`), 'lay'], [t('chip_plies', { n: l.plies }), 'lay'],
       [t('chip_ratio', { r: Object.entries(l.ratio).filter(([, n]) => n > 0).map(([s, n]) => `${s}:${n}`).join(' ') }), 'lay'],
       [t('chip_gap', { v: L(state.gaps.pieceGap) }), 'gaps'], [state.repeat.kind === 'none' ? t('repeat_none') : t('chip_repeat', { kind: t(`repeat_${state.repeat.kind}`), n: state.repeat.matches.length }), 'stripes'],
       ...(l.material ? [[t('chip_fabric', { v: t(`material_${l.material}` as StyleKey) || l.material }), 'lay'] as [string, string]] : []),
     ] as Array<[string, S.Step]>;
-    const r = m.result, rep = m.report, ov = m.overlay as (typeof m.overlay & { matches?: MarkerMatch[] }) | undefined;
+    const src = shown(), r = m.result, rep = m.report, ov = m.overlay as (typeof m.overlay & { matches?: MarkerMatch[] }) | undefined;
     const matched = ov?.matches ?? [], bad = matched.filter(x => !x.pass).length;
-    const practice = isPracticeResult(r);
-    const someNotMatched = !!r && state.repeat.matches.length > 0 && bad > 0;
-    const stats = r ? `<div class="st-stats" aria-label="${tx('marker_stats')}">
-        <div><span>${tx('marker_length')}</span><strong>${metres(r.length, 3)}<small>m</small></strong></div>
-        <div><span>${tx('efficiency')}</span><strong>${percent(r.efficiency)}<small>%</small></strong></div>
-        <div><span>${tx('per_garment')}</span><strong>${S.garmentsPerMarker(l) ? metres(r.length / S.garmentsPerMarker(l), 3) : '—'}<small>m</small></strong></div>
-        <div><span>${tx('spread_length')}</span><strong>${metres(ov?.spread_length_mm ?? r.length + 2 * l.endAllowanceMm, 3)}<small>m</small></strong></div>
-        <div><span>${tx('checks')}</span><strong class="${rep && !rep.ok ? 'error-text' : ''}">${rep ? rep.ok ? tx('checks_ok') : tx('checks_bad', { n: rep.errors.length }) : '—'}</strong></div>
-        ${matched.length ? `<div><span>${tx('stripe_match')}</span><strong class="${bad ? 'error-text' : ''}">${bad ? tx('matched_some', { ok: matched.length - bad, total: matched.length }) : tx('matched_all', { total: matched.length })}</strong></div>` : ''}</div>` : '';
+    const practice = isPracticeResult(src?.result ?? r);
+    const someNotMatched = !!r && !running && state.repeat.matches.length > 0 && bad > 0;
+    const notes = [
+      (m.status === 'failed' || m.error) && !running ? `<div class="notice error st-note" role="alert">${icon('alert')}<div><strong>${tx('nest_failed')}</strong> ${esc(m.error)}<br><span>${tx('nest_failed_hint')}</span></div></div>` : '',
+      m.stale && r && !running ? `<p class="notice warn st-note">${icon('alert')}${tx('marker_stale')}</p>` : '',
+      practice ? `<p class="notice warn st-note">${icon('alert')}${tx('practice_marker')}</p>` : '',
+      someNotMatched ? `<p class="notice warn st-note">${icon('alert')}${tx('browser_no_match')}</p>` : '',
+      r && !running && surplusCopies(rep) ? `<p class="notice warn st-note">${icon('alert')}${tx('surplus_note', { n: surplusCopies(rep) })}</p>` : '',
+      r && !running ? foldEdgeHtml(r) : '',
+    ].join('');
+    const zoom = `<div class="st-zoom" role="group" aria-label="${tx('zoom_label')}"><button type="button" class="icon-btn" data-mzoom="out" aria-label="${tx('zoom_out_m')}" data-tip="${tx('zoom_out_m')} · −">${icon('zoom-out')}</button><button type="button" class="icon-btn" data-mzoom="fit" aria-label="${tx('fit_marker')}" data-tip="${tx('fit_marker')} · 0">${icon('fit')}</button><button type="button" class="icon-btn" data-mzoom="in" aria-label="${tx('zoom_in_m')}" data-tip="${tx('zoom_in_m')} · +" data-tip-align="end">${icon('zoom-in')}</button></div>`;
+    // While searching: one progress line above the live drawing (in place of the overlay switches), or a card before the first layout.
+    const progressBox = running ? `<div class="st-progress${src?.live ? ' inline' : ''}" role="status" aria-live="polite"><span class="st-spinner" aria-hidden="true"></span><strong>${src?.live ? tx('live_best') : tx('marker_working')}</strong><progress max="1" value="${Math.min(1, progress.elapsed / budget)}" aria-label="${tx('search_time')}"></progress><span class="st-progress-text">${progressText()}</span></div>` : '';
     return `<div class="st-marker">
       <div class="st-marker-top"><ul class="st-chips">${chips.map(([text, step]) => `<li><button type="button" class="chip" data-goto="${step}" aria-label="${tx('change_setting', { setting: text })}">${esc(text)}</button></li>`).join('')}</ul>
         <div class="st-row"><div class="segmented" role="group" aria-label="${tx('search_time')}">${BUDGETS.map(([k, s]) => `<button type="button" data-budget="${s}" aria-pressed="${s === budget}" ${running ? 'disabled' : ''}>${tx(k)}</button>`).join('')}</div>
-        ${running ? `<button type="button" class="danger" data-st="stop">${icon('stop')}${tx('stop_use_best')}</button>` : `<button type="button" class="primary large" data-st="nest" id="st-nest-run">${icon('play')}${r ? tx('nest_again') : tx('nest')}</button>`}</div></div>
-      ${running ? `<div class="st-progress" role="status" aria-live="polite"><progress max="1" value="${Math.min(1, progress.elapsed / budget)}" aria-label="${tx('search_time')}"></progress><span>${tx('searching', { s: progress.elapsed.toFixed(0), total: budget })}${progress.best ? ` · ${tx('best_so_far', { m: metres(progress.best.length, 3), e: percent(progress.best.efficiency) })}` : ''}</span></div>` : ''}
-      ${(m.status === 'failed' || m.error) && !running ? `<div class="notice error st-note" role="alert">${icon('alert')}<div><strong>${tx('nest_failed')}</strong> ${esc(m.error)}<br><span>${tx('nest_failed_hint')}</span></div></div>` : ''}
-      ${m.stale && r ? `<p class="notice warn st-note">${icon('alert')}${tx('marker_stale')}</p>` : ''}
-      ${practice ? `<p class="notice warn st-note">${icon('alert')}${tx('practice_marker')}</p>` : ''}
-      ${someNotMatched ? `<p class="notice warn st-note">${icon('alert')}${tx('browser_no_match')}</p>` : ''}
-      ${r ? focusBanner() : ''}
-      <div class="st-marker-canvas">${r ? `<div class="st-layers"><div class="st-layer-checks" role="group" aria-label="${tx('overlays')}">${layerSwitches()}</div>
-          <ul class="st-legend" aria-label="${tx('legend')}">${markerLegend()}</ul>
-          <button type="button" class="small ghost st-edit-hand" data-st="open-editor" title="${tx('open_editor_hint')}" aria-label="${tx('open_editor')}">${icon('marker')}<span>${tx('open_editor')}</span></button></div>` : ''}${r ? `<svg id="st-marker-svg" role="img" data-match-source="${matchSource}" aria-label="${tx('marker_aria', { m: metres(r.length, 3), e: percent(r.efficiency) })}">${markerSvg()}</svg>` : running ? `<div class="canvas-empty">${icon('marker')}<strong>${tx('marker_working')}</strong><span>${tx('marker_working_text')}</span></div>` : `<div class="canvas-empty">${icon('marker')}<strong>${tx('no_marker')}</strong><span>${tx('no_marker_text')}</span></div>`}</div>
-      ${stats}
-      ${rep && !rep.ok ? `<details class="advanced"><summary>${tx('check_details')}</summary><ul>${rep.errors.map(e => `<li><strong>${esc(e.code)}</strong> ${esc(e.message)}</li>`).join('')}</ul></details>` : ''}</div>`;
+        ${running ? `<button type="button" class="danger" data-st="stop">${icon('stop')}${tx('stop_use_best')}</button>` : `<button type="button" class="primary" data-st="nest" id="st-nest-run">${icon('play')}${r ? tx('nest_again') : tx('nest')}</button>`}</div></div>
+      ${notes}
+      ${r && !running ? focusBanner() : ''}
+      <div class="st-marker-canvas${running ? ' running' : ''}">${src ? `<div class="st-layers">${src.live ? progressBox : `<div class="st-layer-checks" role="group" aria-label="${tx('overlays')}">${layerSwitches()}</div>`}
+          <ul class="st-legend" aria-label="${tx('legend')}">${markerLegend(src.job)}</ul>
+          ${src.live ? '' : `<button type="button" class="small ghost st-edit-hand" data-st="open-editor" title="${tx('open_editor_hint')}" aria-label="${tx('open_editor')}">${icon('marker')}<span>${tx('open_editor')}</span></button>`}</div>
+          <div class="st-marker-stage"><svg id="st-marker-svg" tabindex="0" role="img" aria-roledescription="${tx('marker_drawing')}" data-match-source="${matchSource}" aria-label="${tx(src.live ? 'marker_live_aria' : 'marker_aria', { ...LL(src.result.length), e: percent(src.result.efficiency) })}" aria-describedby="st-marker-keys">${markerSvg()}</svg>
+          ${zoom}<p class="st-marker-keys" id="st-marker-keys">${tx('marker_keys')}</p><div class="st-pinfo" id="st-pinfo" role="status" hidden></div></div>` : running ? `<div class="canvas-empty">${icon('marker')}<strong>${tx('marker_working')}</strong><span>${tx('marker_working_text')}</span></div>` : `<div class="canvas-empty">${icon('marker')}<strong>${tx('no_marker')}</strong><span>${tx('no_marker_text')}</span></div>`}${src?.live ? '' : progressBox}</div>
+      ${statsHtml()}
+      ${rep && !rep.ok && !running ? `<details class="advanced"><summary>${tx('check_details')}</summary><ul>${rep.errors.map(e => `<li><strong>${esc(e.code)}</strong> ${esc(e.message)}</li>`).join('')}</ul></details>` : ''}</div>`;
   }
-  /** Size of the marker drawing on screen. The height keeps the stats in view at 1366 x 768. */
+  const progressText = () => `${t('searching', { s: progress.elapsed.toFixed(0), total: budget })}${progress.best ? ` · ${t('best_so_far', { ...LL(progress.best.length), e: percent(progress.best.efficiency) })}` : ''}`;
+  /** Size of the marker drawing on screen (it takes the free height of the step). */
   function markerBox(): [number, number] {
-    const el = document.getElementById('st-marker-svg');
+    const el = byId('st-marker-svg');
     if (el && el.clientWidth > 50 && el.clientHeight > 50) return [el.clientWidth, el.clientHeight];
-    return [Math.max(320, (body.clientWidth || window.innerWidth - 120) - 48), Math.max(200, window.innerHeight - 460)];
+    return [Math.max(320, (body.clientWidth || window.innerWidth - 120) - 48), Math.max(200, window.innerHeight - 330)];
   }
   /** The drawing fills the free height, so its true size is known only after layout: redraw when it changes. */
   let markerSize = '';
   function redrawMarker(): void {
-    const el = document.getElementById('st-marker-svg'); if (!el || state.step !== 'marker' || !state.marker.result) return;
-    const size = markerBox().join('x'); if (size === markerSize && el.childElementCount) return;
+    const el = byId('st-marker-svg'); if (!el || state.step !== 'marker' || !shown()) return;
+    const size = `${markerBox().join('x')}|${mbox ? boxText(mbox) : 'fit'}`; if (size === markerSize && el.childElementCount) return;
     markerSize = size; el.innerHTML = markerSvg();
-    const key = document.getElementById('st-stripe-key'); if (key) key.innerHTML = stripeKey();
+    const key = byId('st-stripe-key'); if (key) key.innerHTML = stripeKey();
   }
   new ResizeObserver(() => window.requestAnimationFrame(redrawMarker)).observe(body);
-  /** Millimetres per screen pixel in the marker drawing. */
-  function markerScale(): number {
-    const m = state.marker, r = m.result!, W = m.job!.fabric.width, [w, h] = markerBox();
-    return Math.max((r.length * 1.02) / w, (W * 1.04) / h);
+  function currentBox(): Box {
+    const src = shown()!, [w, h] = markerBox();
+    if (mbox) return mbox;
+    // Long markers start readable (about half the height, from the start); Fit again shows the whole length.
+    const readable = readableMarker(src.result.length, src.job.fabric.width, w, h, 12, 40);
+    return showWhole || readable.whole ? fitMarker(src.result.length, src.job.fabric.width, w, h, 12, 40) : readable.box;
   }
+  /** Millimetres per screen pixel in the marker drawing. */
+  function markerScale(): number { return mmPerPx(currentBox(), markerBox()[0]); }
+  function setBox(next: Box | null): void { mbox = next; markerSize = ''; redrawMarker(); hidePieceInfo(); }
+  /** Fit: the readable view first; on a long marker, pressing Fit again shows the whole length (and back). */
+  function fitOrWhole(): void { if (!mbox) showWhole = !showWhole; else showWhole = false; setBox(null); }
   /** Overlay switches, each with its key swatch (stripes, match rings, previous marker). */
   function layerSwitches(): string {
     const m = state.marker, ov = m.overlay as (typeof m.overlay & { matches?: MarkerMatch[] }) | undefined;
-    const sw = (k: 'stripes' | 'matches' | 'previous', key: string, text: string, disabled = false) => `<label class="check st-key"><input type="checkbox" data-layer="${k}" ${layers[k] ? 'checked' : ''} ${disabled ? 'disabled' : ''}>${key}<span${k === 'stripes' ? ' id="st-stripe-key"' : ''}>${text}</span></label>`;
-    let out = '';
+    const sw = (k: 'stripes' | 'matches' | 'previous' | 'labels', key: string, text: string, disabled = false) => `<label class="check st-key"><input type="checkbox" data-layer="${k}" ${layers[k] ? 'checked' : ''} ${disabled ? 'disabled' : ''}>${key}<span${k === 'stripes' ? ' id="st-stripe-key"' : ''}>${text}</span></label>`;
+    let out = sw('labels', '<i class="st-key-text">Aa</i>', tx('layer_labels'));
     if (state.repeat.kind !== 'none') out += sw('stripes', `<i class="st-key-line" style="background:${esc(ov?.stripes[0]?.colour ?? 'var(--repeat)')}"></i>`, stripeKey());
     if (state.repeat.matches.length) {
       out += sw('matches', '<i class="st-key-ring ok"></i>', tx('layer_matches'));
@@ -556,8 +723,8 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   }
   const stripeKey = () => { const n = stripeEvery(); return n > 1 ? tx('legend_stripes_every', { n }) : tx('legend_stripes'); };
   /** Sizes by fill colour, in size-chart order, and the fold edge. */
-  function markerLegend(): string {
-    const m = state.marker, job = m.job!, present = new Set(job.pieces.flatMap(p => p.size ? [p.size] : [])), all = state.doc?.sizes ?? [...present];
+  function markerLegend(job: Job): string {
+    const present = new Set(job.pieces.flatMap(p => p.size ? [p.size] : [])), all = state.doc?.sizes ?? [...present];
     const sizes = [...all.filter(s => present.has(s)), ...[...present].filter(s => !all.includes(s))];
     const item = (sw: string, text: string) => `<li>${sw}<span>${text}</span></li>`;
     let out = sizes.map(s => item(`<i class="st-key-fill" style="background:var(--fill-${Math.max(0, all.indexOf(s)) % 6})"></i>`, esc(s))).join('');
@@ -567,7 +734,7 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   /** Draw every n-th stripe when the real ones would be closer than a few pixels (they would merge into grey). */
   function stripeEvery(): number {
     const r = state.repeat, period = r.kind === 'checks' ? Math.min(r.periodX, r.periodY) : r.direction === 'along' ? r.periodY : r.periodX;
-    return stripeStep(period, markerScale(), 6);
+    return shown() ? stripeStep(period, markerScale(), 6) : 1;
   }
   function focusBanner(): string {
     if (focusRule == null || !state.repeat.matches[focusRule]) return '';
@@ -575,13 +742,15 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     return `<div class="notice st-note st-focus" role="status"><span class="st-rule-no">${focusRule + 1}</span><span>${tx('showing_match', { n: focusRule + 1 })} ${ruleText(state.repeat.matches[focusRule]!)}</span>${ruleChip(r)}<button type="button" class="small ghost" data-st="focus-clear">${tx('show_all_matches')}</button></div>`;
   }
   function markerSvg(): string {
-    const m = state.marker, r = m.result!, job = m.job!, W = job.fabric.width, ov = m.overlay as (typeof m.overlay & { matches?: MarkerMatch[] }) | undefined;
+    const src = shown(); if (!src) return '';
+    const { job, result: r } = src, W = job.fabric.width, ov = src.overlay as (MarkerOverlay & { matches?: MarkerMatch[] }) | undefined;
     const Y = (y: number) => (W - y).toFixed(1), P = (list: Pt[]) => list.map(([x, y]) => `${x.toFixed(1)},${Y(y)}`).join(' ');
-    const sizes = state.doc?.sizes ?? [], sizeOf = (id: string) => job.pieces.find(p => p.id === id)?.size ?? '';
-    const u = markerScale(), striped = layers.stripes && !!ov?.stripes.length;
+    const sizes = state.doc?.sizes ?? [], pieceOf = (id: string) => job.pieces.find(p => p.id === id);
+    const box = currentBox(), u = mmPerPx(box, markerBox()[0]), striped = !src.live && layers.stripes && !!ov?.stripes.length;
+    const outlines = ov?.outlines ?? [];
     let out = `<rect class="st-m-fabric" x="0" y="0" width="${r.length.toFixed(1)}" height="${W}"/>`;
-    if (layers.previous && ov?.previous.length) out += ov.previous.filter(p => p.before.length).map(p => `<polygon class="st-m-prev ${p.kind}" points="${P(p.before)}"/>`).join('');
-    out += (ov?.outlines ?? []).map(o => `<polygon class="st-m-piece${striped ? ' striped' : ''}" points="${P(o.points)}" style="fill:var(--fill-${Math.max(0, sizes.indexOf(sizeOf(o.piece_id))) % 6})"><title>${esc(o.piece_id)}</title></polygon>`).join('');
+    if (!src.live && layers.previous && ov?.previous.length) out += ov.previous.filter(p => p.before.length).map(p => `<polygon class="st-m-prev ${p.kind}" points="${P(p.before)}"/>`).join('');
+    out += outlines.map((o, i) => `<polygon class="st-m-piece${striped ? ' striped' : ''}" data-pi="${i}" points="${P(o.points)}" style="fill:var(--fill-${Math.max(0, sizes.indexOf(pieceOf(o.piece_id)?.size ?? o.size ?? '')) % 6})"><title>${esc(pieceOf(o.piece_id)?.name ?? o.piece_id)} · ${esc(pieceOf(o.piece_id)?.size ?? o.size ?? '')}</title></polygon>`).join('');
     if (striped) {
       // Stripe lines from the engine (clipped to the pieces). Dense ones are thinned so each drawn line stays visible.
       const n = stripeEvery(), rp = state.repeat, minW = u * 1.1;
@@ -593,9 +762,9 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
       };
       out += `<g class="st-m-stripes">${ov!.stripes.filter(keep).map(line => `<line class="st-m-stripe" x1="${line.points[0][0].toFixed(1)}" y1="${Y(line.points[0][1])}" x2="${line.points[1][0].toFixed(1)}" y2="${Y(line.points[1][1])}" style="stroke:${esc(line.colour)}" stroke-width="${Math.max(line.width_mm, minW).toFixed(2)}"/>`).join('')}</g>`;
     }
-    out += (ov?.outlines ?? []).map(o => `<polygon class="st-m-edge" points="${P(o.points)}"/>`).join('');
+    out += outlines.map(o => `<polygon class="st-m-edge" points="${P(o.points)}"/>`).join('');
     if (job.fabric.layout === 'folded' || job.fabric.layout === 'tubular') out += `<line class="st-m-fold" x1="0" x2="${r.length}" y1="${Y(0)}" y2="${Y(0)}"/>${job.fabric.layout === 'tubular' ? `<line class="st-m-fold" x1="0" x2="${r.length}" y1="0" y2="0"/>` : ''}`;
-    if (layers.matches) {
+    if (!src.live && layers.matches) {
       const styleRules = state.repeat.matches.length, rr = u * 6.5;
       for (const x of (ov?.matches ?? []).filter(placed)) {
         const rule = styleRuleOf(job, x.rule, styleRules), focus = focusRule == null ? '' : rule === focusRule ? ' focus' : ' dim';
@@ -606,8 +775,77 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
         out += `<g class="st-m-match ${x.pass ? 'ok' : 'bad'}${focus}">${link}${ring(x.a)}${x.b ? ring(x.b) : ''}<title>${esc(`${t('match_n', { n: rule + 1 })}: ${label}`)}</title></g>`;
       }
     }
-    return `<g data-view="${(-u * 10).toFixed(1)} ${(-u * 10).toFixed(1)} ${(r.length + u * 20).toFixed(1)} ${(W + u * 20).toFixed(1)}">${out}</g>`;
+    // Piece name and size where they fit at this zoom; too small pieces keep their details on hover or tap.
+    if (layers.labels) {
+      // Anchors and angles from the Rust label placement; the size follows the zoom (marker-labels.ts).
+      prepareLabels(() => { if (state.step === 'marker') { markerSize = ''; redrawMarker(); } });
+      const byPlacement: Pt[][] = []; outlines.forEach((o, i) => { byPlacement[o.placement ?? i] ??= o.points; });
+      const sizeOf = (i: number) => pieceOf(r.placements[i]?.piece_id ?? '')?.size ?? '';
+      out += `<g class="st-m-labels" aria-hidden="true">${labelsSvg(placedLabels(job, r, 1 / u, byPlacement, sizeOf), W, u, esc)}</g>`;
+    }
+    return `<g data-view="${boxText(box)}">${out}</g>`;
   }
+  // ----- Marker drawing: wheel or +/− to zoom, drag or arrows to pan, 0 to fit; hover or tap a piece for its details -----
+  function svgPoint(svg: SVGSVGElement, clientX: number, clientY: number): Pt {
+    const rect = svg.getBoundingClientRect(), b = currentBox();
+    return [b.x + (clientX - rect.left) / rect.width * b.w, b.y + (clientY - rect.top) / rect.height * b.h];
+  }
+  function zoomMarker(factor: number, at?: Pt): void {
+    const b = currentBox(), w = markerBox()[0];
+    setBox(zoomBox(b, factor, at ?? [b.x + b.w / 2, b.y + b.h / 2], w));
+  }
+  function hidePieceInfo(): void { const card = byId('st-pinfo'); if (card) card.hidden = true; }
+  function showPieceInfo(index: number, clientX: number, clientY: number): void {
+    const src = shown(), card = byId('st-pinfo'), stage = root.querySelector<HTMLElement>('.st-marker-stage'); if (!src || !card || !stage) return;
+    const o = (src.overlay?.outlines ?? [])[index]; if (!o) return;
+    const f = pieceFacts(src.job, src.result, o.piece_id, o.placement);
+    const rows = [[t('size'), f.size || '—'], [t('copy_n'), f.copy ?? '—'], ...(f.bundle != null ? [[t('bundle_n'), f.bundle]] : []), [t('turned'), f.rotation != null ? `${f.rotation}°` : '—'], ...(f.mirrored ? [[t('mirrored'), t('yes')]] : []), ...(f.material && f.material !== 'shell' ? [[t('fabric_word'), t(`material_${f.material}` as StyleKey) || f.material]] : [])] as Array<[string, string | number]>;
+    card.innerHTML = `<strong>${esc(f.name)}</strong><dl>${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>`;
+    card.hidden = false;
+    const r = stage.getBoundingClientRect(), cw = card.offsetWidth, ch = card.offsetHeight;
+    card.style.left = `${Math.max(4, Math.min(r.width - cw - 4, clientX - r.left + 14))}px`;
+    card.style.top = `${Math.max(4, Math.min(r.height - ch - 4, clientY - r.top + 14))}px`;
+  }
+  let mdrag: { id: number; x: number; y: number; box: Box; moved: boolean } | null = null;
+  root.addEventListener('wheel', event => {
+    const svg = (event.target as Element).closest<SVGSVGElement>('#st-marker-svg'); if (!svg) return;
+    event.preventDefault(); zoomMarker(Math.exp(-Math.max(-0.3, Math.min(0.3, event.deltaY * 0.0015))), svgPoint(svg, event.clientX, event.clientY));
+  }, { passive: false });
+  root.addEventListener('pointerdown', event => {
+    const svg = (event.target as Element).closest<SVGSVGElement>('#st-marker-svg'); if (!svg || event.button !== 0) return;
+    mdrag = { id: event.pointerId, x: event.clientX, y: event.clientY, box: currentBox(), moved: false };
+    svg.setPointerCapture(event.pointerId);
+  });
+  root.addEventListener('pointermove', event => {
+    const svg = (event.target as Element).closest<SVGSVGElement>('#st-marker-svg');
+    if (mdrag && mdrag.id === event.pointerId) {
+      const dx = event.clientX - mdrag.x, dy = event.clientY - mdrag.y;
+      if (!mdrag.moved && Math.hypot(dx, dy) < 4) return;
+      mdrag.moved = true; setBox(panBox(mdrag.box, dx, dy, markerBox()[0])); return;
+    }
+    if (!svg || event.pointerType !== 'mouse') return;
+    const pi = (document.elementFromPoint(event.clientX, event.clientY) as Element | null)?.closest<SVGElement>('[data-pi]')?.dataset.pi;
+    if (pi != null) showPieceInfo(Number(pi), event.clientX, event.clientY); else hidePieceInfo();
+  });
+  const endDrag = (event: PointerEvent) => {
+    if (!mdrag || mdrag.id !== event.pointerId) return;
+    const tap = !mdrag.moved; mdrag = null;
+    if (!tap) return;
+    const pi = (document.elementFromPoint(event.clientX, event.clientY) as Element | null)?.closest<SVGElement>('[data-pi]')?.dataset.pi;
+    if (pi != null) showPieceInfo(Number(pi), event.clientX, event.clientY); else hidePieceInfo();
+  };
+  root.addEventListener('pointerup', endDrag); root.addEventListener('pointercancel', () => { mdrag = null; });
+  root.addEventListener('pointerleave', event => { if ((event.target as Element).id === 'st-marker-svg' && !mdrag) hidePieceInfo(); }, true);
+  root.addEventListener('keydown', event => {
+    if ((event.target as Element).id !== 'st-marker-svg') return;
+    const b = currentBox(), w = markerBox()[0], step = 60;
+    const keys: Record<string, () => void> = {
+      '+': () => zoomMarker(1.25), '=': () => zoomMarker(1.25), '-': () => zoomMarker(0.8), '0': fitOrWhole, Home: fitOrWhole,
+      ArrowLeft: () => setBox(panBox(b, step, 0, w)), ArrowRight: () => setBox(panBox(b, -step, 0, w)), ArrowUp: () => setBox(panBox(b, 0, step, w)), ArrowDown: () => setBox(panBox(b, 0, -step, w)),
+      Escape: () => hidePieceInfo(),
+    };
+    const run = keys[event.key]; if (run) { event.preventDefault(); run(); }
+  });
   /** Per-garment match results: the engine's match report (overlay or validator), else pass/fail from validator issues. */
   let matchSource: 'engine' | 'validator' | '' = '';
   async function attachMatches(overlay: unknown, report: ValidationReport | undefined, job: Job, result: MarkerResult): Promise<void> {
@@ -622,44 +860,42 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     let job: Job;
     try { job = await engine.toJob(state.doc, S.jobSettings(state)); job.meta = { ...job.meta, beta_style_name: state.info.name, beta_style_number: state.info.number }; }
     catch (error) { update({ ...state, marker: { ...state.marker, status: 'failed', error: errorText(error) } }); return; }
-    abort = new AbortController(); progress = { elapsed: 0, best: null };
+    abort = new AbortController(); progress = { elapsed: 0, best: null }; live = null; liveNext = null; mbox = null;
     update({ ...state, marker: { ...state.marker, status: 'running', error: undefined } });
     say(t('nest_started'));
     const started = performance.now(), timer = window.setInterval(() => { progress.elapsed = (performance.now() - started) / 1000; if (state.step === 'marker') renderProgress(); }, 500);
     try {
-      const result = await nestMarker(job, { budgetS: budget, signal: abort.signal, practice: practiceRequested(location.search), onProgress: p => { progress.best = p.best; } });
+      const result = await nestMarker(job, { budgetS: budget, signal: abort.signal, practice: practiceRequested(location.search), onProgress: p => { progress.best = p.best; queueLive(job, p.best); } });
       if (!result) throw new Error(t('nest_none'));
       const report = await engine.validate(job, result).catch(() => undefined);
       const overlay = await engine.overlay(job, result, { ...(old ? { previous: old } : {}) }).catch(error => { host.message(errorText(error), true); return undefined; });
       await attachMatches(overlay, report, job, result);
       update({ ...state, marker: { status: 'done', job, result, report, overlay, previous: old, stale: false } });
-      say(t('nest_done', { m: metres(result.length, 3), e: percent(result.efficiency) }));
+      say(t('nest_done', { ...LL(result.length), e: percent(result.efficiency) }));
     } catch (error) {
       update({ ...state, marker: { ...state.marker, status: state.marker.result ? 'done' : 'failed', error: errorText(error), stale: state.marker.stale } });
       host.message(errorText(error), true);
-    } finally { window.clearInterval(timer); abort = null; render(); }
+    } finally { window.clearInterval(timer); abort = null; live = null; liveNext = null; mbox = null; render(); }
   }
   function renderProgress(): void {
     const box = root.querySelector('.st-progress'); if (!box) return;
     box.querySelector('progress')!.value = Math.min(1, progress.elapsed / budget);
-    box.querySelector('span')!.textContent = `${t('searching', { s: progress.elapsed.toFixed(0), total: budget })}${progress.best ? ` · ${t('best_so_far', { m: metres(progress.best.length, 3), e: percent(progress.best.efficiency) })}` : ''}`;
+    box.querySelector('.st-progress-text')!.textContent = progressText();
   }
 
   // ---------- 8 Cut ----------
   function cutHtml(): string {
     const m = state.marker, r = m.result!, l = state.lay, f = S.layFabric(r.length, l), gm = S.garmentsPerMarker(l);
     const tile = (label: string, value: string) => `<div><span>${label}</span><strong>${value}</strong></div>`;
-    return `<div class="st-stats st-cut-tiles">${tile(tx('marker_length'), `${metres(r.length, 3)}<small>m</small>`)}${tile(tx('spread_length'), `${metres(f.perPlyMm, 3)}<small>m</small>`)}${tile(tx('plies'), String(l.plies))}${tile(tx('fabric_needed'), `${metres(f.totalMm, 2)}<small>m</small>`)}${tile(tx('garments_in_lay'), String(gm * f.spreads))}</div>
+    return `<div class="st-stats st-cut-tiles">${tile(tx('marker_length'), LLtile(r.length))}${tile(tx('spread_length'), LLtile(f.perPlyMm))}${tile(tx('plies'), String(l.plies))}${tile(`<span title="${tx('pass_tip')}">${tx('passes')}</span>`, String(f.passes))}${tile(tx('fabric_needed'), LLtile(f.totalMm, 2))}${tile(tx('garments_in_lay'), String(gm * f.passes))}</div>
+      ${foldEdgeHtml(r)}
       <div class="st-grid two">
-      ${card(tx('files_pattern'), `<p class="hint">${tx('files_pattern_hint')}</p><div class="st-files"><button type="button" data-export="pattern-pdf-a4">${icon('print')}${tx('pattern_pdf_a4')}</button><button type="button" data-export="pattern-pdf-a3">${icon('print')}${tx('pattern_pdf_a3')}</button><button type="button" data-export="pattern-dxf">${icon('download')}${tx('pattern_dxf')}</button><button type="button" data-export="pattern-plt">${icon('download')}${tx('pattern_plt')}</button><button type="button" data-st="save-file">${icon('save')}${tx('save_style')}</button></div>`)}
-      ${card(tx('files_marker'), `${serverless() ? '' : `<p class="hint">${tx('files_marker_hint')}</p>`}<label class="check"><input type="checkbox" id="st-guides" ${state.repeat.kind === 'none' ? 'disabled' : ''}>${tx('stripe_guides')}</label><div class="st-files"><button type="button" data-export="marker-tiled">${icon('print')}${tx('marker_tiled')}</button>${(['plt', 'pdf', 'dxf'] as const).map(f => `<button type="button" data-export="marker-${f}" ${serverless() ? `disabled aria-describedby="st-needs-server"` : ''}>${icon(f === 'pdf' ? 'print' : 'download')}${tx(`marker_${f}`)}</button>`).join('')}</div>
-        ${serverless() ? `<p class="hint" id="st-needs-server">${icon('info')} ${tx('needs_server')}</p>` : ''}
+      ${card(tx('files_pattern'), `<p class="hint">${tx('files_pattern_hint')}</p><div class="st-files"><button type="button" data-export="pattern-pdf-a4">${icon('print')}${tx('pattern_pdf_a4')}</button><button type="button" data-export="pattern-pdf-a3">${icon('print')}${tx('pattern_pdf_a3')}</button><button type="button" data-export="pattern-dxf">${icon('download')}${tx('pattern_dxf')}</button><button type="button" data-export="pattern-plt">${icon('download')}${tx('pattern_plt')}</button>${engine?.exportSpecSheet ? `<button type="button" data-spec-export="pdf">${icon('print')}${tx('spec_pdf')}</button><button type="button" data-spec-export="xlsx">${icon('download')}${tx('spec_xlsx')}</button>` : ''}<button type="button" data-st="save-file">${icon('save')}${tx('save_style')}</button></div>`)}
+      ${card(tx('files_marker'), `<label class="check"><input type="checkbox" id="st-guides" ${state.repeat.kind === 'none' ? 'disabled' : ''}>${tx('stripe_guides')}</label><div class="st-files"><button type="button" data-export="marker-tiled">${icon('print')}${tx('marker_tiled')}</button>${(['plt', 'pdf', 'dxf'] as const).map(f => `<button type="button" data-export="marker-${f}">${icon(f === 'pdf' ? 'print' : 'download')}${tx(`marker_${f}`)}</button>`).join('')}</div>
         `)}
       </div>
       ${card(tx('next_in_cutting_room'), `<div class="st-files"><button type="button" class="primary" data-st="cut-plan">${icon('plan')}${tx('make_cut_plan')}</button><button type="button" data-st="spreading">${icon('spread')}${tx('print_spreading')}</button><button type="button" data-st="open-editor">${icon('marker')}${tx('open_editor')}</button><button type="button" data-st="bundles">${icon('bundles')}${tx('make_bundles')}</button></div><p class="hint">${tx('next_in_cutting_room_hint')}</p>`)}`;
   }
-  /** No desktop app and no shop server: only the browser's Rust WASM is available (status set by main.ts). */
-  const serverless = () => !isDesktop() && (staticMode() || document.getElementById('server-status')?.dataset.floorLabel === 'status_browser');
   async function exportFile(kind: string, button: HTMLButtonElement): Promise<void> {
     if (!engine || !state.doc) return;
     const old = button.innerHTML; button.disabled = true;
@@ -671,7 +907,7 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
       else if (kind === 'pattern-plt') { blob = new Blob([await engine.exportPatternPlt(state.doc)], { type: 'application/vnd.hp-hpgl' }); file = `${name}-pattern.plt`; }
       else {
         const m = state.marker; if (!m.job || !m.result) throw new Error(t('why_no_marker'));
-        const guides = (document.getElementById('st-guides') as HTMLInputElement | null)?.checked;
+        const guides = (byId('st-guides') as HTMLInputElement | null)?.checked;
         const job: Job = guides ? { ...structuredClone(m.job), meta: { ...m.job.meta, beta_stripe_guides: true } } : m.job;
         const format = kind === 'marker-tiled' ? 'tiled-a4' : kind.slice(7) as 'plt' | 'pdf' | 'dxf';
         blob = await exportMarker(job, m.result, format); file = `${name}-marker.${format === 'tiled-a4' ? 'tiles-a4.pdf' : format}`;
@@ -687,23 +923,26 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     window.dispatchEvent(new CustomEvent<DocumentState>('beta-open-document', { detail: { job: { ...m.job, meta: { ...m.job.meta, beta_style_handoff: state.info.name } }, result: m.result } }));
   }
   function goScreen(index: number, page?: string): void {
-    const button = document.querySelector<HTMLButtonElement>(`.screen-tabs [data-screen="${index}"]`); button?.click();
-    if (page) document.querySelector<HTMLButtonElement>(`[data-floor-page="${page}"]`)?.click();
+    const button = find<HTMLButtonElement>(`.screen-tabs [data-screen="${index}"]`); button?.click();
+    if (page) find<HTMLButtonElement>(`[data-floor-page="${page}"]`)?.click();
   }
   function cutPlan(): void {
     openEditor();
     window.setTimeout(() => {
       goScreen(1);
-      const names = [...new Set(state.marker.job!.pieces.flatMap(p => p.size ? [p.size] : []))].sort();
-      names.forEach((s, i) => { const input = document.getElementById(`quantity-${i}`) as HTMLInputElement | null; if (input) input.value = String(state.lay.order[s] ?? 0); });
-      const plies = document.getElementById('max-plies') as HTMLInputElement | null; if (plies) plies.value = String(state.lay.plies);
-      const end = document.getElementById('end-allowance') as HTMLInputElement | null; if (end) end.value = String(state.lay.endAllowanceMm);
+      const names = [...new Set(state.marker.job!.pieces.flatMap(p => p.size ? [p.size] : []))].sort(bySize);
+      // Cut order v2 (marker/docs/PLIES.md): "Max plies per lay" counts plies (fabric layers), as the Lay step does.
+      // The planner turns them into passes itself (folded and tube: two plies per pass), so never hand it passes.
+      const form = S.cutPlanHandoff(state.lay, names);
+      form.quantities.forEach((n, i) => { const input = byId(`quantity-${i}`) as HTMLInputElement | null; if (input) input.value = String(n); });
+      const plies = byId('max-plies') as HTMLInputElement | null; if (plies) plies.value = String(form.maxPlies);
+      const end = byId('end-allowance') as HTMLInputElement | null; if (end) end.value = String(form.endAllowanceMm);
     }, 50);
   }
   /** Back from the marker editor: a banner offers to return, optionally with the hand-edited marker. */
   function editorBanner(): void {
-    const main = document.querySelector('#editor-screen .editor-main'); if (!main) return;
-    let banner = document.getElementById('st-back-banner');
+    const main = find('#editor-screen .editor-main'); if (!main) return;
+    let banner = byId('st-back-banner');
     const show = handedOff && host.editorState().job.meta?.beta_style_handoff === state.info.name;
     if (!show) { banner?.remove(); return; }
     if (!banner) { banner = document.createElement('div'); banner.id = 'st-back-banner'; banner.className = 'notice st-back-banner'; main.prepend(banner); }
@@ -727,15 +966,12 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   root.addEventListener('click', event => {
     const el = (event.target as Element).closest<HTMLElement>('button, [data-grade-point], [data-match-point]'); if (!el || !root.contains(el)) return;
     if (el.dataset.stStep) { goStep(el.dataset.stStep as S.Step); return; }
-    if (el.id === 'st-next-top') { const n = S.nextStep(state.step); if (n) goStep(n); return; }
-    if (el.dataset.unit) { update({ ...state, unit: el.dataset.unit as LengthUnit }); canvas.refresh(); return; }
     if (el.dataset.block) { void startFrom(el.dataset.block); return; }
     if (el.dataset.gotoStep || el.dataset.goto) { goStep((el.dataset.goto ?? el.dataset.gotoStep) as S.Step); return; }
     if (el.dataset.gradePiece) { gradePiece = el.dataset.gradePiece; gradePoint = ''; render(); return; }
     if (el.dataset.gradePoint) { gradePoint = el.dataset.gradePoint; render(); return; }
     if (el.dataset.removeSize) { void removeSize(el.dataset.removeSize); return; }
-    if (el.dataset.widthUnit) { update(S.setLay(state, { widthUnit: el.dataset.widthUnit as LengthUnit })); return; }
-    if (el.dataset.widthPreset) { update(S.setLay(state, { widthMm: toMm(Number(el.dataset.widthPreset), state.lay.widthUnit) })); return; }
+    if (el.dataset.widthPreset) { update(S.setLay(state, { widthMm: toMm(Number(el.dataset.widthPreset), 'inch') })); return; }
     if (el.dataset.plies) { update(S.setLay(state, { plies: stepCount(state.lay.plies, Number(el.dataset.plies), S.pliesMustBeEven(state.lay) ? 2 : 1, 500) })); return; }
     if (el.dataset.ratio) { update(S.setLay(state, { ratio: { ...state.lay.ratio, [el.dataset.ratio]: stepCount(state.lay.ratio[el.dataset.ratio] ?? 0, Number(el.dataset.delta), 0, 50) } })); return; }
     if (el.dataset.direction) { update(S.setRepeat(state, { direction: el.dataset.direction as 'along' })); return; }
@@ -744,13 +980,17 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     if (el.dataset.showRule) { focusRule = Number(el.dataset.showRule); layers = { ...layers, matches: true }; goStep('marker'); return; }
     if (el.dataset.matchPoint) { void pickMatch(el.dataset.matchSide as 'a' | 'b', el.dataset.matchPoint); return; }
     if (el.dataset.budget) { budget = Number(el.dataset.budget); render(); return; }
+    if (el.dataset.mzoom) { if (el.dataset.mzoom === 'fit') fitOrWhole(); else zoomMarker(el.dataset.mzoom === 'in' ? 1.25 : 0.8); return; }
     if (el.dataset.export) { void exportFile(el.dataset.export, el as HTMLButtonElement); return; }
+    if (el.dataset.specExport) { void exportSpec(el.dataset.specExport as 'pdf', el as HTMLButtonElement); return; }
+    if (el.dataset.specView) { specGrade = el.dataset.specView === 'grade'; const box = byId('st-spec'); if (box) box.innerHTML = specInner(); root.querySelector<HTMLElement>(`[data-spec-view=${el.dataset.specView}]`)?.focus(); return; }
     switch (el.dataset.st) {
       case 'back': { const p = S.prevStep(state.step); if (p) goStep(p); break; }
       case 'next': { const n = S.nextStep(state.step); if (n) goStep(n); break; }
       case 'home': goScreen(9); break;
-      case 'how': howToggled[state.step] = !howOpen(); if (!howToggled[state.step]) markHowSeen(state.step); renderChrome(); if (state.step === 'pattern') canvas.refresh(); break;
-      case 'how-close': howToggled[state.step] = false; markHowSeen(state.step); renderChrome(); root.querySelector<HTMLElement>('.st-how-btn')?.focus(); if (state.step === 'pattern') canvas.refresh(); break;
+      case 'how': howToggled[state.step] = !howOpen(); if (!howToggled[state.step]) markHowSeen(state.step); renderChrome(); break;
+      case 'how-steps': howSteps[state.step] = !(howSteps[state.step] ?? !!howToggled[state.step]); renderHow(true); root.querySelector<HTMLElement>('.st-how-more')?.focus(); break;
+      case 'how-close': howToggled[state.step] = false; markHowSeen(state.step); renderChrome(); root.querySelector<HTMLElement>('.st-how-btn')?.focus(); break;
       case 'save-file': void saveFile(); break;
       case 'open-file': $<HTMLInputElement>('st-open-file').click(); break;
       case 'restart': if (window.confirm(t('confirm_restart'))) { S.clearSaved(); state = S.initialSession(); history = new PatternHistory(emptyDoc()); base = null; seams = []; canvas.reset(); render(true); } break;
@@ -759,6 +999,7 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
       case 'remove-rule': void commit([{ op: 'attach_rule', piece: gradePiece, point: gradePoint, rule: null }], t('rule_removed')); break;
       case 'close-rule': gradePoint = ''; render(); break;
       case 'add-check': void addCheck(); break;
+      case 'recheck': void refreshDoc().then(() => { specFor = null; render(); say(t('checked_again')); }); break;
       case 'add-band': { const axis = state.repeat.kind === 'stripes' && state.repeat.direction === 'across' ? 'x' : 'y'; update(S.setRepeat(state, { bands: [...state.repeat.bands, { axis, offset_mm: 0, width_mm: 3, colour: ['#1d4f8c', '#b54537', '#176e60', '#94600e'][state.repeat.bands.length % 4]! }] })); break; }
       case 'nest': void runNest(); break;
       case 'stop': abort?.abort(); say(t('stopping')); break;
@@ -788,10 +1029,15 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     if (el.name === 'st-nap') { update(S.setLay(state, { nap: el.value as S.LaySetup['nap'] })); return; }
     if (el.name === 'st-repeat') { update(S.setRepeat(state, { kind: el.value as S.RepeatKind })); return; }
     switch (el.id) {
-      case 'st-width': { const v = parseLength(el.value, state.lay.widthUnit === 'inch' ? 'inch' : 'cm'); if (need(v)) update(S.setLay(state, { widthMm: v })); return; }
+      case 'st-width': { const v = parseLength(el.value, unit()); if (need(v)) update(S.setLay(state, { widthMm: v })); return; }
       case 'st-material': update(S.setLay(state, { material: el.value })); return;
       case 'st-flip': update(S.setLay(state, { allowFlip: el.checked })); return;
-      case 'st-plies': { const v = Number(el.value); if (Number.isInteger(v) && v > 0) update(S.setLay(state, { plies: v })); else host.message(t('why_lay_plies'), true); return; }
+      case 'st-plies': {
+        // The reason shows under the field (and is read out); nothing changes until the number can be used.
+        const v = Number(el.value), why = el.value.trim() === '' ? 'plies_whole' : S.pliesProblem(v, state.lay), box = byId('st-plies-error');
+        if (why) { el.setAttribute('aria-invalid', 'true'); if (box) box.textContent = t(why, { max: S.MAX_PLIES }); say(t(why, { max: S.MAX_PLIES })); return; }
+        update(S.setLay(state, { plies: v })); return;
+      }
       case 'st-end': case 'st-end2': { const v = mm(); if (need(v)) update(S.setLay(state, { endAllowanceMm: v })); return; }
       case 'st-piece-gap': { const v = mm(); if (need(v)) update(S.setGaps(state, { pieceGap: v })); return; }
       case 'st-edge-gap': { const v = mm(); if (need(v)) update(S.setGaps(state, { edgeGap: v })); return; }
@@ -812,7 +1058,7 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     if (el.dataset.blockOn) { update(S.setGaps(state, { blocks: { ...state.gaps.blocks, [el.dataset.blockOn]: el.checked ? 10 : null } })); return; }
     if (el.dataset.block) { const v = mm(); if (need(v)) update(S.setGaps(state, { blocks: { ...state.gaps.blocks, [el.dataset.block]: v } })); return; }
     if (el.dataset.sizeToggle) { if (el.checked) hiddenSizes.delete(el.dataset.sizeToggle); else hiddenSizes.add(el.dataset.sizeToggle); drawNest(); return; }
-    if (el.dataset.layer) { layers = { ...layers, [el.dataset.layer]: el.checked }; render(); return; }
+    if (el.dataset.layer) { layers = { ...layers, [el.dataset.layer]: el.checked }; if (el.dataset.layer === 'labels') { markerSize = ''; redrawMarker(); } else render(); return; }
     const band = (key: 'bandColour' | 'bandWidth' | 'bandOffset' | 'bandAxis') => el.dataset[key] != null ? Number(el.dataset[key]) : -1;
     for (const key of ['bandColour', 'bandWidth', 'bandOffset', 'bandAxis'] as const) {
       const i = band(key); if (i < 0) continue;
@@ -834,7 +1080,7 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     await commit([{ op: 'set_chart', chart: c }], t('chart_updated'));
   }
   async function addSize(): Promise<void> {
-    const d = state.doc!, input = document.getElementById('st-new-size') as HTMLInputElement, name = input.value.trim();
+    const d = state.doc!, input = byId('st-new-size') as HTMLInputElement, name = input.value.trim();
     if (!name || name.length > 12 || d.sizes.includes(name)) { host.message(t('err_size_name'), true); return; }
     // Start the new size one grade step beyond the last size (the step between the last two sizes).
     const last = d.sizes.at(-1)!, prev = d.sizes.at(-2), m = structuredClone(d.measurements);
@@ -860,7 +1106,7 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     if (await commit([{ op: 'set_rule', id, rule: { mode: 'relative', deltas } }, { op: 'attach_rule', piece: gradePiece, point: gradePoint, rule: id }], t('rule_saved'))) void loadNest();
   }
   async function addCheck(): Promise<void> {
-    const get = (id: string) => (document.getElementById(id) as HTMLInputElement).value;
+    const get = (id: string) => (byId(id) as HTMLInputElement).value;
     const edges = (v: string) => v.split(/[ ,]+/).filter(Boolean).map(n => Number(n) - 1);
     const ea = edges(get('st-check-ea')), eb = edges(get('st-check-eb')), ease = parseLength(get('st-check-ease'), unit(), true) ?? 0;
     if (!ea.length || !eb.length || [...ea, ...eb].some(n => !Number.isInteger(n) || n < 0)) { host.message(t('err_edges'), true); return; }
@@ -893,15 +1139,23 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   new MutationObserver(() => root.querySelectorAll<SVGSVGElement>('svg').forEach(s => { const v = s.querySelector('g[data-view]')?.getAttribute('data-view'); if (v && s.getAttribute('viewBox') !== v) s.setAttribute('viewBox', v); })).observe(body, { childList: true, subtree: true });
   window.addEventListener('beta-screen', event => {
     const index = (event as CustomEvent<number>).detail;
-    if (index === STYLE_SCREEN) { void ensureEngine(); render(); }
-    if (index === 0) editorBanner(); else document.getElementById('st-back-banner')?.remove();
+    if (index === STYLE_SCREEN) {
+      void ensureEngine(); render();
+      // After the shell has added this screen to the history: remember the step, so Back returns to it.
+      window.setTimeout(() => { if (!root.hidden) window.history.replaceState({ ...(window.history.state ?? {}), betaStyleStep: state.step }, '', location.hash); }, 0);
+    }
+    if (index === 0) editorBanner(); else byId('st-back-banner')?.remove();
+  });
+  onUnit(next => {
+    state = { ...state, unit: next, lay: { ...state.lay, widthUnit: next } }; persist();
+    if (!root.hidden) { render(); canvas.refresh(); }
   });
   // Language changes re-render the flow (html[data-language] is set by the app switch).
   let language = currentLanguage();
   const navLabel = () => {
-    const b = document.querySelector<HTMLElement>(`[data-screen="${STYLE_SCREEN}"] .nav-label`); if (b) { b.textContent = t('nav'); b.lang = currentLanguage(); }
+    const b = find<HTMLElement>(`[data-screen="${STYLE_SCREEN}"] .nav-label`); if (b) { b.textContent = t('nav'); b.lang = currentLanguage(); }
     // The top bar title was set before this label changed.
-    if (!root.hidden) { const title = document.getElementById('topbar-title'); if (title) title.textContent = t('nav'); }
+    if (!root.hidden) refreshTitle();
   };
   new MutationObserver(() => { if (currentLanguage() !== language) { language = currentLanguage(); navLabel(); if (!root.hidden) render(); } }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-language'] });
   window.setTimeout(navLabel, 0);

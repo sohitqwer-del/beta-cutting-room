@@ -115,6 +115,11 @@ fn buffered_pairs_fit_and_report_progress() -> Result<()> {
     assert_eq!(result.seed, Some(12));
     assert!(validate(&job, &result).ok);
     assert!(!progress.is_empty());
+    for event in &progress {
+        assert!(validate(&job, &event.result).ok);
+        assert_eq!(event.length, event.result.length);
+        assert_eq!(event.result.placements.len(), 4);
+    }
     assert!(result.length <= progress.last().expect("reported a valid result").length + 1e-7);
     assert!(
         progress
@@ -288,6 +293,9 @@ fn check_placements(job: &Job, placements: &[Placement]) -> Result<()> {
         length: metrics.length,
         piece_area: metrics.piece_area,
         efficiency: metrics.efficiency,
+        useful_piece_area: metrics.useful_piece_area,
+        useful_yield: metrics.useful_yield,
+        surplus_copies: metrics.surplus_copies,
         engine: "test".into(),
         seed: None,
         runtime_s: 0.,
@@ -389,6 +397,9 @@ fn zero_gap_f32_rounding_must_not_shrink_the_collision_outline() -> Result<()> {
         length: m.length,
         piece_area: m.piece_area,
         efficiency: m.efficiency,
+        useful_piece_area: m.useful_piece_area,
+        useful_yield: m.useful_yield,
+        surplus_copies: m.surplus_copies,
         engine: "test".into(),
         seed: None,
         runtime_s: 0.,
@@ -458,6 +469,9 @@ fn repair_can_separate_coincident_copies_and_cannot_ignore_max_length() -> Resul
         length: 0.,
         piece_area: 0.,
         efficiency: 0.,
+        useful_piece_area: 0.,
+        useful_yield: 0.,
+        surplus_copies: 0,
         engine: "test".into(),
         seed: None,
         runtime_s: 0.,

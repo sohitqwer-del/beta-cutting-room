@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.7.0 - Make it good
+
+- More room to work. The menu has five jobs (Home, Make a style, Photo to
+  marker, Marker from files, Cutting floor) and More tools. Only the open
+  screen is in the page. One cm/inch switch sets every screen. The phone
+  Back button now goes back inside the app.
+- The marker draws live while the search runs. Pieces show their name and
+  size. Zoom in and tap a piece for its details.
+- The browser edition now does everything except the board-photo digitizer:
+  plotter PLT/HPGL, DXF-AAMA, full-size and tiled PDF, ISO and SVG files
+  (46/46 byte-identical with the desktop app), DXF import with .rul grading,
+  cut plans with "Stop and keep the best plan", rolls, spreading, bundles and
+  tickets, floor tracking, reports, Compare, and local storage with a backup
+  file (33/33 identical with the desktop app).
+- One meaning of plies: a ply is one fabric layer, a pass is one length laid
+  from the roll. Cut order and cut plan files are now format v2; v1 files
+  keep their old meaning.
+- Folded and tube lays show real yield and copies cut but not used.
+  Symmetric pieces serve both layers and fold halves stay on the fold. On the
+  worst test (shirt, folded) fabric fell from 3.34 to 1.68 m per garment.
+  Folded fabric is still behind open fabric.
+- Trouser, track pant and shirt yoke blocks were redrafted (the 0.6.0
+  trousers could not be sewn). 10,806 block checks pass. New spec sheet
+  (points of measure per size) as PDF, CSV or Excel.
+- Fixed: a dart made a second production front; typed units such as "58 in"
+  on a cm screen were ignored; DXF "Cut 2" made two same-hand pieces; folded
+  lays were halved twice in the cut plan.
+- Engine search notes now sit under a closed "Technical details". The lay
+  cost tile shows only when a cost is entered. Rolls, Bundles and Floor
+  table headers follow the chosen language (drafts).
+
+Folded lays still use more fabric than open lays. Blocks need sewn samples
+and a pattern master's fit review. Browser cut planning runs on one thread,
+about 2 seconds per marker. The Windows installer is unsigned. Hindi and Tamil
+are drafts. See [the release record](docs/RELEASE-0.7.0.md).
+
 ## 0.6.0 - From scratch to cut
 
 - Start a style with a blank sheet or one of seven editable basic blocks.

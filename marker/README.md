@@ -1,6 +1,6 @@
 # BETA Cutting Room
 
-**Open-source garment cutting-room software. Self-hosted. Version 0.6.0.**
+**Open-source garment cutting-room software. Self-hosted. Version 0.7.0.**
 
 BETA helps a factory turn patterns into checked markers and cutting-room work.
 BETA Pattern covers drafting, grading and photo digitizing. BETA Marker covers
@@ -19,6 +19,14 @@ Stripes, Marker and Cut. Start with a blank sheet or one of seven editable
 basic blocks. Review fit with a pattern master before production. Grade from
 a size chart, check seams, set fabric and gaps, and inspect the stripe/check
 match report before preparing cutting files.
+
+## In the browser
+
+The browser edition runs the Rust engine on your own device. It does
+everything except the board-photo digitizer: plotter PLT/HPGL, DXF-AAMA,
+full-size and tiled PDF, ISO and SVG files; DXF import; cut plans, rolls,
+spreading, bundles and tickets, floor tracking and reports. Work stays in the
+browser; save a backup file before you clear browser data.
 
 ## From pattern to cutting floor
 
@@ -60,7 +68,7 @@ Read the [module audit](docs/CUTTING-ROOM-STATUS.md) and
 - **Linux self-hosting:** release CLI plus matching static browser assets;
   systemd user-unit and Caddy/nginx examples are provided.
 
-See the [0.6.0 release record](docs/RELEASE-0.6.0.md) for packages and known limits. See
+See the [0.7.0 release record](docs/RELEASE-0.7.0.md) for packages and known limits. See
 [installation and source builds](docs/INSTALL.md),
 [self-hosting](docs/SELF-HOSTING.md) and the
 [public release checklist](docs/RELEASE-CHECKLIST.md).

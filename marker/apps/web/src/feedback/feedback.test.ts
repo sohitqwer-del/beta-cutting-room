@@ -139,7 +139,7 @@ describe('first run and the one-time ask', () => {
     rememberAsk(store, '0.4.0');
     resetSessionMemory();
     expect(shouldAsk(store, '0.4.0')).toBe(false);
-    expect(shouldAsk(store, '0.6.0')).toBe(true);
+    expect(shouldAsk(store, '0.7.0')).toBe(true);
     expect(shouldAsk(new Store(), '0.4.0', true)).toBe(false);
   });
   it('recognises a finished nest or a saved export, but not a cancelled save', () => {

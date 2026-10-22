@@ -47,6 +47,33 @@ impl NestSession {
         super::write(&self.inner.step().map_err(|e| e.to_string())?)
     }
 
+    /// Within-round callbacks are sent directly from the Worker while Rust runs.
+    pub fn step_with_progress(&mut self, callback: &js_sys::Function) -> Result<String, JsValue> {
+        let mut callback_error = None;
+        let mut emit = |progress: BrowserProgress| {
+            if callback_error.is_some() {
+                return;
+            }
+            match super::write(&progress) {
+                Ok(json) => {
+                    if let Err(error) = callback.call1(&JsValue::NULL, &JsValue::from_str(&json)) {
+                        callback_error = Some(error);
+                    }
+                }
+                Err(error) => callback_error = Some(JsValue::from_str(&error)),
+            }
+        };
+        let progress = match &mut self.inner {
+            Session::Plain(session) => session.step_with_progress(&mut emit),
+            Session::Matching(session) => session.step_with_progress(&mut emit),
+        }
+        .map_err(|e| JsValue::from_str(&e.to_string()))?;
+        if let Some(error) = callback_error {
+            return Err(error);
+        }
+        super::write(&progress).map_err(|e| JsValue::from_str(&e))
+    }
+
     /// Set the stop flag. The next step returns the retained incumbent.
     pub fn cancel(&mut self) {
         self.inner.cancel();

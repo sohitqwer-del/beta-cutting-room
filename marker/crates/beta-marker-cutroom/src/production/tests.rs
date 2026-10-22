@@ -38,6 +38,9 @@ fn fixture() -> ReportInput {
         length: metrics.length,
         piece_area: metrics.piece_area,
         efficiency: metrics.efficiency,
+        useful_piece_area: metrics.useful_piece_area,
+        useful_yield: metrics.useful_yield,
+        surplus_copies: metrics.surplus_copies,
         placements,
         engine: "synthetic report fixture".into(),
         seed: Some(42),
@@ -55,6 +58,7 @@ fn fixture() -> ReportInput {
         lays: vec![Lay {
             ratio: BTreeMap::from([("M".into(), 1)]),
             plies: 10,
+            passes: 10,
             marker_length_mm: 110.0,
             efficiency: marker.efficiency,
             fabric_m: 1.3,

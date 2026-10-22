@@ -110,7 +110,7 @@ export interface StyleCore<TOperation = StyleOperation, TMatch extends MatchSumm
 }
 export interface RawStyle { style_command(request: string): string }
 /** Runtime engines support the extended edits and complete validator measurements. */
-export type NativeStyleCore = StyleCore<StyleEditOperation, MatchReport>;
+export type NativeStyleCore = StyleCore<StyleEditOperation, MatchReport> & StyleQualityCore;
 export type NativeMarkerOverlay = MarkerOverlay<MatchReport>;
 /** Transport-only adapter, also usable by an in-process native host. */
 export function bindStyleCore(raw: RawStyle): NativeStyleCore {
@@ -127,6 +127,9 @@ export function bindStyleCore(raw: RawStyle): NativeStyleCore {
     measure: (document, size, request) => call({ action: 'measure', document, size, request }),
     seam_report: (document, check) => call({ action: 'seam_report', document, check }),
     block_seams: document => call({ action: 'block_seams', document }),
+    block_checks: document => call({ action: 'block_checks', document }),
+    spec_sheet: document => call({ action: 'spec_sheet', document }),
+    export_spec_sheet: (document, format) => call({ action: 'export_spec_sheet', document, format }),
     to_job: (document, settings) => call({ action: 'to_job', document, settings }),
     overlay: (job, result, options = {}) => call({ action: 'overlay', job, result, options }),
   };
@@ -138,4 +141,32 @@ export async function loadStyleCore(moduleUrl?: string | URL): Promise<NativeSty
   await raw.default({ module_or_path: new URL('./beta_pattern_wasm_bg.wasm', url) });
   if (typeof raw.style_command !== 'function') throw new Error('Update the local Pattern WASM files to use style tools.');
   return bindStyleCore(raw);
+}
+
+/** Measured engineering assertions. A failed size stays in the report. */
+export interface BlockCheckValue {
+  id: string; category: string; value: number; unit: string;
+  min: number; max: number; pass: boolean; note: string;
+}
+export interface BlockReport {
+  block: BlockKind; sampling_mm: number; pass: boolean; limitations: string[];
+  sizes: { size: string; pass: boolean; checks: BlockCheckValue[]; errors: string[] }[];
+}
+export interface SpecValue {
+  size: string; measured_mm: number; body_mm: number | null; ease_mm: number | null;
+  target_mm: number | null; grade_step_mm: number | null; pass: boolean | null;
+}
+export interface PointOfMeasure {
+  id: string; name: string; method: string; tolerance_mm: number; values: SpecValue[];
+}
+export interface SpecSheet {
+  schema: 'beta-pattern.spec/v1'; style: string; block: BlockKind; unit: 'mm';
+  sizes: string[]; base_size: string; rows: PointOfMeasure[]; notes: string[];
+}
+export interface SpecFile { filename: string; mime: string; bytes: number[] }
+/** Additive native APIs; legacy StyleCore test doubles remain source-compatible. */
+export interface StyleQualityCore {
+  block_checks(document: PatternDocument): BlockReport;
+  spec_sheet(document: PatternDocument): SpecSheet;
+  export_spec_sheet(document: PatternDocument, format: 'pdf' | 'csv' | 'xlsx'): SpecFile;
 }

@@ -11,7 +11,7 @@ $repoRoot = Split-Path $markerRoot -Parent
 $version = (Get-Content (Join-Path $markerRoot 'apps/desktop/src-tauri/tauri.conf.json') -Raw | ConvertFrom-Json).version
 $cliPath = (Resolve-Path -LiteralPath $Cli).Path
 $webPath = (Resolve-Path -LiteralPath $WebDir).Path
-foreach ($name in @('index.html', 'wasm/beta_marker_wasm_bg.wasm', 'wasm/beta_pattern_wasm_bg.wasm', 'wasm/beta_marker_floor_bg.wasm')) {
+foreach ($name in @('index.html', 'wasm/beta_marker_wasm_bg.wasm', 'wasm/beta_pattern_wasm_bg.wasm', 'wasm/beta_marker_floor_bg.wasm', 'wasm/beta_marker_cutroom_wasm_bg.wasm')) {
     if (-not (Test-Path -LiteralPath (Join-Path $webPath $name) -PathType Leaf)) { throw "Missing web release asset: $name" }
 }
 $outputRoot = [IO.Path]::GetFullPath($OutputDir)

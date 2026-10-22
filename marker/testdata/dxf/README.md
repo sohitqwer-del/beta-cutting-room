@@ -22,9 +22,14 @@ The Rust generator is Apache-2.0, like the project code.
 | comparison-marker.plt | 40 units/mm | 2 copies | Original plotted panels with frame, labels and drills |
 
 The shirt front and sleeve and the trouser front/back have Quantity 2. Their
-annotations state that they are intended pairs. Standard AAMA has no pair flag:
-import preserves Quantity 2 as two normal copies unless `--pairs` is passed.
-The same option also splits other even quantities, including yokes and cuffs.
+annotations state that they are intended pairs. Standard AAMA has no pair flag.
+Since round 0.7, import splits an even Quantity of an asymmetric piece into
+left and right copies by default and sets `pairs_assumed` in the report;
+`--pairs=false` keeps every Quantity as same-hand copies. A piece equal to its
+own mirror image within 0.2 mm keeps same-hand copies: in this shirt that is
+the sleeve and the cuff. The shirt back is a one-sided synthetic outline
+with Quantity 1 and no fold line, so on folded fabric its mirrored copy is
+surplus unless flipping is allowed.
 Shirt yokes have Quantity 2 and cuffs Quantity 4. Pocket-position drills appear
 on the shirt fronts; the pocket also has a drill. Each garment piece has two
 notches and a directed grain line. Curved armholes, necklines, sleeve caps and

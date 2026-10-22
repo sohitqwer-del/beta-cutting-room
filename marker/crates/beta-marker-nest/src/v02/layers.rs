@@ -79,7 +79,7 @@ pub(super) fn slots_after(
         normal.reverse();
         mirrored.reverse();
         let foldable = piece.fold_line.is_some() && piece.block_margin.is_none_or(|m| m == 0.0);
-        let symmetric = piece.fold_line.is_some();
+        let symmetric = beta_marker_core::rules::layer_hands_interchangeable(job, piece);
         let faceless = flip_allowed(job, piece);
         let points = transform_points(
             &piece.outline,
@@ -137,6 +137,53 @@ pub(super) fn slots_after(
     }
     ensure!(!out.is_empty(), "no pieces to place");
     Ok(out)
+}
+
+/// Explain a folded marker whose length is set by its fold pieces, not by the search.
+/// Fold halves all need the one fold edge, and a full cut too deep to sit beside
+/// them cannot share their place along the marker, so their lengths add up.
+/// Shapes can interlock a little, so this is an estimate, not a strict bound.
+pub(super) fn fold_edge_note(job: &Job, result: &MarkerResult) -> Option<String> {
+    if job.fabric.layout != Layout::Folded || result.length <= 0.0 {
+        return None;
+    }
+    let usable = job.fabric.width - job.spacing.edge_gap;
+    let (mut halves, mut wide) = (Vec::new(), Vec::new());
+    for pl in &result.placements {
+        let piece = job.pieces.iter().find(|p| p.id == pl.piece_id)?;
+        let b = bbox(&beta_marker_core::rules::cut_outline(piece, pl))?;
+        let item = (b[2] - b[0], b[3] - b[1]);
+        if pl.on_fold {
+            halves.push(item);
+        } else if item.1 > usable / 2.0 {
+            wide.push(item);
+        }
+    }
+    if halves.is_empty() {
+        return None;
+    }
+    let total = |items: &[(f64, f64)]| {
+        items.iter().map(|i| i.0).sum::<f64>()
+            + job.spacing.piece_gap * items.len().saturating_sub(1) as f64
+    };
+    // Halves all share the fold edge. A full cut joins them when it is too deep
+    // to sit beside the shallowest half, and other such cuts when it is wider
+    // than half the table, so no two items of the chain fit side by side.
+    let shallowest = halves.iter().map(|i| i.1).fold(f64::INFINITY, f64::min);
+    let threshold = (usable / 2.0).max(usable - shallowest);
+    let chain: Vec<(f64, f64)> = halves
+        .iter()
+        .chain(wide.iter().filter(|i| i.1 > threshold))
+        .copied()
+        .collect();
+    let (count, needed) = (chain.len(), total(&chain));
+    (count > 1 && needed >= 0.85 * result.length).then(|| {
+        format!(
+            "Fold edge: {count} pieces cut on the fold, or too deep to sit beside them, measure about {:.2} m end to end; this marker is {:.2} m. Even counts per size (cut as full two-layer pieces), a tube or open fabric can make it shorter.",
+            needed / 1000.0,
+            result.length / 1000.0
+        )
+    })
 }
 
 /// Shared cuts couple the directions of all garments they serve.
@@ -311,22 +358,39 @@ pub(super) fn pack(
     // for one-way-per-bundle and avoids coupling incompatible garment directions.
     let directions = directions(job, original, fixed)?;
     let paired = slots(job, true)?;
-    let policies: Vec<&[Slot]> =
+    let sparrow = job.fabric.defects.is_empty()
+        && job.pieces.iter().all(|p| p.buffer <= 0.0)
+        && cancel.is_none()
+        && (cfg!(target_arch = "wasm32")
+            || std::thread::available_parallelism().is_ok_and(|n| n.get() >= 3));
+    // (slots, bounded packer only)
+    let mut policies: Vec<(&[Slot], bool)> =
         if fixed.is_empty() && opts.warm_start.is_none() && paired.len() < original.len() {
             if job.fabric.layout == Layout::Tubular {
-                vec![original, &paired]
+                vec![(original, false), (&paired, false)]
             } else {
-                vec![&paired, original]
+                vec![(&paired, false), (original, false)]
             }
         } else {
-            vec![original]
+            vec![(original, false)]
         };
-    // Keep the old fold search as a checked incumbent. Tubes have two useful
-    // fold edges, so reserve half their budget for that established ordering
-    // before trying the additional hands and full-cut allocations.
+    // Sparrow keeps every fold half on the fold. On folded fabric a shorter
+    // marker can cut some of them as full two-layer pieces beside the halves,
+    // with a surplus layer; the bounded packer can mix both, so it also runs.
+    // The shortest valid marker wins: surplus copies cost their fabric length.
+    if sparrow
+        && fixed.is_empty()
+        && job.fabric.layout == Layout::Folded
+        && original.iter().any(|s| s.placement.on_fold)
+    {
+        policies.push((original, true));
+    }
+    // Keep the old fold search as a checked incumbent. Without Sparrow, tubes
+    // reserve half their budget for that established ordering before trying
+    // the additional hands and full-cut allocations.
     let seed = if fixed.is_empty() && opts.warm_start.is_none() {
         let mut quick = opts.clone();
-        quick.time_limit_s = if job.fabric.layout == Layout::Tubular {
+        quick.time_limit_s = if job.fabric.layout == Layout::Tubular && !sparrow {
             opts.time_limit_s * 0.5
         } else {
             (opts.time_limit_s * 0.02).min(0.25)
@@ -347,10 +411,23 @@ pub(super) fn pack(
     } else {
         None
     };
+    // When fold halves and wide pieces already fill the fold edge, the order
+    // sets the length; the bounded packer, which mixes halves and full cuts,
+    // gets all the time.
+    if seed
+        .as_ref()
+        .or(opts.warm_start.as_ref())
+        .is_some_and(|marker| fold_edge_note(job, marker).is_some())
+    {
+        policies.retain(|(_, bounded_only)| !bounded_only);
+        for policy in &mut policies {
+            policy.1 = true;
+        }
+    }
     let mut best = seed.clone();
     let mut errors = Vec::new();
     let mut reported = f64::INFINITY;
-    for (index, policy) in policies.iter().enumerate() {
+    for (index, &(policy, bounded_only)) in policies.iter().enumerate() {
         if index > 0
             && (started.elapsed().as_secs_f64() >= opts.time_limit_s
                 || cancel.is_some_and(|c| c.load(std::sync::atomic::Ordering::Relaxed)))
@@ -359,14 +436,15 @@ pub(super) fn pack(
         }
         let mut options = opts.clone();
         let left = (opts.time_limit_s - started.elapsed().as_secs_f64()).max(0.001);
-        options.time_limit_s = if policies.len() == 2 && index == 0 {
+        options.time_limit_s = if !sparrow && policies.len() == 2 && index == 0 {
             left * if job.fabric.layout == Layout::Tubular {
                 0.8
             } else {
                 0.6
             }
         } else {
-            left
+            // Sparrow searches share the remaining time equally.
+            left / (policies.len() - index) as f64
         };
         if options.warm_start.is_none()
             && let Some(seed) = seed.as_ref().filter(|seed| compatible(policy, seed))
@@ -380,28 +458,11 @@ pub(super) fn pack(
                 progress(event);
             }
         };
-        let result = if policy.iter().all(|s| !s.placement.on_fold) {
-            super::run_allocated(
-                job,
-                policy,
-                fixed,
-                &options,
-                variant,
-                tuning,
-                &mut on_progress,
-                cancel,
-            )
+        // Fold halves use pinned Sparrow when possible, else the bounded packer.
+        let result = if bounded_only {
+            bounded::pack(job, policy, fixed, &options, variant, &directions, &mut on_progress, cancel)
         } else {
-            bounded::pack(
-                job,
-                policy,
-                fixed,
-                &options,
-                variant,
-                &directions,
-                &mut on_progress,
-                cancel,
-            )
+            super::run_allocated(job, policy, fixed, &options, variant, tuning, &mut on_progress, cancel)
         };
         match result {
             Ok(result)

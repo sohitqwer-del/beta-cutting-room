@@ -2,16 +2,17 @@
 mod bounded;
 mod checks;
 mod layers;
+mod pinned;
 #[cfg(test)]
 mod tests;
 
 use super::{NestOptions, NestProgress, nest_single, safety};
+use crate::Instant;
 use anyhow::{Context, Result, ensure};
 use beta_marker_core::geometry::grain_alignment_deg;
 use beta_marker_core::{Job, Layout, MarkerResult, Nap, Piece, Placement, RotationRule};
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::mpsc;
-use crate::Instant;
 
 #[derive(Clone, Debug)]
 struct Slot {
@@ -67,7 +68,10 @@ pub(super) fn nest_controlled(
     let issues = beta_marker_core::check_job(&job);
     ensure!(issues.is_empty(), "invalid job: {issues:?}");
     let legacy_layers = job.fabric.layout != Layout::Open
-        && opts.fixed.iter().chain(opts.warm_start.iter().flat_map(|r| &r.placements))
+        && opts
+            .fixed
+            .iter()
+            .chain(opts.warm_start.iter().flat_map(|r| &r.placements))
             .any(|p| p.layer_allocations.is_empty());
     let slots = if legacy_layers {
         legacy_slots(&job)?
@@ -107,15 +111,22 @@ pub(super) fn nest_controlled(
         callback(NestProgress {
             seconds: started.elapsed().as_secs_f64(),
             length: reported,
+            result: best.as_ref().expect("finite incumbent").clone(),
         });
     }
     let mut failures = Vec::new();
     let mut accept = |event| match event {
-        Event::Progress(length) if length < reported => {
-            reported = length;
+        Event::Progress(result)
+            if result.length < reported && beta_marker_core::validate(input, &result).ok =>
+        {
+            reported = result.length;
+            if best.as_ref().is_none_or(|b| result.length < b.length) {
+                best = Some(result.clone());
+            }
             callback(NestProgress {
                 seconds: started.elapsed().as_secs_f64(),
-                length,
+                length: result.length,
+                result,
             });
         }
         Event::Done(Ok(result)) => {
@@ -125,7 +136,7 @@ pub(super) fn nest_controlled(
                     "independent validation failed: {:?}",
                     report.errors
                 ));
-            } else if best.as_ref().is_none_or(|b| result.length < b.length) {
+            } else if best.as_ref().is_none_or(|b| result.length <= b.length) {
                 best = Some(result);
             }
         }
@@ -147,7 +158,7 @@ pub(super) fn nest_controlled(
                 &options,
                 first,
                 tuning,
-                &mut |p| accept(Event::Progress(p.length)),
+                &mut |p| accept(Event::Progress(p.result)),
                 cancel,
             );
             accept(Event::Done(result));
@@ -170,7 +181,7 @@ pub(super) fn nest_controlled(
                         index,
                         tuning,
                         &mut |p| {
-                            let _ = send.send(Event::Progress(p.length));
+                            let _ = send.send(Event::Progress(p.result));
                         },
                         cancel,
                     );
@@ -206,9 +217,16 @@ pub(super) fn nest_controlled(
             ));
         }
         if job.fabric.layout != Layout::Open {
-            let unassigned = placed.iter().flat_map(|p| &p.layer_allocations).filter(|a| a.is_none()).count();
+            let unassigned = placed
+                .iter()
+                .flat_map(|p| &p.layer_allocations)
+                .filter(|a| a.is_none())
+                .count();
             if unassigned > 0 {
-                result.warnings.push(format!("Two-layer surplus for '{}': {unassigned} unassigned copies.", piece.id));
+                result.warnings.push(format!(
+                    "Two-layer surplus for '{}': {unassigned} unassigned copies.",
+                    piece.id
+                ));
             }
             let (normal, mirrored) = placed
                 .iter()
@@ -241,6 +259,9 @@ pub(super) fn nest_controlled(
             }
         }
     }
+    if let Some(note) = layers::fold_edge_note(&job, &result) {
+        result.warnings.push(note);
+    }
     if runs > 1 {
         result.warnings.push(format!("Portfolio: {runs} seeds, at most {parallel} concurrent runs, {workers} separator workers per run."));
     }
@@ -268,13 +289,14 @@ pub(super) fn nest_controlled(
         callback(NestProgress {
             seconds: result.runtime_s,
             length: result.length,
+            result: result.clone(),
         });
     }
     Ok(result)
 }
 
 enum Event {
-    Progress(f64),
+    Progress(MarkerResult),
     Done(Result<MarkerResult>),
 }
 
@@ -469,7 +491,8 @@ fn fixed_placements(job: &Job, slots: &[Slot], fixed: &[Placement]) -> Result<Ve
             copy.bundle = slots[index].placement.bundle;
         }
         if job.fabric.layout != Layout::Open && copy.layer_allocations.is_empty() {
-            copy.layer_allocations.clone_from(&slots[index].placement.layer_allocations);
+            copy.layer_allocations
+                .clone_from(&slots[index].placement.layer_allocations);
             if !copy.on_fold && copy.layer_allocations.len() == 1 {
                 copy.layer_allocations.push(None);
             }
@@ -510,7 +533,11 @@ fn directions(
     fixed: &[Placement],
     variant: usize,
 ) -> Result<BTreeMap<u32, f64>> {
-    if job.fabric.layout != Layout::Open && slots.iter().all(|s| !s.placement.layer_allocations.is_empty()) {
+    if job.fabric.layout != Layout::Open
+        && slots
+            .iter()
+            .all(|s| !s.placement.layer_allocations.is_empty())
+    {
         return layers::directions(job, slots, fixed);
     }
     let mut dirs = BTreeMap::new();
@@ -565,8 +592,13 @@ fn run(
 
 #[allow(clippy::too_many_arguments)]
 fn run_allocated(
-    job: &Job, slots: &[Slot], fixed: &[Placement], opts: &NestOptions, variant: usize,
-    tuning: &super::SearchTuning, progress: &mut dyn FnMut(NestProgress),
+    job: &Job,
+    slots: &[Slot],
+    fixed: &[Placement],
+    opts: &NestOptions,
+    variant: usize,
+    tuning: &super::SearchTuning,
+    progress: &mut dyn FnMut(NestProgress),
     cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<MarkerResult> {
     let simple = fixed.is_empty()
@@ -589,17 +621,56 @@ fn run_allocated(
     let dirs = directions(job, slots, fixed, variant)?;
     if !fixed.is_empty()
         || !job.fabric.defects.is_empty()
-        || slots.iter().any(|s| s.placement.on_fold)
         || (job.fabric.layout != Layout::Open
-            && (job.spacing.edge_gap > 0.0 || job.pieces.iter().any(|p| p.buffer > 0.0)))
+            && job.pieces.iter().any(|p| p.buffer > 0.0))
         || small_cpu
         || cancel.is_some()
     {
         return bounded::pack(job, slots, fixed, opts, variant, &dirs, progress, cancel);
     }
+    if !slots.iter().any(|s| s.placement.on_fold) {
+        return sparrow_allocated(job, slots, fixed, opts, variant, tuning, progress, None);
+    }
+    // Fold halves go into Sparrow as pinned outlines. If that cannot be set up
+    // or fails, the bounded packer uses the time that is left.
+    let started = Instant::now();
+    let attempt = pinned::plan(job, slots, variant, &dirs).and_then(|pins| {
+        sparrow_allocated(job, slots, fixed, opts, variant, tuning, progress, Some(pins))
+    });
+    match attempt {
+        Ok(result) => Ok(result),
+        Err(_) => {
+            let mut rest = opts.clone();
+            rest.time_limit_s = (opts.time_limit_s - started.elapsed().as_secs_f64()).max(0.05);
+            bounded::pack(job, slots, fixed, &rest, variant, &dirs, progress, cancel)
+        }
+    }
+}
+
+/// Sparrow with one engine item per physical placement. `pins` gives the
+/// pinned outline of every fold half; warm starts are not used with pins.
+#[allow(clippy::too_many_arguments)]
+fn sparrow_allocated(
+    job: &Job,
+    slots: &[Slot],
+    fixed: &[Placement],
+    opts: &NestOptions,
+    variant: usize,
+    tuning: &super::SearchTuning,
+    progress: &mut dyn FnMut(NestProgress),
+    pins: Option<Vec<Option<pinned::Pin>>>,
+) -> Result<MarkerResult> {
+    let dirs = directions(job, slots, fixed, variant)?;
+    let mut pins = pins.unwrap_or_else(|| vec![None; slots.len()]);
     // Sparrow cannot choose reflection per item. Give each physical placement
     // its own item and select normal/mirrored allocations across runs.
     let mut engine = job.clone();
+    // Sparrow's open strip reserves equal margins at both edges. Enlarge its
+    // virtual width to remove only the margins at physical fold boundaries.
+    let fold_offset = if job.fabric.layout == Layout::Tubular { job.spacing.edge_gap } else { 0.0 };
+    if job.fabric.layout != Layout::Open {
+        engine.fabric.width += job.spacing.edge_gap + fold_offset;
+    }
     engine.fabric.layout = Layout::Open;
     engine.fabric.allow_flip = false;
     engine.fabric.defects.clear();
@@ -609,17 +680,39 @@ fn run_allocated(
     engine.order = None;
     engine.match_rules.clear();
     engine.pieces.clear();
+    // The bottom half of a tube pair travels inside its partner's outline.
+    let partners: BTreeSet<usize> = pins.iter().flatten().filter_map(pinned::Pin::partner).collect();
+    let mut owner = Vec::with_capacity(slots.len());
     for (i, slot) in slots.iter().enumerate() {
-        let mut piece = cut_piece(&job.pieces[slot.piece])?;
-        piece.id = format!("__slot_{i}");
+        if partners.contains(&i) {
+            continue;
+        }
+        owner.push(i);
+        let mut piece = match &pins[i] {
+            Some(pin) => {
+                let mut piece = job.pieces[slot.piece].clone();
+                piece.outline = pin.outline()?;
+                piece.grain = None;
+                piece.fold_line = None;
+                piece.block_margin = None;
+                piece.marks.clear();
+                piece.match_points.clear();
+                piece.rotation = pinned::rotation_rule(pin);
+                piece.tilt_deg = Some(0.0);
+                piece
+            }
+            None => cut_piece(&job.pieces[slot.piece])?,
+        };
+        // The suffix tells the engine import to keep a pinned outline exact.
+        piece.id = format!("__slot_{i}{}", if pins[i].is_some() { crate::PINNED } else { "" });
         piece.flip = Some(false);
         // Every expanded engine item belongs to its private single garment.
         // Original size/bundle identity is restored after optimization.
         piece.size = None;
-        let mirrored = mirror_state(job, slot, variant);
+        let mirrored = pins[i].is_none() && mirror_state(job, slot, variant);
         piece.quantity = u32::from(!mirrored);
         piece.mirror_quantity = u32::from(mirrored);
-        if job.fabric.nap == Nap::OneWayPerBundle {
+        if job.fabric.nap == Nap::OneWayPerBundle && pins[i].is_none() {
             let base = grain_alignment_deg(piece.grain, mirrored);
             let angle =
                 (base + dirs[&slot.placement.bundle.context("slot without bundle")?]).to_radians();
@@ -636,9 +729,15 @@ fn run_allocated(
     } else {
         job.fabric.nap
     };
+    let pinned = pins.iter().any(Option::is_some);
+    if pinned {
+        pinned::calibrate(&mut engine, &mut pins, &owner)?;
+    }
     let mut options = opts.clone();
-    options.warm_start = opts.warm_start.as_ref().and_then(|warm| {
+    options.warm_start = opts.warm_start.as_ref().filter(|_| !pinned).and_then(|warm| {
         let mut result = warm.clone();
+        result.width = engine.fabric.width;
+        for pl in &mut result.placements { pl.translate[1] += fold_offset; }
         for (i, slot) in slots.iter().enumerate() {
             let pl = result.placements.iter_mut().find(|p| {
                 p.piece_id == slot.placement.piece_id
@@ -652,26 +751,55 @@ fn run_allocated(
         }
         Some(result)
     });
-    let mut result = nest_single(&engine, &options, &mut |_| {}, tuning)?;
-    for pl in &mut result.placements {
-        let i: usize = pl
-            .piece_id
-            .strip_prefix("__slot_")
-            .context("unknown engine slot")?
-            .parse()?;
-        let template = &slots.get(i).context("unknown engine slot")?.placement;
-        pl.piece_id.clone_from(&template.piece_id);
-        pl.copy = template.copy;
-        pl.bundle = template.bundle;
-        pl.layer_allocations.clone_from(&template.layer_allocations);
-    }
-    renumber(&mut result.placements, fixed);
-    checks::refresh(job, &mut result)?;
-    checks::complete(job, &result)?;
-    checks::independently_validate(job, &result)?;
+    // Restore original identities and layer assignments before exposing a layout.
+    let restore = |mut result: MarkerResult| -> Result<MarkerResult> {
+        result.width = job.fabric.width;
+        let mut partners = Vec::new();
+        for pl in &mut result.placements {
+            pl.translate[1] -= fold_offset;
+            let i: usize = pl
+                .piece_id
+                .strip_prefix("__slot_")
+                .map(|id| id.trim_end_matches(crate::PINNED))
+                .context("unknown engine slot")?
+                .parse()?;
+            let template = &slots.get(i).context("unknown engine slot")?.placement;
+            if let Some(pin) = &pins[i] {
+                let mut halves = pin.placements(slots, i, pl.rotation_deg, pl.translate).into_iter();
+                *pl = halves.next().context("pinned outline without a half")?.1;
+                pinned::snap(job, pl)?;
+                for (_, mut partner) in halves {
+                    pinned::snap(job, &mut partner)?;
+                    partners.push(partner);
+                }
+                continue;
+            }
+            pl.piece_id.clone_from(&template.piece_id);
+            pl.copy = template.copy;
+            pl.bundle = template.bundle;
+            pl.layer_allocations.clone_from(&template.layer_allocations);
+        }
+        result.placements.extend(partners);
+        renumber(&mut result.placements, fixed);
+        checks::refresh(job, &mut result)?;
+        checks::complete(job, &result)?;
+        checks::independently_validate(job, &result)?;
+        Ok(result)
+    };
+    let mut on_progress = |p: NestProgress| {
+        if let Ok(result) = restore(p.result) {
+            progress(NestProgress {
+                seconds: p.seconds,
+                length: result.length,
+                result,
+            });
+        }
+    };
+    let result = restore(nest_single(&engine, &options, &mut on_progress, tuning)?)?;
     progress(NestProgress {
         seconds: result.runtime_s,
         length: result.length,
+        result: result.clone(),
     });
     Ok(result)
 }

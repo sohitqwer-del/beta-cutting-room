@@ -1,9 +1,10 @@
 import { loadMarkerCore, type Job, type MarkerCore, type MarkerResult, type Pt } from '@beta/marker-wasm';
 import { icon } from '../icons';
 import { apiFetch, downloadFile, isDesktop } from '../transport';
+import { staticMode } from '../static-mode';
 import type { DocumentState } from '../state';
 import type { ProjectorLayout, QuickPiece, QuickWarning } from '@beta/marker-wasm';
-import { exportFile, isPractice, loadQuickEngine, mockRequested, nestAvailable, serverAvailable, nestInRounds, nestPractice, scanInWorker, type QuickEngine } from './adapter';
+import { exportFile, isPractice, loadQuickEngine, mockRequested, nestAvailable, nestInRounds, nestPractice, scanInWorker, type QuickEngine } from './adapter';
 import { ART, qicon } from './art';
 import { bounds, mmToOverlay, pathData } from './geometry';
 import { currentLanguage, pieceName, sizeName, t, warningText, type QuickKey } from './i18n';
@@ -13,6 +14,8 @@ import { installPwa, type InstallState } from './pwa';
 import { t as feedbackText } from '../feedback/i18n';
 import * as S from './state';
 import { formatWidth, metres, metresPerGarment, parseNumber, percent, savingVsUsual, toMm, WIDTH_PRESETS, widthProblem } from './units';
+import { find, byId } from '../screens';
+import { appUnit, longLength, onUnit, setAppUnit } from '../units-pref';
 
 /** Quick Marker: photo of paper pattern pieces → checked pieces → fabric and order → nest → print, chalk,
  * projector or share. Phone first (360-430 px, one hand, 48 px targets), also works on desktop.
@@ -29,7 +32,8 @@ const STEP_LABEL: Record<S.Step, QuickKey> = { start: 'title', capture: 'step_ca
 const MAX_PHOTO = 20 * 1024 * 1024;
 
 export function installQuick(host: QuickHost, content: HTMLElement): { root: HTMLElement } {
-  let state = S.initialState();
+  // One unit for the app: the width unit here is the one chosen in the top bar.
+  let state = S.setUnit(S.initialState(), appUnit());
   let engine: QuickEngine | null = null, engineProblem = '', practice = false, canNest: boolean | null = null;
   let markerCore: MarkerCore | undefined, photoCounter = 0, nestAbort: AbortController | null = null, nestTimer = 0, nestStart = 0, milestone = false;
   let install: InstallState = { canInstall: false, offline: 'unsupported' };
@@ -50,7 +54,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
   content.append(root);
   document.body.insertAdjacentHTML('beforeend', `<dialog id="q-sheet" class="q-sheet" aria-labelledby="q-sheet-title"><div class="q-sheet-body" id="q-sheet-body"></div></dialog>
     <div id="q-projector" class="q-projector" role="dialog" aria-modal="true" aria-labelledby="q-proj-title" hidden></div>`);
-  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => byId(id) as T;
   const body = $('q-body'), head = $('q-head'), sheet = $<HTMLDialogElement>('q-sheet'), proj = $('q-projector');
   const say = (text: string) => { const live = $('q-live'); live.textContent = ''; window.setTimeout(() => { live.textContent = text; }, 40); };
   const pwa = installPwa(next => { install = next; if (state.step === 'start') render(); });
@@ -67,8 +71,13 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     }
     return engine;
   }
+  /** Inch users see long lengths in yards (one unit system); the engine and saved state stay in mm and m. */
+  const yards = () => state.fabric.unit === 'inch';
+  const longText = (mm: number, digits = 2) => { const v = longLength(mm, state.fabric.unit, digits); return `${v.value} ${v.unit}`; };
+  onUnit(unit => { if (state.fabric.unit === unit) return; state = S.setUnit(state, unit); widthText = state.fabric.widthMm ? formatWidth(state.fabric.widthMm, unit) : ''; if (!root.hidden) render(); });
   const nester = async () => { if (canNest == null) canNest = await nestAvailable(apiFetch); return canNest; };
-  void loadMarkerCore().then(core => { markerCore = core; }).catch(() => { /* previews fall back to a simple transform */ });
+  let coreLoading = false;
+  const loadCore = () => { if (coreLoading) return; coreLoading = true; void loadMarkerCore().then(core => { markerCore = core; if (!root.hidden) render(); }).catch(() => { /* previews fall back to a simple transform */ }); };
 
   // ---------- Rendering ----------
   function render(focusTitle = false): void {
@@ -78,7 +87,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     body.innerHTML = ({ start: startHtml, capture: captureHtml, review: reviewHtml, order: orderHtml, nest: nestHtml, use: useHtml } as Record<S.Step, () => string>)[state.step]();
     root.dataset.step = state.step;
     if (focusTitle) { const h = root.querySelector<HTMLElement>('h1'); h?.focus({ preventScroll: true }); window.scrollTo(0, 0); }
-    else if (keep) document.getElementById(keep)?.focus({ preventScroll: true });
+    else if (keep) byId(keep)?.focus({ preventScroll: true });
     if (sheet.open) renderSheet();
   }
   function goStep(step: S.Step): void {
@@ -155,7 +164,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
       <div class="q-photo-text"><h2 id="q-ph-${photo.id}">${tx('photo_label', { n: index + 1 })}</h2>
         <p class="q-status q-${photo.status}">${status}</p>${scale}
         ${photo.error ? `<p class="error-text">${esc(photo.error)}</p>` : ''}
-        ${photo.status !== 'failed' ? `<label class="q-inline">${tx('photo_size')}<select id="q-size-${photo.id}" data-q-change="photo-size" data-id="${photo.id}">${sizeOptions(photo.size)}</select></label>` : ''}
+        ${photo.status !== 'failed' ? `<label class="q-inline">${tx('photo_size')}<select id="q-size-${photo.id}" data-q-change="photo-size" data-id="${photo.id}">${sizeOptions(photo.size)}</select></label><p class="hint q-size-hint">${tx('photo_every_size')}</p>` : ''}
       </div>
       <button type="button" class="ghost icon-btn q-remove" data-q="remove-photo" data-id="${photo.id}" aria-label="${tx('photo_remove')}: ${tx('photo_label', { n: index + 1 })}" data-tip="${tx('photo_remove')}" id="q-rm-${photo.id}">${icon('trash')}</button>
       ${warnings.length ? `<ul class="q-warnings">${groupWarnings(warnings).map(([w, n]) => { const x = warningText(w.code, w.message); return `<li>${icon('alert')}<span><strong>${esc(x.title)}${n > 1 ? ` <span class="q-times">× ${n}</span>` : ''}</strong><span>${esc(x.fix)}</span></span></li>`; }).join('')}</ul>` : ''}
@@ -280,7 +289,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
         ${r.status === 'deleted' ? `<button type="button" data-q="restore" id="q-restore">${icon('undo')}${tx('restore')}</button>` : `<button type="button" class="danger" data-q="delete" id="q-delete">${icon('trash')}${tx('delete')}</button>`}
         ${r.status === 'accepted' ? `<button type="button" class="primary" data-q="next-piece" id="q-next">${tx(nextPending() ? 'next_piece' : 'done')}</button>` : r.status === 'pending' ? `<button type="button" class="primary" data-q="accept" id="q-accept">${icon('check')}${tx(p.grain ? 'use_piece' : 'use_piece_grain')}</button>` : `<button type="button" data-q="close-sheet" id="q-done">${tx('close')}</button>`}
       </div>`;
-    if (keep) document.getElementById(keep)?.focus();
+    if (keep) byId(keep)?.focus();
   }
   const nextPending = () => S.pending(state).find(p => p.piece.id !== state.selected)?.piece.id;
   function switchRow(id: string, action: string, on: boolean, title: QuickKey, hint: QuickKey): string {
@@ -337,7 +346,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
         <p class="q-nest-state" id="q-nest-state">${running ? `<span class="q-spinner" aria-hidden="true"></span>${tx(nestAbort?.signal.aborted ? 'nest_stopping' : 'nest_running')}` : ''}</p>
         <progress id="q-nest-bar" max="${n.budgetS}" value="${Math.min(n.budgetS, elapsed).toFixed(1)}" aria-label="${tx('time')}"></progress>
         <p class="q-nest-time" id="q-nest-time">${tx('nest_elapsed', { s: Math.round(Math.min(n.budgetS, elapsed)), total: n.budgetS })}</p>
-        <div class="q-tiles"><div><span>${tx('nest_best')}</span><strong id="q-best-len">${n.bestLengthMm ? `${metres(n.bestLengthMm)} m` : '–'}</strong></div><div><span>${tx('efficiency')}</span><strong id="q-best-eff">${n.bestEfficiency != null ? `${percent(n.bestEfficiency)}%` : '–'}</strong></div></div>
+        <div class="q-tiles"><div><span>${tx('nest_best')}</span><strong id="q-best-len">${n.bestLengthMm ? longText(n.bestLengthMm) : '–'}</strong></div><div><span>${tx('efficiency')}</span><strong id="q-best-eff">${n.bestEfficiency != null ? `${percent(n.bestEfficiency)}%` : '–'}</strong></div></div>
         <div class="q-preview" id="q-preview">${n.result && n.job ? markerSvg(n.job, n.result) : `<p class="hint">${tx('nest_none_yet')}</p>`}</div>
         ${running ? `<button type="button" class="q-big" data-q="stop" id="q-stop" ${nestAbort?.signal.aborted ? 'disabled' : ''}>${icon('stop')}${tx('nest_stop')}</button>` : ''}
       </div>` : ''}`;
@@ -366,14 +375,14 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     const fake = isPractice(result);
     return `<h1 id="q-title" tabindex="-1">${tx('use_title')}</h1>${practiceNote()}${fake ? `<p class="notice warn q-notice">${icon('alert')}<span>${tx('practice_result')}</span></p>` : ''}
       <div class="q-tiles q-result">
-        <div><span>${tx('length')}</span><strong>${metres(result.length)} m</strong></div>
+        <div><span>${tx('length')}</span><strong>${longText(result.length)}</strong></div>
         <div><span>${tx('efficiency')}</span><strong>${percent(result.efficiency)}%</strong></div>
-        <div><span>${tx('per_garment')}</span><strong>${per == null ? '–' : `${per.toFixed(2)} m`}</strong><small>${tx('garments_count', { n: garments })}</small></div>
+        <div><span>${tx('per_garment')}</span><strong>${per == null ? '–' : longText(per * 1000, 2)}</strong><small>${tx('garments_count', { n: garments })}</small></div>
       </div>
       <div class="q-preview">${markerSvg(job, result)}</div>
-      <div class="q-card q-usual"><label>${tx('usual')} (m)<input id="q-usual" type="text" inputmode="decimal" value="${state.usualM ?? ''}" data-q-input="usual" placeholder="1.60" aria-describedby="q-usual-hint q-saving"></label>
+      <div class="q-card q-usual"><label>${tx('usual')} (${yards() ? 'yd' : 'm'})<input id="q-usual" type="text" inputmode="decimal" value="${state.usualM == null ? '' : Number((state.usualM / (yards() ? 0.9144 : 1)).toFixed(2))}" data-q-input="usual" placeholder="${yards() ? '1.75' : '1.60'}" aria-describedby="q-usual-hint q-saving"></label>
         <p class="hint" id="q-usual-hint">${tx('usual_hint')}</p>
-        <p id="q-saving" class="q-saving ${saving ? (saving.better ? 'ok' : 'warn') : ''}" aria-live="polite">${saving ? (saving.better ? `${icon('check-circle')}${tx('saved', { m: saving.savedM.toFixed(2), pct: percent(saving.savedPct) })}` : tx('saved_none')) : ''}</p></div>
+        <p id="q-saving" class="q-saving ${saving ? (saving.better ? 'ok' : 'warn') : ''}" aria-live="polite">${saving ? (saving.better ? `${icon('check-circle')}${tx('saved', { m: (saving.savedM / (yards() ? 0.9144 : 1)).toFixed(2), u: yards() ? t('unit_yd') : t('unit_m'), pct: percent(saving.savedPct) })}` : tx('saved_none')) : ''}</p></div>
       <h2>${tx('use_it')}</h2>
       <div class="q-use-grid">
         <div class="q-use-card"><button type="button" class="q-use" data-q="tiles" id="q-tiles">${icon('print')}<span><strong>${tx('print_tiles')}</strong><small>${tx('print_tiles_hint')}</small></span></button>
@@ -381,7 +390,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
         <button type="button" class="q-use" data-q="chalk" id="q-chalk">${qicon('chalk')}<span><strong>${tx('chalk')}</strong><small>${tx('chalk_hint')}</small></span></button>
         <button type="button" class="q-use" data-q="projector" id="q-projector-btn">${qicon('projector')}<span><strong>${tx('projector')}</strong><small>${tx('projector_hint')}</small></span></button>
         <button type="button" class="q-use" data-q="share-pdf" id="q-share-pdf">${qicon('share')}<span><strong>${tx('share_pdf')}</strong><small>${tx('share_hint')}</small></span></button>
-        <button type="button" class="q-use" data-q="share-plt" id="q-share-plt">${qicon('share')}<span><strong>${tx('share_plt')}</strong><small>${tx('plt_needs_server')}</small></span></button>
+        <button type="button" class="q-use" data-q="share-plt" id="q-share-plt">${qicon('share')}<span><strong>${tx('share_plt')}</strong></span></button>
         <button type="button" class="q-use" data-q="editor" id="q-editor">${icon('marker')}<span><strong>${tx('open_editor')}</strong></span></button>
       </div>
       <button type="button" class="ghost q-wide" data-q="restart" id="q-restart">${icon('new')}${tx('start_again')}</button>`;
@@ -434,7 +443,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     const onProgress = (p: { elapsedS: number; best: MarkerResult | null; statusLengthMm?: number | null; statusEfficiency?: number | null }) => {
       const len = p.best ? Math.min(p.best.length, p.statusLengthMm ?? Infinity) : p.statusLengthMm ?? null;
       state = S.nestProgress(state, p.elapsedS, len, p.best?.efficiency ?? p.statusEfficiency ?? null, job, p.best ?? undefined);
-      if (p.best && document.getElementById('q-preview')) $('q-preview').innerHTML = markerSvg(job, p.best);
+      if (p.best && byId('q-preview')) $('q-preview').innerHTML = markerSvg(job, p.best);
       updateNestLive();
     };
     try {
@@ -444,7 +453,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
       const best = state.nest.result;
       if (best) {
         state = { ...state, step: 'use' };
-        say(`${t('length')} ${metres(best.length)} m`);
+        say(`${t('length')} ${longText(best.length).replace(/<[^>]+>/g, '')}`);
         if (!milestone && !isPractice(best)) { milestone = true; window.dispatchEvent(new Event('beta-feedback-milestone')); }
       }
     } catch (error) {
@@ -455,10 +464,10 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
   }
   function updateNestLive(): void {
     const n = state.nest, elapsed = Math.min(n.budgetS, (performance.now() - nestStart) / 1000);
-    const bar = document.getElementById('q-nest-bar') as HTMLProgressElement | null; if (!bar) return;
+    const bar = byId('q-nest-bar') as HTMLProgressElement | null; if (!bar) return;
     bar.value = elapsed;
     $('q-nest-time').textContent = t('nest_elapsed', { s: Math.round(elapsed), total: n.budgetS });
-    $('q-best-len').textContent = n.bestLengthMm ? `${metres(n.bestLengthMm)} m` : '–';
+    $('q-best-len').textContent = n.bestLengthMm ? longText(n.bestLengthMm).replace(/<[^>]+>/g, '') : '–';
     $('q-best-eff').textContent = n.bestEfficiency != null ? `${percent(n.bestEfficiency)}%` : '–';
   }
 
@@ -485,7 +494,6 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
         await share(blob, 'marker.pdf');
       }
       if (kind === 'plt') {
-        if (!(await serverAvailable(apiFetch))) { host.message(t('plt_needs_server'), true); return; }
         await share(await exportFile(apiFetch, n.job, n.result, 'plt'), 'marker.plt');
       }
     } catch (error) { host.message(t('file_failed', { error: errorText(error) }), true); }
@@ -604,8 +612,8 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
       case 'gallery': void ready().then(e => { if (e) gallery.click(); else { render(); host.message(engineProblem, true); } }); break;
       case 'sample': void trySample(); break;
       case 'install': void pwa.install(); break;
-      case 'lang': { const select = document.querySelector<HTMLSelectElement>('#app-language'); if (select && !select.disabled) { select.value = el.dataset.lang!; select.dispatchEvent(new Event('change')); } else document.documentElement.dataset.language = el.dataset.lang!; break; }
-      case 'print-target': void apiFetch('/api/digitize/target', { method: 'POST', body: '{}', headers: { 'Content-Type': 'application/json' } }).then(async r => { if (!r.ok) throw new Error(r.status === 404 ? t('plt_needs_server') : `Server ${r.status}`); await downloadFile(await r.blob(), 'beta-a3-target.pdf'); }).catch(error => host.message(errorText(error).includes('fetch') ? t('plt_needs_server') : errorText(error), true)); break;
+      case 'lang': { const select = find<HTMLSelectElement>('#app-language'); if (select && !select.disabled) { select.value = el.dataset.lang!; select.dispatchEvent(new Event('change')); } else document.documentElement.dataset.language = el.dataset.lang!; break; }
+      case 'print-target': if (staticMode()) { host.message(t('target_needs_app'), true); break; } void apiFetch('/api/digitize/target', { method: 'POST', body: '{}', headers: { 'Content-Type': 'application/json' } }).then(async r => { if (!r.ok) throw new Error(r.status === 404 ? t('target_needs_app') : `Server ${r.status}`); await downloadFile(await r.blob(), 'beta-a3-target.pdf'); }).catch(error => host.message(errorText(error).includes('fetch') ? t('target_needs_app') : errorText(error), true)); break;
       case 'back': { const prev = state.step === 'capture' ? 'start' : S.previousStep(state.step); if (prev) { state = { ...state, step: prev === 'nest' ? 'order' : prev }; render(true); } break; }
       case 'goto': goStep(el.dataset.step as S.Step); break;
       case 'remove-photo': state = S.removePhoto(state, id); revoke(id); state = S.clearNest(state); render(); break;
@@ -621,7 +629,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
       case 'chip-no': state = S.dismissChip(state, id, el.dataset.kind as S.SuggestionKind); render(); sheet.querySelector<HTMLElement>('.q-chip-yes, #q-name')?.focus(); break;
       case 'copies': { const p = state.pieces.find(r => r.piece.id === id)?.piece; if (p) setCopies((S.isPair(p) ? (p.quantity ?? 1) : S.copies(p)) + Number(el.dataset.delta)); break; }
       case 'grain-turn': state = S.turnGrain(state, id); changed(); break;
-      case 'unit': { const unit = el.dataset.unit as 'inch' | 'cm'; state = S.setUnit(state, unit); widthText = state.fabric.widthMm ? formatWidth(state.fabric.widthMm, unit) : ''; render(); break; }
+      case 'unit': { const unit = el.dataset.unit as 'inch' | 'cm'; setAppUnit(unit); state = S.setUnit(state, unit); widthText = state.fabric.widthMm ? formatWidth(state.fabric.widthMm, unit) : ''; render(); break; }
       case 'preset': { const v = Number(el.dataset.value); state = S.setWidth(state, toMm(v, state.fabric.unit)); widthText = String(v); changed(); break; }
       case 'garments': { const size = el.dataset.arg!; state = S.setGarments(state, size, (state.garments[size] ?? 0) + Number(el.dataset.delta)); changed(); break; }
       case 'budget': state = { ...state, nest: { ...state.nest, budgetS: Number(el.dataset.s) } }; render(); break;
@@ -672,16 +680,16 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
       msg.textContent = problem ? t(`width_${problem}` as QuickKey) : `= ${(state.fabric.widthMm! / 10).toFixed(1)} cm · ${(state.fabric.widthMm! / 25.4).toFixed(1)} inch`;
       msg.classList.toggle('error-text', !!problem); el.setAttribute('aria-invalid', String(!!problem));
       root.querySelectorAll<HTMLButtonElement>('.q-preset').forEach(b => b.setAttribute('aria-pressed', String(!!state.fabric.widthMm && Math.abs(toMm(Number(b.dataset.value), state.fabric.unit) - state.fabric.widthMm) < 0.5)));
-      const make = document.getElementById('q-make'); if (make) { if (S.blocker(state, 'nest')) make.setAttribute('aria-disabled', 'true'); else make.removeAttribute('aria-disabled'); }
+      const make = byId('q-make'); if (make) { if (S.blocker(state, 'nest')) make.setAttribute('aria-disabled', 'true'); else make.removeAttribute('aria-disabled'); }
     }
     if (el.dataset.qInput === 'usual') {
-      state = { ...state, usualM: parseNumber(el.value) };
+      const usual = parseNumber(el.value); state = { ...state, usualM: usual == null ? null : usual * (yards() ? 0.9144 : 1) };
       const per = metresPerGarment(state.nest.result?.length ?? 0, S.totalGarments(state)), saving = savingVsUsual(per, state.usualM), out = $('q-saving');
       out.className = `q-saving ${saving ? (saving.better ? 'ok' : 'warn') : ''}`;
-      out.innerHTML = saving ? (saving.better ? `${icon('check-circle')}${tx('saved', { m: saving.savedM.toFixed(2), pct: percent(saving.savedPct) })}` : tx('saved_none')) : '';
+      out.innerHTML = saving ? (saving.better ? `${icon('check-circle')}${tx('saved', { m: (saving.savedM / (yards() ? 0.9144 : 1)).toFixed(2), u: yards() ? t('unit_yd') : t('unit_m'), pct: percent(saving.savedPct) })}` : tx('saved_none')) : '';
     }
   });
-  sheet.addEventListener('close', () => { const id = state.selected; state = S.select(state, null); render(); if (id) document.getElementById(`q-pc-${cssId(id)}`)?.focus(); });
+  sheet.addEventListener('close', () => { const id = state.selected; state = S.select(state, null); render(); if (id) byId(`q-pc-${cssId(id)}`)?.focus(); });
   sheet.addEventListener('click', event => { if (event.target === sheet) sheet.close(); });
   function revoke(id: string): void { for (const m of [photoUrls, overlayUrls]) { const u = m.get(id); if (u) URL.revokeObjectURL(u); m.delete(id); } }
   async function restart(): Promise<void> {
@@ -694,11 +702,11 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
   }
 
   // Language: re-render on the app switch (html[data-language]) and keep the sidebar label translated.
-  const navLabel = () => { const b = document.querySelector<HTMLElement>(`[data-screen="${QUICK_SCREEN}"] .nav-label`); if (b) { b.textContent = t('nav'); b.lang = currentLanguage(); } };
+  const navLabel = () => { const b = find<HTMLElement>(`[data-screen="${QUICK_SCREEN}"] .nav-label`); if (b) { b.textContent = t('nav'); b.lang = currentLanguage(); } };
   new MutationObserver(() => { navLabel(); if (!root.hidden) render(); if (!proj.hidden) drawProjector(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-language'] });
   window.addEventListener('beta-screen', event => {
     if ((event as CustomEvent<number>).detail !== QUICK_SCREEN) return;
-    navLabel();
+    navLabel(); loadCore();
     void ready().then(() => render()).catch(() => render());
     void nester().then(() => { if (!root.hidden) render(); });
   });

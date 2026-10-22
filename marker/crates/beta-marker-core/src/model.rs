@@ -323,6 +323,15 @@ pub struct MarkerResult {
     pub piece_area: f64,
     /// `piece_area / (width * length)`, a fraction from 0 to 1.
     pub efficiency: f64,
+    /// Useful full-copy area across physical layers, mm²; surplus is excluded.
+    #[serde(default)]
+    pub useful_piece_area: f64,
+    /// `useful_piece_area / (layers * width * length)`, fraction (layers 1 or 2).
+    #[serde(default)]
+    pub useful_yield: f64,
+    /// Physical full copies cut but not used by requested garments.
+    #[serde(default)]
+    pub surplus_copies: u64,
     /// For example `"sparrow 0.3.0"` or `"manual"`.
     pub engine: String,
     #[serde(default)]
@@ -387,6 +396,12 @@ pub struct ValidationReport {
     pub length: f64,
     pub piece_area: f64,
     pub efficiency: f64,
+    #[serde(default)]
+    pub useful_piece_area: f64,
+    #[serde(default)]
+    pub useful_yield: f64,
+    #[serde(default)]
+    pub surplus_copies: u64,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

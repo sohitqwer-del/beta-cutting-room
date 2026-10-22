@@ -24,9 +24,9 @@ export async function runEditorSmoke(){
   click('[data-ed-unplaced="0"]');fill('#ed-to-x',1100);fill('#ed-to-y',900);click('#ed-place-numeric');assert(count()===7,'numeric place with auto bump');
   click('#ed-fill');assert(count()===8,'fill gaps places final copy');
   click('#demo');
-  fill('#ed-from-x',0);fill('#ed-from-y',0);fill('#ed-to-x',3);fill('#ed-to-y',4);click('#ed-measure-numeric');assert(get('#ed-measurement').textContent==='5.000 mm','Rust ruler distance');
+  fill('#ed-from-x',0);fill('#ed-from-y',0);fill('#ed-to-x',3);fill('#ed-to-y',4);click('#ed-measure-numeric');assert(['0.5 cm','0.2 in'].includes(get('#ed-measurement').textContent),'Rust ruler distance (shown in the app unit)');
   fill('#ed-length',1700);click('#ed-set-length');assert(get('#ed-status').textContent.includes('table 1.700 m'),'length updates table efficiency');
-  fill('#ed-section-x',1600);click('#ed-section-add');assert(get('#ed-sections').textContent.includes('1600.0 mm'),'section line added');
+  fill('#ed-section-x',1600);click('#ed-section-add');assert(/Cut lines: (160 cm|62\.99 in)/.test(get('#ed-sections').textContent),'section line added');
   click('#ed-section-remove');assert(get('#ed-sections').textContent==='Cut lines: none','section removed');
   click('#demo');fill('#ed-library-name','Editor smoke original');click('#ed-library-save');
   const entries=JSON.parse(localStorage.getItem('beta-marker-library-v1')||'[]');assert(entries.some(e=>e.label==='Editor smoke original'),'finished marker library saves job and layout');

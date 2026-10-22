@@ -1,50 +1,50 @@
 /* Style flow: from a new style to a cut-ready marker. Uses the design system tokens and components (style.css).
    Imported by main.ts after style.css so it can refine shared components. 1366 x 768 first; also 1920 x 1080 and tablets. */
 
-/* ---------- Frame ---------- */
-.screen.style { max-width: none; padding: 0; display: flex; flex-direction: column; min-height: calc(100vh - var(--topbar-h)); }
-.st-steps { position: sticky; top: 0; z-index: 8; }
+/* ---------- Frame: one compact bar (Back · steps · tools · Next); the step title is the heading in the top bar ---------- */
+.screen.style { max-width: none; padding: 0; display: flex; flex-direction: column; min-height: calc(100vh - var(--topbar-h)); position: relative; }
+.st-bar { position: sticky; top: 0; z-index: 9; display: flex; align-items: center; gap: var(--sp-2); min-height: 48px; padding: 4px var(--sp-4); background: var(--surface-2); border-bottom: 1px solid var(--line); }
+.st-bar .st-steps { order: 1; flex: 1 1 auto; min-width: 0; }
+.st-back { order: 0; flex: none; gap: 6px; min-height: 36px; padding: 0 10px; color: var(--text-2); }
+.st-bar-tools { order: 2; flex: none; display: flex; align-items: center; gap: 4px; }
+.st-bar-tools .icon-btn { width: 36px; min-height: 36px; }
+.st-bar-tools details.menu > summary { min-height: 36px; padding: 4px 10px; }
+.st-next-wrap { order: 3; flex: none; position: relative; }
+.st-next { gap: 6px; min-height: 40px; padding: 0 14px 0 16px; font-size: var(--fs-s); }
 .st-steps button[aria-disabled=true] { opacity: .55; }
 .st-steps .step-no .icon { width: 14px; height: 14px; }
-.st-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--sp-2) var(--sp-5); align-items: center; padding: 8px var(--sp-5); background: var(--surface); border-bottom: 1px solid var(--line); }
-.st-title { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
-.st-title > div { min-width: 0; }
-.st-title .eyebrow { display: flex; gap: .3em; white-space: nowrap; }
-.st-style-name { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.st-title .icon-tile { width: 40px; height: 40px; flex: none; }
-.st-title h1 { font-size: var(--fs-xl); margin: 0; line-height: 1.2; }
-.st-title h1:focus { outline: none; }
-.st-head-tools { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; justify-content: flex-end; }
-.st-head-tools .segmented button { min-width: 52px; }
-.st-how-btn { gap: 6px; color: var(--accent-text); }
+.st-steps button[data-st-step] { min-height: 36px; padding: 0 10px 0 4px; gap: 6px; }
+.st-steps li + li::before { width: 10px; margin: 0 2px; }
+.st-how-btn { color: var(--accent-text); }
 .st-how-btn[aria-expanded=true] { background: var(--accent-soft); border-color: var(--accent); }
-/* How this works: one short strip under the step title. */
-.st-how { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px var(--sp-4); padding: 8px var(--sp-5); background: var(--accent-soft); border-bottom: 1px solid var(--line); font-size: var(--fs-s); }
-.st-how[hidden] { display: none; }
-.st-how-lead { grid-column: 1; margin: 0; font-weight: 650; color: var(--text); }
-.st-how ol { grid-column: 1; display: flex; flex-wrap: wrap; gap: 4px var(--sp-5); margin: 0; padding: 0; list-style: none; counter-reset: how; color: var(--text-2); }
-.st-how li { counter-increment: how; display: flex; gap: 8px; align-items: baseline; flex: 1 1 260px; max-width: 520px; }
-.st-how li::before { content: counter(how); flex: none; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-size: 11.5px; font-weight: 700; }
-.st-how > button { grid-column: 2; grid-row: 1 / span 2; }
-.st-body { flex: 1 0 auto; width: 100%; max-width: 1560px; margin: 0 auto; padding: var(--sp-4) var(--sp-5) var(--sp-5); }
-.st-dock { position: sticky; bottom: 0; z-index: 7; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--sp-3); padding: 8px var(--sp-5); background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -6px 18px rgb(16 33 26 / 7%); }
-.st-why { margin: 0; text-align: right; color: var(--warn); font-weight: 600; }
+/* Blocked Next: a short reason under the button, also read out. */
+.st-why { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; margin: 0; max-width: 340px; width: max-content; padding: 6px 10px; border: 1px solid var(--warn-line); border-radius: var(--r); background: var(--warn-bg); color: var(--warn); font-size: var(--fs-s); font-weight: 600; box-shadow: var(--shadow-2); white-space: normal; }
+.st-why:empty { display: none; }
 .st-flash { animation: st-flash .7s var(--ease); }
 @keyframes st-flash { 0%, 100% { opacity: 1; } 30% { opacity: .3; } }
+/* How this works: one compact line under the bar on a first visit (the 3 actions fold out); "?" brings it back.
+   It never covers a control. */
+.st-how { display: flex; flex-wrap: wrap; align-items: center; gap: 2px var(--sp-3); padding: 4px var(--sp-4); background: var(--accent-soft); border-bottom: 1px solid var(--line); font-size: var(--fs-s); }
+.st-how[hidden] { display: none; }
+.st-how-icon { color: var(--accent-text); }
+.st-how-lead { flex: 1 1 360px; margin: 0; font-weight: 600; color: var(--text); }
+.st-how > button { min-height: 32px; padding: 2px 10px; }
+.st-how ol { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 2px var(--sp-5); margin: 0 0 2px; padding: 0 0 0 26px; list-style: none; counter-reset: how; color: var(--text-2); }
+.st-how ol[hidden] { display: none; }
+.st-how li { counter-increment: how; display: flex; gap: 8px; align-items: baseline; flex: 1 1 260px; max-width: 520px; }
+.st-how li::before { content: counter(how); flex: none; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-size: 11.5px; font-weight: 700; }
+.st-body { flex: 1 0 auto; width: 100%; max-width: 1560px; margin: 0 auto; padding: var(--sp-3) var(--sp-4) var(--sp-5); }
 
 /* Full-window steps: the drawing and the marker fill the screen; their panels scroll on their own. */
 @media (min-width: 901px) {
   .app-shell[data-active-screen="12"] .app-main { height: 100vh; overflow: hidden; overflow: clip; }
   .app-shell[data-active-screen="12"] #content { flex: 1 1 auto; min-height: 0; overflow: auto; }
   .app-shell[data-active-screen="12"] .screen.style { min-height: 100%; }
-  .screen.style[data-step=pattern] { height: 100%; min-height: 0; }
+  .screen.style[data-step=pattern], .screen.style[data-step=marker] { height: 100%; min-height: 0; }
   .screen.style[data-step=pattern] .st-canvas { flex: 1 1 auto; min-height: 380px; }
+  .screen.style[data-step=marker] .st-body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; max-width: none; padding-bottom: var(--sp-2); }
 }
-@media (max-height: 860px) {
-  .screen.style[data-step=pattern] .st-head, .screen.style[data-step=marker] .st-head { padding-top: 5px; padding-bottom: 5px; }
-  .st-head .icon-tile { display: none; }
-  .st-how { padding-top: 6px; padding-bottom: 6px; }
-}
+@media (max-width: 1500px) { .st-back-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } .st-file-text { display: none; } }
 /* Tables grow with the page: no second scroll bar inside the page (wide tables still scroll sideways). */
 .screen.style .table-scroll { max-height: none; overflow-y: visible; }
 
@@ -101,17 +101,17 @@
 
 /* ---------- 2 Pattern: drafting canvas ---------- */
 .st-canvas { display: flex; min-height: 0; }
-.sc { display: grid; grid-template-columns: 210px minmax(0, 1fr) 276px; width: 100%; min-height: 0; background: var(--canvas-well); }
-.sc-palette { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 8px; background: var(--surface); border-right: 1px solid var(--line); }
-.sc-group { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 8px; }
-.sc-group-title { grid-column: 1 / -1; font-size: 11.5px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--text-3); margin: 2px 2px 0; }
-.sc-tool { position: relative; justify-content: flex-start; gap: 6px; min-height: 42px; padding: 4px 6px; border-color: transparent; background: transparent; font-size: 12.5px; font-weight: 600; line-height: 1.15; white-space: normal; text-align: left; box-shadow: none; }
+.sc { position: relative; display: grid; grid-template-columns: 148px minmax(0, 1fr) 272px; width: 100%; min-height: 0; background: var(--canvas-well); }
+.sc-palette { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 6px; background: var(--surface); border-right: 1px solid var(--line); }
+.sc-group { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-bottom: 6px; }
+.sc-group-title { grid-column: 1 / -1; font-size: 10.5px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--text-3); margin: 2px 2px 0; }
+.sc-tool { position: relative; flex-direction: column; justify-content: center; gap: 2px; min-height: 50px; padding: 5px 2px 4px; border-color: transparent; background: transparent; font-size: 11px; font-weight: 600; line-height: 1.1; white-space: normal; text-align: center; box-shadow: none; overflow-wrap: anywhere; }
 .sc-tool:hover { background: var(--surface-3); border-color: var(--line); }
 .sc-tool .icon { width: 20px; height: 20px; flex: none; }
-.sc-tool kbd { position: absolute; top: 2px; right: 3px; min-width: 0; padding: 0 3px; border-width: 1px; font-size: 10px; line-height: 1.3; color: var(--text-3); background: transparent; }
+.sc-tool kbd { position: absolute; top: 1px; right: 2px; min-width: 0; padding: 0 3px; border-width: 1px; font-size: 10px; line-height: 1.3; color: var(--text-3); background: transparent; }
 .sc-tool[aria-pressed=true] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 .sc-tool[aria-pressed=true] kbd { color: var(--on-accent); border-color: color-mix(in srgb, var(--on-accent) 60%, transparent); }
-.sc-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.sc-main { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .sc-bar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 4px 8px; background: var(--surface); border-bottom: 1px solid var(--line); }
 .sc-bar .icon-btn { width: 36px; min-height: 36px; }
 .sc-bar button.small { min-height: 36px; padding: 4px 10px; gap: 6px; }
@@ -174,7 +174,8 @@
 .sc-pop .check { min-height: 30px; margin: 0; font-size: var(--fs-s); }
 .sc-pop-actions { display: flex; justify-content: flex-end; gap: 6px; }
 .sc-pop-actions button { min-height: 34px; }
-.sc-foot { display: flex; align-items: center; gap: var(--sp-3); min-height: 36px; padding: 2px 10px; background: var(--surface); border-top: 1px solid var(--line); }
+/* What to do next with the current tool: a line over the bottom of the drawing (no row of its own). */
+.sc-foot { position: absolute; left: 24px; right: 0; bottom: 0; z-index: 3; display: flex; align-items: center; gap: var(--sp-3); min-height: 30px; padding: 2px 10px; background: color-mix(in srgb, var(--surface) 90%, transparent); border-top: 1px solid var(--line); pointer-events: none; }
 .sc-hint { flex: 1; display: flex; align-items: center; gap: 8px; margin: 0; font-size: var(--fs-s); color: var(--text-2); }
 .sc-hint .icon { color: var(--accent-text); }
 .sc-cursor { font-size: var(--fs-xs); color: var(--text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -298,13 +299,19 @@
 .st-empty-note strong { display: block; color: var(--text); }
 
 /* ---------- 7 Marker, 8 Cut ---------- */
-.st-marker { display: grid; gap: var(--sp-3); }
+.st-marker { display: grid; gap: var(--sp-2); }
 .st-marker-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3); }
 .st-marker-top .st-row { margin: 0; }
 .st-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; }
-.st-chips .chip { min-height: 32px; cursor: pointer; }
+.st-chips .chip { min-height: 30px; cursor: pointer; }
 .st-chips .chip:hover { border-color: var(--accent); color: var(--accent-text); }
-.st-progress { display: grid; gap: 6px; }
+/* Search progress floats over the top of the drawing, so the live marker keeps its place. */
+.st-progress { position: absolute; top: 46px; left: 50%; transform: translateX(-50%); z-index: 5; width: min(520px, calc(100% - 24px)); display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--info-line); border-radius: var(--r-l); box-shadow: var(--shadow-2); font-size: var(--fs-s); }
+.st-progress progress { flex: 1 1 100%; }
+.st-progress.inline { position: static; transform: none; width: auto; flex: 1 1 520px; flex-wrap: nowrap; padding: 2px 4px; border: 0; background: none; box-shadow: none; }
+.st-progress.inline progress { flex: 0 1 180px; }
+.st-progress-text { color: var(--text-2); font-variant-numeric: tabular-nums; }
+.st-marker-canvas.running .canvas-empty { margin-top: 110px; }
 .st-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--sp-2); }
 .st-stats > div { display: grid; gap: 2px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); box-shadow: var(--shadow-1); }
 .st-stats span { font-size: var(--fs-xs); color: var(--text-3); font-weight: 600; }
@@ -329,19 +336,44 @@
 .st-edit-hand { margin-left: auto; gap: 6px; }
 .st-focus { flex-wrap: wrap; }
 .st-focus > span:nth-child(2) { flex: 1 1 auto; }
-.st-marker-canvas { position: relative; min-height: 260px; background: var(--canvas-well); border: 1px solid var(--line); border-radius: var(--r-l); padding: var(--sp-2); }
-#st-marker-svg { display: block; width: 100%; height: clamp(200px, calc(100vh - 460px), 640px); }
+.st-marker-canvas { position: relative; min-height: 260px; background: var(--canvas-well); border: 1px solid var(--line); border-radius: var(--r-l); padding: 4px; }
+.st-marker-stage { position: relative; }
+#st-marker-svg { display: block; width: 100%; height: clamp(220px, calc(100vh - 330px), 760px); cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+#st-marker-svg:active { cursor: grabbing; }
+#st-marker-svg:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+.st-m-piece { cursor: help; }
+/* Zoom buttons over the bottom-right corner of the drawing; the key hint over the bottom-left. */
+.st-zoom { position: absolute; right: 8px; bottom: 8px; z-index: 4; display: flex; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-1); }
+.st-zoom .icon-btn { width: 36px; min-height: 36px; border-color: transparent; }
+.st-marker-keys { position: absolute; left: 8px; bottom: 8px; z-index: 3; margin: 0; max-width: calc(100% - 150px); padding: 3px 8px; border-radius: var(--r-s); background: color-mix(in srgb, var(--surface) 86%, transparent); color: var(--text-3); font-size: var(--fs-xs); pointer-events: none; }
+/* Piece details on hover or tap. */
+.st-pinfo { position: absolute; z-index: 6; min-width: 170px; max-width: 260px; padding: 8px 10px; background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r); box-shadow: var(--shadow-2); font-size: var(--fs-s); pointer-events: none; }
+.st-pinfo strong { display: block; margin-bottom: 4px; }
+.st-pinfo dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 0; }
+.st-pinfo dl > div { display: contents; }
+.st-pinfo dt { color: var(--text-3); }
+.st-pinfo dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+/* Piece name and size on the marker: dark text with a light halo, sized for the zoom (font size set per label). */
+.st-m-labels text { fill: var(--piece-text); font-family: var(--font); font-weight: 650; paint-order: stroke; stroke: color-mix(in srgb, var(--paper) 80%, transparent); stroke-width: .25em; stroke-linejoin: round; pointer-events: none; }
+.st-m-labels .d { font-weight: 600; fill: var(--text-2); }
+.st-key-text { font-style: normal; font-size: 11px; font-weight: 700; color: var(--text-2); }
 /* Marker step: the drawing takes the height that is left, so the stats stay in view at 1366 x 768. */
 @media (min-width: 901px) {
   .screen.style[data-step=marker] .st-body { display: flex; flex-direction: column; }
   .screen.style[data-step=marker] .st-marker { flex: 1 1 auto; display: flex; flex-direction: column; }
   .screen.style[data-step=marker] .st-marker-canvas { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 240px; }
-  .screen.style[data-step=marker] #st-marker-svg { flex: 1 1 0; height: auto; min-height: 180px; max-height: 760px; }
+  .screen.style[data-step=marker] .st-marker-stage { flex: 1 1 0; min-height: 180px; display: flex; flex-direction: column; }
+  .screen.style[data-step=marker] #st-marker-svg { flex: 1 1 0; height: auto; min-height: 180px; max-height: none; }
 }
-.st-marker-canvas .st-layers { padding: 0 4px 4px; gap: var(--sp-3); }
-.st-note { display: flex; align-items: center; gap: 8px; margin: 0; padding: 6px 12px; font-size: var(--fs-s); }
-.st-marker .st-stats > div { padding: 6px 12px; }
-.st-marker .st-stats strong { font-size: var(--fs-l); }
+.st-marker-canvas .st-layers { padding: 0 6px 2px; gap: 2px var(--sp-3); }
+.st-marker-canvas .st-layers .check { min-height: 32px; font-size: var(--fs-s); }
+.st-note { display: flex; align-items: center; gap: 8px; margin: 0; padding: 4px 12px; font-size: var(--fs-s); }
+/* Numbers in one slim row under the marker. */
+.st-marker .st-stats { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px; }
+.st-marker .st-stats > div { padding: 4px 10px; box-shadow: none; grid-template-columns: 1fr; gap: 0; }
+.st-marker .st-stats span { font-size: 11.5px; }
+.st-marker .st-stats strong { font-size: var(--fs-m); line-height: 1.3; }
+.st-marker .st-stats.live > div { border-style: dashed; }
 .st-marker-canvas .canvas-empty { position: static; transform: none; margin: var(--sp-6) auto; }
 .st-m-fabric { fill: var(--paper); stroke: var(--paper-edge); stroke-width: 1px; vector-effect: non-scaling-stroke; }
 .st-m-fold { stroke: var(--fold); vector-effect: non-scaling-stroke; }
@@ -367,33 +399,54 @@
 .action-card.style-card .icon-tile { background: var(--accent); color: var(--on-accent); }
 
 /* ---------- Responsive and touch ---------- */
+/* Below 1500 px the inspector floats over the right of the drawing: it opens when something is selected or with the
+   panel button, and closes with its close button. The drawing keeps the full width. */
+.sc-insp-toggle, .sc-insp-close { display: none; }
+@media (min-width: 901px) and (max-width: 1499px) {
+  .sc { grid-template-columns: 148px minmax(0, 1fr); }
+  .sc-inspector { position: absolute; top: 52px; right: 10px; bottom: 40px; z-index: 6; width: 290px; height: auto; max-height: calc(100% - 92px); border: 1px solid var(--line); border-radius: var(--r-l); box-shadow: var(--shadow-3); }
+  .sc[data-insp=closed] .sc-inspector { display: none; }
+  .sc-insp-toggle { display: inline-flex; }
+  .sc-insp-close { display: inline-flex; position: absolute; top: 8px; right: 8px; width: 32px; min-height: 32px; z-index: 1; }
+  .sc-inspector .sc-tabs { margin-right: 36px; }
+}
 @media (max-width: 1280px) {
-  .sc { grid-template-columns: 196px minmax(0, 1fr) 248px; }
   .st-grid.grade, .st-grid.gaps { grid-template-columns: minmax(0, 1fr); }
 }
 /* Step bar: when the names do not fit (narrow window or long language), the other steps show their number only;
    the name stays in the tooltip and for screen readers. */
 .st-steps.compact button[data-st-step]:not([aria-current]) .step-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.st-steps.compact button[data-st-step]:not([aria-current]) { padding: 0 6px; }
+.st-steps.compact button[data-st-step]:not([aria-current]) { padding: 0 4px; }
 @media (max-width: 1240px) {
-  .st-how-btn span, .st-edit-hand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .st-edit-hand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 @media (max-width: 1100px) {
   .st-grid.two { grid-template-columns: minmax(0, 1fr); }
-  .sc { grid-template-columns: 172px minmax(0, 1fr) 232px; }
-  .sc-group { grid-template-columns: 1fr; }
   .sc-snap-word { display: none; }
 }
+/* Phones and small tablets: steps on top (they scroll sideways), Back and Next in a bar at the bottom for the thumb. */
 @media (max-width: 900px) {
+  .st-bar { flex-wrap: wrap; padding: 4px var(--sp-2); }
+  .st-bar .st-steps { order: 1; flex: 1 1 0; }
+  .st-bar-tools { order: 2; }
+  /* Back and Next live in the sticky bar (its stacking level is 9), so the strip behind them stays below 9. */
+  .st-back, .st-next-wrap { position: fixed; bottom: 8px; z-index: 31; }
+  .st-back { left: 8px; min-height: 48px; background: var(--surface); border: 1px solid var(--line-strong); }
+  .st-next-wrap { right: 8px; }
+  .st-next { min-height: 48px; }
+  .st-why { top: auto; bottom: calc(100% + 6px); }
+  .screen.style::after { content: ""; position: fixed; left: 0; right: 0; bottom: 0; height: 64px; z-index: 8; background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -6px 18px rgb(16 33 26 / 7%); }
+  .screen.style { padding-bottom: 72px; }
   .sc { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(420px, 70vh) auto; }
   .sc-palette { border-right: 0; border-bottom: 1px solid var(--line); display: flex; overflow-x: auto; gap: 4px; }
   .sc-group { display: flex; margin: 0; }
   .sc-group-title { display: none; }
-  .sc-tool { flex-direction: column; min-width: 72px; text-align: center; font-size: 11px; }
+  .sc-tool { min-width: 64px; }
   .sc-inspector { border-left: 0; border-top: 1px solid var(--line); }
+  .sc-foot { position: static; }
   .st-choices { grid-template-columns: repeat(3, minmax(90px, 1fr)); }
   .st-match-pick { grid-template-columns: minmax(0, 1fr); }
-  .st-body, .st-dock, .st-head { padding-left: var(--sp-3); padding-right: var(--sp-3); }
+  .st-body { padding-left: var(--sp-3); padding-right: var(--sp-3); }
 }
 @media (pointer: coarse) {
   .sc-tool { min-height: 48px; }
@@ -403,9 +456,9 @@
   .st-stepper .icon-btn.small, .sc-stepper .icon-btn { width: 44px; min-height: 44px; }
   .st-chips .chip { min-height: 44px; }
 }
-@media print { .st-steps, .st-dock, .st-head-tools, .sc-palette, .sc-bar, .sc-inspector { display: none !important; } }
-/* Messages sit above the Back/Next dock so they never cover the main action. */
-.app-shell[data-active-screen="12"] .toast-region { bottom: 72px; }
+@media print { .st-bar, .st-how, .sc-palette, .sc-bar, .sc-inspector, .sc-foot { display: none !important; } }
+/* Phones: messages sit above the Back/Next bar so they never cover the main action. */
+@media (max-width: 900px) { .app-shell[data-active-screen="12"] .toast-region { bottom: 76px; } }
 .st-loading { display: flex; align-items: center; gap: 10px; margin: var(--sp-3) 0 0; color: var(--text-2); font-weight: 600; }
 .st-spinner { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid var(--line-strong); border-top-color: var(--accent); animation: st-spin .9s linear infinite; }
 @keyframes st-spin { to { transform: rotate(360deg); } }
@@ -420,3 +473,26 @@
 .st-fields > .st-field:has(#st-info-name) { grid-column: span 2; }
 #st-needs-server { display: flex; gap: 6px; align-items: flex-start; }
 #st-needs-server .icon { flex: none; width: 16px; height: 16px; margin-top: 2px; }
+/* ---------- Spec sheet (points of measure) and review after a change of pieces ---------- */
+.st-spec-card { margin-top: var(--sp-4); }
+.st-spec-bar { align-items: center; margin: 0 0 var(--sp-2); }
+.st-spec-sum { font-size: var(--fs-s); font-weight: 600; color: var(--text-2); }
+.st-spec th, .st-spec td { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.st-spec td { text-align: right; }
+.st-spec .st-spec-base { background: color-mix(in srgb, var(--accent-soft) 70%, transparent); }
+.st-spec .st-bad { color: var(--danger); font-weight: 650; }
+.st-pass, .st-fail { display: inline-block; margin-left: 6px; font-weight: 800; }
+.st-pass { color: var(--ok); } .st-fail { color: var(--danger); }
+.st-pom summary { min-height: 0; font-weight: 650; white-space: normal; }
+.st-pom p { margin: 4px 0 0; max-width: 46ch; font-weight: 400; font-size: var(--fs-xs); color: var(--text-2); white-space: normal; }
+.st-spec-notes { margin: var(--sp-2) 0 0; padding-left: 20px; }
+.st-review { display: flex; gap: var(--sp-3); align-items: flex-start; margin: 0 0 var(--sp-3); }
+.st-review > .icon { flex: none; margin-top: 2px; }
+.st-review p { margin: 4px 0; }
+.st-piece-tabs small { font-weight: 500; color: var(--warn); }
+.sc-piece-list li.construction { opacity: .75; }
+.sc-construction { margin: 4px 0; color: var(--warn); border-color: var(--warn-line); background: var(--warn-bg); }
+/* Folded/tube lays: footprint efficiency is the second figure after useful yield (fold7). */
+.st-stats > div.secondary strong { font-size: var(--fs-m); font-weight: 600; color: var(--text-2); }
+.st-stats abbr { text-decoration: none; cursor: help; }
+.st-fold-edge .hint { display: block; margin-top: 2px; }

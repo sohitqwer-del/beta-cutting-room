@@ -149,6 +149,9 @@ impl Proposer {
         normalized.length = report.length;
         normalized.piece_area = report.piece_area;
         normalized.efficiency = report.efficiency;
+        normalized.useful_piece_area = report.useful_piece_area;
+        normalized.useful_yield = report.useful_yield;
+        normalized.surplus_copies = report.surplus_copies;
         let incumbent = &normalized;
         let job = effective_job(source);
         check_supported(&job)?;
@@ -365,6 +368,9 @@ impl Proposer {
             length: metrics.length,
             piece_area: metrics.piece_area,
             efficiency: metrics.efficiency,
+            useful_piece_area: metrics.useful_piece_area,
+            useful_yield: metrics.useful_yield,
+            surplus_copies: metrics.surplus_copies,
             engine: format!("experimental raster / {}", stats.backend),
             seed: None,
             runtime_s: started.elapsed().as_secs_f64(),

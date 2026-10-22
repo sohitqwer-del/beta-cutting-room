@@ -1,6 +1,7 @@
 import { loadPatternCore } from '@beta/marker-wasm';
+import { find } from './screens';
 /** Original public synthetic geometry. Runs against the local app's real forms. */
-const get = s => { const e = document.querySelector(s); if (!e) throw new Error(`Missing ${s}`); return e; };
+const get = s => { const e = find(s); if (!e) throw new Error(`Missing ${s}`); return e; };
 const wait = async test => { for (let i = 0; i < 200; i++) { if (test()) return; await new Promise(r => setTimeout(r, 50)); } throw new Error(`Timed out: ${get('#pd-status').textContent}`); };
 const ready = () => wait(() => !get('#pattern-workbench').hasAttribute('aria-busy'));
 const saved = () => JSON.parse(localStorage.getItem('beta-cutting-room-v1')).document;

@@ -31,6 +31,48 @@ pub fn nest_with_rules(job: &Job, opts: &NestOptions) -> Result<MarkerResult> {
     nest_with_shade_search(job, opts, 1)
 }
 
+/// Publish only complete candidates checked against the original matching job.
+/// Shade-band subjobs cannot be published as whole markers; they report at completion.
+pub fn nest_with_rules_and_progress(
+    job: &Job,
+    opts: &NestOptions,
+    mut callback: impl FnMut(beta_marker_nest::NestProgress),
+) -> Result<MarkerResult> {
+    if !needs_rules(job) {
+        return beta_marker_nest::nest_with_progress(job, opts, callback);
+    }
+    let started = Instant::now();
+    checks::check_input(job, opts)?;
+    let effective = beta_marker_core::rules::effective_job(job);
+    let mut best = f64::INFINITY;
+    let mut emit = |mut result: MarkerResult| {
+        if result.length < best
+            && beta_marker_core::validate(job, &result).ok
+            && match_errors(job, &result).is_empty()
+        {
+            best = result.length;
+            result.runtime_s = started.elapsed().as_secs_f64();
+            callback(beta_marker_nest::NestProgress {
+                seconds: result.runtime_s,
+                length: result.length,
+                result,
+            });
+        }
+    };
+    let mut result = if effective.fabric.shade.is_some() {
+        nest_with_rules(job, opts)?
+    } else {
+        nest_matching_with_progress(&effective, opts, &mut emit)?
+    };
+    ensure!(
+        beta_marker_core::validate(job, &result).ok && match_errors(job, &result).is_empty(),
+        "Matching result failed independent validation"
+    );
+    result.runtime_s = started.elapsed().as_secs_f64();
+    emit(result.clone());
+    Ok(result)
+}
+
 /// Try alternative whole-bundle shade assignments, then refine the best checked one.
 /// The probes share 35% of the budget; refinement receives the remaining wall time.
 pub fn nest_with_shade_search(
@@ -107,6 +149,14 @@ fn identity(pl: &Placement) -> (&str, bool, u32) {
 }
 
 fn nest_matching(job: &Job, opts: &NestOptions) -> Result<MarkerResult> {
+    nest_matching_with_progress(job, opts, &mut |_| {})
+}
+
+fn nest_matching_with_progress(
+    job: &Job,
+    opts: &NestOptions,
+    callback: &mut dyn FnMut(MarkerResult),
+) -> Result<MarkerResult> {
     let started = Instant::now();
     // A bounded setup allowance keeps sub-second interactive requests useful.
     // Optimization still receives only the remaining requested time.
@@ -177,6 +227,9 @@ fn nest_matching(job: &Job, opts: &NestOptions) -> Result<MarkerResult> {
     } else {
         None
     };
+    if let Some(candidate) = &snapped {
+        callback(candidate.clone());
+    }
     let fixed = if let Some(candidate) = &snapped {
         candidate
             .placements
@@ -193,7 +246,14 @@ fn nest_matching(job: &Job, opts: &NestOptions) -> Result<MarkerResult> {
     // The snapped layout is already complete and checked. Keep it available
     // while bounded fixed-piece compaction searches for a shorter marker.
     finish_opts.warm_start = snapped.clone();
-    let mut result = beta_marker_nest::nest(&free_job, &finish_opts)?;
+    let mut result = beta_marker_nest::nest_with_progress(&free_job, &finish_opts, |p| {
+        let mut result = p.result;
+        assign_bundles(job, &mut result.placements);
+        // Never leak the unmatched baseline or a partially solved bundle.
+        if beta_marker_core::validate(job, &result).ok && match_errors(job, &result).is_empty() {
+            callback(result);
+        }
+    })?;
     assign_bundles(job, &mut result.placements);
     let expected: BTreeMap<_, _> = finish_opts.fixed.iter().map(|p| (identity(p), p)).collect();
     ensure!(
@@ -233,4 +293,5 @@ fn refresh(job: &Job, result: &mut MarkerResult) {
     result.length = m.length;
     result.piece_area = m.piece_area;
     result.efficiency = m.efficiency;
+    m.apply(result);
 }

@@ -1,6 +1,6 @@
 [package]
 name = "beta-cutting-room"
-version = "0.6.0"
+version = "0.7.0"
 edition = "2024"
 license = "Apache-2.0"
 description = "Offline BETA Cutting Room desktop"
@@ -30,6 +30,7 @@ beta-marker-match = { path = "../../../crates/beta-marker-match" }
 beta-marker-plan = { path = "../../../crates/beta-marker-plan" }
 beta-marker-roll = { path = "../../../crates/beta-marker-roll" }
 beta-marker-cutroom = { path = "../../../crates/beta-marker-cutroom" }
+beta-marker-api = { path = "../../../crates/beta-marker-api" }
 beta-pattern-core = { path = "../../../../pattern/crates/beta-pattern-core" }
 beta-pattern-digitize = { path = "../../../../pattern/crates/beta-pattern-digitize" }
 

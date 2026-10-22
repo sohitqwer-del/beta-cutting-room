@@ -5,7 +5,8 @@ describe('desktop transport', () => {
  it('explains server-only features locally in a static build without a network request', async () => {
   vi.stubEnv('VITE_BETA_STATIC', '1'); vi.stubGlobal('window', {});
   const fetch = vi.fn(); vi.stubGlobal('fetch', fetch);
-  const response = await apiFetch('/api/plan', { method: 'POST', body: '{}' });
+  // Cut plans now run in the browser; only the board-photo digitizer still needs a server.
+  const response = await apiFetch('/api/digitize', { method: 'POST', body: '{}' });
   expect(response.status).toBe(503);
   expect((await response.json() as {error:string}).error).toContain('desktop app');
   expect(fetch).not.toHaveBeenCalled();

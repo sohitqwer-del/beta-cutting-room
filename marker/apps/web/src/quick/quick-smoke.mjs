@@ -1,9 +1,10 @@
+import { find } from '../screens';
 /** Quick Marker smoke. Run in the Vite app opened at `?quick-mock=1#/quick` (practice engine), or without
  * `quick-mock` once the Rust Quick Marker API is merged (then step "sample" still uses the practice photos).
  *   const s = await import('/src/quick/quick-smoke.mjs'); await s.runQuickSmoke();
  * Or one step at a time (the headless screenshot runner does this): await s.runStep('review').
  * Uses only visible controls and DOM text. Nesting uses the local Rust server when it answers. */
-const get = s => { const e = document.querySelector(s); if (!e) throw new Error(`Quick smoke: missing ${s}`); return e; };
+const get = s => { const e = find(s); if (!e) throw new Error(`Quick smoke: missing ${s}`); return e; };
 const all = s => Array.from(document.querySelectorAll(s));
 const click = s => get(s).click();
 const tick = (ms = 60) => new Promise(r => setTimeout(r, ms));
@@ -78,6 +79,8 @@ export const STEPS = {
   },
   async order() {
     click('#q-to-order'); await until(() => step() === 'order', 'order step');
+    // One app unit (0.7): the app starts in cm, so switch to inch for the inch presets.
+    click('#q-unit-inch'); await tick();
     click('[data-q="preset"][data-value="58"]'); await tick();
     assert(get('#q-width').value === '58', 'preset fills width');
     click('#q-unit-cm'); await tick();

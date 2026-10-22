@@ -5,7 +5,7 @@ use crate::model::*;
 use crate::rules::{bundle_sizes, bundle_layer_copies, flip_allowed, placement_bundles, placed_outline};
 use std::collections::{BTreeMap, HashMap};
 
-pub(super) fn layers(job: &Job, piece: &Piece, pl: &Placement, report: &mut ValidationReport) {
+pub(super) fn layers(job: &Job, piece: &Piece, pl: &Placement, interchangeable: bool, report: &mut ValidationReport) {
     if pl.layer_allocations.is_empty() {
         return;
     }
@@ -20,7 +20,7 @@ pub(super) fn layers(job: &Job, piece: &Piece, pl: &Placement, report: &mut Vali
         // A fold line declares geometric symmetry, not optional face-down cutting.
         // Its two full layer copies are interchangeable; asymmetric pieces still
         // require the physical normal/mirrored split unless flipping is allowed.
-        valid &= layer.mirrored == (index == 1) || flip_allowed(job, piece) || piece.fold_line.is_some();
+        valid &= layer.mirrored == (index == 1) || interchangeable;
     }
     valid &= useful > 0
         && pl.bundle == pl.layer_allocations.iter().flatten().next().map(|a| a.bundle);

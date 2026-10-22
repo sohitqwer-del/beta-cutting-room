@@ -18,6 +18,7 @@ beta-marker-match.workspace = true
 beta-marker-plan.workspace = true
 beta-marker-roll.workspace = true
 beta-marker-cutroom.workspace = true
+beta-marker-api.workspace = true
 beta-marker-queue.workspace = true
 anyhow.workspace = true
 serde.workspace = true

@@ -38,9 +38,9 @@ pub struct Args {
     /// Garments per size, e.g. S=1,M=2.
     #[arg(long)]
     ratio: Option<String>,
-    /// Split every even Quantity N into N/2 normal and N/2 mirrored copies.
-    #[arg(long)]
-    pairs: bool,
+    /// DXF even quantities default to left/right pairs; use --pairs=false for same-hand copies.
+    #[arg(long, num_args = 0..=1, default_missing_value = "true")]
+    pairs: Option<bool>,
     /// Job name (defaults to the input file stem).
     #[arg(long)]
     name: Option<String>,
@@ -131,12 +131,12 @@ pub fn run(args: Args) -> Result<()> {
     });
     let opts = ImportOptions {
         units,
-        pairs: args.pairs,
+        pairs: args.pairs.unwrap_or(true),
     };
     let (mut report, mut imported_result) = match format.as_str() {
         "plt" | "hpgl" => {
             ensure!(
-                extra.rules.is_none() && args.ratio.is_none() && !args.pairs,
+                extra.rules.is_none() && args.ratio.is_none() && args.pairs != Some(true),
                 "PLT counts come from plotted copies; --rules, --ratio and --pairs require DXF"
             );
             ensure!(
@@ -167,6 +167,7 @@ pub fn run(args: Args) -> Result<()> {
                     dialect: "hpgl".into(),
                     units: Units::Mm,
                     warnings: imported.warnings,
+                    pairs_assumed: false,
                 },
                 Some(imported.result),
             )
@@ -283,10 +284,7 @@ pub fn run(args: Args) -> Result<()> {
         result
             .placements
             .retain(|pl| job.pieces.iter().any(|p| p.id == pl.piece_id));
-        let m = beta_marker_core::compute_metrics(&job, &result.placements);
-        result.length = m.length;
-        result.piece_area = m.piece_area;
-        result.efficiency = m.efficiency;
+        beta_marker_core::compute_metrics(&job, &result.placements).apply(result);
         result.warnings = report.warnings.clone();
     }
     let issues = check_job(&job);

@@ -1,6 +1,6 @@
 {
   "name": "@beta/marker-wasm",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Typed offline Rust WASM bindings for BETA Marker",
   "license": "Apache-2.0",
   "type": "module",
@@ -13,6 +13,7 @@
   "scripts": {
     "build:wasm": "node scripts/build-wasm.mjs",
     "typecheck": "tsc -p tsconfig.json",
-    "build:pattern-wasm": "node scripts/build-pattern-wasm.mjs"
+    "build:pattern-wasm": "node scripts/build-pattern-wasm.mjs",
+    "build:cutroom-wasm": "node scripts/build-cutroom-wasm.mjs"
   }
 }

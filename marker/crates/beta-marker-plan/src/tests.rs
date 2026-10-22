@@ -349,3 +349,53 @@ fn simon_real_plans() -> Result<()> {
     }
     Ok(())
 }
+
+#[test]
+fn folded_lays_count_plies_as_layers_and_passes_as_lengths() {
+    // One meaning of "ply": a fabric layer. A folded pass lays two plies.
+    let mut order = simon_order(false);
+    order.job.fabric.layout = beta_marker_core::Layout::Folded;
+    order.max_plies = 41;
+    assert_eq!(order.plies_per_pass(), 2);
+    assert_eq!(
+        order.max_passes(),
+        20,
+        "odd ply limits round down to whole passes"
+    );
+    let opts = PlanOptions {
+        end_allowance_mm: 10.0,
+        ..Default::default()
+    };
+    let c = table(&[(&[1], 1000.0)]);
+    let p = assemble(&order, &opts, &["S".into()], &c, &[(0, 20)], true, vec![]);
+    let lay = &p.lays[0];
+    assert_eq!((lay.passes, lay.plies), (20, 40));
+    assert_eq!(p.planned["S"], 20, "garments are ratio x passes");
+    assert!(
+        (lay.fabric_m - 20.4).abs() < 1e-9,
+        "fabric is length x passes"
+    );
+    // A v1 order counted passes in max_plies; it keeps that meaning.
+    order.format = CUT_ORDER_FORMAT_V1.into();
+    assert_eq!(order.max_passes(), 41);
+    // Folded fabric cannot make a lay of one ply.
+    order.format = CUT_ORDER_FORMAT.into();
+    order.max_plies = 1;
+    let error = validate_input(&order, &opts).expect_err("one ply on folded fabric");
+    assert!(error.to_string().contains("two plies"));
+    // Open fabric: plies and passes are the same number.
+    order.job.fabric.layout = beta_marker_core::Layout::Open;
+    assert_eq!(order.max_passes(), 1);
+}
+
+#[test]
+fn v1_plan_lays_read_their_plies_as_passes() {
+    let v1 = r#"{"ratio":{"M":2},"plies":12,"marker_length_mm":1000.0,"efficiency":0.8,"fabric_m":12.0}"#;
+    let lay: Lay = serde_json::from_str(v1).expect("v1 lay");
+    assert_eq!((lay.plies, lay.passes), (12, 12));
+    let v2 = r#"{"ratio":{"M":2},"plies":24,"passes":12,"marker_length_mm":1000.0,"efficiency":0.8,"fabric_m":12.0}"#;
+    let lay: Lay = serde_json::from_str(v2).expect("v2 lay");
+    assert_eq!((lay.plies, lay.passes), (24, 12));
+    let round_trip: Lay = serde_json::from_str(&serde_json::to_string(&lay).unwrap()).unwrap();
+    assert_eq!((round_trip.plies, round_trip.passes), (24, 12));
+}

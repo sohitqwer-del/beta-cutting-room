@@ -5,7 +5,16 @@ import { bbox } from '@beta/marker-wasm/geometry';
 import type { DocumentState } from './state';
 import { readDocument } from './state';
 import { icon } from './icons';
+import { isDesktop } from './transport';
+import { staticMode } from './static-mode';
+import { localStore } from './browser-store';
+import { PLAN_PROGRESS_EVENT, stopBrowserPlan } from './browser-cutroom';
 import { clampDefectPoint, compareLengths, defectZone, nestPayload, planErrors, planPayload, planStatus, rectangleDefect, type Comparison, type PlanForm } from './workflows';
+import { byId, find, findAll, park, unpark } from './screens';
+import { bySize } from './sizes';
+import { PASS_TIP } from './plies';
+import { splitNotes, technicalDetailsHtml } from './engine-notes';
+import { FOLD_EDGE_PREFIX, FOLD_EDGE_TEXT, FOOTPRINT_TIP, foldEdgeWarning, markerYield, YIELD_TIP } from './yield';
 
 export interface Editor {
   get(): DocumentState; core(): MarkerCore | undefined; busy(): boolean;
@@ -18,6 +27,7 @@ const number = (id: string, label: string, value: number | null | undefined, min
 const errorText = (e: unknown): string => e instanceof Error ? e.message : String(e);
 /** Explain search limits without exposing engine calibration diagnostics. */
 function planMessage(value: string): string {
+  if (value.startsWith(FOLD_EDGE_PREFIX)) return `${FOLD_EDGE_TEXT} (${value})`;
   if (value.startsWith('Budget calibration')) return 'The planner compared short and longer searches. It kept the best validated fabric total.';
   if (value.startsWith('Final comparison covers')) return 'The final search checked selected plans. Other size ratios may use less fabric.';
   const evaluated = /^Evaluated (\d+) real markers/.exec(value);
@@ -25,11 +35,11 @@ function planMessage(value: string): string {
 }
 
 const check = (id: string, label: string, enabled: boolean): string => `<label class="check"><input id="${id}" type="checkbox" ${enabled ? 'checked' : ''}>${label}</label>`;
-const sizeNames = (job: Job): string[] => [...new Set(job.pieces.flatMap(p => p.size ? [p.size] : []))].sort();
+const sizeNames = (job: Job): string[] => [...new Set(job.pieces.flatMap(p => p.size ? [p.size] : []))].sort(bySize);
 
 /** Cutting-room panels. All packing, garment rules and validation call Rust. */
 export function installFeatures(editor: Editor) {
-  const $ = <T extends Element = HTMLElement>(selector: string): T => document.querySelector<T>(selector)!;
+  const $ = <T extends Element = HTMLElement>(selector: string): T => find<T>(selector)!;
   const n = (id: string): number => Number($<HTMLInputElement>(`#${id}`).value);
   const checked = (id: string): boolean => $<HTMLInputElement>(`#${id}`).checked;
   let pieceIndex = 0, mode: 'none' | 'rectangle' | 'polygon' = 'none', corners: Pt[] = [];
@@ -38,23 +48,23 @@ export function installFeatures(editor: Editor) {
   let colourByBundle = false;
   let cursor: Pt = [0, 0];
   $('.filebar').insertAdjacentHTML('afterend', `<nav class="screen-tabs" aria-label="Workspace screens">${[['Pattern',4],['Digitize',5],['Editor',0],['Cut plan',1],['Rolls',6],['Bundles',7],['Compare',2],['Help',3]].map(([s,i]) => `<button data-screen="${i}" aria-pressed="${i === 0}" aria-controls="${i === 0 ? 'editor-screen' : `screen-${i}`}">${s}</button>`).join('')}</nav>`);
-  $('aside').insertAdjacentHTML('beforeend', '<section id="fabric-v2" class="v2-panel"></section><section id="piece-v2" class="v2-panel"></section>');
+  $('#setup-panel').insertAdjacentHTML('beforeend', '<section id="fabric-v2" class="v2-panel"></section><section id="piece-v2" class="v2-panel"></section>');
   $('.panel-heading').insertAdjacentHTML('afterend', '<nav class="settings-tabs" aria-label="Editor settings"><button type="button" data-settings="job" aria-pressed="true">Basics</button><button type="button" data-settings="fabric" aria-pressed="false">Fabric rules</button><button type="button" data-settings="piece" aria-pressed="false">Piece rules</button></nav>');
   $('#fabric-v2').hidden = true; $('#piece-v2').hidden = true;
-  document.querySelectorAll<HTMLButtonElement>('[data-settings]').forEach(button => button.onclick = () => {
+  findAll<HTMLButtonElement>('[data-settings]').forEach(button => button.onclick = () => {
     const tab = button.dataset.settings;
     // The Nest dock stays visible on every tab.
     for (const selector of ['#job-form', '.import-settings']) $(selector).hidden = tab !== 'job';
     $('#fabric-v2').hidden = tab !== 'fabric'; $('#piece-v2').hidden = tab !== 'piece';
-    document.querySelectorAll<HTMLButtonElement>('[data-settings]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
-    $('aside').scrollTop = 0;
+    findAll<HTMLButtonElement>('[data-settings]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+    $('#setup-panel').scrollTop = 0;
   });
   $('.workspace').insertAdjacentHTML('afterend', `
     <section id="screen-1" class="screen" hidden><div class="screen-head"><div><h1>Cut plan</h1><p>Enter garments to cut. One lay is one marker spread in several fabric layers (plies).</p></div></div>
       <form id="plan-form" class="card plan-card"><h2 class="section-title"><span class="step-badge" aria-hidden="true">1</span>Garments to cut</h2><div id="plan-quantities" class="fields size-grid"></div>
-      <h2 class="section-title"><span class="step-badge" aria-hidden="true">2</span>Lay limits</h2><div class="fields plan-fields">${number('max-plies','Max plies per lay',50,1,'1')}${number('max-garments','Max garments per marker',4,1,'1')}</div>
-      <details class="advanced"><summary>More options: over-cut, search time, end allowance, cost</summary><div class="fields plan-fields">${number('overcut','Allowed over-cut (%)',0)}${number('plan-time','Time per marker (seconds)',5,0.1)}${number('plan-final-time','Final search per ratio (seconds)',0)}${number('end-allowance','Allowance at each end (mm)',0)}${number('lay-cost','Cost per lay (INR)',0)}</div><p class="hint">Final search 0 skips the longer search. End allowance is added at both ends of every ply. Lay cost is an estimate for comparing plans.</p></details>
-      <div class="form-actions"><button id="make-plan" class="primary large" type="submit">${icon('plan')}Make cut plan</button><p id="plan-error" role="status"></p></div></form><div id="plan-result" aria-live="polite" data-empty="No cut plan yet. Enter the garments to cut for each size, then choose Make cut plan."></div></section>
+      <h2 class="section-title"><span class="step-badge" aria-hidden="true">2</span>Lay limits</h2><div class="fields plan-fields">${number('max-plies','Max plies per lay',50,1,'1')}${number('max-garments','Max garments per marker',4,1,'1')}</div><p class="hint">Plies are fabric layers on the table. ${PASS_TIP} So 40 plies of folded fabric = 20 passes.</p>
+      <details class="advanced"><summary>More options: over-cut, search time, end allowance, cost</summary><div class="fields plan-fields">${number('overcut','Allowed over-cut (%)',0)}${number('plan-time','Time per marker (seconds)',5,0.1)}${number('plan-final-time','Final search per ratio (seconds)',0)}${number('end-allowance','Allowance at each end (mm)',0)}${number('lay-cost','Cost per lay (INR)',0)}</div><p class="hint">Final search 0 skips the longer search. End allowance is added at both ends of every pass. Lay cost is an estimate for comparing plans.</p></details>
+      <div class="form-actions"><button id="make-plan" class="primary large" type="submit">${icon('plan')}Make cut plan</button><button id="stop-plan" type="button" hidden>${icon('stop')}Stop and keep the best plan</button><p id="plan-error" role="status"></p><progress id="plan-progress" class="plan-progress" hidden aria-label="Cut plan search running"></progress></div></form><div id="plan-result" aria-live="polite" data-empty="No cut plan yet. Enter the garments to cut for each size, then choose Make cut plan."></div></section>
     <section id="screen-2" class="screen" hidden><div class="screen-head"><div><h1>Compare fabric use</h1><p>Open a PLT marker from your current CAD. We check it with the same rules and re-nest the same pieces on the same fabric width.</p></div></div>
       <div class="card compare-card"><h2 class="section-title"><span class="step-badge" aria-hidden="true">1</span>Fabric and search time</h2><div class="fields">${number('compare-width','Fabric width (mm)',editor.get().job.fabric.width,1)}${number('compare-time','Re-nest time (seconds)',10,0.1)}</div>
       <h2 class="section-title"><span class="step-badge" aria-hidden="true">2</span>Your CAD marker</h2><label class="upload-label">Current CAD marker (.plt)<input id="compare-file" type="file" accept=".plt,.hpgl"></label>
@@ -74,13 +84,16 @@ export function installFeatures(editor: Editor) {
       <dt>Plies and lays</dt><dd>A ply is one layer of fabric. A lay is a stack of plies cut using one marker: a ratio of M:2 and L:1 on 20 plies makes 40 M and 20 L garments.</dd>
       <dt>Efficiency</dt><dd>Efficiency is the area of the cut pieces divided by fabric width × marker length. Check the rules and required counts as well as the percentage.</dd></dl></section>`);
   function screen(index: number): void {
+    // Only the active screen stays in the page; the others are parked with their state (screens.ts).
+    for (const panel of findAll<HTMLElement>('.screen')) if (panel.id === `screen-${index}`) unpark(panel); else park(panel);
+    for (const part of [$('.workspace'), $('#editor-filebar')]) if (index === 0) unpark(part); else park(part);
     $('#editor-filebar').hidden = index !== 0;
     $('.workspace').setAttribute('hidden', '');
-    document.querySelectorAll<HTMLElement>('.screen').forEach(panel => panel.hidden = panel.id !== `screen-${index}`);
+    findAll<HTMLElement>('.screen').forEach(panel => panel.hidden = panel.id !== `screen-${index}`);
     cuttingRoom?.activate(index);
     if (index === 8) floor?.activate();
     if (index === 0) $('.workspace').removeAttribute('hidden');
-    document.querySelectorAll<HTMLButtonElement>('[data-screen]').forEach(b => b.setAttribute('aria-pressed',String(Number(b.dataset.screen) === index)));
+    findAll<HTMLButtonElement>('[data-screen]').forEach(b => b.setAttribute('aria-pressed',String(Number(b.dataset.screen) === index)));
     if (index === 1) updatePlanSizes();
     window.scrollTo(0, 0);
     window.dispatchEvent(new CustomEvent('beta-screen', { detail: index }));
@@ -92,11 +105,11 @@ export function installFeatures(editor: Editor) {
     getRegister: () => cuttingRoom.floorRegister(), receiveRegister: register => cuttingRoom.floorReceive(register),
     loadOrder: quantities => { updatePlanSizes(); sizeNames(editor.get().job).forEach((size,i) => { $<HTMLInputElement>(`#quantity-${i}`).value = String(quantities[size] ?? 0); }); },
   });
-  document.querySelectorAll<HTMLButtonElement>('[data-screen]').forEach(b => b.onclick = () => screen(Number(b.dataset.screen)));
+  findAll<HTMLButtonElement>('[data-screen]').forEach(b => b.onclick = () => screen(Number(b.dataset.screen)));
   $('.screen-tabs').addEventListener('keydown', event => {
     const e = event as KeyboardEvent;
     if (!['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
-    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-screen]'));
+    const buttons = Array.from(findAll<HTMLButtonElement>('[data-screen]'));
     const current = buttons.indexOf(e.target as HTMLButtonElement);
     if (current < 0) return;
     e.preventDefault();
@@ -218,14 +231,32 @@ export function installFeatures(editor: Editor) {
     event.preventDefault();if(operation||editor.busy())return;
     try{
       const form=formValues(),payload=planPayload(editor.get().job,form);operation=true;$<HTMLButtonElement>('#make-plan').disabled=true;$('#plan-error').textContent='Rust is evaluating the cut plan…';
+      $('#stop-plan').hidden=!staticMode();$('#plan-progress').hidden=false;
       plan=await(await editor.api('plan',JSON.stringify(payload))).json() as CutPlan;planJob=payload.order.job;planEnd=form.endAllowance;planCost=form.layCost;renderPlan();$('#plan-error').textContent=planStatus(plan);
+      savePlan();
     }catch(e){$('#plan-error').textContent=errorText(e);}
-    finally{operation=false;$<HTMLButtonElement>('#make-plan').disabled=false;}
+    finally{operation=false;$<HTMLButtonElement>('#make-plan').disabled=false;$('#stop-plan').hidden=true;$('#plan-progress').hidden=true;}
   });
+  // Browser plans run in a Worker: show each checked step, and allow a stop that keeps the best plan.
+  window.addEventListener(PLAN_PROGRESS_EVENT,event=>{const p=(event as CustomEvent<CutPlan>).detail;if(operation)$('#plan-error').textContent=`Measured ${p.markers_evaluated} marker${p.markers_evaluated===1?'':'s'} in ${p.runtime_s.toFixed(0)} s. Best so far: ${p.total_fabric_m.toFixed(2)} m${p.complete?'':' (not complete yet)'}.`;});
+  $('#stop-plan').addEventListener('click',()=>{if(stopBrowserPlan())$('#plan-error').textContent='Stopping. Keeping the best checked plan.';});
+  /** In the browser the plan is kept on this device (IndexedDB), like rolls and floor records. */
+  const PLAN_KEY='plan';
+  function savePlan():void{if(isDesktop()||!plan)return;void localStore().set(PLAN_KEY,{plan,planJob,planEnd,planCost}).catch(()=>editor.message('Browser storage is full or blocked. Save a backup file.',true));}
+  if(!isDesktop())void localStore().get<{plan?:CutPlan;planJob?:Job;planEnd?:number;planCost?:number}>(PLAN_KEY).then(saved=>{if(!saved?.plan||plan)return;plan=saved.plan;planJob=saved.planJob;planEnd=saved.planEnd??0;planCost=saved.planCost??0;renderPlan();$('#plan-error').textContent=planStatus(plan);}).catch(()=>{});
+  /** Folded/tube lays: useful yield first, footprint second (fold7); open lays: efficiency. A lay's own fold-edge note follows. */
+  function efficiencyCell(l:CutPlan['lays'][number]):string{
+    const y=markerYield(planJob?.fabric.layout,{efficiency:l.efficiency,...(l.result??{})},null);
+    const main=y.headline==='yield'?`<strong title="${YIELD_TIP}">${(y.usefulYield!*100).toFixed(1)}% yield</strong><br><small title="${FOOTPRINT_TIP}">footprint ${(l.efficiency*100).toFixed(1)}%</small>`:`${(l.efficiency*100).toFixed(1)}%`;
+    const surplus=y.surplus?`<br><small class="warn-text">${y.surplus} piece${y.surplus===1?'':'s'} cut but not used</small>`:'';
+    const fold=foldEdgeWarning(l.result?.warnings)?`<br><small class="warn-text" title="${esc(foldEdgeWarning(l.result?.warnings))}">Limited by the fold length</small>`:'';
+    return main+surplus+fold;
+  }
   function renderPlan():void{
     if(!plan)return;
     const tile=(label:string,value:string)=>`<div><span>${label}</span><strong>${value}</strong></div>`;
-    $('#plan-result').innerHTML=`<div class="plan-totals result-totals">${tile('Total fabric',`${plan.total_fabric_m.toFixed(3)} m`)}${tile('Lays',String(plan.lays.length))}${tile('Planned garments',Object.entries(plan.planned).map(([s,n])=>`${esc(s)} ${n}`).join(' · '))}${tile('Lay cost (estimate)',`INR ${(planCost*plan.lays.length).toFixed(2)}`)}<button type="button" data-print>${icon('print')}Print cut plan</button></div><div class="table-scroll"><table><caption>${esc(plan.order_name)} — planned lays</caption><thead><tr>${['Lay','Size ratio','Plies','Length (m)','Efficiency','Fabric (m)','Marker'].map(s=>`<th scope="col">${s}</th>`).join('')}</tr></thead><tbody>${plan.lays.map((l,i)=>`<tr><th scope="row">${i+1}</th><td>${Object.entries(l.ratio).map(([s,n])=>`${esc(s)}:${n}`).join(' · ')}</td><td>${l.plies}</td><td>${(l.marker_length_mm/1000).toFixed(3)}</td><td>${(l.efficiency*100).toFixed(1)}%</td><td>${((l.marker_length_mm+2*planEnd)*l.plies/1000).toFixed(3)}</td><td><button data-open-lay="${i}" ${l.result?'':'disabled'}>Open marker</button></td></tr>`).join('')}</tbody></table></div>${plan.warnings.length?`<div class="notice"><ul>${plan.warnings.map(w=>`<li>${esc(planMessage(w))}</li>`).join('')}</ul></div>`:''}`;
+    const notes=splitNotes(plan.warnings);
+    $('#plan-result').innerHTML=`<div class="plan-totals result-totals">${tile('Total fabric',`${plan.total_fabric_m.toFixed(3)} m`)}${tile('Lays',String(plan.lays.length))}${tile('Planned garments',Object.entries(plan.planned).map(([s,n])=>`${esc(s)} ${n}`).join(' · '))}${planCost>0?tile('Lay cost (estimate)',`INR ${(planCost*plan.lays.length).toFixed(2)}`):''}<button type="button" data-print>${icon('print')}Print cut plan</button></div><div class="table-scroll"><table><caption>${esc(plan.order_name)} — planned lays</caption><thead><tr>${['Lay','Size ratio','Plies','Passes','Length (m)','Efficiency','Fabric (m)','Marker'].map(s=>s==='Passes'?`<th scope="col" title="${PASS_TIP}">${s}</th>`:`<th scope="col">${s}</th>`).join('')}</tr></thead><tbody>${plan.lays.map((l,i)=>`<tr><th scope="row">${i+1}</th><td>${Object.entries(l.ratio).map(([s,n])=>`${esc(s)}:${n}`).join(' · ')}</td><td>${l.plies}</td><td>${l.passes??l.plies}</td><td>${(l.marker_length_mm/1000).toFixed(3)}</td><td>${efficiencyCell(l)}</td><td>${l.fabric_m.toFixed(3)}</td><td><button data-open-lay="${i}" ${l.result?'':'disabled'}>Open marker</button></td></tr>`).join('')}</tbody></table></div>${notes.shown.length?`<div class="notice"><ul>${notes.shown.map(w=>`<li>${esc(planMessage(w))}</li>`).join('')}</ul></div>`:''}${technicalDetailsHtml(notes.technical,esc)}`;
   }
   $('#plan-result').addEventListener('click',event=>{const b=(event.target as Element).closest<HTMLButtonElement>('[data-open-lay]');const lay=plan?.lays[Number(b?.dataset.openLay)];if(!lay?.result||!planJob)return;const job=structuredClone(planJob);job.order={sizes:lay.ratio};editor.open({job,result:lay.result});screen(0);});
   $('#compare-file').addEventListener('change',async()=>{
@@ -257,7 +288,7 @@ export function installFeatures(editor: Editor) {
     const saving=ours&&theirs.ok&&ours.ok?compareLengths(theirs.length,ours.length):null;
     const issues = [...theirs.errors, ...theirs.warnings].map(e=>`Current CAD — ${e.code}: ${e.message}`)
       .concat([...ours?.errors??[], ...ours?.warnings??[]].map(e=>`BETA — ${e.code}: ${e.message}`),
-        (c.theirs.warnings??[]).map(w=>`Current CAD — ${w}`), (c.ours?.warnings??[]).map(w=>`BETA — ${w}`));
+        (c.theirs.warnings??[]).map(w=>`Current CAD — ${w}`), splitNotes(c.ours?.warnings).shown.map(w=>`BETA — ${w}`));
     $('#compare-result').innerHTML=`<div class="comparison-cards"><article><h2>Your current CAD</h2><strong>${(theirs.length/1000).toFixed(3)} m</strong><p>${(theirs.efficiency*100).toFixed(1)}% efficiency · ${theirs.ok?'Checks passed':'Check issues below'}</p></article><article><h2>BETA re-nest</h2><strong>${ours?`${(ours.length/1000).toFixed(3)} m`:'Waiting'}</strong><p>${ours?`${(ours.efficiency*100).toFixed(1)}% efficiency · ${ours.ok?'Checks passed':'Check issues below'}`:'Uses the same imported pieces and rules'}</p></article></div>${saving?`<p class="saving">${saving.metres.toFixed(3)} m · ${saving.percent.toFixed(2)}% fabric saving per marker</p>`:'<p>Savings are shown when both markers pass validation.</p>'}<ul>${[...theirs.errors,...ours?.errors??[]].map(e=>`<li>${esc(e.code)}: ${esc(e.message)}</li>`).join('')}</ul><button id="open-theirs">Open current CAD marker</button> ${c.ours?'<button id="open-ours">Open BETA marker</button>':''}`;
     $('#compare-result ul').innerHTML = issues.map(e=>`<li>${esc(e)}</li>`).join('');
     $('#open-theirs').onclick=()=>{editor.open({job:c.job,result:c.theirs});screen(0);};if(c.ours)$('#open-ours').onclick=()=>{editor.open({job:c.job,result:c.ours!});screen(0);};
@@ -274,7 +305,7 @@ export function installFeatures(editor: Editor) {
     refresh:()=>{
       const active=document.activeElement as HTMLInputElement|null,id=active?.id,start=active?.type==='text'?active.selectionStart:null;
       renderFabric();renderPiece();updatePlanSizes();
-      if(id){const input=document.getElementById(id) as HTMLInputElement|null;input?.focus({preventScroll:true});if(start!=null&&input?.type==='text')input.setSelectionRange(start,start);}
+      if(id){const input=byId(id) as HTMLInputElement|null;input?.focus({preventScroll:true});if(start!=null&&input?.type==='text')input.setSelectionRange(start,start);}
     },
     drawing:()=>mode!=='none',
     cancel:()=>{mode='none';corners=[];promptDrawing();$<HTMLSelectElement>('#defect-mode').value=mode;},

@@ -11,6 +11,8 @@ export interface BrowserNestOptions {
   warm_start?: MarkerResult | null;
 }
 export interface NestProgress {
+  /** Within-round update; no continue acknowledgement is required. */
+  checkpoint?: boolean;
   round: number;
   seconds: number;
   round_seconds: number;

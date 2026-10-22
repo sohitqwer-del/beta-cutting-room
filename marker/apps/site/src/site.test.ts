@@ -24,7 +24,7 @@ const home = homePage(ctx).value;
 describe('config', () => {
   it('has a complete portable ZIP download', () => {
     const p = site.downloads.portable;
-    expect(p.url).toMatch(/^https:\/\/github\.com\/.+\/releases\/download\/v0\.6\.0\/BETA-Cutting-Room_0\.6\.0_windows-x64-portable\.zip$/);
+    expect(p.url).toMatch(/^https:\/\/github\.com\/.+\/releases\/download\/v0\.7\.0\/BETA-Cutting-Room_0\.7\.0_windows-x64-portable\.zip$/);
     expect(p.url!.endsWith(p.file)).toBe(true);
     expect(p.size).toMatch(/^\d+(\.\d+)? MiB$/);
     expect(p.sha256).toMatch(/^[0-9a-f]{64}$/);

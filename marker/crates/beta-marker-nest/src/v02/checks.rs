@@ -280,6 +280,7 @@ pub(super) fn refresh(job: &Job, result: &mut MarkerResult) -> Result<()> {
     } else {
         0.0
     };
+    beta_marker_core::compute_metrics(job, &result.placements).apply(result);
     Ok(())
 }
 

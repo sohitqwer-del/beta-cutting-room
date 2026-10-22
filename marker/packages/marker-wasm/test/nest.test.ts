@@ -44,6 +44,24 @@ function harness(raw: NestRuntime) {
   return { send, messages };
 }
 describe('nesting worker', () => {
+  it('posts within-round layouts before the step returns', async () => {
+    const rt = runtime(1);
+    const Session = rt.raw.NestSession;
+    rt.raw.NestSession = class extends Session {
+      step_with_progress(callback: (json: string) => void) {
+        callback(JSON.stringify({ result, round: 0, seconds: 0.1, improved: true, done: false }));
+        return this.step();
+      }
+    };
+    const h = harness(rt.raw);
+    h.send({ type: 'nest', id: 1, job, options: {} });
+    await until(() => h.messages.some(m => m.type === 'done'));
+    const events = h.messages.filter(m => m.type === 'progress');
+    expect(events).toHaveLength(2);
+    expect(events[0]!.progress.checkpoint).toBe(true);
+    expect(events[0]!.progress.result.placements).toEqual(result.placements);
+    expect(events[1]!.progress.done).toBe(true);
+  });
   it('loads once, yields, reports marker payloads and frees the session', async () => {
     const rt = runtime();
     const h = harness(rt.raw);
@@ -104,6 +122,16 @@ function client() {
 describe('typed worker helper', () => {
   const checkpoint = (): NestProgress => ({ round: 0, seconds: 0.1, round_seconds: 0.1,
     done: false, cancelled: false, improved: true, memory_bytes: 65536, result: structuredClone(result) });
+  it('does not acknowledge within-round checkpoints or let callbacks corrupt recovery', async () => {
+    vi.useFakeTimers();
+    const { worker, nester } = client();
+    worker.emit({ type: 'ready' }); await nester.ready;
+    const pending = nester.nest(job, { time_limit_s: 1 }, p => { p.result.placements.length = 0; });
+    worker.emit({ type: 'progress', id: 1, progress: { ...checkpoint(), checkpoint: true } });
+    expect(worker.messages.filter(m => m.type === 'continue')).toHaveLength(0);
+    await vi.advanceTimersByTimeAsync(6000);
+    expect((await pending).placements).toEqual(result.placements);
+  });
   it('terminates a stalled worker and returns an untouched private checkpoint at the budget', async () => {
     vi.useFakeTimers();
     const { worker, nester } = client();

@@ -47,10 +47,15 @@ pub fn validate(job: &Job, result: &MarkerResult) -> ValidationReport {
         length: m.length,
         piece_area: m.piece_area,
         efficiency: m.efficiency,
+        useful_piece_area: m.useful_piece_area,
+        useful_yield: m.useful_yield,
+        surplus_copies: m.surplus_copies,
         errors: check_job(job),
         ..ValidationReport::default()
     };
     let by_id: HashMap<_, _> = job.pieces.iter().map(|p| (p.id.as_str(), p)).collect();
+    let interchangeable: HashMap<_, _> = job.pieces.iter().map(|p| (p.id.as_str(),
+        job.fabric.layout != Layout::Open && crate::rules::layer_hands_interchangeable(job, p))).collect();
     for p in &job.pieces {
         if p.block_margin.is_some_and(|v| !v.is_finite() || v < 0.0) {
             report.errors.push(issue(
@@ -95,7 +100,7 @@ pub fn validate(job: &Job, result: &MarkerResult) -> ValidationReport {
             report.errors.push(issue("layer_allocation",
                 "Every layered placement must declare its assignments when explicit allocation is used.".into(), &[&p.id]));
         }
-        v02::layers(job, p, pl, &mut report);
+        v02::layers(job, p, pl, interchangeable[p.id.as_str()], &mut report);
         let (normal, mirrored) = layer_copies(job.fabric.layout, pl);
         for (mirror, count) in [(false, normal), (true, mirrored)] {
             let key = (p.id.clone(), mirror && !flip_allowed(job, p));

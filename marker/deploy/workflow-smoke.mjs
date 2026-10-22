@@ -34,8 +34,8 @@ async function evaluate(expression) {
   if (value.exceptionDetails) throw new Error(value.exceptionDetails.exception?.description || JSON.stringify(value.exceptionDetails));
   return value.result.value;
 }
-async function until(expression, label) {
-  const deadline = Date.now() + 15000;
+async function until(expression, label, ms = 15000) {
+  const deadline = Date.now() + ms;
   while (Date.now() < deadline) { if (await evaluate(expression)) { report.cases.push(label); return; } await delay(100); }
   throw new Error(`Timed out: ${label}`);
 }
@@ -75,23 +75,32 @@ try {
   await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
   await send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: out });
   // This origin belongs only to this runner. Use a fresh document for each independent workflow.
+  // Only the open screen is in the page (0.7): start on the marker screen, which holds the WASM status.
+  let runs = 0;
   async function fresh(query = '') {
+    // A new query each run: navigating to the same URL with only a hash would not load a fresh document.
+    const [search = '', hash = '/marker'] = query.split('#');
+    query = `${search || '?'}${search ? '&' : ''}run=${++runs}#/marker`;
     let load = loaded();
     await send('Page.navigate', { url: url.href + query });
     await load;
-    await until('document.querySelector("#wasm-status")?.textContent.includes("Rust WASM is active")', 'real WASM ready');
+    await until('document.querySelector("#wasm-status")?.textContent.includes("Rust WASM is active")', 'real WASM ready', 60000);
     await evaluate('localStorage.clear(); sessionStorage.clear()');
     load = loaded();
     await send('Page.reload');
     await load;
-    await until('document.querySelector("#wasm-status")?.textContent.includes("Rust WASM is active")', 'clean workflow ready');
+    await until('document.querySelector("#wasm-status")?.textContent.includes("Rust WASM is active")', 'clean workflow ready', 60000);
+    // The WASM status lives on the marker screen; then open the routine's own screen from the menu.
+    const screens = { '/pattern': 4, '/quick': 11 };
+    if (screens[hash] != null) { await evaluate(`document.querySelector('[data-screen="${screens[hash]}"]').click()`); await delay(300); }
   }
-  const run = async (module, fn) => evaluate(`(async()=>{const m=await import(${JSON.stringify('/src/' + module)});return await m[${JSON.stringify(fn)}]()})()`);
+  // A routine that never settles fails after two minutes with its name, instead of hanging the runner.
+  const run = async (module, fn) => evaluate(`(async()=>{const m=await import(${JSON.stringify('/src/' + module)});return await Promise.race([m[${JSON.stringify(fn)}](),new Promise((_,no)=>setTimeout(()=>no(new Error(${JSON.stringify(fn + ' did not finish in 120 s')}+' · status: '+(document.querySelector('#floor-status,#message')?.textContent??''))),120000))])})()`);
   for (const [name, module, functions, query] of [
     ['editor', 'editor-smoke.mjs', ['runEditorSmoke'], ''],
     ['floor', 'floor-smoke.mjs', ['runFloorSmoke','checkFloorLanguagesAndManual'], ''],
-    ['pattern', 'pattern-smoke.mjs', ['runPatternSwitchChecks','runPatternSmoke','runPatternChecks','runPatternTraceChecks'], ''],
-    ['production', 'pattern-production-smoke.mjs', ['runProductionSeams','runProductionLibraryPreview','applyProductionLibrary','runProductionMarksAndFold','runProductionHandoff'], ''],
+    ['pattern', 'pattern-smoke.mjs', ['runPatternSwitchChecks','runPatternSmoke','runPatternChecks','runPatternTraceChecks'], '#/pattern'],
+    ['production', 'pattern-production-smoke.mjs', ['runProductionSeams','runProductionLibraryPreview','applyProductionLibrary','runProductionMarksAndFold','runProductionHandoff'], '#/pattern'],
     ['quick', 'quick/quick-smoke.mjs', ['runQuickSmoke'], '?quick-mock=1#/quick'],
     ['roll-audit', 'audit-smoke.mjs', ['runRollAuditChecks'], ''],
     ['incomplete-plan', 'audit-smoke.mjs', ['runIncompletePlanCheck'], ''],

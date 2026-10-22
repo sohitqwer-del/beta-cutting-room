@@ -1,5 +1,9 @@
 //! JSON-in/JSON-out browser bindings. These functions also run in native tests.
 mod nesting;
+mod export;
+pub use export::*;
+mod import;
+pub use import::*;
 use beta_marker_core::{Job, MarkerResult, Placement, Pt};
 use serde::{Serialize, de::DeserializeOwned};
 use wasm_bindgen::prelude::*;
@@ -59,7 +63,8 @@ pub fn metrics(job: &str, placements: &str) -> Result<String, String> {
     let job = beta_marker_core::rules::effective_job(&read_job(job)?);
     let m = beta_marker_core::compute_metrics(&job, &read::<Vec<Placement>>(placements)?);
     write(
-        &serde_json::json!({"length": m.length, "piece_area": m.piece_area, "efficiency": m.efficiency}),
+        &serde_json::json!({"length": m.length, "piece_area": m.piece_area, "efficiency": m.efficiency,
+            "useful_piece_area": m.useful_piece_area, "useful_yield": m.useful_yield, "surplus_copies": m.surplus_copies}),
     )
 }
 /// Return grain-aligned angles, tilt and the free-rotation flag for a piece copy.

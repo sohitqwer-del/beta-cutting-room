@@ -1,9 +1,10 @@
 import { loadPatternCore } from '@beta/marker-wasm';
+import { find } from './screens';
 /** Browser smoke: import this module in the local app, then call runPatternSmoke().
  * Uses the same forms and click handlers as a pattern maker; never injects JSON state.
  * Take a collaborative-browser recording while it runs to retain mode screenshots.
  */
-const get=s=>{const e=document.querySelector(s);if(!e)throw new Error(`Missing ${s}`);return e;};
+const get=s=>{const e=find(s);if(!e)throw new Error(`Missing ${s}`);return e;};
 const wait=async test=>{for(let i=0;i<100;i++){if(test())return;await new Promise(r=>setTimeout(r,50));}throw new Error('Timed out: '+get('#pd-status').textContent);};
 const click=async selector=>{get(selector).click();await wait(()=>!get('#pattern-workbench').hasAttribute('aria-busy'));await new Promise(r=>requestAnimationFrame(()=>r()));};
 const fill=(selector,text)=>{const e=get(selector);e.value=String(text);e.dispatchEvent(new Event('input',{bubbles:true}));};

@@ -45,15 +45,31 @@ impl Units {
 }
 
 /// Options for importing a drawing.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ImportOptions {
     /// Source unit override.
     #[serde(default)]
     pub units: Units,
-    /// Split each positive even Quantity N into N/2 normal and N/2 mirrored
-    /// copies. False preserves Quantity N because AAMA has no standard pair flag.
-    #[serde(default)]
+    /// Split each positive even Quantity N of an asymmetric piece into N/2
+    /// normal and N/2 mirrored (left/right) copies. This is the default, since
+    /// AAMA has no standard pair flag; the report records the assumption.
+    /// Symmetric pieces keep same-hand copies. False keeps every Quantity N
+    /// as same-hand copies.
+    #[serde(default = "default_pairs")]
     pub pairs: bool,
+}
+
+fn default_pairs() -> bool {
+    true
+}
+
+impl Default for ImportOptions {
+    fn default() -> Self {
+        Self {
+            units: Units::Auto,
+            pairs: true,
+        }
+    }
 }
 
 /// Imported pieces and the assumptions made while reading them.
@@ -69,24 +85,14 @@ pub struct ImportReport {
     pub units: Units,
     /// Recoverable omissions and assumptions.
     pub warnings: Vec<String>,
+    /// True when at least one even Quantity was split into left/right copies.
+    #[serde(default)]
+    pub pairs_assumed: bool,
 }
 
 /// Import pattern pieces from DXF bytes. All output coordinates are millimetres.
 pub fn import_dxf(bytes: &[u8], opts: &ImportOptions) -> anyhow::Result<ImportReport> {
-    let mut report = pattern::import(parser::read(bytes)?, opts, None)?;
-    if opts.pairs {
-        let split = report
-            .pieces
-            .iter()
-            .filter(|p| p.mirror_quantity > 0)
-            .count();
-        if split > 0 {
-            report.warnings.push(format!(
-                "Pairs: {split} pieces with an even Quantity N were split into N/2 normal and N/2 mirrored copies. Check left/right pieces before cutting."
-            ));
-        }
-    }
-    Ok(report)
+    pattern::import(parser::read(bytes)?, opts, None)
 }
 
 #[cfg(test)]

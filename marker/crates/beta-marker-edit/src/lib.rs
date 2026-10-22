@@ -441,6 +441,7 @@ fn metrics(job: &Job, r: &mut MarkerResult) {
     r.length = m.length;
     r.piece_area = m.piece_area;
     r.efficiency = m.efficiency;
+    m.apply(r);
     r.width = job.fabric.width;
     r.engine = "manual / Rust editing".into();
 }

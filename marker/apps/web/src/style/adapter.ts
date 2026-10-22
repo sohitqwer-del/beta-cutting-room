@@ -1,6 +1,6 @@
 import * as wasm from '@beta/marker-wasm';
 import type { BlockInfo, CreateStyle, GradedPiece, Hit, Job, MarkerCore, MarkerOverlay, MarkerResult, Measured, Measurement, OverlayOptions, PatternCore,
-  PatternDocument, PatternGrade, PatternInspection, Pt, QuickMarkerCore, SeamCheck, SeamReport, SizeChart, StyleCore, StyleEditOperation, MatchSummary, StyleJobSettings, ValidationReport } from '@beta/marker-wasm';
+  PatternDocument, PatternGrade, PatternInspection, Pt, QuickMarkerCore, SeamCheck, SeamReport, SizeChart, SpecFile, SpecSheet, StyleCore, StyleEditOperation, StyleQualityCore, MatchSummary, StyleJobSettings, ValidationReport } from '@beta/marker-wasm';
 import { apiFetch } from '../transport';
 import { exportFile, isPractice, nestInRounds, nestPractice, type NestProgress } from '../quick/adapter';
 
@@ -39,6 +39,9 @@ export interface StyleEngine {
   exportPatternPdf(document: PatternDocument, paper: 'A4' | 'A3'): Promise<Uint8Array>;
   exportPatternDxf(document: PatternDocument): Promise<string>;
   exportPatternPlt(document: PatternDocument): Promise<string>;
+  /** Points of measure for every size, from the graded stitch paths (fit7). Absent on older engine builds. */
+  specSheet?(document: PatternDocument): Promise<SpecSheet>;
+  exportSpecSheet?(document: PatternDocument, format: 'pdf' | 'csv' | 'xlsx'): Promise<SpecFile>;
 }
 export type LoadResult = { ok: true; engine: StyleEngine; note?: string } | { ok: false; error: string };
 
@@ -71,8 +74,13 @@ export function joinCores(style: StyleCore<StyleEditOperation, MatchSummary>, pa
     exportPatternPdf: (doc, paper) => call(() => pattern.export_pdf(doc, paper)),
     exportPatternDxf: doc => call(() => pattern.export_dxf(doc)),
     exportPatternPlt: doc => call(() => pattern.export_plt(doc)),
+    ...(hasQuality(style) ? {
+      specSheet: (doc: PatternDocument) => call(() => style.spec_sheet(doc)),
+      exportSpecSheet: (doc: PatternDocument, format: 'pdf' | 'csv' | 'xlsx') => call(() => style.export_spec_sheet(doc, format)),
+    } : {}),
   };
 }
+const hasQuality = (style: object): style is StyleQualityCore => typeof (style as Partial<StyleQualityCore>).spec_sheet === 'function' && typeof (style as Partial<StyleQualityCore>).export_spec_sheet === 'function';
 
 /** Match points on the marker: positions from Rust `transform`, pass or fail from the Rust validator's `match` issues
  * ("Bundle N does not satisfy matching point piece/point"). No phase arithmetic happens in the browser. */
@@ -121,8 +129,7 @@ export async function nestMarker(job: Job, run: { budgetS: number; signal?: Abor
 }
 
 let quick: Promise<QuickMarkerCore> | undefined;
-/** Marker files. PLT, DXF and full-size PDF come from the native Rust exporter (desktop or server).
- * In the browser edition a tiled A4/A3 marker PDF is made by Rust WASM instead. */
+/** Marker files use shared Rust writers through WASM, desktop IPC or the server. */
 export async function exportMarker(job: Job, result: MarkerResult, format: 'plt' | 'pdf' | 'dxf' | 'tiled-a4' | 'tiled-a3'): Promise<Blob> {
   if (format === 'tiled-a4' || format === 'tiled-a3') {
     quick ??= wasm.loadQuickMarkerCore();

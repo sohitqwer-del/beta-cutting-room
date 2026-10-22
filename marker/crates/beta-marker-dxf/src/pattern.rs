@@ -2,7 +2,7 @@
 
 use crate::{
     ImportOptions, ImportReport, Units, curves,
-    parser::{Drawing, Record},
+    parser::{Drawing, Pair, Record},
 };
 use anyhow::{Context, Result, ensure};
 use beta_marker_core::{
@@ -123,10 +123,11 @@ fn expand(
                 .iter()
                 .filter(|entity| {
                     entity.kind != "ATTDEF"
-                        || !r
-                            .vertices
-                            .iter()
-                            .any(|attr| attr.value(2) == entity.value(2))
+                        || !r.vertices.iter().any(|attr| {
+                            attr.value(2)
+                                .zip(entity.value(2))
+                                .is_some_and(|(a, b)| a.eq_ignore_ascii_case(b))
+                        })
                 })
                 .cloned()
                 .collect();
@@ -344,7 +345,7 @@ fn field<'a>(texts: impl Iterator<Item = &'a str>, key: &str) -> Option<String> 
     for text in texts {
         for line in text.lines() {
             if let Some((label, value)) = line.split_once(':')
-                && label.trim().eq_ignore_ascii_case(key)
+                && label.trim().replace('_', " ").eq_ignore_ascii_case(key)
                 && !value.trim().is_empty()
             {
                 return Some(value.trim().to_string());
@@ -377,10 +378,49 @@ pub(crate) struct BetaFields {
 }
 
 pub(crate) fn import(
-    d: Drawing,
+    mut d: Drawing,
     opts: &ImportOptions,
     grades: Option<&crate::GradeTable>,
 ) -> Result<ImportReport> {
+    let mut warnings = vec![];
+    // Some garment exporters store the pattern library only in BLOCKS and put
+    // no INSERTs in model space. Use root piece blocks once, never nested helper
+    // blocks or reserved model/paper-space blocks. Explicit INSERTs remain authoritative.
+    if !d.entities.iter().any(|r| r.kind == "INSERT")
+        && !d.entities.iter().any(|r| {
+            matches!(
+                r.kind.as_str(),
+                "LINE" | "POLYLINE" | "LWPOLYLINE" | "ARC" | "CIRCLE" | "SPLINE" | "ELLIPSE"
+            )
+        })
+    {
+        let nested: BTreeSet<_> = d
+            .blocks
+            .values()
+            .flat_map(|b| &b.entities)
+            .filter(|r| r.kind == "INSERT")
+            .filter_map(|r| r.value(2).map(str::to_ascii_uppercase))
+            .collect();
+        let roots: Vec<_> = d
+            .blocks
+            .keys()
+            .filter(|name| !name.starts_with('*') && !nested.contains(*name))
+            .cloned()
+            .collect();
+        for name in roots {
+            d.entities.push(Record {
+                kind: "INSERT".into(),
+                fields: vec![Pair {
+                    code: 2,
+                    value: name,
+                }],
+                vertices: vec![],
+            });
+        }
+        if d.entities.iter().any(|r| r.kind == "INSERT") {
+            warnings.push("No model-space INSERTs: imported root BLOCK definitions once each. Check piece quantities.".into());
+        }
+    }
     if grades.is_some() {
         check_grade_axes(&d, &d.entities, 0, &mut BTreeSet::new())?;
     }
@@ -391,7 +431,6 @@ pub(crate) fn import(
         .map(Record::text)
         .collect();
     let file_field = |key| field(file_texts.iter().map(String::as_str), key);
-    let mut warnings = vec![];
     let mut units = opts.units;
     if units == Units::Auto {
         if let Some(values) = d.header.get("$INSUNITS")
@@ -541,6 +580,8 @@ pub(crate) fn import(
         "generic"
     };
     let mut pieces = vec![];
+    // Blocks per `Pairing` outcome.
+    let mut pairs = [0usize; 3];
     if aama {
         for (block, shapes) in batches {
             let piece = garment(
@@ -552,7 +593,8 @@ pub(crate) fn import(
                 &mut warnings,
                 grades,
             )?;
-            if let Some(p) = piece {
+            if let Some((p, pairing)) = piece {
+                pairs[pairing as usize] += 1;
                 if let Some(table) = grades {
                     pieces.extend(crate::grading::generate(&p, table, &mut warnings)?);
                 } else {
@@ -602,7 +644,19 @@ pub(crate) fn import(
             sizes.push(size.clone());
         }
     }
+    let [_, split, kept] = pairs;
+    if split > 0 {
+        let kept = if kept > 0 {
+            format!(" {kept} symmetric pieces with an even Quantity keep same-hand copies.")
+        } else {
+            String::new()
+        };
+        warnings.push(format!(
+            "Pairs: {split} asymmetric pieces with an even Quantity N were split into N/2 normal and N/2 mirrored (left/right) copies.{kept} Check left/right pieces before cutting, or import with pairs off."
+        ));
+    }
     Ok(ImportReport {
+        pairs_assumed: split > 0,
         pieces,
         sizes,
         dialect: dialect.into(),
@@ -635,6 +689,16 @@ fn check_grade_axes(
     Ok(())
 }
 
+/// What the importer did with a piece's Quantity.
+#[derive(Clone, Copy)]
+enum Pairing {
+    Unchanged,
+    /// Split into left/right copies.
+    Split,
+    /// Even Quantity of a symmetric piece, kept as same-hand copies.
+    KeptSymmetric,
+}
+
 fn garment(
     block: &str,
     shapes: &[Shape],
@@ -643,7 +707,7 @@ fn garment(
     opts: &ImportOptions,
     warnings: &mut Vec<String>,
     grades: Option<&crate::GradeTable>,
-) -> Result<Option<Piece>> {
+) -> Result<Option<(Piece, Pairing)>> {
     let name = metadata(shapes, "Piece Name").unwrap_or_else(|| {
         warn(
             warnings,
@@ -849,13 +913,21 @@ fn garment(
         },
         |s| s.parse::<u32>().context("invalid Quantity text"),
     )?;
-    let (mut quantity, mut mirror_quantity) =
-        if opts.pairs && quantity > 0 && quantity.is_multiple_of(2) {
-            // One summary warning is added by `import_dxf`.
-            (quantity / 2, quantity / 2)
+    // A symmetric piece has no left and right versions: keep its copies same-hand.
+    let mut pairing = Pairing::Unchanged;
+    if opts.pairs && quantity > 0 && quantity.is_multiple_of(2) {
+        pairing = if mirror.is_none() && !beta_marker_core::rules::mirror_symmetric(&outline, grain, true) {
+            Pairing::Split
         } else {
-            (quantity, 0)
+            Pairing::KeptSymmetric
         };
+    }
+    // One summary warning is added by `import`.
+    let (mut quantity, mut mirror_quantity) = if matches!(pairing, Pairing::Split) {
+        (quantity / 2, quantity / 2)
+    } else {
+        (quantity, 0)
+    };
     let mut id = format!(
         "{}-{}-{}",
         sanitize(style.as_deref().unwrap_or("STYLE")),
@@ -874,6 +946,8 @@ fn garment(
         );
         id = fields.id;
         style = fields.style;
+        // BETA's own export records the exact hands; nothing is assumed.
+        pairing = Pairing::Unchanged;
         quantity = fields.quantity;
         mirror_quantity = fields.mirror_quantity;
         rotation = fields.rotation;
@@ -894,7 +968,7 @@ fn garment(
             ),
         );
     }
-    Ok(Some(Piece {
+    let piece = Piece {
         id,
         name,
         style,
@@ -912,7 +986,8 @@ fn garment(
         fold_line: mirror,
         match_points,
         ..Default::default()
-    }))
+    };
+    Ok(Some((piece, pairing)))
 }
 
 fn sanitize(s: &str) -> String {

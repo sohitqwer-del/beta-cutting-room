@@ -25,10 +25,11 @@ if (env.BETA_SKIP_WASM_BUILD !== '1') {
   run(resolve(marker, 'packages/marker-wasm/scripts/build-wasm.mjs'));
   run(resolve(marker, 'packages/marker-wasm/scripts/build-pattern-wasm.mjs'));
   run(fileURLToPath(new URL('./build-floor-wasm.mjs', import.meta.url)));
+  run(resolve(marker, 'packages/marker-wasm/scripts/build-cutroom-wasm.mjs'));
 }
-for (const module of ['beta_marker_wasm', 'beta_pattern_wasm', 'beta_marker_floor']) {
+for (const module of ['beta_marker_wasm', 'beta_pattern_wasm', 'beta_marker_floor', 'beta_marker_cutroom_wasm']) {
   for (const suffix of ['.js', '_bg.wasm']) {
-    if (!existsSync(join(pkg, module + suffix))) throw new Error(`Missing ${module + suffix}. Build all three WASM modules first.`);
+    if (!existsSync(join(pkg, module + suffix))) throw new Error(`Missing ${module + suffix}. Build all four WASM modules first.`);
   }
 }
 run(require.resolve('typescript/bin/tsc'), ['-p', join(web, 'tsconfig.json')]);

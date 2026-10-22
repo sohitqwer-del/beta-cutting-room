@@ -153,8 +153,10 @@ async function nestOnServer(fetcher: Fetcher, job: Job, run: NestRun): Promise<M
       await new Promise(r => setTimeout(r, run.pollMs ?? 1000));
       if (!polling) break;
       try {
-        const s = await (await fetcher('/api/nest/status')).json() as { best_length_mm?: number | null; best_efficiency?: number | null };
-        run.onProgress?.({ elapsedS: elapsed(), round, best, statusLengthMm: s.best_length_mm ?? null, statusEfficiency: s.best_efficiency ?? null });
+        const s = await (await fetcher('/api/nest/status')).json() as { best_length_mm?: number | null; best_efficiency?: number | null; result?: MarkerResult | null };
+        // Newer servers also send the best layout of the running round, so screens can draw it live.
+        const live = s.result && Array.isArray(s.result.placements) && better(s.result, best) ? s.result : best;
+        run.onProgress?.({ elapsedS: elapsed(), round, best: live, statusLengthMm: s.best_length_mm ?? null, statusEfficiency: s.best_efficiency ?? null });
       } catch { /* status is optional */ }
     }
   };
@@ -184,7 +186,7 @@ export async function nestPractice(job: Job, run: NestRun): Promise<MarkerResult
 }
 export const isPractice = (result: MarkerResult | undefined): boolean => result?.engine === MOCK_ENGINE;
 
-/** Plotter file from the native Rust exporter (needs the desktop app or server). */
+/** Factory file from the shared Rust exporter, including the static WASM transport. */
 export async function exportFile(fetcher: Fetcher, job: Job, result: MarkerResult, format: 'plt' | 'pdf'): Promise<Blob> {
   const response = await fetcher(`/api/export?format=${format}`, { method: 'POST', body: JSON.stringify({ job, result }), headers: { 'Content-Type': 'application/json' } });
   if (!response.ok) throw new Error(await errorOf(response));

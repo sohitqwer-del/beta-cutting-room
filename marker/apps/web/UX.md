@@ -233,3 +233,109 @@ The lead walked the Style flow on the screenshots and asked for it to "feel fini
 Engine polish (`marker/polish-engine`, merged on mvp bb79b01, STYLE-API "Polish additions") is wired in: the per-garment match report (`overlay.matches`, or the validator's `matches`) gives each pair its status and offset in mm ("Matched · 4 of 4 · within 0.2 mm", "Off by up to 3 mm"); all canvas picking (points, lines, piece edges with `edge` and `along_mm`, piece interiors) is the Rust `hit_test`, and the browser edge maths is gone; darts pass `seam_edge`; Offset on a line, cubic or arc makes a linked parallel copy (`offset_path`) and the inspector says what it follows; a new **Extend / trim** tool (key E) makes a copy of a straight line that ends on another line (`extend_trim`); linked derived pieces say they regrade from their source; blocks arrive laid out (Arrange stays for later edits); the canvas no longer adds twin notches and drill holes on fold pieces because the engine adds the mirrored partners on a folded or tube hand-off (seam allowance still changes both twin edges, as the engine requires symmetric widths).
 
 Checks: Vitest (`polish.test.ts`: label placement inside L shapes, zoom levels, width limits, shortening; match report grouping, worst mm, not placed, engine report shape; stripe thinning; plain error text), web typecheck, web build and `build:static`, real-engine smoke 14/14 (the 11 round-0.6 steps plus Offset on a line, Extend / trim, and "match report and Show on marker") at 1366 x 768, 1024 touch, Hindi, Tamil and dark. Screenshots: `<data-dir>/style-polish-shots/after-*`, `lang-*`, `dark-1366`, `static-1366`.
+
+## Round 0.7: room to work, fewer screens, one unit (ux7)
+
+The factory owner: "Still the software is not great. See ways to improve." The lead's 10-minute test and audit7's task walks found the same things: too little room for the drawing, too many screens with no clear start, every screen mounted at once, mixed units, a marker that appears only at the end and has no labels. Before shots and numbers: `<data-dir>/round07-shots/ux7/before-*`, `measure-before-1366/`.
+
+### Room to work
+
+| Static build, 1366 x 768 (`measure.mjs`) | Before | After |
+|---|---|---|
+| Chrome above the Style drawing | top bar 56 + "Browser edition" banner 66 + step bar 57 + title 54 + hint 82 px, and a Next dock of 65 px at the bottom | top bar 48 + one step bar 48 px (+ a one-line help on a first visit); no bottom dock |
+| Pattern drawing, first visit | 784 x 356 px (27% of the screen) | 1122 x 560 px (60%) |
+| Pattern drawing, later visits | 784 x 438 px (33%) | 1122 x 601 px (64% of the screen, 78% of the height); the inspector floats over it below 1500 px |
+| Style marker drawing | 1228 x 180 px (21%) | 1252 x 382 px (46%; 341 px on a first visit), with zoom, pan and fit |
+| Marker editor canvas | 940 x 413 px (37%, 54% of the height) | 948 x 519 px (47%, 68% of the height); Setup can still be hidden for more |
+| Phone 390 x 844: top of the Pattern drawing / of the Style marker | 923 px / 1089 px (below the screen) | 471 px / 609 px (on the screen) |
+
+The ~70% target is met for the drawing's height (78% on Pattern) but not for its area while side panels are open: a tool palette and the setup panel stay visible because factory users need their names. Hiding the editor's Setup panel or the Pattern inspector gives the rest.
+
+- **Top bar** (48 px, one row on every screen): title · status chip with a popover (where BETA runs, what works here, the server token; the old "Browser edition" banner lives here) · language · **cm | inch** · Feedback · "⋯" (theme, About).
+- **Style bar**: Back · the 8 steps (names fold to numbers when they do not fit) · help · file menu · one **Next**. The step title is the page heading in the top bar ("Make a style · Crew neck tee · Step 2 of 8" over "Draft the pattern"). Back and Next keep keyboard focus between steps; the new step is announced.
+- **Step help** is one line on a first visit (the 3 actions fold out with "Show the 3 steps"); "?" brings it back. It never covers a control. A floating card was tried first and removed: on a first visit it covered the spread choice and the Make marker button.
+- **Pattern step**: two-column tool palette with the name under each icon; the "what to do next" line sits over the bottom of the drawing; below 1500 px the inspector floats over the right of the drawing, opens when something is selected (or with the panel button) and closes with ✕.
+- **Marker editor**: the file commands share one row with the workflow steps; the status row is slimmer; the shortcut line moved into the keyboard help.
+- On phones the steps scroll on top and Back/Next sit in a bar at the bottom (thumb reach).
+
+### Simpler navigation
+
+- Menu: **Home, Make a style, Photo to marker, Marker from files, Cutting floor**, then **More tools** (Cut plan, Rolls, Bundles, Reports, Compare, Pattern formulas, Digitize, Help). More tools opens by itself when one of its screens is active. Every address (`#/marker`, `#/pattern`, `#/cut-plan` …) still works.
+- Screens follow the address: Back and Forward (and the phone back gesture) move between screens.
+- **Home** leads with one **Start here** card (Make a style, eight steps, and Continue for a saved style), then "Already have patterns?" (photo of paper pieces, DXF files, demo), then cutting-floor shortcuts and the Continue list.
+
+### Only the active screen is in the page
+
+Inactive screens are parked: taken out of the document with their elements, listeners and state kept (`src/screens.ts`). Lookups use `find` / `findAll` / `byId`, which also search parked screens, so a screen can still update itself and the language switch reaches every screen. The pattern and floor engines load when their screen opens or when the browser is idle; the Quick screen starts its marker engine when it opens (it was started twice).
+
+| Static build, headless, 1366 x 768 | Before | After |
+|---|---|---|
+| Elements on Home / `#/style` step 1 / Pattern step / Marker editor | 3,329 / 3,371 / 3,601 / 3,651 | 687 / 951 / 1,184 / 1,320 |
+| Elements inside hidden parts of the page | about 3,100 | about 250 (closed menus and dialogs) |
+| Text from other screens in the accessibility tree | yes (hidden screens' units, empty states) | none (parked screens are not in the document) |
+| Home ready, fresh profile (two alternating runs, median of 5 each) | 363 / 323 ms | 306 / 343 ms |
+| Style blocks ready | 560 / 492 ms | 469 / 515 ms |
+| WASM loaded at start | marker (twice), pattern, floor (12.7 MB) | marker once; pattern and floor when needed or idle |
+| Step switch, click to drawn | 9–87 ms | 13–79 ms; Grade 197 ms and Stripes 130 ms with fit7's redrafted blocks (81 and 70 ms with the old pattern engine in the same UI) |
+
+Start-up is about the same on a quiet laptop (about 5% faster); under heavy load an earlier pair measured 653 → 490 ms, because the first layout no longer covers every screen.
+
+### One unit system
+
+The user picks cm or inch once in the top bar. Short lengths show in cm or inch, long lengths (marker, fabric per garment, fabric needed) in metres or yards. Engines, saved files and the API stay in millimetres.
+
+- Style flow: every length, the marker chips ("Width 152.4 cm", not "Width 60 in" in a cm style), the lay width (fabric presets keep their inch names: "152.4 cm (60″)"), stats and the Cut tiles.
+- Every number field labelled "(mm)" or "(m)" anywhere in the app (editor setup, Fabric and Piece rules, cut plan, compare, rolls, floor) shows and accepts the chosen unit. `ux.ts` does this in one place: the field's `value` property still reads and writes millimetres or metres, so screens, scripts and engines do not change.
+- Marker editor read-outs (length, per garment, positions, measure, clearances, cut lines, ruler in metres or yards) and Photo to marker (width, lengths, "your usual fabric").
+
+### Live marker while nesting
+
+The browser nester already sends the best complete marker (checked by the Rust validator) after every round, and export7 added within-round checkpoints (`checkpoint: true`). The Style Marker step and the Marker editor draw it as it improves, with "Best length so far"; **Stop and keep best** keeps it. No API change was needed. With a desktop app or shop server the editor uses `/api/nest/status` `result` when present.
+
+### Marker readability
+
+- Piece name and size on each piece. Anchor and angle come from the Rust label placement (`MarkerExportCore.labels`, export7); the screen only sizes the text for the zoom and shortens or hides it when the piece is too small (`src/marker-labels.ts`, one adapter, with a display-only fallback for older engine builds). Same in the Marker editor (no more overlapping text on small pieces).
+- Style marker: wheel or +/− to zoom, drag or arrows to pan, 0 or Fit to fit; hover or tap a piece for its name, size, copy, garment, turn, mirror and fabric; legend with sizes, fold edge, stripes, match rings and previous marker; a "Piece names" switch.
+- Long markers (a 33 m folded lay was a 10 px strip): Fit first shows them readable (the fabric fills about half the height, from the start); Fit again shows the whole length.
+
+### Spec sheet and changes of pieces (fit7)
+
+- **Grade step: Measurement spec (points of measure)** from the Rust spec sheet: one row per point of measure (its method opens under the name), tolerance ±, values per size in cm or inch, the base size highlighted, ✓ or ✗ where a body target exists and "design" where none, a Grade steps view, the engine's notes, and PDF / Excel / CSV files. The Cut step offers the spec sheet PDF and Excel next to the pattern files.
+- After a dart, split or pleat that replaces a block piece, the seam check card says the checks need review (with the engine's text and Check again) instead of "No seam checks yet"; the old piece is marked "construction only, not cut"; the spec sheet says why it cannot measure.
+
+### Plies (plan7 contract, `marker/docs/PLIES.md`)
+
+A ply is one layer of fabric; a pass is one length laid from the roll (folded and tube: two plies). The Lay step says "40 plies = 20 passes from the roll (folded or tube: 2 plies per pass)"; the Cut step shows separate **Plies** and **Passes** tiles. Make a cut plan hands the planner plies (`S.cutPlanHandoff`, tested): cut order v2 halves folded plies into passes itself, so handing it passes would halve twice.
+
+After merging plan7 (browser cutting room):
+- **Cut plan** table has separate Plies and Passes columns; Fabric (m) is Rust's `fabric_m` (= length per pass × passes), not plies × length. The form says "Plies are fabric layers… 40 plies of folded fabric = 20 passes". While the planner runs, an indeterminate bar sits under the status line and **Stop and keep the best plan** sits next to Make cut plan (browser edition).
+- **Rolls, Bundles, Floor**: every count that is really passes is labelled **Passes** (tables, fields, shade runs, allocation messages, plan-lay choices "40 plies · 20 passes"), with the tooltip "1 pass = one length from the roll; folded or tube = 2 plies." The Floor spreading form shows it as a hint too (Hindi/Tamil drafts). JSON names (`plies`, `allocated_plies`) are unchanged.
+- **Backup**: "Save a backup file" / "Restore from a backup file" (all work in this browser) are in the "⋯" menu on every screen and on the Cutting floor screen, in a labelled group next to the floor-record backup. The status popover says where to find them.
+- Only the board-photo digitizer still says it needs the desktop app or a server.
+
+### Folded and tube lays (fold7 merged, `marker/fold7` 7a4b497)
+
+- **Yield first.** On folded and tube lays the marker editor, the Style Marker step and the Cut plan table lead with **Yield** (Rust `useful_yield`: fabric that ends up in garments, both layers) and show **Footprint** (`efficiency`, table area covered including unused copies) as a smaller second figure, each with a tooltip. Open lays keep "Efficiency". Values come from the validator report first, then the result; old saved results without the fields keep efficiency (never estimated). One helper: `src/yield.ts` (tested).
+- **"N pieces cut but not used"** reads `surplus_copies` (fallback: count of `surplus_copy` warnings) in the editor check badge, the Style checks tile and note, and per lay in the Cut plan.
+- **Fold edge.** The engine's `Fold edge:` warning shows as plain words — "This order is limited by the fold length, not by search time. Try more garments per marker (even counts per size), a tube, or an open lay." — with the engine's own text as detail: editor checks list, Style Marker and Cut steps, Cut plan lay cells and plan notes.
+- **DXF pairs.** The import option is on by default ("Even quantities are left/right pairs"), the "Cut 2" dialog sets it, and every import sends the real choice (`dxfImportPath`, tested). The dialog says mirror-symmetric pieces (cuffs) are never split; the engine's "Pairs: …" note shows after import.
+
+### Findings from audit7 fixed here
+
+Hidden-screen text (parking); 12 screen choices (five jobs + More tools); room on the Pattern step; editor units and width presets (36/44/58/60″, folded lays enter the width on the table and show the open width); "Checks passed" in green with copies cut but not used (now an amber "N pieces cut but not used"); before nesting the badge says "N pieces ready to nest" and the list hides "missing piece" and raw codes; DXF import asks what "Cut 2" means (a left and right pair is the default) and the file units; long-marker view; feedback names the Style screen and its step and reports the browser platform correctly; sizes in chart order (S, M, L, XL); plies 1 to 500 with one clear reason per problem shown under the field; "one photo is one size" in Photo to marker.
+
+### Checks
+
+- Vitest (worktree root, `npx vitest run marker`): 33 files, 277 tests (245 before this round); new tests for marker view maths, readable fits, the label adapter (engine and fallback), units, size order, plies and the spec-sheet adapter.
+- Real-engine Style smoke (CDP, real mouse and keys, real Style engine and Rust browser nester): 14/14 after every change of this round. With fit7's engine the smoke drags the armhole handle inward (fit7's note) and also checks the spec sheet (13 points of measure x 4 sizes) and nine real files from the browser: pattern PDF, DXF, PLT; tiled marker PDF; marker PLT, PDF, DXF (export7); spec sheet PDF and Excel.
+- Headless tools (not in the repo): `<data-dir>/round07-shots/ux7/tools/` — `measure.mjs` (load, DOM, accessibility, switch, room), `routes.mjs` (one screen in the page on every route, Hindi reaches parked screens), `live.mjs` (live marker), `editor-dxf.mjs` (DXF → Cut 2 → folded → nest → labels), `look.mjs` (screenshots), `smoke.mjs`.
+
+### Open issues
+
+1. The folded Style T-shirt still wastes a layer (smoke: Yield 43.9 %, Footprint 70.6 %, 10 pieces cut but not used); the screen now says so plainly and suggests an open lay or turning pieces over. Engine work (fold7 open items), not UI.
+2. Floor, Rolls and Bundles read-outs that are plain text (not number fields) still show metres; in inch mode they should show yards.
+3. Rolls and Bundles table headers stay English when the language changes (only the Floor and menu labels are translated); their Passes tooltip is English.
+6. A mini-map for very long markers was not built; Fit shows them readable first and whole on the second press.
+7. Grade and Stripes step switches take about 120 ms longer with fit7's redrafted blocks (engine geometry), still under 0.2 s.
+4. Pattern formulas (advanced) keeps millimetre formulas.
+5. Hindi and Tamil strings added this round are drafts for native review.

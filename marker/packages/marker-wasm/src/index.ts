@@ -1,4 +1,7 @@
 export * from './pattern';
+export * from './export';
+export * from './import';
+export * from './cutroom';
 export { createMarkerNester, nest } from './nest';
 export type { MarkerNester, MarkerNesterConfig, BrowserNestOptions, NestProgress } from './nest';
 export type * from './types';

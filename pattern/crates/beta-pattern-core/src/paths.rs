@@ -126,7 +126,7 @@ impl Curve {
             _ => true,
         }
     }
-    fn sample(&self, t: f64) -> Result<(Pt, Pt)> {
+    pub(crate) fn sample(&self, t: f64) -> Result<(Pt, Pt)> {
         Ok(match self {
             Self::Line(p) => (add(p[0], mul(sub(p[1], p[0]), t)), sub(p[1], p[0])),
             Self::Cubic(p) => {

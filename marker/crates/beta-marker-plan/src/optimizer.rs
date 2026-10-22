@@ -11,7 +11,7 @@ struct Search<'a> {
     candidates: &'a [Candidate],
     required: &'a [u32],
     upper: &'a [u32],
-    max_plies: u32,
+    max_passes: u32,
     opts: &'a PlanOptions,
     best: Vec<(usize, u32)>,
     best_cost: f64,
@@ -71,7 +71,7 @@ impl Search<'_> {
             .map(|((r, n), upper)| (upper - n) / r)
             .min()
             .unwrap_or(0)
-            .min(self.max_plies)
+            .min(self.max_passes)
     }
 
     fn add(&self, made: &[u32], i: usize, p: u32) -> Vec<u32> {
@@ -182,7 +182,7 @@ impl Search<'_> {
         let mut cost = 0.0;
         let mut path = Vec::new();
         while plies > 0 && path.len() < 10_000 {
-            let p = plies.min(self.max_plies);
+            let p = plies.min(self.max_passes);
             if p == 0 {
                 return;
             }
@@ -302,7 +302,7 @@ pub(crate) fn solve(
     candidates: &[Candidate],
     required: &[u32],
     upper: &[u32],
-    max_plies: u32,
+    max_passes: u32,
     opts: &PlanOptions,
 ) -> Solution {
     let unit_bound = candidates
@@ -354,21 +354,21 @@ pub(crate) fn solve(
         .map(|i| {
             measured
                 .iter()
-                .map(|c| u64::from(c.ratio[i]) * u64::from(max_plies))
+                .map(|c| u64::from(c.ratio[i]) * u64::from(max_passes))
                 .max()
                 .unwrap_or(0)
         })
         .collect();
     let total_capacity = measured
         .iter()
-        .map(|c| c.ratio.iter().map(|r| u64::from(*r)).sum::<u64>() * u64::from(max_plies))
+        .map(|c| c.ratio.iter().map(|r| u64::from(*r)).sum::<u64>() * u64::from(max_passes))
         .max()
         .unwrap_or(0);
     let mut search = Search {
         candidates,
         required,
         upper,
-        max_plies,
+        max_passes,
         opts,
         best: Vec::new(),
         best_cost: f64::INFINITY,

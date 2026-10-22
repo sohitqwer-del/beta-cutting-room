@@ -10,6 +10,8 @@ import en from './locales/en.json';
 import hi from './locales/hi.json';
 import ta from './locales/ta.json';
 import { t } from './i18n';
+import { planPayload } from '../workflows';
+import { demoJob } from '../demo';
 
 const doc = (pieces = 1, sizes = ['S', 'M', 'L']): PatternDocument => ({ format: 'beta-pattern.doc/v1', name: 'Tee', sizes, base_size: 'M', measurements: Object.fromEntries(sizes.map(s => [s, {}])), variables: {}, drawing: {},
   pieces: Array.from({ length: pieces }, (_, i) => ({ id: `p${i}`, name: `P${i}`, edges: [], material: i === 2 ? 'lining' : 'shell' })) });
@@ -33,6 +35,21 @@ describe('units', () => {
     expect(parseLength('abc', 'cm')).toBeNull();
     expect(parseLength('1/0', 'inch')).toBeNull();
     expect(parseLength('', 'cm')).toBeNull();
+  });
+  it('uses the unit the person typed, not the screen unit', () => {
+    expect(parseLength('58 in', 'cm')).toBeCloseTo(1473.2, 9);
+    expect(parseLength('58"', 'cm')).toBeCloseTo(1473.2, 9);
+    expect(parseLength('150 cm', 'inch')).toBe(1500);
+    expect(parseLength('1-1/2 in', 'cm')).toBeCloseTo(38.1, 9);
+    expect(parseLength('1-1/2', 'inch')).toBeCloseTo(38.1, 9);
+    expect(parseLength('.5', 'cm')).toBe(5);
+  });
+  it('refuses lengths that could be read two ways or are not plain numbers', () => {
+    expect(parseLength('1,500', 'cm')).toBeNull();
+    expect(parseLength('1e3', 'cm')).toBeNull();
+    expect(parseLength('0x10', 'cm')).toBeNull();
+    expect(parseLength('Infinity', 'cm')).toBeNull();
+    expect(parseLength('in', 'inch')).toBeNull();
   });
   it('keeps angles in (-180, 180] and limits widths and steppers', () => {
     expect(normaliseAngle(270)).toBe(-90);
@@ -159,8 +176,22 @@ describe('style flow state', () => {
     expect(S.jobSettings(S.setRepeat(s, { kind: 'none' })).fabric.repeat).toBeNull();
   });
   it('works out spread length and fabric for open and folded lays', () => {
-    expect(S.layFabric(5000, { endAllowanceMm: 20, plies: 40, layout: 'open' })).toEqual({ perPlyMm: 5040, totalMm: 201600, spreads: 40 });
-    expect(S.layFabric(5000, { endAllowanceMm: 20, plies: 40, layout: 'folded' }).totalMm).toBe(100800);
+    expect(S.layFabric(5000, { endAllowanceMm: 20, plies: 40, layout: 'open' })).toEqual({ perPlyMm: 5040, totalMm: 201600, passes: 40 });
+    expect(S.layFabric(5000, { endAllowanceMm: 20, plies: 40, layout: 'folded' })).toEqual({ perPlyMm: 5040, totalMm: 100800, passes: 20 });
+    expect(S.layFabric(5000, { endAllowanceMm: 20, plies: 40, layout: 'tubular' }).passes).toBe(20);
+  });
+  it('hands the cut planner plies (layers), never passes: cut order v2 halves folded plies itself', () => {
+    // marker/docs/PLIES.md: 40 plies of folded fabric = 20 passes. Handing over 20 would halve twice (10 passes).
+    const lay = { ...S.initialSession().lay, layout: 'folded' as const, plies: 40, endAllowanceMm: 15, order: { M: 120, L: 40 } };
+    expect(S.layFabric(5000, lay).passes).toBe(20);
+    const form = S.cutPlanHandoff(lay, ['S', 'M', 'L']);
+    expect(form).toEqual({ quantities: [0, 120, 40], maxPlies: 40, endAllowanceMm: 15 });
+    const payload = planPayload(demoJob, { quantities: { M: 120, L: 40 }, maxPlies: form.maxPlies, maxGarments: 4, overcut: 0, time: 1, endAllowance: form.endAllowanceMm, layCost: 0 });
+    expect(payload.order.format).toBe('beta-marker.cutorder/v2');
+    expect(payload.order.max_plies).toBe(40);
+    const open = { ...lay, layout: 'open' as const };
+    expect(S.layFabric(5000, open).passes).toBe(40);
+    expect(S.cutPlanHandoff(open, ['M']).maxPlies).toBe(40);
   });
   it('saves and restores the session, never the marker', () => {
     const store = new Map<string, string>();
@@ -199,6 +230,16 @@ describe('engine adapter', () => {
     await expect(e.validate({} as never, {} as never)).rejects.toThrow(/not loaded/);
     expect(await e.nestSizes(doc(1), 'p0.a')).toEqual({ M: [] });
     expect(await e.exportPatternDxf(doc(1))).toBe('DXF');
+  });
+  it('offers the spec sheet only when the engine measures one', async () => {
+    expect(joinCores(style, pattern, undefined, 'style').specSheet).toBeUndefined();
+    const sheet = { schema: 'beta-pattern.spec/v1', style: 's', block: 't_shirt', unit: 'mm', sizes: ['M'], base_size: 'M', rows: [], notes: [] };
+    const quality = { ...style, block_checks: vi.fn(), spec_sheet: vi.fn(() => sheet), export_spec_sheet: vi.fn(() => ({ filename: 'spec.pdf', mime: 'application/pdf', bytes: [37, 80] })) };
+    const e = joinCores(quality as never, pattern, undefined, 'style');
+    expect(await e.specSheet!(doc(1))).toBe(sheet);
+    expect((await e.exportSpecSheet!(doc(1), 'pdf')).filename).toBe('spec.pdf');
+    quality.spec_sheet.mockImplementation(() => { throw new Error('Topology changed.'); });
+    await expect(e.specSheet!(doc(1))).rejects.toThrow('Topology changed.');
   });
   it('reads the practice switch from the address', () => {
     expect(practiceRequested('?style-practice=1')).toBe(true);
@@ -239,5 +280,19 @@ describe('style strings', () => {
   it('fills placeholders and falls back to English', () => {
     expect(t('n_pieces', { n: 3 }, 'en')).toBe('3 pieces');
     expect(t('step_of', { n: 2, total: 8 }, 'ta')).toMatch(/2/);
+  });
+});
+
+describe('plies', () => {
+  it('gives one clear reason for each problem', async () => {
+    const S = await import('./state');
+    const open = { layout: 'open' as const, face: 'up' as const }, folded = { layout: 'folded' as const, face: 'up' as const };
+    expect(S.pliesProblem(40, open)).toBeNull();
+    expect(S.pliesProblem(0, open)).toBe('plies_whole');
+    expect(S.pliesProblem(-5, open)).toBe('plies_whole');
+    expect(S.pliesProblem(2.5, open)).toBe('plies_whole');
+    expect(S.pliesProblem(1e12, open)).toBe('plies_max');
+    expect(S.pliesProblem(41, folded)).toBe('plies_even_error');
+    expect(S.pliesProblem(41, open)).toBeNull();
   });
 });

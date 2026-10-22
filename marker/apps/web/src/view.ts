@@ -8,6 +8,14 @@ export function fitView(length: number, width: number, aspect: number): View {
   const h = w / aspect;
   return { x: (length - w) / 2, y: (width - h) / 2, width: w, height: h };
 }
+/** Fit for reading. A short marker shows whole; a long one fills about half the height from its start, so pieces stay
+ * readable (move along the length to see the rest). */
+export function fitReadable(length: number, width: number, aspect: number, minShare = 0.5): View {
+  const whole = fitView(length, width, aspect);
+  if (width / whole.height >= minShare) return whole;
+  const h = width / minShare, w = h * aspect, pad = width * 0.06;
+  return { x: -pad, y: (width - h) / 2, width: w, height: h };
+}
 /** Zoom around a point; the anchor stays at the same screen position. */
 export function zoomAt(view: View, anchor: Pt, factor: number): View {
   const scale = Math.max(20 / view.width, Math.min(200000 / view.width, factor));

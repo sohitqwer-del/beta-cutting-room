@@ -2,11 +2,16 @@ import { icon } from './icons';
 import { installUx } from './ux';
 import { CREDITS, logo, PRODUCT, VERSION } from './brand';
 import { isDesktop, serverToken, setServerToken } from './transport';
+import { staticMode } from './static-mode';
 import type { DocumentState } from './state';
 import { installFeedback } from './feedback';
 import { installQuick, QUICK_SCREEN } from './quick/ui';
 import { installStyle, STYLE_SCREEN } from './style/ui';
 import { t as styleText } from './style/i18n';
+import { find, findAll, screenTitle } from './screens';
+import { appUnit, onUnit, setAppUnit, type AppUnit } from './units-pref';
+import { label, type LabelKey } from './floor-i18n';
+import type { FloorLanguage } from './floor-types';
 
 /** App frame: sidebar navigation (full or icon rail), top bar, workflow steps with "Next", Home, Reports, About,
  * theme, language and server token. It moves the existing screens into one layout and never changes their behaviour. */
@@ -19,24 +24,24 @@ export interface ShellHost {
 
 const esc = (v: unknown): string => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 
-interface Screen { index: number; key: string; title: string; group: string; icon: string; hash: string }
-/** Screen indexes are fixed by existing modules: 0 editor, 1 plan, 2 compare, 3 help, 4 pattern, 5 digitize, 6 rolls, 7 bundles, 8 floor, 11 quick marker, 12 style flow. */
-const SCREENS: Screen[] = [
+interface Screen { index: number; key: string; title: string; group: '' | 'more'; icon: string; hash: string; titleKey?: string }
+/** Screen indexes are fixed by existing modules: 0 editor, 1 plan, 2 compare, 3 help, 4 pattern, 5 digitize, 6 rolls, 7 bundles, 8 floor, 11 quick marker, 12 style flow.
+ * The menu shows the five jobs people come for; the rest sits under "More tools". Addresses (#/marker, #/pattern …) never change. */
+export const SCREENS: Screen[] = [
   { index: 9, key: 'home', title: 'Home', group: '', icon: 'home', hash: 'home' },
+  { index: STYLE_SCREEN, key: 'make_style', title: 'Make a style', group: '', icon: 'style', hash: 'style' },
   { index: QUICK_SCREEN, key: 'quick', title: 'Photo to marker', group: '', icon: 'photo-marker', hash: 'quick' },
-  { index: STYLE_SCREEN, key: 'style', title: 'Style: pattern to cut', group: 'design', icon: 'style', hash: 'style' },
-  { index: 4, key: 'pattern', title: 'Pattern formulas', group: 'design', icon: 'pattern', hash: 'pattern' },
-  { index: 5, key: 'digitize', title: 'Digitize', group: 'design', icon: 'digitize', hash: 'digitize' },
-  { index: 0, key: 'editor', title: 'Marker editor', group: 'planning', icon: 'marker', hash: 'marker' },
-  { index: 1, key: 'cut_plan', title: 'Cut plan', group: 'planning', icon: 'plan', hash: 'cut-plan' },
-  { index: 2, key: 'compare', title: 'Compare', group: 'planning', icon: 'compare', hash: 'compare' },
-  { index: 6, key: 'rolls', title: 'Rolls', group: 'cutting_floor', icon: 'rolls', hash: 'rolls' },
-  { index: 8, key: 'floor', title: 'Floor', group: 'cutting_floor', icon: 'floor', hash: 'floor' },
-  { index: 7, key: 'bundles', title: 'Bundles', group: 'cutting_floor', icon: 'bundles', hash: 'bundles' },
-  { index: 10, key: 'reports', title: 'Reports', group: 'insight', icon: 'reports', hash: 'reports' },
-  { index: 3, key: 'help', title: 'Help', group: 'insight', icon: 'help', hash: 'help' },
+  { index: 0, key: 'marker_files', title: 'Marker from files', group: '', icon: 'marker', hash: 'marker', titleKey: 'editor' },
+  { index: 8, key: 'cutting_floor', title: 'Cutting floor', group: '', icon: 'floor', hash: 'floor' },
+  { index: 1, key: 'cut_plan', title: 'Cut plan', group: 'more', icon: 'plan', hash: 'cut-plan' },
+  { index: 6, key: 'rolls', title: 'Rolls', group: 'more', icon: 'rolls', hash: 'rolls' },
+  { index: 7, key: 'bundles', title: 'Bundles', group: 'more', icon: 'bundles', hash: 'bundles' },
+  { index: 10, key: 'reports', title: 'Reports', group: 'more', icon: 'reports', hash: 'reports' },
+  { index: 2, key: 'compare', title: 'Compare', group: 'more', icon: 'compare', hash: 'compare' },
+  { index: 4, key: 'pattern_formulas', title: 'Pattern formulas', group: 'more', icon: 'pattern', hash: 'pattern' },
+  { index: 5, key: 'digitize', title: 'Digitize', group: 'more', icon: 'digitize', hash: 'digitize' },
+  { index: 3, key: 'help', title: 'Help', group: 'more', icon: 'help', hash: 'help' },
 ];
-const GROUPS: Record<string, string> = { design: 'Design', planning: 'Marker and planning', cutting_floor: 'Cutting floor', insight: 'Reports and help' };
 
 /** Pattern → marker → plan → rolls → spread → cut → bundles → sewing. Floor steps open a Floor page.
  * Step 1 opens the Style flow (draft to marker); the formula Pattern screen also counts as step 1. */
@@ -63,12 +68,14 @@ function applyTheme(theme: string): void {
 }
 
 export function installShell(host: ShellHost) {
-  const $ = <T extends Element = HTMLElement>(s: string, root: ParentNode = document): T => root.querySelector<T>(s)!;
+  const $ = <T extends Element = HTMLElement>(s: string, root?: ParentNode): T => (root ? root.querySelector<T>(s) : find<T>(s))!;
   const app = $<HTMLDivElement>('#app');
   let theme = 'light';
   try { theme = localStorage.getItem(THEME_KEY) ?? 'light'; } catch { /* default */ }
   applyTheme(theme);
   let current = 0;
+  /** Set once the first screen is shown; `fromAddress` while a screen opens because the address changed. */
+  let started = false, fromAddress = false;
 
   // ----- Frame -----
   const header = $<HTMLElement>('header');
@@ -76,7 +83,7 @@ export function installShell(host: ShellHost) {
   const nav = $<HTMLElement>('.screen-tabs');
   const filebar = $<HTMLElement>('#editor-filebar');
   const messageEl = $<HTMLElement>('#message');
-  const sections = [$<HTMLElement>('.workspace'), ...Array.from(document.querySelectorAll<HTMLElement>('.screen'))];
+  const sections = [$<HTMLElement>('.workspace'), ...Array.from(findAll<HTMLElement>('.screen'))];
 
   app.classList.add('app-shell');
   const skip = document.createElement('a'); skip.href = '#content'; skip.className = 'skip-link'; skip.textContent = 'Skip to main content';
@@ -88,23 +95,34 @@ export function installShell(host: ShellHost) {
   app.prepend(skip, sidebar, appMain);
   appMain.append(header);
 
+  // Top bar, one slim row: title · status (with what works where) · language · units · feedback · "⋯" (theme, About).
   header.innerHTML = `<button type="button" class="menu-toggle icon-btn ghost" id="menu-toggle" aria-controls="sidebar" aria-expanded="false" aria-label="Show navigation">${icon('menu')}</button>
-    <div class="topbar-title"><span class="eyebrow" id="topbar-group"></span><strong id="topbar-title">Home</strong></div>
+    <div class="topbar-title" id="topbar-heading"><span class="eyebrow" id="topbar-group"></span><strong id="topbar-title">Home</strong></div>
+    <details class="menu status-menu" id="status-menu"><summary aria-label="Where BETA runs and what works here"></summary><div class="menu-panel status-panel" id="status-panel" role="group" aria-label="Where BETA runs">
+      <div class="status-where" id="status-where"></div>
+      ${isDesktop() ? '' : `<button type="button" id="token-button" class="small" aria-haspopup="dialog">${icon('key')}<span id="token-label">Server token</span></button>`}</div></details>
     <div class="topbar-tools" id="topbar-tools" role="group" aria-label="App settings"></div>
-    <button type="button" class="topbar-more icon-btn ghost" id="topbar-more" aria-controls="topbar-tools" aria-expanded="false" aria-label="More: language, theme and help">${icon('more')}</button>`;
+    <button type="button" class="topbar-more icon-btn ghost" id="topbar-more" aria-controls="topbar-tools" aria-expanded="false" aria-label="Theme, About and more settings" data-tip="Theme and About" data-tip-align="end">${icon('more')}</button>`;
   const tools = $<HTMLElement>('.topbar-tools', header);
-  tools.before(status);
-  // The feedback module adds its button before #about-button.
+  // The status text (set by main.ts) is the summary of a small popover; the old "Browser edition" banner lives inside it.
+  $('#status-menu > summary', header).append(status);
+  // The feedback module adds its button before #topbar-extra (theme and About open from the "⋯" button).
   tools.insertAdjacentHTML('beforeend', `<label class="tool-select">${icon('globe')}<span class="label-text" data-floor-label="language">Language</span><select id="app-language" aria-label="Language"><option value="en">English</option><option value="hi" lang="hi">हिन्दी · draft</option><option value="ta" lang="ta">தமிழ் · draft</option></select></label>
-    <label class="tool-select">${icon('sun')}<span class="label-text">Theme</span><select id="app-theme" aria-label="Colour theme"><option value="light">Light</option><option value="dark">Dark</option><option value="system">Same as computer</option></select></label>
-    ${isDesktop() ? '' : `<button type="button" id="token-button" class="small tool-button" aria-haspopup="dialog" data-tip="Server access token">${icon('key')}<span id="token-label">Server token</span></button>`}
-    <button type="button" id="about-button" class="small tool-button" aria-haspopup="dialog" aria-label="About ${PRODUCT}">${icon('info')}<span class="tool-text">About</span></button>`);
+    <div class="segmented unit-switch" role="group" aria-labelledby="unit-switch-label"><span class="sr-only" id="unit-switch-label" data-floor-label="units">Units</span><button type="button" data-app-unit="cm" aria-pressed="false">cm</button><button type="button" data-app-unit="inch" aria-pressed="false">inch</button></div>
+    <div class="topbar-extra" id="topbar-extra" role="group" aria-label="Theme and About">
+      <label class="tool-select menu-select">${icon('sun')}<span class="menu-select-text" data-floor-label="theme">Theme</span><select id="app-theme" aria-label="Colour theme"><option value="light">Light</option><option value="dark">Dark</option><option value="system">Same as computer</option></select></label>
+      <button type="button" id="about-button" aria-haspopup="dialog" aria-label="About ${PRODUCT}">${icon('info')}<span data-floor-label="about">About</span></button></div>`);
 
+  // Cutting-room screens: one row with this screen's file commands (editor) and the workflow steps with "Next".
+  const workbar = document.createElement('div'); workbar.className = 'workbar';
   const workflow = document.createElement('nav'); workflow.className = 'workflow'; workflow.setAttribute('aria-label', 'Cutting room workflow');
-  workflow.innerHTML = `<span class="workflow-label" data-floor-label="workflow">Workflow</span><ol>${STEPS.map((s, i) => `<li><button type="button" data-step="${i}" aria-description="${esc(s.hint)}"><span class="step-no" aria-hidden="true">${i + 1}</span><span data-floor-label="${s.key}">${esc(s.label)}</span></button></li>`).join('')}</ol>
+  workflow.innerHTML = `<span class="workflow-label" data-floor-label="workflow">Workflow</span><ol>${STEPS.map((s, i) => `<li><button type="button" data-step="${i}" aria-description="${esc(s.hint)}" title="${esc(s.label)}"><span class="step-no" aria-hidden="true">${i + 1}</span><span class="step-name" data-floor-label="${s.key}">${esc(s.label)}</span></button></li>`).join('')}</ol>
     <button type="button" class="workflow-next" id="workflow-next" hidden><span class="next-word" data-floor-label="next">Next</span><span class="next-name"></span>${icon('arrow-right')}</button>`;
-  header.after(workflow);
-  workflow.after(filebar);
+  header.after(workbar);
+  workbar.append(filebar, workflow);
+  // Step names that do not fit show as numbers (the name stays in the tooltip and for screen readers).
+  const fitSteps = () => { const list = workflow.querySelector('ol')!; if (workbar.hidden || !workbar.isConnected) return; workflow.classList.remove('compact'); if (list.scrollWidth > list.clientWidth + 2) workflow.classList.add('compact'); };
+  new ResizeObserver(() => fitSteps()).observe(workbar);
   appMain.append(content);
   content.append(...sections);
   const toasts = document.createElement('div'); toasts.className = 'toast-region';
@@ -113,21 +131,31 @@ export function installShell(host: ShellHost) {
   app.append(toasts);
 
   // ----- Sidebar navigation (existing [data-screen] buttons, regrouped, with icons) -----
+  // Five jobs people come for, then "More tools" (folded) for everything else. Every screen and address still works.
   const existing = new Map(Array.from(nav.querySelectorAll<HTMLButtonElement>('[data-screen]'), b => [Number(b.dataset.screen), b]));
   sidebar.append(nav); nav.textContent = '';
-  let group = '-';
+  nav.insertAdjacentHTML('beforeend', `<div class="nav-main" role="group" aria-label="Main jobs"></div>
+    <button type="button" class="nav-more-toggle" id="nav-more-toggle" aria-expanded="false" aria-controls="nav-more">${icon('more')}<span class="nav-label" data-floor-label="more_tools">More tools</span>${icon('chevron-down', 'nav-chevron')}</button>
+    <div class="nav-more" id="nav-more" role="group" aria-label="More tools" hidden></div>`);
+  const navMain = $<HTMLElement>('.nav-main', nav), navMore = $<HTMLElement>('#nav-more', nav), moreToggle = $<HTMLButtonElement>('#nav-more-toggle', nav);
   for (const s of SCREENS) {
-    if (s.group !== group) { group = s.group; if (group) nav.insertAdjacentHTML('beforeend', `<div class="nav-group" data-floor-label="${group}">${GROUPS[group]}</div>`); }
     let button = existing.get(s.index);
     if (!button) { button = document.createElement('button'); button.type = 'button'; button.dataset.screen = String(s.index); button.setAttribute('aria-pressed', 'false'); button.setAttribute('aria-controls', `screen-${s.index}`); button.onclick = () => host.show(s.index); }
-    button.innerHTML = `${icon(s.icon)}<span class="nav-label">${esc(button.textContent?.trim() || s.title)}</span>`;
-    nav.append(button);
+    button.innerHTML = `${icon(s.icon)}<span class="nav-label">${esc(s.title)}</span>`;
+    (s.group === 'more' ? navMore : navMain).append(button);
   }
+  const MORE_KEY = 'beta-nav-more';
+  function setMore(open: boolean, remember = true): void {
+    navMore.hidden = !open; moreToggle.setAttribute('aria-expanded', String(open));
+    if (remember) try { localStorage.setItem(MORE_KEY, open ? 'open' : 'closed'); } catch { /* session only */ }
+  }
+  try { setMore(localStorage.getItem(MORE_KEY) === 'open', false); } catch { setMore(false, false); }
+  moreToggle.addEventListener('click', () => setMore(navMore.hidden));
   nav.addEventListener('keydown', event => {
     if (!['ArrowUp', 'ArrowDown'].includes(event.key)) return;
-    const buttons = Array.from(nav.querySelectorAll<HTMLButtonElement>('[data-screen]')), at = buttons.indexOf(event.target as HTMLButtonElement);
+    const buttons = Array.from(nav.querySelectorAll<HTMLButtonElement>('[data-screen], #nav-more-toggle')).filter(b => !b.closest('[hidden]')), at = buttons.indexOf(event.target as HTMLButtonElement);
     if (at < 0) return; event.preventDefault();
-    const next = buttons[(at + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length]!; next.focus(); next.click();
+    const next = buttons[(at + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length]!; next.focus(); if (next.dataset.screen) next.click();
   });
   sidebar.insertAdjacentHTML('beforeend', `<div class="sidebar-foot"><p class="sidebar-promise">Open source · runs on your own PC or server · your data stays in your factory.</p><p class="sidebar-version">Version ${esc(VERSION)} · Apache-2.0</p>
     <button type="button" id="nav-rail-toggle" class="rail-toggle" aria-controls="sidebar">${icon('chevrons-left')}<span class="nav-label">Collapse menu</span></button></div>`);
@@ -158,7 +186,7 @@ export function installShell(host: ShellHost) {
   // ----- Dialogs -----
   document.body.insertAdjacentHTML('beforeend', `
   <dialog id="about-dialog" class="about" aria-labelledby="about-title"><div class="dialog-body">
-    <div class="about-head">${logo(56, `${PRODUCT} logo`)}<div><h2 id="about-title">${PRODUCT}</h2><p>Version ${esc(VERSION)} · ${isDesktop() ? 'Desktop app' : 'Browser app with local server'}</p></div></div>
+    <div class="about-head">${logo(56, `${PRODUCT} logo`)}<div><h2 id="about-title">${PRODUCT}</h2><p>Version ${esc(VERSION)} · ${isDesktop() ? 'Desktop app' : staticMode() ? 'Browser edition · runs on this device' : 'Browser app with local server'}</p></div></div>
     <p class="promise">Open source · runs on your own PC or server · your data stays in your factory.</p>
     <p>Pattern, digitizing, marker making, cut planning, roll inspection, spreading, cutting and bundle tracking in one offline app. No account, no cloud service and no tracking. All garment calculations run in Rust on this computer or your own server.</p>
     <dl><dt>Licence</dt><dd>Apache-2.0</dd>${CREDITS.map(([name, licence, use]) => `<dt>${esc(name)}</dt><dd>${esc(licence)} · ${esc(use)}</dd>`).join('')}</dl>
@@ -172,7 +200,7 @@ export function installShell(host: ShellHost) {
     <div class="dialog-actions"><button type="button" id="token-clear" class="danger">Forget token</button><button type="button" data-close>Cancel</button><button type="button" id="token-save" class="primary">Save and connect</button></div></div></dialog>
   <dialog id="confirm-dialog" aria-labelledby="confirm-title"><div class="dialog-body"><h2 id="confirm-title">Please confirm</h2><p id="confirm-text"></p>
     <div class="dialog-actions"><button type="button" id="confirm-no">Cancel</button><button type="button" id="confirm-yes" class="primary">Continue</button></div></div></dialog>`);
-  document.querySelectorAll<HTMLButtonElement>('dialog [data-close]').forEach(b => b.onclick = () => b.closest('dialog')!.close());
+  findAll<HTMLButtonElement>('dialog [data-close]').forEach(b => b.onclick = () => b.closest('dialog')!.close());
 
   function confirmAction(text: string, yes: string): Promise<boolean> {
     const dialog = $<HTMLDialogElement>('#confirm-dialog');
@@ -192,17 +220,14 @@ export function installShell(host: ShellHost) {
   function sync(index: number): void {
     current = index;
     const s = byIndex.get(index);
-    const navButton = nav.querySelector<HTMLElement>(`[data-screen="${index}"] .nav-label`);
-    $('#topbar-title').textContent = navButton?.textContent ?? s?.title ?? '';
-    const groupLabel = s?.group ? nav.querySelector<HTMLElement>(`[data-floor-label="${s.group}"]`)?.textContent ?? '' : '';
-    $('#topbar-group').textContent = groupLabel;
-    $('#print-title').textContent = s?.title ?? '';
+    renderTitle();
     $('#print-date').textContent = new Date().toLocaleDateString();
-    document.title = `${s?.title ?? ''} · ${PRODUCT}`;
-    workflow.hidden = index === 9 || index === QUICK_SCREEN || index === STYLE_SCREEN;
+    workbar.hidden = index === 9 || index === QUICK_SCREEN || index === STYLE_SCREEN;
     app.dataset.activeScreen = String(index);
+    // A screen under "More tools" keeps its group open, so the highlighted button is visible.
+    if (s?.group === 'more' && navMore.hidden) setMore(true, false);
     if (index === 9) renderHome();
-    const page = document.querySelector<HTMLElement>('[data-floor-page][aria-pressed=true]')?.dataset.floorPage;
+    const page = find<HTMLElement>('[data-floor-page][aria-pressed=true]')?.dataset.floorPage;
     let active = -1;
     workflow.querySelectorAll<HTMLButtonElement>('[data-step]').forEach(b => {
       const step = STEPS[Number(b.dataset.step)]!;
@@ -224,17 +249,36 @@ export function installShell(host: ShellHost) {
       nextButton.setAttribute('aria-label', `Next step: ${nextStep + 1} ${name}. ${next.hint}`);
       nextButton.dataset.tip = next.hint; nextButton.dataset.tipAlign = 'end';
     }
-    if (s && location.hash !== `#/${s.hash}`) history.replaceState(null, '', `#/${s.hash}`);
+    // Each screen change is a browser history entry, so Back and Forward (and the phone back gesture) move between screens.
+    if (s && location.hash !== `#/${s.hash}`) { if (started && !fromAddress) history.pushState(null, '', `#/${s.hash}`); else history.replaceState(null, '', `#/${s.hash}`); }
     try { localStorage.setItem(LAST_KEY, String(index)); } catch { /* optional */ }
     app.classList.remove('nav-open'); $('#menu-toggle').setAttribute('aria-expanded', 'false');
     closeTools(false);
+    fitSteps();
   }
+  /** Top-bar title: the screen's own title when it gives one (the Style flow shows its step), else the menu name. */
+  function renderTitle(): void {
+    const s = byIndex.get(current), language = (document.documentElement.dataset.language ?? 'en') as FloorLanguage;
+    const lang: FloorLanguage = language === 'hi' || language === 'ta' ? language : 'en';
+    const navName = nav.querySelector<HTMLElement>(`[data-screen="${current}"] .nav-label`)?.textContent ?? s?.title ?? '';
+    const own = screenTitle(current);
+    const title = own?.title ?? (s?.titleKey ? label(lang, s.titleKey as LabelKey) : navName);
+    const eyebrow = own?.eyebrow ?? (s?.group === 'more' ? label(lang, 'more_tools') : '');
+    const el = $('#topbar-title');
+    el.textContent = title; $('#topbar-group').textContent = eyebrow;
+    // A screen that puts its main heading in the top bar (Style) gets a real heading there, focusable after a step change.
+    if (own?.heading) { el.setAttribute('role', 'heading'); el.setAttribute('aria-level', '1'); el.tabIndex = -1; }
+    else { el.removeAttribute('role'); el.removeAttribute('aria-level'); el.removeAttribute('tabindex'); }
+    $('#print-title').textContent = title;
+    document.title = `${title} · ${PRODUCT}`;
+  }
+  window.addEventListener('beta-title', renderTitle);
   window.addEventListener('beta-screen', event => sync((event as CustomEvent<number>).detail));
   document.addEventListener('click', event => { if ((event.target as Element).closest('[data-floor-page]')) queueMicrotask(() => sync(current)); });
   function go(index: number, floorPage?: string, focus?: string): void {
     host.show(index);
-    if (floorPage) { document.querySelector<HTMLButtonElement>(`[data-floor-page="${floorPage}"]`)?.click(); sync(index); }
-    if (focus) { const target = document.querySelector<HTMLElement>(focus); target?.scrollIntoView({ block: 'center' }); target?.focus(); }
+    if (floorPage) { find<HTMLButtonElement>(`[data-floor-page="${floorPage}"]`)?.click(); sync(index); }
+    if (focus) { const target = find<HTMLElement>(focus); target?.scrollIntoView({ block: 'center' }); target?.focus(); }
   }
   workflow.addEventListener('click', event => {
     const b = (event.target as Element).closest<HTMLButtonElement>('[data-step]'); if (!b) return;
@@ -258,7 +302,9 @@ export function installShell(host: ShellHost) {
   function closeTools(focus: boolean): void { if (!header.classList.contains('tools-open')) return; header.classList.remove('tools-open'); more.setAttribute('aria-expanded', 'false'); if (focus) more.focus(); }
   more.addEventListener('click', () => {
     const open = !header.classList.contains('tools-open'); header.classList.toggle('tools-open', open); more.setAttribute('aria-expanded', String(open));
-    if (open) tools.querySelector<HTMLElement>('select, button')?.focus();
+    // Wide screens open only the Theme and About panel; phones open every setting.
+    const extra = $<HTMLElement>('#topbar-extra', header), phone = getComputedStyle(extra).display === 'contents';
+    if (open) (phone ? tools : extra).querySelector<HTMLElement>('select, button')?.focus();
   });
   document.addEventListener('click', event => { if (header.classList.contains('tools-open') && !header.contains(event.target as Node)) closeTools(false); });
   document.addEventListener('keydown', event => {
@@ -268,7 +314,7 @@ export function installShell(host: ShellHost) {
   });
 
   async function action(name: string, element: HTMLElement): Promise<void> {
-    const click = (selector: string) => document.querySelector<HTMLElement>(selector)?.click();
+    const click = (selector: string) => find<HTMLElement>(selector)?.click();
     switch (name) {
       case 'open-file': click('#open-button'); break;
       case 'new-marker': go(0); click('#open-button'); break;
@@ -278,53 +324,50 @@ export function installShell(host: ShellHost) {
         if (await confirmAction('Start a blank pattern? The current pattern draft is replaced. Save it first with Save pattern JSON if you need it.', 'Start blank pattern')) { go(4); click('#pd-new'); }
         break;
       case 'export': {
-        const button = document.querySelector<HTMLButtonElement>(`[data-export="${element.dataset.format}"]`);
+        const button = find<HTMLButtonElement>(`[data-export="${element.dataset.format}"]`);
         if (button) { button.click(); host.message('Preparing the file from the current marker…'); }
         break;
       }
       case 'recent': {
-        const recent = document.querySelector<HTMLSelectElement>('#native-recent');
+        const recent = find<HTMLSelectElement>('#native-recent');
         if (recent) { recent.value = element.dataset.path ?? ''; recent.dispatchEvent(new Event('change')); }
         break;
       }
     }
   }
 
-  // ----- Home -----
+  // ----- Home: one clear "Start here", then other ways in, the cutting floor and what to continue -----
   function homeHtml(): string {
-    const card = (act: string, iconName: string, title: string, text: string, extra = '') => `<button type="button" class="action-card${extra}" ${act}><span class="icon-tile">${icon(iconName)}</span><span class="action-text"><strong>${title}</strong><span>${text}</span></span>${icon('arrow-right', 'action-arrow')}</button>`;
-    const task = (go: string, iconName: string, title: string, text: string) => `<button type="button" class="task-card" ${go}><span class="icon-tile">${icon(iconName)}</span><strong>${title}</strong><span>${text}</span></button>`;
-    const guide = (n: number, title: string, text: string, buttons: string) => `<li><span class="step-badge" aria-hidden="true">${n}</span><div class="guide-text"><strong>${title}</strong><span>${text}</span></div><div class="guide-actions">${buttons}</div></li>`;
+    const L = (key: string, text: string) => `<span data-floor-label="${key}">${esc(text)}</span>`;
+    const card = (act: string, iconName: string, titleKey: string, title: string, textKey: string, text: string, extra = '') => `<button type="button" class="action-card${extra}" ${act}><span class="icon-tile">${icon(iconName)}</span><span class="action-text"><strong>${L(titleKey, title)}</strong><span>${L(textKey, text)}</span></span>${icon('arrow-right', 'action-arrow')}</button>`;
+    const task = (go: string, iconName: string, key: string, title: string) => `<button type="button" class="task-chip" ${go}>${icon(iconName)}${L(key, title)}</button>`;
+    const flow = ['style', 'pattern', 'grade', 'lay', 'gaps', 'stripes', 'marker', 'cut'];
     return `<section id="screen-9" class="screen home" hidden aria-labelledby="home-title">
-    <div class="home-hero">${logo(64, `${PRODUCT} logo`)}<div class="home-hero-text"><h1 id="home-title">${PRODUCT}</h1><p>Make patterns and markers, plan the cut, and track every lay and bundle from fabric roll to sewing line.</p></div>
-      <ul class="chips" aria-label="About this app"><li class="chip ok">${icon('check')}Open source · Apache-2.0</li><li class="chip">Works offline</li><li class="chip">Your data stays in your factory</li></ul></div>
+    <div class="home-hero">${logo(48, `${PRODUCT} logo`)}<div class="home-hero-text"><h1 id="home-title">${PRODUCT}</h1><p>${L('home_lead', 'Make patterns and markers, plan the cut and track every lay, on your own computer.')}</p></div>
+      <ul class="chips" aria-label="About this app"><li class="chip ok">${icon('check')}${L('home_chip_open', 'Open source · Apache-2.0')}</li><li class="chip">${L('home_chip_offline', 'Works offline')}</li><li class="chip">${L('home_chip_data', 'Your data stays in your factory')}</li></ul></div>
     <div class="home-columns">
-      <section class="home-section" aria-labelledby="home-start"><h2 id="home-start">Start</h2><div class="start-grid">
-        ${card(`data-go="${QUICK_SCREEN}"`, 'photo-marker', 'Photo to marker', 'No CAD? Take a photo of your paper pattern pieces with your phone. BETA finds the shapes and plans the marker.', ' quick-card')}
-        ${card(`data-go="${STYLE_SCREEN}"`, 'style', esc(styleText('home_title')), esc(styleText('home_text')), ' primary-card style-card')}
-        ${card('data-act="new-marker"', 'marker', 'Start a new marker', 'Open DXF pattern pieces, set the fabric width and nest.')}
-        ${card('data-act="demo"', 'demo', 'Try the demo', 'A small sample shirt. Safe to try every tool.')}
-        ${card('data-act="new-pattern"', 'new', 'Formula pattern (advanced)', 'A blank formula draft with measurements, like Seamly2D.')}
-        ${isDesktop() ? card('data-act="open-project"', 'open', 'Open a project', 'A saved .betaproj folder with all screens.') : card('data-act="open-file"', 'open', 'Open a saved marker', 'Marker job or result JSON, or DXF pieces.')}
-      </div></section>
-      <section class="home-section" aria-labelledby="home-continue"><h2 id="home-continue">Continue</h2><div id="home-recent"></div></section>
+      <section class="home-section home-start" aria-labelledby="home-start"><h2 id="home-start">${L('home_start_here', 'Start here')}</h2>
+        <div class="start-card">
+          <span class="icon-tile">${icon('style')}</span>
+          <div class="start-text"><h3>${L('make_style', 'Make a style')}</h3><p>${L('home_style_text', 'From a basic block or a blank sheet to a cut-ready marker, in eight guided steps.')}</p>
+            <ol class="start-flow" aria-hidden="true">${flow.map((k, i) => `<li><b>${i + 1}</b>${esc(styleText(`step_${k}` as Parameters<typeof styleText>[0]))}</li>`).join('')}</ol>
+            <div class="start-actions"><button type="button" class="primary large" data-go="${STYLE_SCREEN}" id="home-style-start">${icon('play')}${L('home_style_new', 'Start a new style')}</button><span id="home-style-continue"></span></div></div>
+        </div></section>
+      <section class="home-section" aria-labelledby="home-continue"><h2 id="home-continue">${L('home_continue', 'Continue')}</h2><div id="home-recent"></div></section>
     </div>
-    <section class="home-section home-guide card" aria-labelledby="home-guide"><h2 id="home-guide">Your first marker in 3 minutes</h2>
-      <ol class="guide-steps">
-        ${guide(1, 'Open the pieces', 'Choose a DXF file from your CAD, or use the demo shirt.', `<button type="button" data-act="new-marker">${icon('open')}Open DXF</button><button type="button" data-act="demo">${icon('demo')}Demo</button>`)}
-        ${guide(2, 'Set fabric and sizes', 'Enter the fabric width and how many garments of each size go in one marker.', `<button type="button" data-go="0" data-focus='[data-field="width"]'>Go to setup</button>`)}
-        ${guide(3, 'Nest the marker', 'Press Nest marker. The best result so far shows while it searches.', `<button type="button" data-go="0" data-focus="#nest">${icon('play')}Nest</button>`)}
-        ${guide(4, 'Check and export', 'Look for “Checks passed” under the marker, then export PLT, PDF or DXF.', `<button type="button" data-go="0" data-focus="#export-menu > summary">${icon('download')}Export</button>`)}
-      </ol></section>
-    <section class="home-section" aria-labelledby="home-tasks"><h2 id="home-tasks">Common tasks</h2><div class="task-grid">
-      ${task('data-go="1"', 'plan', 'Plan a cut order', 'Garments per size → lays, plies and metres.')}
-      ${task('data-go="6"', 'rolls', 'Inspect rolls', '4-point defects, shade and shrinkage groups.')}
-      ${task('data-go="8" data-page="spreading"', 'print', 'Print a spreading sheet', 'Release a lay with its rolls and print the lay sheet.')}
-      ${task('data-go="7"', 'bundles', 'Make bundles', 'Number cut parts and print tickets or stickers.')}
+    <section class="home-section" aria-labelledby="home-have"><h2 id="home-have">${L('home_have', 'Already have patterns?')}</h2><div class="start-grid three">
+      ${card(`data-go="${QUICK_SCREEN}"`, 'photo-marker', 'home_photo_title', 'Photo of paper pieces', 'home_photo_text', 'No CAD? Photograph your paper pattern pieces with a phone. BETA finds the shapes and plans the marker.')}
+      ${card('data-act="new-marker"', 'marker', 'home_files_title', 'DXF files from your CAD', 'home_files_text', 'Open DXF pattern pieces, set the fabric width and nest the marker.')}
+      ${isDesktop() ? card('data-act="open-project"', 'open', 'home_project_title', 'Open a project', 'home_project_text', 'A saved .betaproj folder with all screens.') : card('data-act="demo"', 'demo', 'home_demo_title', 'Try the demo', 'home_demo_text', 'A small sample shirt in the marker editor. Safe to try every tool.')}
     </div></section>
-    <section class="home-section" aria-labelledby="home-flow"><h2 id="home-flow" data-floor-label="workflow">Workflow</h2><p class="hint">Each step hands its result to the next. Choose a step to open it.</p>
-      <ol class="flow-map">${STEPS.map((s, i) => `<li><button type="button" data-go="${s.screen}" ${s.floorPage ? `data-page="${s.floorPage}"` : ''}><span class="flow-head"><span class="flow-no" aria-hidden="true">${i + 1}</span>${icon(s.icon)}</span><strong data-floor-label="${s.key}">${esc(s.label)}</strong><span>${esc(s.hint)}</span></button></li>`).join('')}</ol></section>
-    <div class="home-foot"><span>Open source · runs on your own PC or server · your data stays in your factory.</span><button type="button" class="small ghost" data-open-about>${icon('info')}About ${PRODUCT} ${esc(VERSION)}</button></div>
+    <section class="home-section" aria-labelledby="home-floor"><h2 id="home-floor">${L('cutting_floor', 'Cutting floor')}</h2><div class="task-row">
+      ${task('data-go="1"', 'plan', 'home_plan', 'Plan a cut order')}
+      ${task('data-go="6"', 'rolls', 'home_rolls', 'Inspect rolls')}
+      ${task('data-go="8" data-page="spreading"', 'print', 'home_spread', 'Print a spreading sheet')}
+      ${task('data-go="7"', 'bundles', 'home_bundles', 'Make bundles')}
+      ${task('data-go="10"', 'reports', 'reports', 'Reports')}
+    </div></section>
+    <div class="home-foot"><span>${L('home_promise', 'Open source · runs on your own PC or server · your data stays in your factory.')}</span><button type="button" class="small ghost" data-open-about>${icon('info')}About ${PRODUCT} ${esc(VERSION)}</button></div>
     </section>`;
   }
   function renderHome(): void {
@@ -335,15 +378,20 @@ export function installShell(host: ShellHost) {
       const saved = JSON.parse(localStorage.getItem('beta-cutting-room-v1') ?? 'null') as { document?: { name?: string; sizes?: string[] } } | null;
       if (saved?.document?.name) list.push(`<li><button type="button" data-go="4"><span class="icon-tile">${icon('pattern')}</span><span><strong>${esc(saved.document.name)}</strong><small>Pattern draft on this computer · ${saved.document.sizes?.length ?? 0} sizes</small></span>${icon('chevron-right', 'action-arrow')}</button></li>`);
     } catch { /* No draft. */ }
-    const recent = document.querySelector<HTMLSelectElement>('#native-recent');
+    const recent = find<HTMLSelectElement>('#native-recent');
     if (recent) {
       for (const o of Array.from(recent.options).filter(o => o.value).slice(0, 6)) list.push(`<li><button type="button" data-act="recent" data-path="${esc(o.value)}"><span class="icon-tile">${icon('file')}</span><span><strong>${esc(o.value.split(/[\\/]/).pop())}</strong><small>${esc(o.value)}</small></span>${icon('chevron-right', 'action-arrow')}</button></li>`);
     }
     const files = isDesktop() ? [] : readRecent();
+    // A style in progress (Style flow session on this computer) can be continued from Home.
+    let style: { info?: { name?: string }; step?: string; doc?: unknown } | null = null;
+    try { style = JSON.parse(localStorage.getItem('beta-style-v1') ?? 'null'); } catch { /* none */ }
+    const lang = (document.documentElement.dataset.language ?? 'en') as FloorLanguage, l: FloorLanguage = lang === 'hi' || lang === 'ta' ? lang : 'en';
+    $('#home-style-continue').innerHTML = style?.doc && style.step ? `<button type="button" data-go="${STYLE_SCREEN}">${icon('arrow-right')}${esc(label(l, 'home_continue'))}: ${esc(style.info?.name || styleText('step_style'))} · ${esc(styleText(`step_${style.step}` as Parameters<typeof styleText>[0]))}</button>` : '';
     $('#home-recent').innerHTML = `<ul class="recent-list">${list.join('')}</ul>${files.length ? `<details class="recent-files"><summary>Files opened recently in this browser (${files.length})</summary><p class="hint">For safety a browser cannot reopen a file by itself. Choose Open a saved marker and pick it again.</p><ul class="plain-list">${files.map(f => `<li>${esc(f.name)} <span class="chip">${esc(f.kind)}</span> <span class="hint">${esc(new Date(f.at).toLocaleString())}</span></li>`).join('')}</ul></details>` : ''}`;
   }
   for (const [selector, kind] of [['#open-file', 'Marker'], ['#pattern-file', 'Pattern'], ['#roll-file', 'Rolls'], ['#compare-file', 'Compare'], ['#digitize-photo', 'Photo']] as const) {
-    document.querySelector<HTMLInputElement>(selector)?.addEventListener('change', event => { const f = (event.target as HTMLInputElement).files?.[0]; if (f) rememberFile(f.name, kind); });
+    find<HTMLInputElement>(selector)?.addEventListener('change', event => { const f = (event.target as HTMLInputElement).files?.[0]; if (f) rememberFile(f.name, kind); });
   }
 
   // ----- Reports -----
@@ -364,13 +412,19 @@ export function installShell(host: ShellHost) {
 
   // ----- Language: one switch for the whole app, kept in step with the Floor switch -----
   const language = $<HTMLSelectElement>('#app-language');
-  const floorLanguage = document.querySelector<HTMLSelectElement>('#floor-language');
+  const floorLanguage = find<HTMLSelectElement>('#floor-language');
   if (floorLanguage) {
     language.value = floorLanguage.value;
     language.addEventListener('change', () => { floorLanguage.value = language.value; floorLanguage.dispatchEvent(new Event('change')); sync(current); });
     floorLanguage.addEventListener('change', () => { language.value = floorLanguage.value; });
     floorLanguage.dispatchEvent(new Event('change'));
   } else language.disabled = true;
+
+  // ----- Units: one choice (cm or inch) for every screen -----
+  const showUnit = (unit: AppUnit) => tools.querySelectorAll<HTMLButtonElement>('[data-app-unit]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.appUnit === unit)));
+  showUnit(appUnit()); document.documentElement.dataset.unit = appUnit();
+  tools.addEventListener('click', event => { const b = (event.target as Element).closest<HTMLButtonElement>('[data-app-unit]'); if (b) setAppUnit(b.dataset.appUnit === 'inch' ? 'inch' : 'cm'); });
+  onUnit(showUnit);
 
   // ----- Theme -----
   const themeSelect = $<HTMLSelectElement>('#app-theme');
@@ -445,7 +499,7 @@ export function installShell(host: ShellHost) {
     '#inspection-result': 'No inspection yet. Add rolls and defects, then inspect.',
     '#spread-result': 'No allocation yet. Inspect rolls, then allocate a group to the cut plan.',
   };
-  for (const [selector, text] of Object.entries(empty)) document.querySelector(selector)?.setAttribute('data-empty', text);
+  for (const [selector, text] of Object.entries(empty)) find(selector)?.setAttribute('data-empty', text);
 
   // ----- Units inside number fields, menus that close on Escape and outside clicks -----
   installUx(document.body);
@@ -453,10 +507,19 @@ export function installShell(host: ShellHost) {
   // ----- Feedback button, screen links, welcome and one-time ask (self-contained module) -----
   installFeedback({ state: host.state, message: host.message });
 
-  // ----- First screen: the address (#/pattern) or Home -----
+  // ----- First screen: the address (#/pattern) or Home. Later address changes (Back, Forward, a typed or linked address) follow. -----
   const fromHash = SCREENS.find(s => `#/${s.hash}` === location.hash);
   host.show(fromHash ? fromHash.index : 9);
   if (!fromHash) homeScreen.querySelector<HTMLElement>('h1')?.setAttribute('tabindex', '-1');
+  started = true;
+  const follow = () => {
+    const target = SCREENS.find(s => `#/${s.hash}` === location.hash);
+    if (!target || target.index === current) return;
+    fromAddress = true;
+    try { host.show(target.index); } finally { fromAddress = false; }
+  };
+  window.addEventListener('hashchange', follow);
+  window.addEventListener('popstate', follow);
 
   return { askToken, confirm: confirmAction };
 }

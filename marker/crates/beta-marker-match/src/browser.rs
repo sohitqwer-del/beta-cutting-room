@@ -1,5 +1,5 @@
 //! Matching search rounds using the existing browser-worker progress contract.
-use crate::{Instant, nest_with_rules};
+use crate::{Instant, nest_with_rules_and_progress};
 use anyhow::{Context, Result, ensure};
 use beta_marker_core::{Job, MarkerResult};
 use beta_marker_nest::{
@@ -16,6 +16,7 @@ pub struct MatchingSession {
     round: u32,
     cancelled: bool,
     done: bool,
+    last_checkpoint: Option<Instant>,
 }
 impl MatchingSession {
     pub fn new(job: Job, options: BrowserOptions) -> Result<Self> {
@@ -29,12 +30,19 @@ impl MatchingSession {
             round: 0,
             cancelled: false,
             done: false,
+            last_checkpoint: None,
         })
     }
     pub fn cancel(&mut self) {
         self.cancelled = true;
     }
     pub fn step(&mut self) -> Result<BrowserProgress> {
+        self.step_with_progress(&mut |_| {})
+    }
+    pub fn step_with_progress(
+        &mut self,
+        callback: &mut dyn FnMut(BrowserProgress),
+    ) -> Result<BrowserProgress> {
         ensure!(
             !(self.cancelled && self.best.is_none()),
             "Search cancelled before a checked marker was available."
@@ -60,7 +68,32 @@ impl MatchingSession {
                     fixed: self.options.fixed.clone(),
                     warm_start: self.best.clone(),
                 };
-                match nest_with_rules(&self.job, &options) {
+                let best = &mut self.best;
+                let last_checkpoint = &mut self.last_checkpoint;
+                let round = self.round;
+                let mut emit = |event: beta_marker_nest::NestProgress| {
+                    if best.as_ref().is_some_and(|old| event.length >= old.length) {
+                        return;
+                    }
+                    let mut result = event.result;
+                    result.runtime_s = started.elapsed().as_secs_f64();
+                    *best = Some(result.clone());
+                    improved = true;
+                    if last_checkpoint.is_none_or(|last| last.elapsed().as_secs_f64() >= 0.5) {
+                        *last_checkpoint = Some(Instant::now());
+                        callback(BrowserProgress {
+                            checkpoint: true,
+                            round,
+                            seconds: result.runtime_s,
+                            round_seconds: before.elapsed().as_secs_f64(),
+                            improved: true,
+                            done: false,
+                            cancelled: false,
+                            result,
+                        });
+                    }
+                };
+                match nest_with_rules_and_progress(&self.job, &options, &mut emit) {
                     Ok(candidate) => {
                         let checked = beta_marker_core::validate(&self.job, &candidate);
                         ensure!(
@@ -71,10 +104,13 @@ impl MatchingSession {
                         if self
                             .best
                             .as_ref()
-                            .is_none_or(|old| candidate.length < old.length)
+                            .is_none_or(|old| candidate.length <= old.length)
                         {
+                            improved |= self
+                                .best
+                                .as_ref()
+                                .is_none_or(|old| candidate.length < old.length);
                             self.best = Some(candidate);
-                            improved = true;
                         }
                     }
                     Err(error) if self.best.is_some() => {
@@ -98,6 +134,7 @@ impl MatchingSession {
             .context("No checked matching marker is available.")?;
         result.runtime_s = seconds;
         Ok(BrowserProgress {
+            checkpoint: false,
             round: self.round,
             seconds,
             round_seconds: before.elapsed().as_secs_f64(),
@@ -124,7 +161,14 @@ mod tests {
             },
         )
         .unwrap();
-        let first = session.step().unwrap();
+        let mut events = vec![];
+        let first = session.step_with_progress(&mut |p| events.push(p)).unwrap();
+        assert!(!events.is_empty());
+        for event in &events {
+            assert!(event.checkpoint);
+            assert!(beta_marker_core::validate(&job, &event.result).ok);
+            assert!(crate::match_errors(&job, &event.result).is_empty());
+        }
         assert!(beta_marker_core::validate(&job, &first.result).ok);
         assert!(crate::match_errors(&job, &first.result).is_empty());
         session.cancel();

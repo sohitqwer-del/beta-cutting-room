@@ -260,6 +260,7 @@ fn search(
             {
                 status["best_length_mm"] = p["best_length_mm"].clone();
                 status["best_efficiency"] = p["best_efficiency"].clone();
+                status["result"] = p["result"].clone();
             }
         }
         if let Some(r) = value.get("reply") {
@@ -277,6 +278,7 @@ fn search(
         let mut status = lock(&state.status);
         status["best_length_mm"] = result["length"].clone();
         status["best_efficiency"] = result["efficiency"].clone();
+        status["result"] = result;
     }
     drop(guard);
     Ok(if cancelled {

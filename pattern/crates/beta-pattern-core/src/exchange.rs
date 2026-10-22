@@ -23,6 +23,9 @@ pub fn to_job(
     let mut pieces = vec![];
     for (size, count) in &ratio {
         for p in grade(doc, size, tolerance)? {
+            if p.piece.quantity == 0 && p.piece.mirror_quantity == 0 {
+                continue;
+            }
             p.piece
                 .quantity
                 .checked_mul(*count)
@@ -93,6 +96,9 @@ pub fn export_dxf(doc: &Document, sizes: &[String], tolerance: f64) -> Result<St
         let graded = grade(doc, size, tolerance)?;
         let mut point_map = BTreeMap::new();
         for (p, g) in doc.pieces.iter().zip(graded) {
+            if g.piece.quantity == 0 && g.piece.mirror_quantity == 0 {
+                continue;
+            }
             point_map.insert(p.id.clone(), g.points);
             let mut piece = g.piece;
             // Layer 6 denotes a half pattern in our reader. This is already a

@@ -2,7 +2,7 @@
 
 export const site = {
   name: 'BETA Cutting Room',
-  version: '0.6.0',
+  version: '0.7.0',
   /** Public source repository, e.g. "https://github.com/<org>/project-beta". */
   repoUrl: 'https://github.com/sohitqwer-del/beta-cutting-room' as string | null,
   /** Public address of this website, used for social preview tags. */
@@ -15,17 +15,18 @@ export const site = {
   contactEmail: 'sohitqwer@gmail.com' as string | null,
   downloads: {
     windows: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.6.0/BETA-Cutting-Room_0.6.0_x64-setup.exe' as string | null,
-      file: 'BETA-Cutting-Room_0.6.0_x64-setup.exe',
-      size: '9.61 MiB',
-      sha256: 'd9e6e1f887db829d842579b5ebc3f96ec3905e285387d71cd8fc571f984aed98' as string | null,
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_x64-setup.exe' as string | null,
+      file: 'BETA-Cutting-Room_0.7.0_x64-setup.exe',
+      size: '11.08 MiB',
+      sha256: '07e3e7e49332b3554555df46855498d08ed59126e48b17ff3f9348014ae7233e' as string | null,
     },
     portable: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.6.0/BETA-Cutting-Room_0.6.0_windows-x64-portable.zip' as string | null,
-      file: 'BETA-Cutting-Room_0.6.0_windows-x64-portable.zip',
-      size: '10.93 MiB',
-      sha256: '6ee86bb77ad9ff6bfe303edee1373bc6760f22d5f3c530bde44efb67ad5efb7a' as string | null,
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_windows-x64-portable.zip' as string | null,
+      file: 'BETA-Cutting-Room_0.7.0_windows-x64-portable.zip',
+      size: '12.85 MiB',
+      sha256: 'ffb220923617fa9e0a5f590ddb71e84bd4b8d438d535dac33bc5bfecb4159eee' as string | null,
     },
+    // Linux: the 0.7.0 glibc 2.31 build needs the lead's isolated Linux builder; until then this is the published 0.6.0 server package.
     server: {
       url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.6.0/BETA-Cutting-Room_0.6.0_linux-x86_64.tar.gz' as string | null,
       file: 'BETA-Cutting-Room_0.6.0_linux-x86_64.tar.gz (Linux server, glibc 2.31 target; tested with 2.31 and 2.43)',

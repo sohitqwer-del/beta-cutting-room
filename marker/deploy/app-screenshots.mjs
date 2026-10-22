@@ -64,7 +64,8 @@ try {
   };
   await send('Page.enable'); await send('Network.enable'); await send('Runtime.enable');
   await send('Emulation.setDeviceMetricsOverride', { width: 1920, height: 1200, deviceScaleFactor: 1, mobile: false });
-  await send('Page.navigate', { url: url.href });
+  // Only the open screen is in the page (0.7): open the marker screen, which holds the WASM status.
+  await send('Page.navigate', { url: url.href + '#/marker' });
 
   await until('document.querySelector("#token-dialog")?.open === true', 'token dialog ready');
   await evaluate(`document.querySelector('#token-input').value = ${JSON.stringify(token)}; document.querySelector('#token-save').click();`);

@@ -11,7 +11,9 @@ pub fn apply_roll_group(job: &mut Job, group: &RollGroup) -> Vec<String> {
     group.roll_ids.clone()
 }
 
-/// Convert chosen lays into whole-ply spread requests. Length includes both
+/// Convert chosen lays into whole-pass spread requests. The roll allocator counts
+/// passes (lengths taken from rolls), so each request carries `lay.passes`.
+/// Length includes both
 /// end allowances, converted from millimetres to metres. IDs are stable even
 /// when the allocator changes execution order. Splicing is disabled.
 /// `eligible_roll_ids` must describe the stock used to set job shrinkage.
@@ -34,8 +36,8 @@ pub fn spreading_requests(
         .enumerate()
         .map(|(i, lay)| {
             ensure!(
-                lay.plies > 0 && lay.marker_length_mm.is_finite() && lay.marker_length_mm > 0.0,
-                "Lay {} has invalid plies or length.",
+                lay.passes > 0 && lay.marker_length_mm.is_finite() && lay.marker_length_mm > 0.0,
+                "Lay {} has invalid passes or length.",
                 i + 1
             );
             Ok(LayRequest {
@@ -43,7 +45,7 @@ pub fn spreading_requests(
                 marker_length_m: (lay.marker_length_mm + 2.0 * plan.options.end_allowance_mm)
                     / 1000.0,
                 fabric_width_mm: width_mm,
-                plies: lay.plies,
+                plies: lay.passes,
                 shade_rule: ShadePolicy::SameGroup,
                 eligible_roll_ids: eligible_roll_ids.to_vec(),
                 allow_splicing: false,
@@ -63,8 +65,10 @@ mod tests {
             ..Default::default()
         };
         plan.options.end_allowance_mm = 25.0;
+        // A folded lay: 14 plies in 7 passes. Rolls supply passes.
         plan.lays.push(crate::Lay {
-            plies: 7,
+            plies: 14,
+            passes: 7,
             marker_length_mm: 2000.0,
             ..Default::default()
         });

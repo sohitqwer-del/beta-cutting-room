@@ -1,6 +1,6 @@
 //! Single-thread browser search, yielding to the host between warm-start rounds.
 //! All geometry and acceptance decisions stay in Rust. No shared memory is needed.
-use crate::{Instant, NestOptions, SearchTuning};
+use crate::{Instant, NestOptions};
 use anyhow::{Result, ensure};
 use beta_marker_core::{Job, MarkerResult};
 use serde::{Deserialize, Serialize};
@@ -35,6 +35,8 @@ impl Default for BrowserOptions {
 /// A complete, independently checked incumbent, never a partial layout.
 #[derive(Clone, Debug, Serialize)]
 pub struct BrowserProgress {
+    /// True for a within-round notification. It needs no host acknowledgement.
+    pub checkpoint: bool,
     pub round: u32,
     pub seconds: f64,
     pub round_seconds: f64,
@@ -57,6 +59,7 @@ pub struct BrowserSession {
     round: u32,
     cancelled: bool,
     done: bool,
+    last_checkpoint: Option<Instant>,
 }
 
 impl BrowserSession {
@@ -99,6 +102,7 @@ impl BrowserSession {
             round: 0,
             cancelled: false,
             done: false,
+            last_checkpoint: None,
         })
     }
 
@@ -107,6 +111,14 @@ impl BrowserSession {
     }
 
     pub fn step(&mut self) -> Result<BrowserProgress> {
+        self.step_with_progress(&mut |_| {})
+    }
+
+    /// Publish checked improvements while the synchronous optimizer is running.
+    pub fn step_with_progress(
+        &mut self,
+        callback: &mut dyn FnMut(BrowserProgress),
+    ) -> Result<BrowserProgress> {
         ensure!(
             !(self.cancelled && self.best.is_none()),
             "search cancelled before a complete marker was available"
@@ -126,8 +138,14 @@ impl BrowserSession {
                     fixed: self.options.fixed.clone(),
                     // Keep the cheap seed as recovery, but let Sparrow use its
                     // own constructor on its first attempt. A box-based seed
-                    // can trap its search in a much worse layout.
-                    warm_start: if self.round == 0 {
+                    // can trap its search in a much worse layout. A warm start
+                    // also fixes the two-layer allocation, so every third round
+                    // of a folded or tubular job starts fresh to try others.
+                    warm_start: if self.round == 0
+                        || (self.job.fabric.layout != beta_marker_core::Layout::Open
+                            && self.options.fixed.is_empty()
+                            && self.round.is_multiple_of(3))
+                    {
                         self.options.warm_start.clone()
                     } else {
                         self.best
@@ -138,13 +156,45 @@ impl BrowserSession {
                 // Publish a checked BETA-owned incumbent before entering Sparrow.
                 // Some upstream separator work can exceed its timeout. The host
                 // can then terminate a stalled Worker without losing this marker.
+                let round = self.round + u32::from(self.seeded);
+                let best = &mut self.best;
+                let last_checkpoint = &mut self.last_checkpoint;
+                let mut on_progress = |event: crate::NestProgress| {
+                    let mut candidate = event.result;
+                    if best
+                        .as_ref()
+                        .is_some_and(|old| candidate.length >= old.length)
+                    {
+                        return;
+                    }
+                    if !beta_marker_core::validate(&self.job, &candidate).ok {
+                        return;
+                    }
+                    candidate.seed = options.seed;
+                    candidate.runtime_s = started.elapsed().as_secs_f64();
+                    *best = Some(candidate.clone());
+                    improved = true;
+                    if last_checkpoint.is_none_or(|last| last.elapsed().as_secs_f64() >= 0.5) {
+                        *last_checkpoint = Some(Instant::now());
+                        callback(BrowserProgress {
+                            checkpoint: true,
+                            round,
+                            seconds: candidate.runtime_s,
+                            round_seconds: before.elapsed().as_secs_f64(),
+                            improved: true,
+                            done: false,
+                            cancelled: false,
+                            result: candidate,
+                        });
+                    }
+                };
                 let outcome = if !self.seeded {
                     options.time_limit_s = options.time_limit_s.min(0.1);
                     let cancel = std::sync::atomic::AtomicBool::new(false);
-                    crate::nest_with_cancellation(&self.job, &options, &cancel, |_| {})
+                    crate::nest_with_cancellation(&self.job, &options, &cancel, &mut on_progress)
                 } else {
                     self.round += 1;
-                    crate::nest_with_tuning(&self.job, &options, &SearchTuning::default())
+                    crate::nest_with_progress(&self.job, &options, &mut on_progress)
                 };
                 let candidate = match outcome {
                     Ok(candidate) => candidate,
@@ -167,10 +217,13 @@ impl BrowserSession {
                 if self
                     .best
                     .as_ref()
-                    .is_none_or(|best| candidate.length < best.length)
+                    .is_none_or(|best| candidate.length <= best.length)
                 {
+                    improved |= self
+                        .best
+                        .as_ref()
+                        .is_none_or(|best| candidate.length < best.length);
                     self.best = Some(candidate);
-                    improved = true;
                 } else if self.done {
                     // Preserve the diagnostic on the retained valid incumbent.
                     self.best = Some(candidate);
@@ -196,6 +249,7 @@ impl BrowserSession {
                 .push("Browser search stopped between rounds; best valid marker retained.".into());
         }
         Ok(BrowserProgress {
+            checkpoint: false,
             round: self.round,
             seconds,
             round_seconds: before.elapsed().as_secs_f64(),
@@ -224,6 +278,32 @@ mod tests {
             seed: Some(7),
             ..Default::default()
         }
+    }
+    #[test]
+    fn within_round_checkpoints_are_valid_monotone_and_throttled() -> Result<()> {
+        let job = job();
+        let mut session = BrowserSession::new(job.clone(), options())?;
+        let mut events = vec![];
+        let boundary = session.step_with_progress(&mut |p| events.push(p))?;
+        assert!(
+            !events.is_empty(),
+            "seed must be visible before step returns"
+        );
+        let mut length = f64::INFINITY;
+        let mut seconds = None;
+        for event in events {
+            assert!(event.checkpoint && !event.done);
+            assert!(beta_marker_core::validate(&job, &event.result).ok);
+            assert!(event.result.length < length);
+            if let Some(last) = seconds {
+                assert!(event.seconds - last >= 0.49);
+            }
+            seconds = Some(event.seconds);
+            length = event.result.length;
+        }
+        assert!(!boundary.checkpoint);
+        assert!(boundary.result.length <= length);
+        Ok(())
     }
     #[test]
     fn valid_monotone_rounds_and_cooperative_stop() -> Result<()> {

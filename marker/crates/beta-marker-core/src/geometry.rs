@@ -36,6 +36,55 @@ pub fn bbox(points: &[Pt]) -> Option<[f64; 4]> {
     Some(b)
 }
 
+/// Distance from `p` to the segment `a`-`b`.
+pub fn point_segment_distance(p: Pt, a: Pt, b: Pt) -> f64 {
+    let d = [b[0] - a[0], b[1] - a[1]];
+    let len2 = d[0] * d[0] + d[1] * d[1];
+    let t = if len2 > 0.0 {
+        (((p[0] - a[0]) * d[0] + (p[1] - a[1]) * d[1]) / len2).clamp(0.0, 1.0)
+    } else {
+        0.0
+    };
+    (p[0] - a[0] - t * d[0]).hypot(p[1] - a[1] - t * d[1])
+}
+
+/// Whether two closed outlines have the same shape up to translation, within
+/// `tolerance` mm. Vertex sampling, start point and winding do not matter: every
+/// vertex and edge midpoint of each outline must lie near the other outline,
+/// and the bounding boxes and areas must agree.
+pub fn same_outline_translated(a: &[Pt], b: &[Pt], tolerance: f64) -> bool {
+    let (Some(aa), Some(bb)) = (bbox(a), bbox(b)) else { return false };
+    if a.len() < 3 || b.len() < 3 || a.iter().chain(b).flatten().any(|v| !v.is_finite()) {
+        return false;
+    }
+    if (aa[2] - aa[0] - bb[2] + bb[0]).abs() > tolerance
+        || (aa[3] - aa[1] - bb[3] + bb[1]).abs() > tolerance
+    {
+        return false;
+    }
+    let perimeter: f64 = (0..a.len())
+        .map(|i| {
+            let (p, q) = (a[i], a[(i + 1) % a.len()]);
+            (q[0] - p[0]).hypot(q[1] - p[1])
+        })
+        .sum();
+    if (area(a) - area(b)).abs() > tolerance * perimeter {
+        return false;
+    }
+    let b: Vec<Pt> = b.iter().map(|p| [p[0] + aa[0] - bb[0], p[1] + aa[1] - bb[1]]).collect();
+    let near = |source: &[Pt], target: &[Pt]| {
+        (0..source.len()).all(|i| {
+            let (p, q) = (source[i], source[(i + 1) % source.len()]);
+            [p, [(p[0] + q[0]) / 2.0, (p[1] + q[1]) / 2.0]].iter().all(|&s| {
+                (0..target.len()).any(|j| {
+                    point_segment_distance(s, target[j], target[(j + 1) % target.len()]) <= tolerance
+                })
+            })
+        })
+    };
+    near(a, &b) && near(&b, a)
+}
+
 /// Normalise an angle to `[0, 360)`.
 pub fn norm_deg(a: f64) -> f64 {
     let r = a.rem_euclid(360.0);

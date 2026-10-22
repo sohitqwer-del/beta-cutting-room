@@ -17,7 +17,7 @@ export default defineConfig({
     configureServer(server) {
       server.middlewares.use('/wasm', (request, response, next) => {
         const name = request.url?.split('?')[0]?.replace(/^\//, '');
-        if (!name || !['beta_marker_wasm.js', 'beta_marker_wasm_bg.wasm', 'beta_pattern_wasm.js', 'beta_pattern_wasm_bg.wasm', 'beta_marker_floor.js', 'beta_marker_floor_bg.wasm'].includes(name) || !existsSync(join(pkg, name))) return next();
+        if (!name || !['beta_marker_wasm.js', 'beta_marker_wasm_bg.wasm', 'beta_pattern_wasm.js', 'beta_pattern_wasm_bg.wasm', 'beta_marker_floor.js', 'beta_marker_floor_bg.wasm', 'beta_marker_cutroom_wasm.js', 'beta_marker_cutroom_wasm_bg.wasm'].includes(name) || !existsSync(join(pkg, name))) return next();
         response.setHeader('Content-Type', name.endsWith('.wasm') ? 'application/wasm' : 'text/javascript');
         response.end(readFileSync(join(pkg, name)));
       });

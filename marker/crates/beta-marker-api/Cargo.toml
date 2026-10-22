@@ -1,0 +1,18 @@
+[package]
+name = "beta-marker-api"
+description = "Transport-free cut planning, roll and cutting-room requests shared by the server, desktop app and browser"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+beta-marker-core.workspace = true
+beta-marker-dxf.workspace = true
+beta-marker-export.workspace = true
+beta-marker-nest.workspace = true
+beta-marker-plan.workspace = true
+beta-marker-roll.workspace = true
+beta-marker-cutroom.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true

@@ -1,6 +1,6 @@
 # BETA Cutting Room
 
-**Open-source, self-hosted cutting-room software for garment factories. Version 0.6.0.**
+**Open-source, self-hosted cutting-room software for garment factories. Version 0.7.0.**
 
 BETA takes a style from pattern to sewing line: draft and grade patterns, nest
 markers, plan cuts, inspect rolls, print spreading sheets, cut and make bundles.
@@ -26,9 +26,20 @@ no cloud, no licence fee. Your patterns never leave your factory.
 > Please do not attach factory patterns unless you agree to make them public.
 > The app also has a **Feedback** button on every screen; it never sends anything by itself.
 
-## New in 0.6.0: pattern to cut in one flow
+## New in 0.7.0: easier to use, and the whole cutting room in the browser
 
-Start from a blank sheet or a ready block (T-shirt, shirt, trouser, skirt, kurta, polo, track pant), draw and edit the pattern, grade it from a size chart, choose the lay (open, folded or tube), set the cut gaps, add stripes or checks with a live overlay and match points, make the marker and export the cut files. Blocks are starting drafts: check the fit before production.
+- **Roomier, simpler screens.** One "Start here" path, a short menu (Make a style, Photo to marker, Marker from files, Cutting floor, More tools), one cm/inch switch for the whole app, and the phone Back button works.
+- **Live marker.** The marker is drawn while it improves, with piece name and size on every piece, zoom, and tap for details.
+- **Everything in the browser, no server:** plotter (PLT/HPGL), DXF-AAMA, full-size and tiled PDF, DXF import with grade rules, cut plan, rolls, spreading sheet, bundles and tickets, floor tracking, reports and compare. Work stays on your device; save a backup file to move it.
+- **Honest folded and tube lays.** Results show the real fabric yield and pieces cut but not used. Waste on the worst test case is about halved, but folded fabric is still behind open fabric for small orders. See [FOLD7_RESULTS.md](marker/crates/beta-marker-nest/FOLD7_RESULTS.md).
+- **Better blocks.** Trouser, track pant and shirt yoke redrafted; 10,806 shape and seam checks pass for all 7 blocks in every size; new measurement spec sheet (PDF, CSV, Excel). Blocks are still starting drafts: sew a sample before production.
+- **Clear words.** A ply is one layer of fabric; a pass is one length laid from the roll (folded or tube = 2 plies per pass).
+
+Full notes: [marker/docs/RELEASE-0.7.0.md](marker/docs/RELEASE-0.7.0.md). Real-user audit: [marker/docs/AUDIT-0.7.md](marker/docs/AUDIT-0.7.md).
+
+### From 0.6.0: pattern to cut in one flow
+
+Start from a blank sheet or a ready block (T-shirt, shirt, trouser, skirt, kurta, polo, track pant), draw and edit the pattern, grade it from a size chart, choose the lay (open, folded or tube), set the cut gaps, add stripes or checks with a live overlay and match points, make the marker and export the cut files.
 
 ## What is inside
 
@@ -57,12 +68,12 @@ Tukatech, Gerber and Optitex are not yet compared. Details and caveats:
 
 ## Install
 
-- **Browser:** open the app link above on a PC or phone. It works offline after the first visit and keeps your data on the device. Best for trying and small jobs; for big markers use the desktop app.
-- **Windows:** download `BETA-Cutting-Room_0.6.0_x64-setup.exe` from Releases
+- **Browser:** open the app link above on a PC or phone. It works offline after the first visit and keeps your data on the device. Best for trying and small to medium jobs; for big markers and faster planning use the desktop app.
+- **Windows:** download `BETA-Cutting-Room_0.7.0_x64-setup.exe` from Releases
   and check its SHA-256. The installer is not code-signed yet, so SmartScreen
   may warn you. See [marker/docs/INSTALL.md](marker/docs/INSTALL.md).
 - **Server:** see [marker/docs/SELF-HOSTING.md](marker/docs/SELF-HOSTING.md).
-  The ready-made Linux build needs glibc 2.31 or newer (for example Ubuntu 20.04+).
+  The ready-made Linux build needs glibc 2.31 or newer (for example Ubuntu 20.04+). The 0.7.0 Linux build follows shortly; until then use 0.6.0 or build from source.
 
 ## Build from source
 

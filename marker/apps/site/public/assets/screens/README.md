@@ -1,6 +1,6 @@
 # Release screenshots
 
-Real BETA Cutting Room 0.6.0 browser app, captured headlessly against the local
+Real BETA Cutting Room 0.7.0 browser app, captured headlessly against the local
 Rust server and the local Rust WASM. All seven files are 1920 x 1200 PNGs in
 the light theme, with device scale 1. No visible windows open.
 

@@ -706,7 +706,8 @@ fn pdf_bytes(pages: &[String]) -> Result<Vec<u8>> {
     let xref = out.len();
     let mut tail = format!("xref\n0 {}\n0000000000 65535 f \n", offsets.len());
     for offset in offsets.iter().skip(1) {
-        ensure!(*offset <= 9_999_999_999, "PDF exceeds xref limit");
+        // u64: the 10-digit xref limit is larger than a 32-bit (WASM) usize.
+        ensure!(*offset as u64 <= 9_999_999_999, "PDF exceeds xref limit");
         writeln!(tail, "{offset:010} 00000 n ")?;
     }
     write!(

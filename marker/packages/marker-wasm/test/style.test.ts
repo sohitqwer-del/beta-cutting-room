@@ -67,4 +67,20 @@ describe('style loader wire contract', () => {
     expect(core.hit_test(document, 'M', [2, 4], 5)[0]).toEqual(hit);
     expect(core.overlay({} as Job, {} as MarkerResult).matches).toEqual([match]);
   });
+  it('keeps null spec targets, grade order and binary exports through the native adapter', () => {
+    const values = [{ size: 'S', measured_mm: 500, target_mm: null, grade_step_mm: null, pass: null },
+      { size: 'M', measured_mm: 530, target_mm: null, grade_step_mm: 30, pass: null }];
+    const file = { filename: 'measurement-spec.pdf', mime: 'application/pdf', bytes: [37, 80, 68, 70] };
+    const core = bindStyleCore({ style_command(raw) {
+      const request = JSON.parse(raw);
+      if (request.action === 'spec_sheet') return JSON.stringify({ rows: [{ values }] });
+      if (request.action === 'block_checks') return JSON.stringify({ pass: false, sizes: [{ size: 'M', pass: false, errors: ['Review topology'] }] });
+      expect(request).toEqual({ action: 'export_spec_sheet', document, format: 'pdf' });
+      return JSON.stringify(file);
+    } });
+    expect(core.spec_sheet(document).rows[0]?.values).toEqual(values);
+    expect(core.block_checks(document).pass).toBe(false);
+    expect(core.export_spec_sheet(document, 'pdf')).toEqual(file);
+  });
+
 });

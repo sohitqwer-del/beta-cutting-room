@@ -254,7 +254,7 @@ def main() -> int:
         raise RuntimeError("The Windows SDK loader audit was not reached")
     excluded = sorted((r for k, r in all_resolved.items() if k not in records), key=lambda r: (r["name"], r["version"]))
     lines = [
-        "# Third-party licences: BETA Cutting Room 0.6.0", "",
+        "# Third-party licences: BETA Cutting Room 0.7.0", "",
         "Generated from Cargo metadata, local npm package manifests and installed package.json files.",
         "No network licence service is used. Re-run after lockfile or dependency changes.",
         "Bundled Droid Sans fonts use Apache-2.0; the site Bricolage Grotesque font uses OFL-1.1.", "",
@@ -311,7 +311,7 @@ def main() -> int:
     if args.texts:
         args.texts.parent.mkdir(parents=True, exist_ok=True)
         with args.texts.open("w", encoding="utf-8") as output:
-            output.write("BETA Cutting Room 0.6.0 - third-party licence and notice texts\n\n")
+            output.write("BETA Cutting Room 0.7.0 - third-party licence and notice texts\n\n")
             output.write("Mozilla Public License 2.0 (jagua-rs 1.0.0, unmodified)\n")
             output.write((MARKER / "deploy/licenses/MPL-2.0.txt").read_text(encoding="utf-8") + "\n\n")
             output.write("Microsoft WebView2 SDK loader 1.0.3800.47 - BSD three-clause terms\n")

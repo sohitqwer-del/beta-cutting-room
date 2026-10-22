@@ -23,7 +23,22 @@ export function setServerToken(token: string): void {
 /** Keep byte exports and JSON errors identical across both transports. */
 export async function apiFetch(url: string, init?: RequestInit): Promise<Response> {
   if (!isDesktop()) {
+    const path = url.split('?')[0];
+    if (path === '/api/import') {
+      const { browserImport } = await import('./browser-import');
+      const imported = await browserImport(url, init);
+      if (imported) return imported;
+    }
+    if (path === '/api/export') {
+      const { browserExport } = await import('./browser-export');
+      const output = await browserExport(url, init);
+      if (output) return output;
+    }
     if (staticMode() && url.startsWith('/api/')) {
+      // Cut plans, rolls, spreading, bundles, tickets, reports and PLT import run in Rust WASM here.
+      const { browserCutRoom } = await import('./browser-cutroom');
+      const local = await browserCutRoom(url, init);
+      if (local) return local;
       return new Response(JSON.stringify({ error: SERVER_FEATURE_MESSAGE }), {
         status: 503, headers: { 'Content-Type': 'application/json' },
       });

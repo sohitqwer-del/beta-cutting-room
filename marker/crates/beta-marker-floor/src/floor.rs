@@ -637,6 +637,9 @@ impl FloorState {
         marker.length = checked.length;
         marker.piece_area = checked.piece_area;
         marker.efficiency = checked.efficiency;
+        marker.useful_piece_area = checked.useful_piece_area;
+        marker.useful_yield = checked.useful_yield;
+        marker.surplus_copies = checked.surplus_copies;
         self.lays.push(FloorLay {
             id: p.id,
             order: p.order,

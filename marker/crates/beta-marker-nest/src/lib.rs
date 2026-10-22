@@ -17,6 +17,7 @@ mod v02;
 use anyhow::{Context, Result, ensure};
 use beta_marker_core::geometry::{grain_alignment_deg, norm_deg, transform_points};
 use beta_marker_core::{Demand, Job, MarkerResult, Placement, RESULT_FORMAT};
+pub(crate) use jagua_rs::Instant;
 use jagua_rs::geometry::shape_modification::ShapeModifyConfig;
 use jagua_rs::io::ext_repr::{ExtItem, ExtOrientation, ExtRotation, ExtSPolygon, ExtShape};
 use jagua_rs::io::import::Importer;
@@ -29,7 +30,6 @@ use sparrow::util::listener::{ReportType, SolutionListener};
 use sparrow::util::terminator::BasicTerminator;
 use std::collections::BTreeMap;
 use std::time::Duration;
-pub(crate) use jagua_rs::Instant;
 
 /// Search controls. Sparrow import, initial construction and final checks add
 /// overhead to its exploration/compression budget. The constrained path includes
@@ -78,12 +78,14 @@ impl Default for NestOptions {
 }
 
 /// One feasible improvement, measured on the original cut outlines.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NestProgress {
     /// Wall time since entry, including instance construction.
     pub seconds: f64,
     /// Best feasible marker length, millimetres.
     pub length: f64,
+    /// Complete independently checked layout, in the caller's piece identities.
+    pub result: MarkerResult,
 }
 
 /// Nest and check a job, without installing a logger, signal handler or exporter.
@@ -123,6 +125,9 @@ pub fn nest_with_cancellation(
         Some(cancel),
     )
 }
+
+/// Engine id suffix of a fold half joined to its pinning bar (see `v02::pinned`).
+const PINNED: &str = "_pin";
 
 fn nest_single(
     job: &Job,
@@ -216,6 +221,9 @@ fn nest_single(
         length: metrics.length,
         piece_area: metrics.piece_area,
         efficiency: metrics.efficiency,
+        useful_piece_area: metrics.useful_piece_area,
+        useful_yield: metrics.useful_yield,
+        surplus_copies: metrics.surplus_copies,
         engine: "sparrow 0.3.0".into(),
         seed: Some(seed),
         runtime_s: 0.0,
@@ -378,6 +386,10 @@ fn build_instance(job: &Job, mapping: &[Demand]) -> Result<(SPInstance, f64)> {
             min_quality: None,
         };
         let mut item_importer = importer;
+        if piece.id.ends_with(PINNED) {
+            // Simplification may move a pinned outline's extreme edges outward.
+            item_importer.shape_modify_config.simplify_tolerance = None;
+        }
         let radius = half_gap + piece.buffer;
         // Reserve a numerical guard even when requested spacing is zero.
         // Round-join chords need slightly more than sec(0.05) inflation.
@@ -491,6 +503,9 @@ impl SolutionListener for ProgressListener<'_> {
                 length: metrics.length,
                 piece_area: metrics.piece_area,
                 efficiency: metrics.efficiency,
+                useful_piece_area: metrics.useful_piece_area,
+                useful_yield: metrics.useful_yield,
+                surplus_copies: metrics.surplus_copies,
                 engine: "sparrow 0.3.0".into(),
                 seed: None,
                 runtime_s: 0.0,
@@ -503,10 +518,11 @@ impl SolutionListener for ProgressListener<'_> {
             let length = metrics.length;
             if length < self.best {
                 self.best = length;
-                self.candidate = Some(candidate);
+                self.candidate = Some(candidate.clone());
                 (self.callback)(NestProgress {
                     seconds: self.started.elapsed().as_secs_f64(),
                     length,
+                    result: candidate,
                 });
             }
         }

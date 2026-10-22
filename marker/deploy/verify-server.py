@@ -23,7 +23,7 @@ def main():
     help_result = subprocess.run(prefix + [str(binary), "--help"], env=env, capture_output=True, text=True, timeout=10)
     assert help_result.returncode == 0, help_result.stderr
     version_result = subprocess.run(prefix + [str(binary), "--version"], env=env, capture_output=True, text=True, timeout=10)
-    assert version_result.returncode == 0 and "0.6.0" in version_result.stdout, version_result.stdout
+    assert version_result.returncode == 0 and "0.7.0" in version_result.stdout, version_result.stdout
     rejected = subprocess.run(prefix + [str(binary), "serve", "--bind", "0.0.0.0"], env=env, capture_output=True, text=True, timeout=10)
     assert rejected.returncode != 0 and "requires --token or BETA_TOKEN" in rejected.stderr, rejected.stderr
     with socket.socket() as probe:
@@ -59,7 +59,7 @@ def main():
         assert request("/api/health?token=" + token)[0] == 401
         status, body = request("/api/health", {"Authorization": "Bearer " + token})
         health = json.loads(body)
-        assert status == 200 and health["ok"] and health["version"] == "0.6.0", health
+        assert status == 200 and health["ok"] and health["version"] == "0.7.0", health
         assert request("/")[0] == 200
         assert request("/%2e%2e/Cargo.toml")[0] == 404
         print("PASS: help/version; unauthenticated network-bind rejection; token from BETA_TOKEN; health/status authentication; static index; traversal rejection")

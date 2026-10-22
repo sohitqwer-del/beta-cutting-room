@@ -16,18 +16,28 @@ export function formatLength(mm: number, unit: LengthUnit, withUnit = false): st
   const text = Object.is(rounded, -0) ? '0' : String(rounded);
   return withUnit ? `${text} ${unit === 'inch' ? 'in' : 'cm'}` : text;
 }
-/** Parse a typed length. Accepts a comma decimal mark and simple inch fractions ("1 1/2", "3/8").
- * Returns millimetres, or null for empty or nonsense. Negative values are allowed only when asked for. */
+/** Parse a typed length. Accepts a comma decimal mark and simple inch fractions ("1 1/2", "1-1/2", "3/8").
+ * A typed unit wins over the screen unit: "58 in" is 58 inches even when the screen shows cm.
+ * Returns millimetres, or null for empty or nonsense. "1,500" is null: it may mean 1.5 or 1500.
+ * Negative values are allowed only when asked for. */
 export function parseLength(text: string, unit: LengthUnit, allowNegative = false): number | null {
-  const clean = text.trim().replace(',', '.').replace(/\s*(cm|in|inch|")\s*$/i, '');
+  let clean = text.trim();
+  const typed = /\s*(cm|in|inch|inches|")\s*$/i.exec(clean);
+  if (typed) {
+    unit = typed[1]?.toLowerCase() === 'cm' ? 'cm' : 'inch';
+    clean = clean.slice(0, typed.index);
+  }
+  if (/^-?\d+,\d{3}$/.test(clean)) return null;
+  clean = clean.replace(',', '.');
   if (!clean) return null;
   let value: number;
-  const fraction = /^(-?)(?:(\d+)\s+)?(\d+)\/(\d+)$/.exec(clean);
+  const fraction = /^(-?)(?:(\d+)(?:\s+|-))?(\d+)\/(\d+)$/.exec(clean);
   if (fraction) {
     const [, sign, whole, top, bottom] = fraction;
     if (Number(bottom) === 0) return null;
     value = (Number(whole ?? 0) + Number(top) / Number(bottom)) * (sign ? -1 : 1);
-  } else value = Number(clean);
+  } else if (/^-?(\d+\.?\d*|\.\d+)$/.test(clean)) value = Number(clean);
+  else return null;
   if (!Number.isFinite(value) || (!allowNegative && value < 0)) return null;
   return toMm(value, unit);
 }

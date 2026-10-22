@@ -123,6 +123,9 @@
     "length": 21,
     "piece_area": 200,
     "efficiency": 0.09523809523809523,
+    "useful_piece_area": 200.0,
+    "useful_yield": 0.09523809523809523,
+    "surplus_copies": 0,
     "engine": "fixture",
     "seed": 42,
     "runtime_s": 0,
@@ -336,6 +339,9 @@
       "length": 21,
       "piece_area": 200,
       "efficiency": 0.09523809523809523,
+      "useful_piece_area": 210.12,
+      "useful_yield": 0.044897435897435896,
+      "surplus_copies": 0,
       "engine": "fixture",
       "seed": 42,
       "runtime_s": 0,
@@ -384,6 +390,9 @@
         "length": 21,
         "piece_area": 200,
         "efficiency": 0.09523809523809523,
+        "useful_piece_area": 210.12,
+        "useful_yield": 0.044897435897435896,
+        "surplus_copies": 0,
         "engine": "fixture",
         "seed": 42,
         "runtime_s": 0,
@@ -406,7 +415,7 @@
       }
     },
     "order": {
-      "format": "beta-marker.cutorder/v1",
+      "format": "beta-marker.cutorder/v2",
       "name": "Test order",
       "job": {
         "format": "beta-marker.job/v1",
@@ -598,7 +607,7 @@
       "quantities": {
         "M": 20
       },
-      "max_plies": 10,
+      "max_plies": 20,
       "max_garments_per_marker": 2,
       "overcut_pct": 1
     },
@@ -614,7 +623,7 @@
       "final_time_s": 0
     },
     "plan": {
-      "format": "beta-marker.cutplan/v1",
+      "format": "beta-marker.cutplan/v2",
       "order_name": "Test order",
       "options": {
         "time_per_marker_s": 0.1,
@@ -632,7 +641,8 @@
           "ratio": {
             "M": 2
           },
-          "plies": 10,
+          "plies": 20,
+          "passes": 10,
           "marker_length_mm": 21,
           "efficiency": 0.1,
           "fabric_m": 0.41,
@@ -643,6 +653,9 @@
             "length": 21,
             "piece_area": 200,
             "efficiency": 0.09523809523809523,
+            "useful_piece_area": 210.12,
+            "useful_yield": 0.044897435897435896,
+            "surplus_copies": 0,
             "engine": "fixture",
             "seed": 42,
             "runtime_s": 0,

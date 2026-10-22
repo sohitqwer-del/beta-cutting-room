@@ -59,7 +59,20 @@ fn blocks_are_separate_in_every_size_and_after_chart_growth() {
                 }
                 for p in pieces {
                     if let Some(g) = p.piece.grain {
-                        assert!((g[0][0] - g[1][0]).abs() < 1e-8);
+                        let id = p.piece.id.strip_suffix(&format!("-{size}")).unwrap();
+                        let horizontal = id == "waistband"
+                            || block.id == blocks::BlockKind::Shirt
+                                && matches!(id, "collar" | "stand" | "cuff");
+                        if horizontal {
+                            assert!((g[0][1] - g[1][1]).abs() < 1e-8);
+                        } else if id == "neck_facing" {
+                            assert!(
+                                ((g[0][0] - g[1][0]).abs() - (g[0][1] - g[1][1]).abs()).abs()
+                                    < 1e-8
+                            );
+                        } else {
+                            assert!((g[0][0] - g[1][0]).abs() < 1e-8);
+                        }
                     }
                 }
             }

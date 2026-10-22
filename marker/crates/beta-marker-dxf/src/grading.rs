@@ -194,11 +194,6 @@ pub fn import_dxf_with_rules(
 ) -> Result<ImportReport> {
     let mut report = pattern::import(parser::read(bytes)?, opts, Some(table))?;
     report.warnings.extend(table.warnings.clone());
-    if opts.pairs {
-        report
-            .warnings
-            .push("Pairs: even quantities split into equal normal and mirrored copies.".into());
-    }
     Ok(report)
 }
 

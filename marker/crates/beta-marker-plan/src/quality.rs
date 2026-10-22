@@ -16,7 +16,8 @@ fn guard<T>(action: impl FnOnce() -> Result<T>) -> Result<T> {
         anyhow::anyhow!("Nesting engine panicked; discarded this trial: {message}")
     })?
 }
-pub(crate) fn checked_nest(
+/// Native engine: the full nester with its panic guard, as `plan` uses it.
+pub fn checked_nest(
     job: &beta_marker_core::Job,
     options: &beta_marker_nest::NestOptions,
 ) -> Result<MarkerResult> {
@@ -61,6 +62,9 @@ pub(crate) fn refine(
             length: report.length,
             piece_area: report.piece_area,
             efficiency: report.efficiency,
+            useful_piece_area: report.useful_piece_area,
+            useful_yield: report.useful_yield,
+            surplus_copies: report.surplus_copies,
             ..result
         });
     }
@@ -109,7 +113,7 @@ pub(super) fn select(
     engine: &mut crate::NestExecutor<'_>,
 ) -> Result<optimizer::Solution> {
     let (required, upper) = demand;
-    let baseline = optimizer::solve(measured, required, upper, order.max_plies, opts);
+    let baseline = optimizer::solve(measured, required, upper, order.max_passes(), opts);
     if measured.is_empty() || baseline.actions.is_empty() {
         return Ok(baseline);
     }
@@ -149,7 +153,7 @@ pub(super) fn select(
             c.length *= correction(count(c), &samples);
         }
     }
-    let nominated = optimizer::solve(&scored, required, upper, order.max_plies, opts);
+    let nominated = optimizer::solve(&scored, required, upper, order.max_passes(), opts);
     let shortlist: BTreeSet<_> = baseline
         .actions
         .iter()
@@ -184,7 +188,7 @@ pub(super) fn select(
             }
         }
     }
-    let mut selected = optimizer::solve(&actual, required, upper, order.max_plies, opts);
+    let mut selected = optimizer::solve(&actual, required, upper, order.max_passes(), opts);
     // A bounded re-search must also retain the explicit feasible incumbent.
     let complete = |solution: &optimizer::Solution| {
         required.iter().enumerate().all(|(k, q)| {

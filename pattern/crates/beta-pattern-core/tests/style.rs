@@ -27,8 +27,9 @@ fn folded_handoff_completes_one_sided_cut_marks_but_open_handoff_keeps_them() {
         .iter()
         .filter(|m| m.kind == beta_marker_core::MarkKind::Notch)
         .count();
-    assert_eq!(folded_marks, 4);
-    assert_eq!(edited.pieces[0].annotations.len(), 3);
+    let original_marks = doc.pieces[0].annotations.len();
+    assert_eq!(folded_marks, original_marks + 2);
+    assert_eq!(edited.pieces[0].annotations.len(), original_marks + 1);
     assert_eq!(style::to_job(&edited, &settings).unwrap(), folded);
     settings.fabric.layout = beta_marker_core::Layout::Open;
     let open = style::to_job(&edited, &settings).unwrap();
@@ -41,7 +42,7 @@ fn folded_handoff_completes_one_sided_cut_marks_but_open_handoff_keeps_them() {
             .iter()
             .filter(|m| m.kind == beta_marker_core::MarkKind::Notch)
             .count(),
-        3
+        original_marks + 1
     );
 }
 

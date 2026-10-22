@@ -20,7 +20,7 @@ def main():
         header = source.read(64)
     if header[:6] != b"\x7fELF\x02\x01" or struct.unpack_from("<H", header, 18)[0] != 62:
         raise ValueError("Expected a little-endian x86_64 Linux ELF")
-    for name in ["web/index.html", "web/wasm/beta_marker_wasm_bg.wasm", "web/wasm/beta_pattern_wasm_bg.wasm", "web/wasm/beta_marker_floor_bg.wasm", "NOTICE", "THIRD-PARTY-NOTICES.txt"]:
+    for name in ["web/index.html", "web/wasm/beta_marker_wasm_bg.wasm", "web/wasm/beta_pattern_wasm_bg.wasm", "web/wasm/beta_marker_floor_bg.wasm", "web/wasm/beta_marker_cutroom_wasm_bg.wasm", "NOTICE", "THIRD-PARTY-NOTICES.txt"]:
         if not (stage / name).is_file():
             raise ValueError(f"Missing portable release content: {name}")
     config = Path(__file__).resolve().parents[1] / "apps/desktop/src-tauri/tauri.conf.json"

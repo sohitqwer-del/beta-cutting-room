@@ -67,7 +67,11 @@ export function chordWidth(outline: Pt[], at: Pt): number {
 export function planLabel(outline: Pt[], name: string, detail: string, scale: number): LabelPlan | null {
   const anchor = labelAnchor(outline); if (!anchor) return null;
   // Room in screen pixels: the chord through the anchor (less a margin) and twice the clearance for height.
-  const room = chordWidth(outline, anchor.at) * scale * 0.86, tall = anchor.clearance * 2 * scale * 0.9;
+  return fitLabel(anchor.at, name, detail, chordWidth(outline, anchor.at) * scale * 0.86, anchor.clearance * 2 * scale * 0.9);
+}
+/** Fit a name (and a detail line) into `room` x `tall` screen pixels around an anchor placed by the engine or above.
+ * Too small: the name alone, then shortened with "…", then null (nothing drawn). */
+export function fitLabel(at: Pt, name: string, detail: string, room: number, tall: number): LabelPlan | null {
   if (room < 28 || tall < LABEL_MIN * 1.2) return null;
   let size = Math.min(LABEL_MAX, room / Math.max(textEms(name), 1), tall / 1.25);
   let text = name;
@@ -80,7 +84,7 @@ export function planLabel(outline: Pt[], name: string, detail: string, scale: nu
   }
   const detailSize = Math.max(9.5, size * 0.78);
   const showDetail = !!detail && size >= 11.5 && textEms(detail) * detailSize <= room && tall >= size * 1.25 + detailSize * 1.4;
-  return { at: anchor.at, name: Math.round(size * 10) / 10, detail: Math.round(detailSize * 10) / 10, showDetail, text };
+  return { at, name: Math.round(size * 10) / 10, detail: Math.round(detailSize * 10) / 10, showDetail, text };
 }
 /** Cut text to fit `ems` with an ellipsis; empty when fewer than three letters would remain. */
 export function shorten(text: string, ems: number): string {

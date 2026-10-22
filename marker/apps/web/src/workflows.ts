@@ -23,9 +23,14 @@ export function planErrors(form: PlanForm): string[] {
   if (!Number.isFinite(form.finalTime ?? 0) || (form.finalTime ?? 0) < 0 || (form.finalTime ?? 0) > 86400) errors.push('Final search time must be between 0 and 86400 seconds.');
   return errors;
 }
+/** DXF import route. `pairs` is always sent: the user's answer to "Cut 2 = a left and right pair?" (default yes, as the engine). */
+export function dxfImportPath(width: number, units: string, pairs: boolean): string {
+  return `import?format=dxf&width=${width}&units=${encodeURIComponent(units)}&pairs=${pairs}`;
+}
 export function planPayload(job: Job, form: PlanForm): { order: CutOrder; options: PlanOptions } {
   const errors = planErrors(form); if (errors.length) throw new Error(errors.join(' '));
-  return structuredClone({ order: { format: 'beta-marker.cutorder/v1', name: job.name, job, quantities: form.quantities,
+  // v2: max_plies counts plies (fabric layers). Folded and tube lays use two plies per pass.
+  return structuredClone({ order: { format: 'beta-marker.cutorder/v2', name: job.name, job, quantities: form.quantities,
     max_plies: form.maxPlies, max_garments_per_marker: form.maxGarments, overcut_pct: form.overcut },
   options: { time_per_marker_s: form.time, final_time_s: form.finalTime ?? 0, end_allowance_mm: form.endAllowance } });
 }

@@ -140,7 +140,7 @@ Contract fields are in `model.rs` (all optional, default = version 0.1 behaviour
 | Bundles, one way per garment | `Placement.bundle`, `Nap::OneWayPerBundle` | Every nest result fills `bundle`: garment `k` of `rules::bundle_sizes` (sizes in garment order XS < S < M < L < XL, numeric sizes by value). With `one_way_per_bundle` all pieces of a bundle share 0 or 180. | nest, validator |
 | Shade bands | `fabric.shade` | All placements of a bundle lie in one band (`k * band_mm` to `(k + 1) * band_mm` on the axis). | match, validator |
 | Stripe/check matching | `fabric.repeat`, `Piece.match_points`, `Job.match_rules` | Placed match points are in phase with the repeat within `tolerance_mm` (1 mm default), per bundle. | match, validator |
-| Cut order planning | `beta_marker_plan::{CutOrder, CutPlan}` | Split an order (garments per size) into lays (ratio + plies) under ply and marker-size limits, minimising fabric. | plan |
+| Cut order planning | `beta_marker_plan::{CutOrder, CutPlan}` | Split an order (garments per size) into lays (ratio + plies + passes) under ply and marker-size limits, minimising fabric. A ply is one fabric layer; a pass is one length laid from the roll (folded/tubular: two plies). Order and plan format v2; see `docs/PLIES.md`. | plan |
 | Batch / width trials | `beta-marker batch` | Nest many jobs, optionally at several widths, with a summary CSV. | plan |
 | Compare with current CAD | `beta-marker import` of HPGL/PLT markers | Read a marker plotted by another CAD, rebuild pieces and their placement, recompute its length/efficiency, re-nest the same pieces. | dxf |
 | Grading | AAMA/ASTM rule tables | Generate sizes from a base size and grade rules. | dxf |
@@ -162,7 +162,10 @@ The validator checks exact normal and mirrored demand globally and per garment.
 It rejects extra useful assignments, missing copies, wrong hands, wrong sizes
 and mixed legacy/explicit allocation. Flip permission pools the two demand hands,
 as before. A declared `fold_line` means the full piece is symmetric, so its two
-physical copies are interchangeable. This does not enable optional flipping of
+physical copies are interchangeable. Since round 0.7 an outline equal to its own
+mirror image within 0.2 mm (`rules::mirror_symmetric`, about the grain axis, or
+across it when nap and rotation permit a half turn) is interchangeable too
+(`rules::layer_hands_interchangeable`). This does not enable optional flipping of
 full placements. An on-fold half may use either displayed hand without requiring
 mirror demand or flip permission. Its one useful copy has the declared demand hand.
 
@@ -172,7 +175,19 @@ useful garment/hand pairs to cutting-room labels and XLSX reports. `placement_bu
 every garment served by a cut. Bundle shade, nap and matching checks include
 each assigned garment. Marker `piece_area` and `efficiency` remain occupied spread
 area measures. Useful-demand yield is requested full-piece area divided by
-`layers * width * length`; it never includes surplus.
+`layers * width * length`; it never includes surplus. Since round 0.7,
+`MarkerResult`, `ValidationReport` and `Metrics` carry it as `useful_piece_area`
+(mm², summed over all layers), `useful_yield` (fraction; layers = 1 open, 2
+folded or tubular) and `surplus_copies` (full copies cut but serving no garment).
+The validator recomputes all three; old JSON without them reads as 0.
+
+Fold halves are nested by Sparrow when no fixed pieces, defects or buffers
+apply: each half is joined to a thin bar (folded) or to a half on the opposite
+fold (tube) so the joined outline spans the usable width, then snapped onto its
+fold. On folded fabric the bounded packer also runs, since cutting some fold
+pieces as full two-layer pieces can give a shorter marker. The shortest valid
+marker wins. A `Fold edge:` warning explains a folded marker whose length is set
+by fold halves and pieces wider than half the table.
 
 ## 8. Paths and commands
 

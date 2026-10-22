@@ -167,7 +167,7 @@
   "per_garment": "Fabric per garment",
   "usual": "Your usual fabric per garment",
   "usual_hint": "Optional. Enter what you use today to see the saving.",
-  "saved": "You save {m} m per garment ({pct}%)",
+  "saved": "You save {m} {u} per garment ({pct}%)",
   "saved_none": "No saving against your usual length. Keep your usual way, or try Best time.",
   "garments_count": "Garments: {n}",
   "practice_result": "Practice layout. Not a real marker.",
@@ -182,7 +182,7 @@
   "share_pdf": "Share PDF",
   "share_plt": "Share PLT for plotter",
   "share_hint": "Send to the plotter shop, for example by WhatsApp.",
-  "plt_needs_server": "PLT needs the BETA app or shop server.",
+  "target_needs_app": "The A3 target sheet is made by the board-photo digitizer, which is not in this browser edition. Print it from the BETA desktop app or a shop server, or use the A4 sheet mode.",
   "open_editor": "Open in Marker editor",
   "start_again": "Start a new marker",
   "start_again_confirm": "Start again? Photos and pieces from this marker are removed.",
@@ -235,5 +235,8 @@
   "blocked_pending": "Check every piece first: use it or delete it.",
   "blocked_width": "Enter the fabric width.",
   "blocked_no_garments": "Set at least one garment.",
-  "blocked_no_result": "Make the marker first."
+  "blocked_no_result": "Make the marker first.",
+  "unit_m": "m",
+  "unit_yd": "yd",
+  "photo_every_size": "One photo is one size. Take a photo of the pieces of every size you will cut: this flow does not grade sizes (use Make a style for grading)."
 }

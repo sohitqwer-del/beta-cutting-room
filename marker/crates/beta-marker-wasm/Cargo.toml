@@ -13,6 +13,7 @@ beta-marker-core.workspace = true
 beta-marker-edit.workspace = true
 beta-marker-nest.workspace = true
 beta-marker-match.workspace = true
+beta-marker-dxf.workspace = true
 serde_json.workspace = true
 serde.workspace = true
 wasm-bindgen = "0.2"

@@ -53,7 +53,9 @@ pub struct LayRequest {
     pub id: String,
     /// Length of the final nested marker, in metres.
     pub marker_length_m: f64,
-    /// Required number of complete fabric layers.
+    /// Passes to lay: whole lengths taken from rolls. The JSON name is kept for
+    /// file compatibility. Open fabric lays one ply per pass; folded and tubular
+    /// fabric lay two (see `beta_marker_plan::plies_per_pass`).
     pub plies: u32,
     /// Width of the final marker, in millimetres.
     pub fabric_width_mm: f64,
@@ -137,9 +139,9 @@ pub struct SpliceInstruction {
 pub struct RollAllocation {
     /// Source stock identity.
     pub roll_id: String,
-    /// Number of distinct plies this roll contributes to, including split plies.
+    /// Number of distinct passes this roll contributes to, including split passes.
     pub plies: u32,
-    /// Number of uninterrupted whole plies from this roll in this lay.
+    /// Number of uninterrupted whole passes from this roll in this lay.
     pub full_plies: u32,
     /// Cloth consumed in this lay, including overlaps, in metres.
     pub used_m: f64,
@@ -154,7 +156,7 @@ pub struct RollAllocation {
 pub struct LaySpread {
     /// Original request; marker geometry and constraints remain auditable.
     pub lay: LayRequest,
-    /// Number of fully covered plies. No partial ply consumes stock.
+    /// Number of fully covered passes. No partial pass consumes stock.
     pub allocated_plies: u32,
     /// Table rows, one per contributing roll.
     pub allocations: Vec<RollAllocation>,

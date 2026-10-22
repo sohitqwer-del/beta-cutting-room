@@ -87,6 +87,7 @@ fn pieces(doc: &Document, sizes: &[String], tolerance: f64) -> Result<Vec<Piece>
         .into_iter()
         .flatten()
         .map(|g| g.piece)
+        .filter(|p| p.quantity > 0 || p.mirror_quantity > 0)
         .collect::<Vec<_>>();
     ensure!(!pieces.is_empty(), "no pieces to print");
     Ok(pieces)
@@ -296,6 +297,55 @@ fn cross(out: &mut String, p: Pt) -> Result<()> {
         false,
     )?;
     Ok(())
+}
+
+/// Paginated A4 monospaced report using the existing offline PDF writer.
+/// Caller wraps lines to 90 ASCII characters; unsupported glyphs use the writer's fallback.
+pub(crate) fn report_pdf(pages: &[Vec<String>]) -> Result<Vec<u8>> {
+    ensure!(
+        !pages.is_empty() && pages.len() <= 1000,
+        "Report page count is out of range"
+    );
+    let mut objects = vec![
+        b"<< /Type /Catalog /Pages 2 0 R >>".to_vec(),
+        vec![],
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>".to_vec(),
+    ];
+    let mut kids = vec![];
+    for (i, lines) in pages.iter().enumerate() {
+        ensure!(lines.len() <= 48, "Too many report lines");
+        let mut out = String::new();
+        for (row, line) in lines.iter().enumerate() {
+            ensure!(line.chars().count() <= 90, "Report line needs wrapping");
+            text(
+                &mut out,
+                [14. * PT, (280. - row as f64 * 5.3) * PT],
+                9.,
+                line,
+            )?;
+        }
+        text(
+            &mut out,
+            [14. * PT, 12. * PT],
+            8.,
+            &format!(
+                "BETA Cutting Room | {} / {} | Measurements in mm",
+                i + 1,
+                pages.len()
+            ),
+        )?;
+        page(&mut objects, &mut kids, [210., 297.], out, "");
+    }
+    objects[1] = format!(
+        "<< /Type /Pages /Count {} /Kids [{}] >>",
+        kids.len(),
+        kids.iter()
+            .map(|id| format!("{id} 0 R"))
+            .collect::<Vec<_>>()
+            .join(" ")
+    )
+    .into_bytes();
+    document(objects)
 }
 /// Dependency-free PDF 1.4: portrait A4/A3, vector pieces at 1:1, true overlap,
 /// alignment crosses, tile coordinates and a separate 100 mm calibration-square page.

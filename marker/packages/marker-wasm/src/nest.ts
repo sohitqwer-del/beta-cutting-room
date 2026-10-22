@@ -84,7 +84,7 @@ export function createMarkerNester(config: MarkerNesterConfig = {}): MarkerNeste
         // Keep a private copy: a drawing callback may mutate its own payload.
         current.latest = structuredClone(data.progress);
         current.progress?.(data.progress);
-        if (!disposed && !current.latest.done) post({ type: 'continue', id: data.id, round: current.latest.round });
+        if (!disposed && !current.latest.done && !current.latest.checkpoint) post({ type: 'continue', id: data.id, round: current.latest.round });
       }
       catch (error) {
         clearTimeout(current.timer);

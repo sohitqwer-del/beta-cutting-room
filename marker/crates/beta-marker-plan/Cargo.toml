@@ -10,6 +10,7 @@ beta-marker-roll.workspace = true
 beta-marker-core.workspace = true
 beta-marker-nest.workspace = true
 beta-marker-match.workspace = true
+jagua-rs.workspace = true
 anyhow.workspace = true
 serde.workspace = true
 serde_json.workspace = true

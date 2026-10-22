@@ -205,12 +205,12 @@ pub fn price_plan(
     let net: f64 = plan
         .lays
         .iter()
-        .map(|l| l.marker_length_mm * f64::from(l.plies) / 1000.0)
+        .map(|l| l.marker_length_mm * f64::from(l.passes) / 1000.0)
         .sum();
     let ends: f64 = plan
         .lays
         .iter()
-        .map(|l| 2.0 * plan.options.end_allowance_mm * f64::from(l.plies) / 1000.0)
+        .map(|l| 2.0 * plan.options.end_allowance_mm * f64::from(l.passes) / 1000.0)
         .sum();
     ensure!(
         (plan.total_fabric_m - net - ends).abs() <= 1e-6 * (1.0 + net + ends),

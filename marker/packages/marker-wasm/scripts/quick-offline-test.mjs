@@ -91,8 +91,12 @@ try {
     await wait("!document.querySelector('#nest').disabled && /sparrow|bounded/.test(document.querySelector('#engine').textContent)", 30000);
     check(await evaluate("document.querySelector('#check-status').textContent === 'Checks passed'"), 'normal marker editor nests and validates without an API');
     await shot('static-marker-demo.png');
+    // Since 0.7 only the board-photo digitizer needs a server; only the open screen is in the page.
+    await click('[data-screen="5"]');
+    check(await evaluate("[...document.querySelectorAll('.static-feature-note')].some(n => /digitizing panel needs the desktop app or server/.test(n.textContent))"), 'the digitizer explains that it needs the desktop app or a server');
+    await click('[data-screen="1"]');
+    check(await evaluate("!document.querySelector('.static-feature-note') && !document.querySelector('#make-plan').disabled"), 'cut plan works in the browser without a server note');
     await click('[data-screen="11"]');
-    check(await evaluate("document.querySelectorAll('.static-feature-note').length >= 5"), 'server-only panels explain their limits');
     check(!report.requests.some(u => new URL(u).pathname.includes('/api/')), 'static mode sends no API requests');
   }
   server.closeAllConnections(); await new Promise(resolve => server.close(resolve));

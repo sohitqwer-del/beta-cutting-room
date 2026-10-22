@@ -41,12 +41,13 @@ function main(args) {
     return;
   }
   const mode = args[0] || 'cli';
-  if (args.length > 1) throw new Error('Usage: node deploy/release-build.mjs [cli|desktop|marker-wasm|pattern-wasm|floor-wasm] or --verify <binary>');
+  if (args.length > 1) throw new Error('Usage: node deploy/release-build.mjs [cli|desktop|marker-wasm|pattern-wasm|floor-wasm|cutroom-wasm] or --verify <binary>');
   const scripts = {
     desktop: 'apps/desktop/scripts/tauri.mjs',
     'marker-wasm': 'packages/marker-wasm/scripts/build-wasm.mjs',
     'pattern-wasm': 'packages/marker-wasm/scripts/build-pattern-wasm.mjs',
     'floor-wasm': 'apps/web/scripts/build-floor-wasm.mjs',
+    'cutroom-wasm': 'packages/marker-wasm/scripts/build-cutroom-wasm.mjs',
   };
   if (mode !== 'cli' && !scripts[mode]) throw new Error(`Unknown release build: ${mode}`);
   if (!process.env.CARGO_TARGET_DIR) throw new Error('Set CARGO_TARGET_DIR to external build output.');

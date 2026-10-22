@@ -1,6 +1,7 @@
 import './feedback.css';
 import { logo, VERSION } from '../brand';
 import { downloadFile, isDesktop } from '../transport';
+import { staticMode } from '../static-mode';
 import type { DocumentState } from '../state';
 import { FEEDBACK_CONFIG } from './config';
 import { openFeedbackLink } from './external';
@@ -8,6 +9,7 @@ import { currentLanguage, t, translateFeedback, type FeedbackKey } from './i18n'
 import { isMilestone, rememberAsk, rememberWelcome, shouldAsk, shouldShowWelcome, type KeyStore } from './memory';
 import { buildReport, detectOs, issueUrl, languageName, mailtoUrl, platformName, privacyHints, reportFileName,
   type FeedbackContext, type FeedbackKind, type MarkerNumbers, type Platform, type Report } from './report';
+import { byId, find, findAll } from '../screens';
 
 /** Feedback everywhere, a humble first-run welcome and one gentle "How did that go?" ask.
  * Self-contained: the shell calls installFeedback() once. Nothing is sent without the user's choice.
@@ -16,7 +18,7 @@ export interface FeedbackHost { state?: () => DocumentState; message?: (text: st
 export interface FeedbackApi { open(kind?: FeedbackKind): void; showWelcome(): void; askOnce(): void }
 
 /** English screen names for reports. Indexes are fixed by the shell. */
-const SCREEN_NAMES: Record<number, string> = { 0: 'Marker editor', 1: 'Cut plan', 2: 'Compare', 3: 'Help', 4: 'Pattern', 5: 'Digitize', 6: 'Rolls', 7: 'Bundles', 8: 'Floor', 9: 'Home', 10: 'Reports', 11: 'Photo to marker' };
+const SCREEN_NAMES: Record<number, string> = { 0: 'Marker editor', 1: 'Cut plan', 2: 'Compare', 3: 'Help', 4: 'Pattern formulas', 5: 'Digitize', 6: 'Rolls', 7: 'Bundles', 8: 'Floor', 9: 'Home', 10: 'Reports', 11: 'Photo to marker', 12: 'Make a style' };
 /** Screens where anonymous marker numbers make sense. */
 const MARKER_SCREENS = new Set([0, 1, 2]);
 const KINDS: FeedbackKind[] = ['bug', 'missing', 'idea'];
@@ -39,7 +41,7 @@ async function copyText(text: string): Promise<boolean> {
   try { await navigator.clipboard.writeText(text); return true; } catch { /* Fall back below. */ }
   const area = document.createElement('textarea'); area.value = text; area.setAttribute('readonly', ''); area.className = 'fb-offscreen';
   // Inside an open modal dialog the rest of the page is inert, so the helper must live in the dialog.
-  (document.querySelector('dialog[open]') ?? document.body).append(area); area.select();
+  (find('dialog[open]') ?? document.body).append(area); area.select();
   let ok = false; try { ok = document.execCommand('copy'); } catch { ok = false; }
   area.remove(); return ok;
 }
@@ -69,14 +71,14 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
   let report: Report | null = null;
 
   // ----- Top bar button (before About; the shell keeps it on every screen) -----
-  const tools = document.querySelector<HTMLElement>('.topbar-tools') ?? document.querySelector<HTMLElement>('header');
+  const tools = find<HTMLElement>('.topbar-tools') ?? find<HTMLElement>('header');
   const topButton = document.createElement('button');
   topButton.type = 'button'; topButton.id = 'feedback-button'; topButton.className = 'small fb-topbar-button';
   topButton.setAttribute('aria-haspopup', 'dialog'); topButton.setAttribute('aria-keyshortcuts', 'Shift+?');
   topButton.dataset.fbAttr = 'title:button_title';
   topButton.innerHTML = `${svg(BUBBLE)}${label('button')}`;
   topButton.addEventListener('click', () => open());
-  const about = tools?.querySelector('#about-button');
+  const about = tools?.querySelector('#topbar-extra') ?? tools?.querySelector('#about-button');
   if (about) about.before(topButton); else tools?.append(topButton);
 
   // ----- Dialogs and the ask card -----
@@ -129,7 +131,7 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
   </section>
   <p id="fb-announce" class="fb-offscreen" role="status" aria-live="polite"></p>`);
 
-  const $ = <T extends HTMLElement = HTMLElement>(id: string): T => document.getElementById(id) as T;
+  const $ = <T extends HTMLElement = HTMLElement>(id: string): T => byId(id) as T;
   const dialog = $<HTMLDialogElement>('fb-dialog'), welcome = $<HTMLDialogElement>('fb-welcome'), ask = $('fb-ask');
   const form = $<HTMLFormElement>('fb-form'), previewStep = $('fb-preview-step'), status = $('fb-status');
   const announce = (text: string) => { const el = $('fb-announce'); el.textContent = ''; window.setTimeout(() => { el.textContent = text; }, 50); };
@@ -137,14 +139,14 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
 
   // ----- Help screen and About: a humble line and the same three actions -----
   const helpActions = `<div class="toolgroup fb-actions"><button type="button" class="primary small" data-fb-open>${label('title')}</button>${externalLink(FEEDBACK_CONFIG.discussions, 'discussion')}<button type="button" class="small" data-fb-show-welcome>${label('show_welcome')}</button></div>`;
-  const help = document.querySelector<HTMLElement>('#screen-3');
+  const help = find<HTMLElement>('#screen-3');
   if (help) {
     const box = document.createElement('section'); box.className = 'fb-help'; box.setAttribute('aria-labelledby', 'fb-help-title');
     box.innerHTML = `<h2 id="fb-help-title" data-fb="help_title">${esc(t('help_title'))}</h2>${label('humble', 'p')}${helpActions}`;
     const intro = help.querySelector('h1 + p') ?? help.querySelector('h1');
     if (intro) intro.after(box); else help.prepend(box);
   }
-  const aboutBody = document.querySelector<HTMLElement>('#about-dialog .dialog-body');
+  const aboutBody = find<HTMLElement>('#about-dialog .dialog-body');
   if (aboutBody) {
     const box = document.createElement('div'); box.className = 'fb-about';
     box.innerHTML = `${label('humble', 'p', ' class="fb-strong"')}${helpActions.replace('primary small', 'small')}`;
@@ -155,18 +157,20 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
   // ----- Context shown to the user and put in the report -----
   function screenName(): string {
     const base = SCREEN_NAMES[screen] ?? 'Unknown';
-    const page = screen === 8 ? document.querySelector<HTMLElement>('[data-floor-page][aria-pressed=true]')?.dataset.floorPage : '';
+    const page = screen === 8 ? find<HTMLElement>('[data-floor-page][aria-pressed=true]')?.dataset.floorPage : screen === 12 ? find<HTMLElement>('#screen-12')?.dataset.step : '';
     return page && /^[a-z_-]{1,30}$/.test(page) ? `${base} › ${page}` : base;
   }
   function context(): FeedbackContext {
-    const platform: Platform = isDesktop() ? 'desktop' : document.querySelector('#server-status')?.classList.contains('connected') ? 'server' : 'browser';
+    // "connected" is also set when the Rust engine runs in this browser; only a real server answer means "server".
+    const status = find<HTMLElement>('#server-status');
+    const platform: Platform = isDesktop() ? 'desktop' : staticMode() || status?.dataset.floorLabel === 'status_browser' || !status?.classList.contains('connected') ? 'browser' : 'server';
     const ua = navigator as Navigator & { userAgentData?: { platform?: string } };
     return { screen: screenName(), version: VERSION, platform, os: detectOs(navigator.userAgent, ua.userAgentData?.platform ?? navigator.platform), language: currentLanguage() };
   }
   function numbers(): MarkerNumbers | null {
     const state = host.state?.(); if (!state) return null;
     const placed = state.result.placements.length;
-    const time = Number(document.querySelector<HTMLInputElement>('#time')?.value);
+    const time = Number(find<HTMLInputElement>('#time')?.value);
     return { pieces: placed || state.job.pieces.length, efficiencyPct: placed ? state.result.efficiency * 100 : null, timeLimitS: Number.isFinite(time) && time > 0 ? time : null };
   }
   function renderContext(): void {
@@ -186,7 +190,7 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
   function open(next: FeedbackKind = kind): void {
     if (dialog.open) return;
     if (welcome.open) welcome.close();
-    document.querySelector<HTMLDialogElement>('#about-dialog[open]')?.close();
+    find<HTMLDialogElement>('#about-dialog[open]')?.close();
     hideAsk(false);
     opener = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : topButton;
     setKind(next); renderContext(); showForm(); status.textContent = ''; $('fb-error').textContent = '';
@@ -257,7 +261,7 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
     if (target.closest('[data-fb-close]')) { target.closest('dialog')?.close(); return; }
     const openButton = target.closest<HTMLElement>('[data-fb-open]');
     if (openButton) { open((openButton.dataset.fbOpen || undefined) as FeedbackKind | undefined); return; }
-    if (target.closest('[data-fb-show-welcome]')) { document.querySelector<HTMLDialogElement>('#about-dialog[open]')?.close(); showWelcome(); return; }
+    if (target.closest('[data-fb-show-welcome]')) { find<HTMLDialogElement>('#about-dialog[open]')?.close(); showWelcome(); return; }
     const external = target.closest<HTMLElement>('[data-fb-external]');
     if (external) {
       const outcome = await openFeedbackLink(external.dataset.fbExternal!, copyText);
@@ -269,7 +273,7 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
 
   // ----- "Report a problem with this screen": one link under each screen's main heading -----
   function screenLink(): void {
-    const section = screen === 0 ? document.querySelector<HTMLElement>('.workspace') : document.getElementById(`screen-${screen}`);
+    const section = screen === 0 ? find<HTMLElement>('.workspace') : byId(`screen-${screen}`);
     if (!section || section.querySelector('.fb-screen-link')) return;
     const heading = (screen === 0 ? section.querySelector('.main-heading h2') : null) ?? section.querySelector('h1') ?? section.querySelector('h2');
     const link = document.createElement('button');
@@ -314,13 +318,13 @@ export function installFeedback(host: FeedbackHost = {}): FeedbackApi {
     if (choice === 'send') { hideAsk(true); open('idea'); } else if (choice === 'later') { hideAsk(true); topButton.focus(); }
   });
   ask.addEventListener('keydown', event => { if (event.key === 'Escape') { hideAsk(true); topButton.focus(); } });
-  const messageEl = document.querySelector<HTMLElement>('#message');
+  const messageEl = find<HTMLElement>('#message');
   if (messageEl) new MutationObserver(() => { if (isMilestone(messageEl.textContent ?? '')) askOnce(); }).observe(messageEl, { childList: true, characterData: true, subtree: true });
   window.addEventListener('beta-feedback-milestone', askOnce);
 
   // ----- Language: follow the app switch on <html data-language> -----
   new MutationObserver(() => {
-    for (const root of [topButton, dialog, welcome, ask, ...Array.from(document.querySelectorAll<HTMLElement>('.fb-help, .fb-about, .fb-screen-link'))]) translateFeedback(root);
+    for (const root of [topButton, dialog, welcome, ask, ...Array.from(findAll<HTMLElement>('.fb-help, .fb-about, .fb-screen-link'))]) translateFeedback(root);
     if (dialog.open && !form.hidden) renderContext();
   }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-language'] });
   translateFeedback(topButton);

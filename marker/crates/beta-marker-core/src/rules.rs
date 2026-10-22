@@ -280,6 +280,39 @@ pub fn flip_allowed(job: &Job, piece: &Piece) -> bool {
     piece.flip.unwrap_or(job.fabric.allow_flip)
 }
 
+/// Largest outline difference (mm) at which a piece still counts as its own mirror
+/// image. Well below cutting accuracy, well above CAD export rounding.
+pub const SYMMETRY_TOLERANCE_MM: f64 = 0.2;
+
+/// Whether an outline equals its own mirror image, both aligned to the grain:
+/// symmetric about an axis along the grain, or (with `half_turn`) about an axis
+/// across it. Independent of origin, winding and vertex sampling.
+pub fn mirror_symmetric(outline: &[Pt], grain: Option<[Pt; 2]>, half_turn: bool) -> bool {
+    let normal = transform_points(outline, false, grain_alignment_deg(grain, false), [0.; 2]);
+    let mirror = transform_points(outline, true, grain_alignment_deg(grain, true), [0.; 2]);
+    let turns: &[f64] = if half_turn { &[0.0, 180.0] } else { &[0.0] };
+    turns.iter().any(|&angle| {
+        let candidate = transform_points(&mirror, false, angle, [0.; 2]);
+        crate::geometry::same_outline_translated(&normal, &candidate, SYMMETRY_TOLERANCE_MM)
+    })
+}
+
+/// Whether a copy cut from the mirrored layer of a two-layer spread can serve a
+/// demand for the normal hand, and the reverse. True for a declared fold line
+/// (an assertion of symmetry), for flip permission, and for an outline equal to
+/// its mirror image in a permitted grain direction. This exchanges layer demand
+/// only; it does not permit a face-down copy on open fabric.
+pub fn layer_hands_interchangeable(job: &Job, piece: &Piece) -> bool {
+    if piece.fold_line.is_some() || flip_allowed(job, piece) {
+        return true;
+    }
+    // A half turn reverses the nap and needs the 180-degree grain direction.
+    let half_turn = job.fabric.nap == Nap::None
+        && allowed_rotations(job, piece, true).allows(grain_alignment_deg(piece.grain, true) + 180.)
+        && allowed_rotations(job, piece, false).allows(grain_alignment_deg(piece.grain, false) + 180.);
+    mirror_symmetric(&piece.outline, piece.grain, half_turn)
+}
+
 /// Sort key for size labels: standard letter sizes in garment order, then numeric sizes
 /// by value, then any other label alphabetically.
 pub fn size_order_key(size: &str) -> (u8, f64, String) {
@@ -578,6 +611,39 @@ mod tests {
     use super::*;
     use crate::model::*;
     use std::collections::BTreeMap;
+
+    #[test]
+    fn inferred_layer_symmetry_respects_grain_nap_and_boundary_sampling() {
+        let mut j = job(Nap::None);
+        let p = &mut j.pieces[0];
+        p.grain = Some([[13., 27.], [13., 37.]]);
+        p.outline = vec![[13., 27.], [33., 27.], [33., 37.], [23., 47.], [13., 37.]];
+        assert!(layer_hands_interchangeable(&j, &j.pieces[0]));
+        // Different sampling along the matching edges is not asymmetry, and
+        // CAD rounding within the tolerance is ignored.
+        j.pieces[0].outline.insert(1, [18., 27.]);
+        assert!(layer_hands_interchangeable(&j, &j.pieces[0]));
+        j.pieces[0].outline[1][1] += 0.1;
+        assert!(layer_hands_interchangeable(&j, &j.pieces[0]));
+        j.pieces[0].outline[1][1] += 1.0;
+        assert!(!layer_hands_interchangeable(&j, &j.pieces[0]));
+        j.pieces[0].outline.remove(1);
+        // A notch on one side only: the endpoints match, the boundary does not.
+        j.pieces[0].outline.insert(1, [16., 27.]);
+        j.pieces[0].outline.insert(2, [17., 30.]);
+        j.pieces[0].outline.insert(3, [18., 27.]);
+        assert!(!layer_hands_interchangeable(&j, &j.pieces[0]));
+        j.pieces[0].outline.drain(1..4);
+        assert!(mirror_symmetric(&j.pieces[0].outline, j.pieces[0].grain, false));
+        // Reflection about the cross-grain axis needs a half turn to match.
+        j.pieces[0].outline = vec![[0., 0.], [20., 0.], [30., 10.], [20., 20.], [0., 20.]];
+        assert!(layer_hands_interchangeable(&j, &j.pieces[0]));
+        j.fabric.nap = Nap::OneWay;
+        assert!(!layer_hands_interchangeable(&j, &j.pieces[0]));
+        j.fabric.nap = Nap::None;
+        j.pieces[0].rotation = RotationRule::Fixed;
+        assert!(!layer_hands_interchangeable(&j, &j.pieces[0]));
+    }
 
     fn job(nap: Nap) -> Job {
         let piece = |id: &str, size: &str| Piece {

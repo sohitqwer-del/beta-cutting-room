@@ -42,7 +42,7 @@ const rows: Row[] = [
     beta: yes('defects, shade bands'), tuka: doc(undefined, 'PLAN'), gerber: doc(undefined, 'PLAN'), lectra: doc('sectional and shade-zone nesting', 'L1'),
     optitex: doc('damaged zones, shading controls', 'O2'), audaces: nv(), rp: doc('Richpeace defect avoidance, shade sections', 'R1') } },
   { group: 'Marker making', feature: 'Folded or tubular fabric', cells: {
-    beta: partial('supported; folded T-shirt test improved from 43% to 63% fabric use in 0.5, still below open fabric (~78%)'), tuka: nv(), gerber: doc(undefined, 'PLAN'), lectra: nv(), optitex: doc('fold work', 'O3'), audaces: nv(), rp: nv() } },
+    beta: partial('supported with useful yield and unused-copy counts; waste much lower in 0.7, still behind open fabric'), tuka: nv(), gerber: doc(undefined, 'PLAN'), lectra: nv(), optitex: doc('fold work', 'O3'), audaces: nv(), rp: nv() } },
   { group: 'Planning and floor', feature: 'Cut order planning', cells: {
     beta: yes('ratios, plies, lay lengths'), tuka: doc('TUKAcutplan', 'PLAN'), gerber: doc('AccuPlan', 'G5'), lectra: doc('Valia planning', 'L6'),
     optitex: doc('CutPlan', 'PLAN'), audaces: nv(), rp: doc('BOKE cut-plan interface', 'B1') } },

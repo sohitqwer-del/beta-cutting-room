@@ -33,15 +33,15 @@ const features = [
   { icon: 'plan', title: 'Cut planning and costing', items: ['Size ratios, ply heights and lay lengths from an order', 'Fabric consumption and cost estimates', 'Compare fabric widths (command line)'] },
   { icon: 'rolls', title: 'Rolls and spreading', items: ['4-point roll inspection and defect maps', 'Shade and shrinkage groups', 'Roll allocation, splice zones and end bits'] },
   { icon: 'bundles', title: 'Bundles and the floor', items: ['Ply numbering, bundles, QR tickets and stickers', 'Re-cut planning for damaged parts', 'Bundle scan-out to sewing lines with a USB scanner'] },
-  { icon: 'files', title: 'Files and data', items: ['Plot: PLT/HPGL and 1:1 PDF; SVG, DXF, generic ISO cutter file', 'Import orders and rolls from CSV or Excel', 'Export consumption and work-in-progress as CSV'] },
+  { icon: 'files', title: 'Files and data', items: ['Plot: PLT/HPGL and 1:1 PDF; SVG, DXF, generic ISO cutter file, also in the browser', 'Import orders and rolls from CSV or Excel', 'Export consumption and work-in-progress as CSV'] },
 ];
 
 const notYet = [
-  'Basic blocks need a fit review by a pattern master. Extend and trim work between straight lines.',
-  'In the browser, marker PLT, full-size PDF and DXF need the desktop app or a server. Tiled PDF works locally.',
+  'Basic blocks pass 10,806 automatic checks, but they need sewn samples and a fit review by a pattern master. Extend and trim work between straight lines.',
+  'The browser edition does everything except the board-photo digitizer. Cut planning in the browser runs on one thread, about 2 seconds per marker.',
   'Quick Marker real-photo accuracy is untested. Check dimensions against the paper before cutting.',
   'Plotter and cutter profiles are generic. Test them on your machines before production.',
-  'Folded and tubular fabric work. Folded results improved a lot in 0.5 (T-shirt test 43% to 63%) but are still below open fabric.',
+  'Folded and tubular lays now show real yield and unused copies. Waste fell a lot in 0.7 (shirt test 3.34 to 1.68 m per garment), but folded fabric is still behind open fabric.',
   'No direct Tally or SAP connector yet. Exchange data with CSV or Excel files.',
   'Server access is local by default. Factory-network use needs an access token and an HTTPS proxy.',
   'The Windows installer is not code-signed yet. Windows may show a warning.',
@@ -279,7 +279,7 @@ ${section('download', 'Download', html`
   <article class="card download-card">
     <span class="card-icon">${icon('server')}</span>
     <h3>Linux server</h3>
-    <p>The <code>beta-marker serve</code> command runs the same app in a web browser. ${d.server.size}. Needs glibc 2.43 or newer.</p>
+    <p>The <code>beta-marker serve</code> command runs the same app in a web browser. ${d.server.size}. Needs glibc 2.31 or newer (tested with 2.31 and 2.43).</p>
     ${downloadButton(d.server.url, 'Download server', 'btn btn-secondary')}
     <p class="small muted"><a href="install.html#server">Server steps</a></p>
   </article>

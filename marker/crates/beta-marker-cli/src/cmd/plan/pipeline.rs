@@ -106,6 +106,7 @@ fn plan_table(plan: &CutPlan) -> CutPlanTable {
             "Lay",
             "Ratio",
             "Plies",
+            "Passes",
             "Marker length (mm)",
             "Efficiency (%)",
             "Fabric (m)",
@@ -121,6 +122,7 @@ fn plan_table(plan: &CutPlan) -> CutPlanTable {
                     format!("L{:03}", i + 1),
                     format!("{:?}", l.ratio),
                     l.plies.to_string(),
+                    l.passes.to_string(),
                     l.marker_length_mm.to_string(),
                     (100.0 * l.efficiency).to_string(),
                     l.fabric_m.to_string(),
@@ -296,9 +298,10 @@ pub fn run(args: Args) -> Result<()> {
     );
     for (i, l) in plan.lays.iter().enumerate() {
         println!(
-            "L{:03}: {:?} x {} plies, {:.3} m, {:.2}% efficiency",
+            "L{:03}: {:?} x {} passes ({} plies), {:.3} m, {:.2}% efficiency",
             i + 1,
             l.ratio,
+            l.passes,
             l.plies,
             l.marker_length_mm / 1000.0,
             100.0 * l.efficiency
@@ -372,10 +375,13 @@ mod tests {
     }
     #[test]
     fn small_pipeline_writes_checked_print_and_cutter_artifacts() -> Result<()> {
-        let root = std::env::var_os("BETA_DATA_DIR").map(PathBuf::from).unwrap_or_else(std::env::temp_dir).join(format!(
-            "marker-bench/integrate/fast-{}",
-            std::process::id()
-        ));
+        let root = std::env::var_os("BETA_DATA_DIR")
+            .map(PathBuf::from)
+            .unwrap_or_else(std::env::temp_dir)
+            .join(format!(
+                "marker-bench/integrate/fast-{}",
+                std::process::id()
+            ));
         fs::create_dir_all(&root)?;
         let cutorder = root.join("order.json");
         let rolls = root.join("rolls.json");
@@ -441,7 +447,10 @@ mod tests {
     #[test]
     #[ignore = "full Simon production pipeline: long nests, PDFs and cutters under BETA_DATA_DIR"]
     fn simon_long_pipeline() -> Result<()> {
-        let root = std::env::var_os("BETA_DATA_DIR").map(PathBuf::from).unwrap_or_else(std::env::temp_dir).join("marker-bench/integrate");
+        let root = std::env::var_os("BETA_DATA_DIR")
+            .map(PathBuf::from)
+            .unwrap_or_else(std::env::temp_dir)
+            .join("marker-bench/integrate");
         fs::create_dir_all(&root)?;
         let rolls = root.join("demo-rolls.json");
         json(Some(&rolls), &beta_marker_roll::demo_register())?;

@@ -6,6 +6,7 @@ import { chordWidth, edgeDistance, isProductionLabel, planLabel, shorten } from 
 import { chainLoop, inBox, snapPoint, type EdgeHit, type Guide, type SnapResult, type SnapTarget } from './snap';
 import { boundsOf, fitView, pan, rulerTicks, toScreen, toWorld, viewBox, zoomAt, type View } from './view';
 import { formatAngle, formatLength, fromMm, normaliseAngle, parseLength, step, type LengthUnit } from './units';
+import { byId } from '../screens';
 
 /** Pattern drafting canvas: tools with icons and names, direct manipulation, snapping with guides,
  * exact values in a small popover, multi-select, zoom and pan, rulers in cm or inch, an inspector and a piece list.
@@ -94,7 +95,8 @@ export function installCanvas(root: HTMLElement, host: CanvasHost) {
         <div class="push"></div>
         <button type="button" class="icon-btn" id="sc-zoom-out" aria-label="${tx('zoom_out')}" data-tip="${tx('zoom_out')} · −">${icon('zoom-out')}</button>
         <button type="button" class="icon-btn" id="sc-fit" aria-label="${tx('fit')}" data-tip="${tx('fit')} · 0">${icon('fit')}</button>
-        <button type="button" class="icon-btn" id="sc-zoom-in" aria-label="${tx('zoom_in')}" data-tip="${tx('zoom_in')} · +" data-tip-align="end">${icon('zoom-in')}</button>
+        <button type="button" class="icon-btn" id="sc-zoom-in" aria-label="${tx('zoom_in')}" data-tip="${tx('zoom_in')} · +">${icon('zoom-in')}</button>
+        <button type="button" class="icon-btn sc-insp-toggle" id="sc-insp-toggle" aria-pressed="false" aria-controls="sc-inspector" aria-label="${tx('inspector')}" data-tip="${tx('inspector')}" data-tip-align="end">${icon('panel-right')}</button>
       </div>
       <div class="sc-stage" id="sc-stage">
         <span class="sc-ruler-unit" id="sc-ruler-unit" aria-hidden="true"></span><svg class="sc-ruler-x" id="sc-ruler-x" aria-hidden="true"></svg><svg class="sc-ruler-y" id="sc-ruler-y" aria-hidden="true"></svg>
@@ -104,7 +106,7 @@ export function installCanvas(root: HTMLElement, host: CanvasHost) {
       </div>
       <div class="sc-foot"><p class="sc-hint" id="sc-hint" aria-live="polite"></p><span class="sc-cursor" id="sc-cursor" aria-hidden="true"></span></div>
     </div>
-    <aside class="sc-inspector" aria-label="${tx('inspector')}">
+    <aside class="sc-inspector" id="sc-inspector" aria-label="${tx('inspector')}"><button type="button" class="icon-btn ghost sc-insp-close" id="sc-insp-close" aria-label="${tx('close')}">${icon('close')}</button>
       <div class="segmented sc-tabs" role="group" aria-label="${tx('inspector')}"><button type="button" data-tab="selected" aria-pressed="true">${tx('tab_selected')}</button><button type="button" data-tab="pieces" aria-pressed="false">${tx('tab_pieces')}</button></div>
       <div id="sc-inspect" class="sc-inspect"></div>
     </aside></div>`;
@@ -625,7 +627,19 @@ export function installCanvas(root: HTMLElement, host: CanvasHost) {
   }
 
   // ---------- Inspector ----------
+  /** Medium screens: the inspector floats over the drawing. It shows while something is selected (until closed for that
+   * selection) or while pinned open with the panel button. Wide screens dock it, so these flags change nothing there. */
+  let inspPinned = false, inspDismissed: string | null = null, lastSelection = '';
+  try { inspPinned = localStorage.getItem('beta-style-inspector') === 'open'; } catch { /* default */ }
+  const inspShown = () => inspPinned || (selection.size > 0 && inspDismissed !== [...selection].join('|'));
+  function setInspector(open: boolean): void {
+    inspPinned = open; inspDismissed = open ? null : [...selection].join('|');
+    try { localStorage.setItem('beta-style-inspector', open ? 'open' : 'closed'); } catch { /* session only */ }
+    renderInspector();
+  }
   function renderInspector(): void {
+    const key = [...selection].join('|'); if (key !== lastSelection) { lastSelection = key; inspDismissed = null; }
+    const shown = inspShown(); $<HTMLElement>('.sc').dataset.insp = shown ? 'open' : 'closed'; $('#sc-insp-toggle').setAttribute('aria-pressed', String(shown));
     root.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tab === inspectorTab)));
     const box = $('#sc-inspect'), d = doc(), g = geometry();
     const active = document.activeElement as HTMLElement | null, keep = active && box.contains(active) ? active.id : '';
@@ -633,13 +647,14 @@ export function installCanvas(root: HTMLElement, host: CanvasHost) {
     if (inspectorTab === 'pieces') {
       box.innerHTML = `<p class="hint">${tx('pieces_hint')}</p><ul class="sc-piece-list">${d.pieces.map((p, i) => {
         const ok = g?.pieces.find(q => q.id === p.id)?.ok;
-        return `<li class="${selection.has(`piece:${p.id}`) ? 'selected' : ''}"><button type="button" class="sc-piece-pick" data-pick-piece="${esc(p.id)}"><i class="swatch" style="background:var(--fill-${i % 6})"></i><strong>${esc(p.name)}</strong><span class="chip ${ok ? 'ok' : 'bad'}">${ok ? tx('closed') : tx('not_closed')}</span></button>
+        const construction = (p.quantity ?? 1) === 0 && (p.mirror_quantity ?? 0) === 0;
+        return `<li class="${selection.has(`piece:${p.id}`) ? 'selected' : ''}${construction ? ' construction' : ''}">${construction ? `<span class="chip sc-construction">${tx('construction_only')}</span>` : ''}<button type="button" class="sc-piece-pick" data-pick-piece="${esc(p.id)}"><i class="swatch" style="background:var(--fill-${i % 6})"></i><strong>${esc(p.name)}</strong><span class="chip ${ok ? 'ok' : 'bad'}">${ok ? tx('closed') : tx('not_closed')}</span></button>
           <div class="sc-piece-row"><span class="sc-stepper"><button type="button" class="icon-btn small" data-qty="${esc(p.id)}" data-delta="-1" aria-label="${tx('fewer', { name: p.name })}">${icon('minus')}</button><output aria-label="${tx('quantity')}">${p.quantity ?? 1}</output><button type="button" class="icon-btn small" data-qty="${esc(p.id)}" data-delta="1" aria-label="${tx('more', { name: p.name })}">${icon('plus')}</button></span>
           <label class="check sc-pair"><input type="checkbox" data-pair="${esc(p.id)}" ${p.mirror_quantity ? 'checked' : ''}>${tx('pair')}</label>
           <select data-material="${esc(p.id)}" aria-label="${tx('fabric_of', { name: p.name })}">${MATERIALS.map(m => `<option value="${m}" ${(p.material ?? 'shell') === m ? 'selected' : ''}>${tx(`material_${m}` as StyleKey)}</option>`).join('')}</select></div></li>`;
       }).join('') || `<li class="hint">${tx('no_pieces')}</li>`}</ul>`;
     } else box.innerHTML = selectedHtml();
-    if (keep) document.getElementById(keep)?.focus();
+    if (keep) byId(keep)?.focus();
   }
   function linkedNote(d: PatternDocument, p: PatternPiece): string {
     const o = d.drawing[p.edges[0]?.object ?? ''] as unknown as { kind?: string; recipe?: { source?: unknown; operation?: unknown } } | undefined;
@@ -900,6 +915,8 @@ export function installCanvas(root: HTMLElement, host: CanvasHost) {
       case 'sc-all': showAll = !showAll; b.setAttribute('aria-pressed', String(showAll)); lastDoc = ''; void reload(); break;
       case 'sc-names': showNames = !showNames; b.setAttribute('aria-pressed', String(showNames)); render(); break;
       case 'sc-arrange': void arrange(); break;
+      case 'sc-insp-toggle': setInspector(!inspShown()); break;
+      case 'sc-insp-close': setInspector(false); $('#sc-insp-toggle').focus(); break;
     }
   });
   root.addEventListener('change', e => {

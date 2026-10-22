@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { demoJob, demoResult } from './demo';
 import { changePlacement, emptyResult, History, readDocument } from './state';
-import { fitView, markerPoint, rulerTicks, screenPoint, zoomAt } from './view';
+import { fitReadable, fitView, markerPoint, rulerTicks, screenPoint, zoomAt } from './view';
 describe('editor history and files', () => {
   it('moves immutably, protects locks, undoes and clears redo on a new edit', () => {
     const start = { job: demoJob, result: demoResult };
@@ -39,6 +39,13 @@ describe('view coordinates and rulers', () => {
     expect(view.x).toBeLessThan(0); expect(view.y).toBeLessThan(0);
     expect(view.x + view.width).toBeGreaterThan(3000);
     expect(view.y + view.height).toBeGreaterThan(1500);
+  });
+  it('starts a long marker readable and shows a short one whole', () => {
+    expect(fitReadable(3000, 1500, 1.8)).toEqual(fitView(3000, 1500, 1.8));
+    const long = fitReadable(33000, 740, 1.8);
+    expect(740 / long.height).toBeCloseTo(0.5, 6);
+    expect(long.x).toBeLessThan(0); expect(long.x).toBeGreaterThan(-100);
+    expect(long.width / long.height).toBeCloseTo(1.8);
   });
   it('keeps the cursor anchor stationary when zooming and flips y once', () => {
     const view = { x: 10, y: 20, width: 1000, height: 500 };

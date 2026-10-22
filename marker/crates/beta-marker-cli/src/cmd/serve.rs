@@ -14,7 +14,6 @@ use beta_marker_core::{Job, MarkerResult};
 use beta_marker_dxf::{ImportOptions, Units};
 use beta_marker_export::ExportOptions;
 use beta_marker_nest::NestOptions;
-use beta_marker_plan::{CutOrder, PlanOptions};
 use http_body_util::{BodyExt, Full, LengthLimitError, Limited};
 use hyper::{
     Method, Request, Response, StatusCode,
@@ -151,6 +150,21 @@ impl Reply {
             Err(error) => Self::error(500, &error.to_string()),
         }
     }
+    fn from_output(output: beta_marker_api::Output) -> Self {
+        match output {
+            beta_marker_api::Output::Json(body) => {
+                Self::bytes("application/json; charset=utf-8", body)
+            }
+            beta_marker_api::Output::File {
+                mime,
+                extension,
+                body,
+            } => Self {
+                extension,
+                ..Self::bytes(mime, body)
+            },
+        }
+    }
     fn error(status: u16, message: &str) -> Self {
         Self {
             status,
@@ -201,11 +215,7 @@ struct NestRequest {
     job: Job,
     options: NestOptions,
 }
-#[derive(Deserialize)]
-struct PlanRequest {
-    order: CutOrder,
-    options: PlanOptions,
-}
+use beta_marker_api::PlanRequest;
 #[derive(Default)]
 struct SearchStatus {
     started: Option<Instant>,
@@ -213,12 +223,14 @@ struct SearchStatus {
     length: Option<f64>,
     efficiency: Option<f64>,
     elapsed_s: f64,
+    result: Option<MarkerResult>,
+    last_layout: Option<Instant>,
 }
 impl SearchStatus {
     fn reply(&self) -> Reply {
         Reply::json(json!({"running":self.running,
             "elapsed_s": if self.running { self.started.map_or(0.0, |t| t.elapsed().as_secs_f64()) } else { self.elapsed_s },
-            "best_length_mm":self.length,"best_efficiency":self.efficiency}))
+            "best_length_mm":self.length,"best_efficiency":self.efficiency,"result":self.result}))
     }
 }
 #[derive(Deserialize)]
@@ -336,6 +348,7 @@ fn ensure_counts(job: &Job) -> Result<(), Reply> {
 
 // Open fabric has one cut outline per demanded copy. Folded layouts can use
 // half pieces, so their progress efficiency stays unknown until a result exists.
+#[cfg(test)]
 fn progress_area(job: &Job) -> Option<f64> {
     if job.fabric.layout != beta_marker_core::Layout::Open {
         return None;
@@ -380,139 +393,11 @@ struct SeamlyRequest {
     measurements: Option<String>,
     size: Option<String>,
 }
-#[derive(Deserialize)]
-struct InspectRequest {
-    register: beta_marker_roll::RollRegister,
-    #[serde(default)]
-    settings: beta_marker_roll::InspectionSettings,
-    #[serde(default)]
-    grouping: beta_marker_roll::GroupingSettings,
-}
-#[derive(Deserialize)]
-struct SpreadRequest {
-    register: beta_marker_roll::RollRegister,
-    #[serde(default)]
-    lays: Vec<beta_marker_roll::LayRequest>,
-    #[serde(default)]
-    markers: Vec<SpreadMarker>,
-    #[serde(default)]
-    shade_rule: beta_marker_roll::ShadePolicy,
-    #[serde(default)]
-    eligible_roll_ids: Vec<String>,
-    #[serde(default)]
-    settings: beta_marker_roll::AllocationSettings,
-}
-#[derive(Deserialize)]
-struct SpreadMarker {
-    id: String,
-    job: Job,
-    result: MarkerResult,
-    plies: u32,
-    #[serde(default)]
-    end_allowance_mm: f64,
-}
-#[derive(Deserialize)]
-struct FromSpreadRequest {
-    job: Job,
-    result: MarkerResult,
-    register: beta_marker_roll::RollRegister,
-    spread: beta_marker_roll::SpreadingPlan,
-    lay_id: String,
-    order: String,
-    colour: String,
-}
-#[derive(Deserialize)]
-struct BundleRequest {
-    lay: beta_marker_cutroom::bundles::Lay,
-    #[serde(default)]
-    rules: beta_marker_cutroom::bundles::BundleRules,
-}
-#[derive(Deserialize)]
-struct TicketRequest {
-    bundles: Vec<beta_marker_cutroom::bundles::Bundle>,
-    paper: Option<String>,
-}
-#[derive(Deserialize)]
-struct CostRequest {
-    job: Job,
-    garments: u32,
-    price_per_m: f64,
-}
-#[derive(Deserialize)]
-struct RecutRequest {
-    bundle: beta_marker_cutroom::bundles::Bundle,
-    piece: beta_marker_cutroom::bundles::PieceKey,
-    id: String,
-    reason: String,
-}
-#[derive(Deserialize)]
-struct PhysicalLayRequest {
-    job: Job,
-    result: MarkerResult,
-    id: String,
-    order: String,
-    colour: String,
-    plies: Vec<beta_marker_cutroom::bundles::PlyRun>,
-}
-#[derive(Deserialize)]
-struct MarkerActualsRequest {
-    source: PhysicalLayRequest,
-    issued_mm: f64,
-    end_bits_mm: f64,
-    actual_piece_area_mm2: f64,
-    actual_pieces: u64,
-    recut_count: u64,
-    end_allowance_per_ply_mm: f64,
-}
-
-// Physical-layer expansion and garment numbering belong in Rust.
-fn physical_lay(input: PhysicalLayRequest) -> anyhow::Result<beta_marker_cutroom::bundles::Lay> {
-    use beta_marker_cutroom::bundles::{CutPart, Lay};
-    anyhow::ensure!(
-        beta_marker_core::validate(&input.job, &input.result).ok,
-        "The marker must pass validation before bundling"
-    );
-    let mut parts = Vec::new();
-    let mut slots = std::collections::BTreeMap::new();
-    for placement in &input.result.placements {
-        let piece = input
-            .job
-            .pieces
-            .iter()
-            .find(|p| p.id == placement.piece_id)
-            .ok_or_else(|| anyhow::anyhow!("Unknown piece {}", placement.piece_id))?;
-        let size = piece
-            .size
-            .clone()
-            .ok_or_else(|| anyhow::anyhow!("Piece needs a size"))?;
-        for (garment, hand) in
-            beta_marker_core::rules::layer_assignments(input.job.fabric.layout, placement)
-        {
-            let garment = garment.ok_or_else(|| {
-                anyhow::anyhow!("Marker has no garment identities. Nest it again before bundling")
-            })?;
-            let slot = slots.entry((piece.id.clone(), garment, hand)).or_insert(0);
-            parts.push(CutPart {
-                piece_id: piece.id.clone(),
-                size: size.clone(),
-                garment,
-                slot: *slot,
-                mirrored: hand,
-            });
-            *slot += 1;
-        }
-    }
-    Ok(Lay {
-        id: input.id,
-        style: input.job.name,
-        order: input.order,
-        colour: input.colour,
-        plies: input.plies,
-        parts,
-    })
-}
-
 fn cutting_route(path: &str, body: &[u8]) -> Option<anyhow::Result<Reply>> {
+    // Roll, spreading and cutting-room routes are shared with desktop and WASM.
+    if let Some(output) = beta_marker_api::cutroom(path, body) {
+        return Some(output.map(Reply::from_output));
+    }
     let known = [
         "/api/pattern/starter",
         "/api/pattern/style",
@@ -536,17 +421,6 @@ fn cutting_route(path: &str, body: &[u8]) -> Option<anyhow::Result<Reply>> {
         "/api/pattern/to-job",
         "/api/digitize",
         "/api/digitize/target",
-        "/api/roll/inspect",
-        "/api/roll/spread",
-        "/api/cutroom/lay",
-        "/api/cutroom/from-spread",
-        "/api/cutroom/bundles",
-        "/api/cutroom/tickets",
-        "/api/cutroom/stickers",
-        "/api/cutroom/cost",
-        "/api/cutroom/recut",
-        "/api/cutroom/report",
-        "/api/cutroom/report-marker",
     ];
     if !known.contains(&path) {
         return None;
@@ -737,152 +611,6 @@ fn cutting_route(path: &str, body: &[u8]) -> Option<anyhow::Result<Reply>> {
                     }
                 }
             }
-            "/api/roll/inspect" => {
-                let input: InspectRequest = serde_json::from_slice(body)?;
-                Ok(Reply::json(
-                    json!({"inspection": beta_marker_roll::inspect(&input.register, &input.settings)?,
-                    "groups": beta_marker_roll::group_rolls(&input.register, &input.grouping)?}),
-                ))
-            }
-            "/api/roll/spread" => {
-                let mut input: SpreadRequest = serde_json::from_slice(body)?;
-                anyhow::ensure!(
-                    input.markers.is_empty() || input.lays.is_empty(),
-                    "Supply marker sources or lay requests, not both"
-                );
-                for marker in input.markers {
-                    anyhow::ensure!(
-                        marker.end_allowance_mm.is_finite() && marker.end_allowance_mm >= 0.0,
-                        "End allowance must be non-negative"
-                    );
-                    let validation = beta_marker_core::validate(&marker.job, &marker.result);
-                    anyhow::ensure!(validation.ok, "Marker {} must pass validation", marker.id);
-                    input.lays.push(beta_marker_roll::LayRequest {
-                        id: marker.id,
-                        marker_length_m: (validation.length + 2.0 * marker.end_allowance_mm)
-                            / 1000.0,
-                        plies: marker.plies,
-                        fabric_width_mm: marker.job.fabric.width,
-                        shade_rule: input.shade_rule.clone(),
-                        eligible_roll_ids: input.eligible_roll_ids.clone(),
-                        allow_splicing: false,
-                        splice_zones: vec![],
-                    });
-                }
-                anyhow::ensure!(!input.lays.is_empty(), "Supply at least one lay");
-                let plan =
-                    beta_marker_roll::allocate(&input.register, &input.lays, &input.settings)?;
-                beta_marker_roll::validate_plan(&input.register, &plan)?;
-                Ok(Reply::json(plan))
-            }
-            "/api/cutroom/from-spread" => {
-                let input: FromSpreadRequest = serde_json::from_slice(body)?;
-                beta_marker_roll::validate_plan(&input.register, &input.spread)?;
-                let lay = input
-                    .spread
-                    .lays
-                    .iter()
-                    .find(|s| s.lay.id == input.lay_id)
-                    .ok_or_else(|| anyhow::anyhow!("Lay is not in the spreading plan"))?;
-                Ok(Reply::json(beta_marker_cutroom::integration::from_spread(
-                    &input.job,
-                    &input.result,
-                    &input.register,
-                    lay,
-                    &input.order,
-                    &input.colour,
-                )?))
-            }
-            "/api/cutroom/lay" => Ok(Reply::json(physical_lay(serde_json::from_slice(body)?)?)),
-            "/api/cutroom/bundles" => {
-                let input: BundleRequest = serde_json::from_slice(body)?;
-                Ok(Reply::json(beta_marker_cutroom::bundles::bundle_lay(
-                    &input.lay,
-                    input.rules,
-                )?))
-            }
-            "/api/cutroom/tickets" | "/api/cutroom/stickers" => {
-                let input: TicketRequest = serde_json::from_slice(body)?;
-                let paper = match input.paper.as_deref().unwrap_or("a4") {
-                    "a4" => beta_marker_cutroom::tickets::TicketPaper::A4,
-                    "label100x50" => beta_marker_cutroom::tickets::TicketPaper::Label100x50,
-                    _ => anyhow::bail!("Paper must be a4 or label100x50"),
-                };
-                let pdf = if path.ends_with("tickets") {
-                    beta_marker_cutroom::tickets::ticket_pdf(&input.bundles, paper)?
-                } else {
-                    beta_marker_cutroom::tickets::sticker_pdf(&input.bundles, paper)?
-                };
-                Ok(Reply::bytes("application/pdf", pdf))
-            }
-            "/api/cutroom/recut" => {
-                let input: RecutRequest = serde_json::from_slice(body)?;
-                Ok(Reply::json(beta_marker_cutroom::recuts::Damage::record(
-                    input.id,
-                    &input.bundle,
-                    input.piece,
-                    input.reason,
-                )?))
-            }
-            "/api/cutroom/report-marker" => {
-                let input: MarkerActualsRequest = serde_json::from_slice(body)?;
-                let validation =
-                    beta_marker_core::validate(&input.source.job, &input.source.result);
-                anyhow::ensure!(validation.ok, "The source marker must pass validation");
-                let layers = if input.source.job.fabric.layout == beta_marker_core::Layout::Open {
-                    1.0
-                } else {
-                    2.0
-                };
-                let width_mm = input.source.job.fabric.width * layers;
-                let lay = physical_lay(input.source)?;
-                let plies = lay
-                    .plies
-                    .last()
-                    .ok_or_else(|| anyhow::anyhow!("Lay needs shade runs"))?
-                    .last;
-                beta_marker_cutroom::bundles::bundle_lay(&lay, Default::default())?;
-                let actuals = beta_marker_cutroom::reports::LayActuals {
-                    lay: lay.id,
-                    order: lay.order,
-                    width_mm,
-                    marker_length_mm: validation.length,
-                    plies,
-                    end_allowance_per_ply_mm: input.end_allowance_per_ply_mm,
-                    piece_area_per_ply_mm2: validation.piece_area * layers,
-                    pieces_per_ply: u32::try_from(lay.parts.len())?,
-                    actual_piece_area_mm2: input.actual_piece_area_mm2,
-                    actual_pieces: input.actual_pieces,
-                    recut_count: input.recut_count,
-                    spreading: vec![beta_marker_cutroom::reports::SpreadingRecord {
-                        issued_mm: input.issued_mm,
-                        end_bits_mm: input.end_bits_mm,
-                    }],
-                };
-                Ok(Reply::json(beta_marker_cutroom::reports::lay_report(
-                    &actuals,
-                )?))
-            }
-            "/api/cutroom/report" => Ok(Reply::json(beta_marker_cutroom::reports::lay_report(
-                &serde_json::from_slice(body)?,
-            )?)),
-            "/api/cutroom/cost" => {
-                let input: CostRequest = serde_json::from_slice(body)?;
-                anyhow::ensure!(
-                    input.price_per_m.is_finite() && input.price_per_m >= 0.0,
-                    "Price must be non-negative"
-                );
-                let estimate = beta_marker_cutroom::costing::estimate(
-                    &input.job,
-                    input.job.fabric.width,
-                    input.garments,
-                    &Default::default(),
-                )?;
-                let cost = estimate.fabric_per_garment_mm / 1000.0 * input.price_per_m;
-                Ok(Reply::json(
-                    json!({"estimate":estimate,"fabric_cost_per_garment":cost,"price_per_m":input.price_per_m}),
-                ))
-            }
             "/api/digitize/target" => {
                 let target = beta_pattern_digitize::target::Target::tiled(
                     beta_pattern_digitize::target::SheetSize::A3,
@@ -967,26 +695,9 @@ fn route(method: &Method, url: &str, body: &[u8], root: &Path) -> Route {
             match params.get("format").copied().unwrap_or("dxf") {
                 "dxf" => {}
                 "plt" => {
-                    let Some(width) = params
-                        .get("width")
-                        .and_then(|w| w.parse::<f64>().ok())
-                        .filter(|w| w.is_finite() && *w > 0.0)
-                    else {
-                        return Reply::error(400, "PLT import needs a positive fabric width in mm")
-                            .into();
-                    };
-                    let opts = beta_marker_dxf::HpglOptions {
-                        width: Some(width),
-                        ..Default::default()
-                    };
-                    return match beta_marker_dxf::import_hpgl(body, &opts) {
-                        Ok(report) => Reply::json(json!({
-                            "job": report.job,
-                            "result": report.result,
-                            "warnings": report.warnings,
-                        }))
-                        .into(),
-                        Err(error) => Reply::error(400, &format!("{error:#}")).into(),
+                    return match beta_marker_api::import_plt(body, params.get("width").copied()) {
+                        Ok(output) => Reply::from_output(output).into(),
+                        Err(error) => Reply::error(400, &error).into(),
                     };
                 }
                 _ => return Reply::error(400, "Import format must be dxf or plt").into(),
@@ -998,7 +709,8 @@ fn route(method: &Method, url: &str, body: &[u8], root: &Path) -> Route {
                 "inch" => Units::Inch,
                 _ => return Reply::error(400, "Units must be auto, mm, cm or inch").into(),
             };
-            let pairs = match params.get("pairs").copied().unwrap_or("false") {
+            // Matches ImportOptions::default and WASM: left/right pairs unless pairs=false.
+            let pairs = match params.get("pairs").copied().unwrap_or("true") {
                 "true" => true,
                 "false" => false,
                 _ => return Reply::error(400, "Pairs must be true or false").into(),
@@ -1038,22 +750,8 @@ fn route(method: &Method, url: &str, body: &[u8], root: &Path) -> Route {
         },
         ("POST", "/api/plan") => match parse::<PlanRequest>(body) {
             Ok(input) => {
-                if input.order.max_plies == 0
-                    || input.order.max_garments_per_marker == 0
-                    || input.order.quantities.values().all(|q| *q == 0)
-                    || !input.order.overcut_pct.is_finite()
-                    || input.order.overcut_pct < 0.0
-                    || !input.options.time_per_marker_s.is_finite()
-                    || input.options.time_per_marker_s <= 0.0
-                    || !input.options.final_time_s.is_finite()
-                    || !(0.0..=86400.0).contains(&input.options.final_time_s)
-                    || !input.options.end_allowance_mm.is_finite()
-                    || input.options.end_allowance_mm < 0.0
-                {
-                    return Reply::error(400, "Plan needs positive quantities, ply and garment limits, positive time, and non-negative over-cut and end allowance").into();
-                }
-                if let Err(error) = ensure_counts(&input.order.job) {
-                    return error.into();
+                if let Err(error) = beta_marker_api::check_plan(&input) {
+                    return Reply::error(400, &error).into();
                 }
                 Route::Plan(Box::new(input))
             }
@@ -1294,26 +992,38 @@ fn dispatch(method: Method, url: String, body: Bytes, state: &ServiceState) -> R
     };
     let reply = match std::panic::catch_unwind(|| match work {
         Route::Nest(input) => {
-            let area = progress_area(&input.job);
+            let mut on_progress = |p: beta_marker_nest::NestProgress| {
+                let mut status = state.progress.lock().unwrap_or_else(|e| e.into_inner());
+                if status.length.is_none_or(|length| p.length < length)
+                    && status
+                        .last_layout
+                        .is_none_or(|last| last.elapsed().as_secs_f64() >= 0.5)
+                {
+                    status.length = Some(p.length);
+                    status.efficiency = Some(p.result.efficiency);
+                    status.result = Some(p.result);
+                    status.last_layout = Some(Instant::now());
+                }
+            };
             let result = if beta_marker_match::needs_rules(&input.job) {
-                beta_marker_match::nest_with_rules(&input.job, &input.options)
+                beta_marker_match::nest_with_rules_and_progress(
+                    &input.job,
+                    &input.options,
+                    &mut on_progress,
+                )
             } else {
-                beta_marker_nest::nest_with_progress(&input.job, &input.options, |p| {
-                    let mut status = state.progress.lock().unwrap_or_else(|e| e.into_inner());
-                    if status.length.is_none_or(|length| p.length < length) {
-                        status.length = Some(p.length);
-                        status.efficiency = area
-                            .filter(|_| p.length > 0.0)
-                            .map(|a| a / (input.job.fabric.width * p.length));
-                    }
-                })
+                beta_marker_nest::nest_with_progress(&input.job, &input.options, &mut on_progress)
             }?;
             let mut status = state.progress.lock().unwrap_or_else(|e| e.into_inner());
             status.length = Some(result.length);
             status.efficiency = Some(result.efficiency);
+            status.result = Some(result.clone());
             Ok::<Reply, anyhow::Error>(Reply::json(result))
         }
-        Route::Plan(input) => beta_marker_plan::plan(&input.order, &input.options).map(Reply::json),
+        Route::Plan(input) => {
+            beta_marker_api::plan(&input, &mut beta_marker_plan::checked_nest, |_| Ok(()))
+                .map(Reply::json)
+        }
         _ => unreachable!("only work routes reach the worker"),
     }) {
         Ok(Ok(reply)) => reply,

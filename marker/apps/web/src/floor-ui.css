@@ -68,3 +68,12 @@ html[data-language=en] #floor-draft { display: none; }
   .floor-workbench .floor-actions > * { flex: 1 1 100%; }
   .floor-workbench .floor-actions label { min-width: 0; }
 }
+/* Browser edition: whole-app backup next to the floor-record backup, each in a labelled group. */
+/* Two groups do not fit beside the heading: they take their own row right under it (phones keep them at the end). */
+@media (min-width: 721px) {
+  .floor-workbench:has(.backup-group) > .floor-top { order: -2; }
+  .floor-workbench > .floor-backups:has(.backup-group) { order: -1; grid-column: 1 / -1; grid-row: auto; justify-content: flex-start; align-items: stretch; margin: 0 0 var(--sp-3); }
+}
+.floor-backups .backup-group { display: flex; flex-wrap: wrap; align-items: flex-end; align-content: flex-start; gap: var(--sp-2); padding: 6px 8px 8px; border: 1px solid var(--line); border-radius: var(--r-s); }
+.floor-backups .backup-group-title { flex-basis: 100%; font-size: var(--fs-xs); font-weight: 600; color: var(--text-3); }
+.floor-backups .backup-group button { min-height: 36px; }

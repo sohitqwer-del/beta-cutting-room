@@ -179,8 +179,11 @@ pub struct LayTicket {
     pub lay: String,
     /// Marker identifier, stable within the report.
     pub marker: String,
-    /// Plies / spreads as used by the source plan.
+    /// Fabric plies (layers) in the lay, as in the source plan.
     pub plies: u32,
+    /// Lengths of fabric laid. Folded and tubular fabric lay two plies per pass.
+    #[serde(default)]
+    pub passes: u32,
     /// Marker length, metres.
     pub marker_m: f64,
     /// Head allowance per ply, metres.
@@ -352,7 +355,7 @@ pub fn build(input: &ReportInput) -> Result<ReportPack> {
         )?;
     }
     for (i, lay) in input.plan.lays.iter().enumerate() {
-        ensure!(lay.plies > 0, "Lay plies must be positive.");
+        ensure!(lay.passes > 0, "Lay plies must be positive.");
         let mut job = input.job.clone();
         job.order = Some(Order {
             sizes: lay.ratio.clone(),
@@ -379,7 +382,7 @@ pub fn build(input: &ReportInput) -> Result<ReportPack> {
             .transpose()?;
         if let Some(spread) = allocated {
             ensure!(
-                spread.lay.plies == lay.plies
+                spread.lay.plies == lay.passes
                     && (spread.lay.fabric_width_mm - input.job.fabric.width).abs() < 0.01
                     && (spread.lay.marker_length_m
                         - (lay.marker_length_mm + 2.0 * input.plan.options.end_allowance_mm)
@@ -391,12 +394,12 @@ pub fn build(input: &ReportInput) -> Result<ReportPack> {
         }
         let mut quantities = BTreeMap::new();
         for (s, n) in &lay.ratio {
-            let n = n.checked_mul(lay.plies).context("Lay quantity overflow")?;
+            let n = n.checked_mul(lay.passes).context("Lay quantity overflow")?;
             quantities.insert(s.clone(), n);
             *made.entry(s.clone()).or_default() += u64::from(n);
         }
-        net += checked.length * f64::from(lay.plies) / 1000.0;
-        end_loss += 2.0 * input.plan.options.end_allowance_mm * f64::from(lay.plies) / 1000.0;
+        net += checked.length * f64::from(lay.passes) / 1000.0;
+        end_loss += 2.0 * input.plan.options.end_allowance_mm * f64::from(lay.passes) / 1000.0;
         let rolls: Vec<_> = allocated
             .into_iter()
             .flat_map(|l| l.allocations.iter().map(|r| r.roll_id.clone()))
@@ -418,6 +421,7 @@ pub fn build(input: &ReportInput) -> Result<ReportPack> {
             lay: id,
             marker: format!("M{:03}", i + 1),
             plies: lay.plies,
+            passes: lay.passes,
             marker_m: checked.length / 1000.0,
             head_m: input.plan.options.end_allowance_mm / 1000.0,
             tail_m: input.plan.options.end_allowance_mm / 1000.0,

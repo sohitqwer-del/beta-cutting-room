@@ -1,8 +1,8 @@
 //! Optional controls for measured search experiments. Existing callers keep their defaults.
+use crate::Instant;
 use crate::{Job, MarkerResult, NestOptions, NestProgress, v02};
 use anyhow::{Result, ensure};
 use serde::{Deserialize, Serialize};
-use crate::Instant;
 
 /// How independent seeds share a search budget.
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, Eq)]
@@ -182,6 +182,7 @@ pub(crate) fn nest_with_tuning_and_progress(
                     callback(NestProgress {
                         seconds: started.elapsed().as_secs_f64(),
                         length: progress.length,
+                        result: progress.result,
                     });
                 }
             },
@@ -194,6 +195,7 @@ pub(crate) fn nest_with_tuning_and_progress(
                     callback(NestProgress {
                         seconds: started.elapsed().as_secs_f64(),
                         length: result.length,
+                        result: result.clone(),
                     });
                 }
                 best = Some(result);

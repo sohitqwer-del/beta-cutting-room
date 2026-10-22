@@ -4,6 +4,8 @@ import { editorSettings, type EditorCore, type EditorInspection } from './editor
 import { addLibraryEntry, cleanSelection, documentFromEdit, LIBRARY_KEY, readLibrary, type LibraryEntry } from './editor-state';
 import { icon } from './icons';
 import './editor-tools.css';
+import { find, findAll } from './screens';
+import { appUnit, longLength, shortLength } from './units-pref';
 interface Host {
   get(): DocumentState; core(): EditorCore | undefined; busy(): boolean;
   selection(): number[]; select(indices: number[]): void;
@@ -15,7 +17,7 @@ const esc = (v: unknown): string => String(v ?? '').replace(/[&<>"']/g, c => ({ 
 const shortcuts = [
   ['Tab / Shift+Tab', 'Focus a piece or tool'], ['Shift+click', 'Add or remove a piece from the selection'],
   ['A', 'Select all pieces'], ['V', 'Rubber-band selection; drag empty space'], ['G', 'Move / pan mode'],
-  ['Arrows', 'Nudge selected group by the chosen step'], ['Shift+Arrows', 'Nudge by 10 mm'], ['Alt+Arrows', 'Bump selected group to contact'],
+  ['Arrows', 'Nudge selected group by the chosen step'], ['Shift+Arrows', 'Nudge by 10 mm (1 cm)'], ['Alt+Arrows', 'Bump selected group to contact'],
   ['R', 'Next allowed rotation for selected group'], ['[ / ]', 'Tilt group by −0.5° / +0.5° within each piece rule'],
   ['F', 'Flip selected pieces when allowed'], ['S', 'Swap exactly two selected pieces'], ['L', 'Lock or unlock selected group'],
   ['C / E', 'Compact all / Close the end'], ['Delete', 'Return selected unlocked pieces to the unplaced list'],
@@ -24,7 +26,7 @@ const shortcuts = [
 ];
 /** Editor-only controls. All geometry, demand accounting, measurements and reuse checks call WASM. */
 export function installEditorTools(host: Host) {
-  const $ = <T extends Element = HTMLElement>(s: string): T => document.querySelector<T>(s)!;
+  const $ = <T extends Element = HTMLElement>(s: string): T => find<T>(s)!;
   const n = (s: string): number => Number($<HTMLInputElement>(s).value);
   let mode: 'move' | 'select' | 'measure' | 'place' = 'move';
   let measureStart: Pt | undefined, measureEnd: Pt | undefined, inspection: EditorInspection | undefined;
@@ -70,16 +72,16 @@ export function installEditorTools(host: Host) {
   function run(action: Record<string, unknown>): void {
     guarded(() => {
       const out = core().apply(host.get(), host.selection(), action);
-      if (out.measurement !== null) $('#ed-measurement').textContent = `${out.measurement.toFixed(3)} mm`;
+      if (out.measurement !== null) $('#ed-measurement').textContent = shortLength(out.measurement);
       if (!['select', 'rectangle', 'measure'].includes(String(action.op))) host.commit(documentFromEdit(out), true);
       host.select(out.selected);
       host.redraw(); if (out.notice) host.message(out.notice);
     });
   }
-  function setMode(next: typeof mode): void { if (next === 'measure') { $<HTMLDetailsElement>('#ed-measure-details').open = true; window.dispatchEvent(new Event('beta-inspector')); } mode = next; measureStart = undefined; measureEnd = undefined; armed = next === 'place' ? armed : -1; document.querySelectorAll<HTMLButtonElement>('[data-ed-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.edMode === mode))); host.redraw(); }
+  function setMode(next: typeof mode): void { if (next === 'measure') { $<HTMLDetailsElement>('#ed-measure-details').open = true; window.dispatchEvent(new Event('beta-inspector')); } mode = next; measureStart = undefined; measureEnd = undefined; armed = next === 'place' ? armed : -1; findAll<HTMLButtonElement>('[data-ed-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.edMode === mode))); host.redraw(); }
   function measure(): void { measureStart = [n('#ed-from-x'),n('#ed-from-y')]; measureEnd = [n('#ed-to-x'),n('#ed-to-y')]; run({ op:'measure',from:measureStart,to:measureEnd }); }
-  document.querySelectorAll<HTMLButtonElement>('[data-ed-bump]').forEach(b => b.onclick = () => run({ op:'bump',direction:b.dataset.edBump }));
-  document.querySelectorAll<HTMLButtonElement>('[data-ed-mode]').forEach(b => b.onclick = () => setMode(b.dataset.edMode as typeof mode));
+  findAll<HTMLButtonElement>('[data-ed-bump]').forEach(b => b.onclick = () => run({ op:'bump',direction:b.dataset.edBump }));
+  findAll<HTMLButtonElement>('[data-ed-mode]').forEach(b => b.onclick = () => setMode(b.dataset.edMode as typeof mode));
   const clicks: Record<string, () => void> = {
     '#ed-compact': () => run({op:'compact'}), '#ed-close-end': () => run({op:'close_end'}), '#ed-all': () => run({op:'select',field:'all',value:''}),
     '#ed-select': () => run({op:'select',field:$<HTMLSelectElement>('#ed-select-field').value,value:$<HTMLInputElement>('#ed-select-value').value}),
@@ -110,21 +112,21 @@ export function installEditorTools(host: Host) {
     const overlap=inspection.pairs.reduce((sum,p)=>sum+p.overlap_mm2,0), gaps=inspection.pairs.filter(p=>p.overlap_mm2<=1e-7).length;
     const tolerance=Math.max(0,n('#ed-tolerance'));
     $('#ed-overlap').textContent=`Overlap ${overlap.toFixed(3)} mm² · ${gaps} gap violations · ${inspection.section_violations.length} section violations · ${inspection.end_violations.length} pieces past end. ${overlap>0 && overlap<=tolerance?'Within display tolerance; still invalid for cutting.':''}`;
-    $('#ed-pairs').innerHTML=inspection.pairs.slice(0,30).map(p=>`<li>Copies ${p.a+1} / ${p.b+1}: overlap ${p.overlap_mm2.toFixed(3)} mm²; gap ${p.distance_mm.toFixed(3)} / ${p.required_mm.toFixed(3)} mm</li>`).join('');
-    $('#ed-status').textContent=`Length ${(inspection.validation.length/1000).toFixed(3)} m · table ${(inspection.table_length/1000).toFixed(3)} m · efficiency ${(inspection.table_efficiency*100).toFixed(1)}% · ${host.get().result.placements.length} placed / ${inspection.unplaced.length} unplaced · ${inspection.pairs.length} gap/overlap pairs · ${inspection.validation.errors.length} rule errors`;
+    $('#ed-pairs').innerHTML=inspection.pairs.slice(0,30).map(p=>`<li>Copies ${p.a+1} / ${p.b+1}: overlap ${p.overlap_mm2.toFixed(3)} mm²; gap ${shortLength(p.distance_mm, appUnit(), false)} / ${shortLength(p.required_mm)}</li>`).join('');
+    $('#ed-status').textContent=`Length ${longLength(inspection.validation.length).value} ${longLength(inspection.validation.length).unit} · table ${longLength(inspection.table_length).value} ${longLength(inspection.table_length).unit} · efficiency ${(inspection.table_efficiency*100).toFixed(1)}% · ${host.get().result.placements.length} placed / ${inspection.unplaced.length} unplaced · ${inspection.pairs.length} gap/overlap pairs · ${inspection.validation.errors.length} rule errors`;
   }
   function refresh(): void {
     try { inspection=host.core()?.inspect(host.get()); } catch(e) { inspection=undefined; host.message(`Editor checks failed: ${String(e)}`,true); }
     selection(); renderChecks();
     const s=editorSettings(host.get().job);
-    $('#ed-sections').textContent=`Cut lines: ${s.sections?.map(x=>`${x.toFixed(1)} mm`).join(', ')||'none'}`;
+    $('#ed-sections').textContent=`Cut lines: ${s.sections?.map(x=>shortLength(x)).join(', ')||'none'}`;
     if (document.activeElement!==$('#ed-length')) $<HTMLInputElement>('#ed-length').value=String(inspection?.table_length??host.get().result.length);
     $('#ed-unplaced-count').textContent=inspection?`(${inspection.unplaced.length})`:'';
     const waiting=inspection?.unplaced.length??0;$('#ed-unplaced-chip').hidden=!waiting;$('#ed-unplaced-chip').innerHTML=`<span class="tag warn">${waiting} not placed</span>`;
     const focusIndex=(document.activeElement as HTMLElement)?.dataset.edUnplaced;
     $('#ed-unplaced').innerHTML=inspection?.unplaced.map((p,i)=>`<button data-ed-unplaced="${i}" aria-pressed="${armed===i}">${esc(host.get().job.pieces.find(q=>q.id===p.piece_id)?.name??p.piece_id)} · ${esc(host.get().job.pieces.find(q=>q.id===p.piece_id)?.size??'No size')} · ${p.mirrored?'mirrored':'normal'} · copy ${p.copy+1}${p.bundle==null?'':` · bundle ${p.bundle+1}`}</button>`).join('')||'<p>No unplaced copies.</p>';
-    document.querySelectorAll<HTMLButtonElement>('[data-ed-unplaced]').forEach(b=>b.onclick=()=>{armed=Number(b.dataset.edUnplaced);mode='place';host.message('Choose a clear point on the canvas, or enter X/Y and press Place armed copy.');refresh();});
-    if(focusIndex)document.querySelector<HTMLElement>(`[data-ed-unplaced="${Number(focusIndex)}"]`)?.focus({preventScroll:true});
+    findAll<HTMLButtonElement>('[data-ed-unplaced]').forEach(b=>b.onclick=()=>{armed=Number(b.dataset.edUnplaced);mode='place';host.message('Choose a clear point on the canvas, or enter X/Y and press Place armed copy.');refresh();});
+    if(focusIndex)find<HTMLElement>(`[data-ed-unplaced="${Number(focusIndex)}"]`)?.focus({preventScroll:true});
   }
   function selection(): void { $('#ed-selected').textContent=`${host.selection().length} selected`; }
   function place(at: Pt): void { if(armed<0)throw new Error('Choose an unplaced copy first.');const before=host.get().result.placements.length;run({op:'place',unplaced:armed,at});if(host.get().result.placements.length>before){armed=-1;setMode('move');refresh();} }
@@ -143,7 +145,7 @@ export function installEditorTools(host: Host) {
     if ((event.target as Element).hasAttribute('data-length-handle') && ['ArrowLeft','ArrowRight'].includes(event.key)) {
       const step=event.shiftKey?10:n('#ed-step');
       run({op:'length',length:(inspection?.table_length??host.get().result.length)+(event.key==='ArrowRight'?step:-step)});
-      document.querySelector<SVGElement>('[data-length-handle]')?.focus();return true;
+      find<SVGElement>('[data-length-handle]')?.focus();return true;
     }
     if(k==='?'){clicks['#ed-help']!();return true;}
     if(k==='escape'){setMode('move');return false;}

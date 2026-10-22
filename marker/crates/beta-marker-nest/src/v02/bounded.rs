@@ -1,6 +1,7 @@
 //! Bounded obstacle construction and incremental compaction. Search never owns
 //! the only complete layout: a checked incumbent survives every interruption.
 use super::{NestOptions, NestProgress, Slot, checks, mirror_state, renumber};
+use crate::Instant;
 use anyhow::{Context, Result, ensure};
 use beta_marker_core::geometry::{area, bbox, grain_alignment_deg, norm_deg, transform_points};
 use beta_marker_core::{Job, Layout, MarkerResult, Nap, Placement, Pt, RESULT_FORMAT};
@@ -9,7 +10,6 @@ use rand::{RngExt, SeedableRng, rngs::Xoshiro256PlusPlus, seq::SliceRandom};
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
-use crate::Instant;
 
 #[derive(Clone)]
 struct Shape {
@@ -104,10 +104,14 @@ fn orientations(
         let explicit = !slot.placement.layer_allocations.is_empty();
         let mirrors = if beta_marker_core::rules::flip_allowed(job, piece)
             || ((job.fabric.layout == Layout::Folded
-                || (explicit && job.fabric.layout == Layout::Tubular)) && piece.mirror_quantity > 0)
-            || (explicit && on_fold && piece.fold_line.is_some()) {
+                || (explicit && job.fabric.layout == Layout::Tubular))
+                && piece.mirror_quantity > 0)
+            || (explicit && on_fold && piece.fold_line.is_some())
+        {
             vec![preferred, !preferred]
-        } else { vec![preferred] };
+        } else {
+            vec![preferred]
+        };
         for &mirrored in &mirrors {
             let mut pl = slot.placement.clone();
             pl.on_fold = on_fold;
@@ -213,6 +217,36 @@ fn orientations(
         "piece '{}' cannot fit the usable width or fold direction",
         piece.id
     );
+    Ok(out)
+}
+
+/// Fold-half positions for an on-fold slot: the placement moved onto a fold
+/// edge, `true` for the top edge (y = width), and the half outline there.
+pub(super) fn fold_orientations(
+    job: &Job,
+    slot: &Slot,
+    variant: usize,
+    directions: &BTreeMap<u32, f64>,
+) -> Result<Vec<(Placement, bool, Vec<Pt>)>> {
+    let mut out = Vec::new();
+    for o in orientations(job, slot, variant, directions)? {
+        if !o.fold {
+            continue;
+        }
+        let b = o.shape.bounds;
+        let edge = job.spacing.edge_gap + job.pieces[slot.piece].buffer;
+        let low = if job.fabric.layout == Layout::Tubular { 0.0 } else { edge };
+        let high = job.fabric.width;
+        let edges = if job.fabric.layout == Layout::Tubular { 2 } else { 1 };
+        for (index, &y) in o.ys.iter().take(edges).enumerate() {
+            if b[1] + y >= low - 1e-8 && b[3] + y <= high + 1e-8 {
+                let mut pl = o.placement.clone();
+                pl.translate = [0.0, y];
+                let points = o.shape.points.iter().map(|p| [p[0], p[1] + y]).collect();
+                out.push((pl, index == 0, points));
+            }
+        }
+    }
     Ok(out)
 }
 
@@ -426,6 +460,9 @@ fn marker(
         length: 0.0,
         piece_area: 0.0,
         efficiency: 0.0,
+        useful_piece_area: 0.0,
+        useful_yield: 0.0,
+        surplus_copies: 0,
         engine: "beta-marker bounded obstacle packer 0.4".into(),
         seed,
         runtime_s: 0.0,
@@ -536,7 +573,10 @@ pub(super) fn pack(
         for choice in &mut choices {
             choice.placement.copy = slot.placement.copy;
             choice.placement.bundle = slot.placement.bundle;
-            choice.placement.layer_allocations.clone_from(&slot.placement.layer_allocations);
+            choice
+                .placement
+                .layer_allocations
+                .clone_from(&slot.placement.layer_allocations);
             if !choice.placement.on_fold && choice.placement.layer_allocations.len() == 1 {
                 choice.placement.layer_allocations.push(None);
             }
@@ -614,6 +654,7 @@ pub(super) fn pack(
             progress(NestProgress {
                 seconds: started.elapsed().as_secs_f64(),
                 length: reported,
+                result: incumbent.clone(),
             });
         }
         // Rebuild correspondence by piece/bundle (not renumbered copy), consuming
@@ -633,7 +674,11 @@ pub(super) fn pack(
                         && s.placement.piece_id == pl.piece_id
                         && s.placement.bundle == pl.bundle
                         && (s.placement.layer_allocations.is_empty()
-                            || s.placement.layer_allocations.iter().flatten().eq(pl.layer_allocations.iter().flatten()))
+                            || s.placement
+                                .layer_allocations
+                                .iter()
+                                .flatten()
+                                .eq(pl.layer_allocations.iter().flatten()))
                         && (job.fabric.layout != Layout::Open
                             || beta_marker_core::rules::flip_allowed(job, &job.pieces[s.piece])
                             || s.placement.mirrored == pl.mirrored)
@@ -718,7 +763,9 @@ pub(super) fn pack(
             }
         }
         let result = marker(job, fixed, &placed, opts.seed)?;
-        if result.length <= best.as_ref().context("missing incumbent")?.length + 1e-7 {
+        if result.length < best.as_ref().context("missing incumbent")?.length - 1e-7
+            || ((result.length - best.as_ref().context("missing incumbent")?.length).abs() <= 1e-7
+                && result.surplus_copies <= best.as_ref().context("missing incumbent")?.surplus_copies) {
             if checked(job, &result).is_ok() {
                 best = Some(result);
             } else {
@@ -799,6 +846,7 @@ pub(super) fn pack(
         progress(NestProgress {
             seconds: result.runtime_s,
             length: result.length,
+            result: result.clone(),
         });
     }
     result.warnings.push(format!("Bounded obstacle packing: {passes} compaction passes; fixed transforms preserved. Prepare {prepare_s:.3}s; initial construction {construct_s:.3}s; search/check {:.3}s.", search_started.elapsed().as_secs_f64()));

@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 mod dxf;
 mod hpgl;
 mod iso;
+mod labels;
 mod pdf;
 mod scene;
 mod sheets;
@@ -17,6 +18,7 @@ mod workbook;
 
 pub use dxf::to_dxf;
 pub use iso::{IsoProfile, to_iso};
+pub use labels::{MarkerLabel, marker_labels};
 pub use sheets::{LabelOptions, to_labels_pdf, to_mini_marker_pdf};
 pub use workbook::{CutPlanTable, to_tables_xlsx, to_xlsx};
 

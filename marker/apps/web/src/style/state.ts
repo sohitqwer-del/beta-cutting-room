@@ -67,9 +67,18 @@ export function blocker(s: Session, step: Step): Blocker | null {
   if (at >= 7 && (s.marker.status !== 'done' || !s.marker.result)) return 'no_marker';
   return null;
 }
+export const MAX_PLIES = 500;
+/** Why a ply count cannot be used: not a whole number of 1 or more, more than a table takes, or odd on a lay that cuts
+ * two layers together. */
+export function pliesProblem(plies: number, lay: Pick<LaySetup, 'layout' | 'face'>): 'plies_whole' | 'plies_max' | 'plies_even_error' | null {
+  if (!Number.isInteger(plies) || plies < 1) return 'plies_whole';
+  if (plies > MAX_PLIES) return 'plies_max';
+  if (pliesMustBeEven(lay) && plies % 2) return 'plies_even_error';
+  return null;
+}
 export function layProblem(lay: LaySetup): 'lay_width' | 'lay_plies' | 'lay_ratio' | null {
   if (widthProblem(lay.widthMm)) return 'lay_width';
-  if (!Number.isInteger(lay.plies) || lay.plies < 1 || (pliesMustBeEven(lay) && lay.plies % 2)) return 'lay_plies';
+  if (pliesProblem(lay.plies, lay)) return 'lay_plies';
   if (!Object.values(lay.ratio).some(n => n > 0)) return 'lay_ratio';
   return null;
 }
@@ -138,12 +147,18 @@ export function jobSettings(s: Session): JobSettings {
     ...(s.lay.material ? { material: s.lay.material } : {}),
   };
 }
-/** Spread length per ply (cut extent plus waste at each end) and total fabric for the lay. */
-export function layFabric(markerLengthMm: number, lay: Pick<LaySetup, 'endAllowanceMm' | 'plies' | 'layout'>): { perPlyMm: number; totalMm: number; spreads: number } {
+/** Spread length per ply (cut extent plus waste at each end) and total fabric for the lay.
+ * One meaning (marker/docs/PLIES.md): a ply is one fabric layer; a pass is one length laid from the roll.
+ * Open: one ply per pass. Folded and tube: two plies per pass, so fabric = length per pass x passes. */
+export function layFabric(markerLengthMm: number, lay: Pick<LaySetup, 'endAllowanceMm' | 'plies' | 'layout'>): { perPlyMm: number; totalMm: number; passes: number } {
   const perPlyMm = markerLengthMm + 2 * lay.endAllowanceMm;
-  // Folded and tubular plies count fabric layers; one spread pass lays two of them.
-  const spreads = lay.layout === 'open' ? lay.plies : Math.ceil(lay.plies / 2);
-  return { perPlyMm, totalMm: perPlyMm * spreads, spreads };
+  const passes = lay.layout === 'open' ? lay.plies : Math.ceil(lay.plies / 2);
+  return { perPlyMm, totalMm: perPlyMm * passes, passes };
+}
+/** What "Make a cut plan" puts in the Cut plan form: garments per size (in `sizes` order), max plies and end allowance.
+ * Cut order v2 counts max plies in plies (layers); the planner halves them into passes on folded/tube lays itself. */
+export function cutPlanHandoff(lay: Pick<LaySetup, 'plies' | 'endAllowanceMm' | 'order'>, sizes: readonly string[]): { quantities: number[]; maxPlies: number; endAllowanceMm: number } {
+  return { quantities: sizes.map(s => lay.order[s] ?? 0), maxPlies: lay.plies, endAllowanceMm: lay.endAllowanceMm };
 }
 
 const KEY = 'beta-style-v1';

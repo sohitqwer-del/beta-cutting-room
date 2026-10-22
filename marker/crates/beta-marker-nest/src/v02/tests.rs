@@ -352,11 +352,46 @@ fn asymmetric_layers_never_replace_an_unrequested_hand() -> Result<()> {
     j.fabric.layout = Layout::Tubular;
     j.pieces[0].quantity = 1;
     j.pieces[0].size = Some("M".into());
+    j.pieces[0].outline[2] = [53., 32.];
     j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 2)]) });
     let result = super::nest(&j, &options(), &mut |_| {})?;
     assert_eq!(result.placements.len(), 2);
     assert!(result.placements.iter().all(|p| p.layer_allocations[1].is_none()));
     assert!(beta_marker_core::validate(&j, &result).ok);
+    Ok(())
+}
+
+#[test]
+fn inferred_symmetric_layers_use_both_hands_with_honest_odd_surplus() -> Result<()> {
+    for layout in [Layout::Folded, Layout::Tubular] {
+        let mut j = job();
+        j.fabric.layout = layout;
+        j.fabric.width = 41.;
+        j.pieces[0].quantity = 1;
+        j.pieces[0].size = Some("M".into());
+        j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 3)]) });
+        let result = super::nest(&j, &options(), &mut |_| {})?;
+        let report = beta_marker_core::validate(&j, &result);
+        assert!(report.ok, "{:?}", report.errors);
+        assert_eq!(result.placements.len(), 2);
+        assert_eq!(result.surplus_copies, 1);
+        assert_eq!(result.surplus_copies, report.surplus_copies);
+        assert_eq!(result.useful_piece_area, 7200.);
+        assert!((result.useful_yield - 0.75 * result.efficiency).abs() < 1e-8);
+    }
+    Ok(())
+}
+
+#[test]
+fn fold_half_is_preferred_when_full_fallback_only_saves_local_space() -> Result<()> {
+    let mut j = job();
+    j.fabric.layout = Layout::Folded;
+    j.fabric.width = 100.;
+    j.pieces[0].quantity = 1;
+    j.pieces[0].fold_line = Some([[0., 20.], [60., 20.]]);
+    let result = super::nest(&j, &options(), &mut |_| {})?;
+    assert!(result.placements[0].on_fold);
+    assert_eq!(result.surplus_copies, 0);
     Ok(())
 }
 
@@ -683,6 +718,9 @@ fn pending_flip_validator_is_reported_without_accepting_the_result() -> Result<(
         length: 0.0,
         piece_area: 0.0,
         efficiency: 0.0,
+        useful_piece_area: 0.0,
+        useful_yield: 0.0,
+        surplus_copies: 0,
         engine: "test".into(),
         seed: None,
         runtime_s: 0.0,
@@ -697,5 +735,89 @@ fn pending_flip_validator_is_reported_without_accepting_the_result() -> Result<(
     } else {
         assert!(gate.unwrap_err().to_string().contains("pending_validator"));
     }
+    Ok(())
+}
+
+fn fold_job(layout: Layout, width: f64, depth: f64, garments: u32) -> Job {
+    let mut j = job();
+    j.fabric.layout = layout;
+    j.fabric.width = width;
+    j.pieces[0].quantity = 1;
+    j.pieces[0].size = Some("M".into());
+    j.pieces[0].outline = vec![[0.0, 0.0], [60.0, 0.0], [60.0, depth], [0.0, depth]];
+    j.pieces[0].fold_line = Some([[0.0, depth / 2.0], [60.0, depth / 2.0]]);
+    j.order = Some(Order { sizes: BTreeMap::from([("M".into(), garments)]) });
+    j
+}
+
+fn pinned_sparrow(j: &Job) -> Result<MarkerResult> {
+    let slots = layers::slots(j, false)?;
+    assert!(slots.iter().all(|s| s.placement.on_fold));
+    let directions = directions(j, &slots, &[], 0)?;
+    let pins = pinned::plan(j, &slots, 0, &directions)?;
+    let options = NestOptions { time_limit_s: 0.3, ..options() };
+    sparrow_allocated(j, &slots, &[], &options, 0, &SearchTuning::default(), &mut |_| {}, Some(pins))
+}
+
+#[test]
+fn pinned_fold_halves_nest_in_sparrow_and_sit_exactly_on_the_fold() -> Result<()> {
+    let mut j = fold_job(Layout::Folded, 100.0, 40.0, 3);
+    j.spacing = Spacing { piece_gap: 2.0, edge_gap: 3.0 };
+    let result = pinned_sparrow(&j)?;
+    assert!(result.engine.starts_with("sparrow"), "{}", result.engine);
+    let report = beta_marker_core::validate(&j, &result);
+    assert!(report.ok, "{:?}", report.errors);
+    assert_eq!(result.placements.iter().filter(|p| p.on_fold).count(), 3);
+    assert_eq!(result.surplus_copies, 0);
+    // Halves are 20 mm deep, so the bars must not let them stack across the width.
+    assert!(result.length >= 3.0 * 60.0 + 2.0 * 2.0 - 1e-6, "{}", result.length);
+    Ok(())
+}
+
+#[test]
+fn tube_pairs_use_both_folds_at_the_same_place() -> Result<()> {
+    let j = fold_job(Layout::Tubular, 100.0, 80.0, 2);
+    let slots = layers::slots(&j, false)?;
+    let directions = directions(&j, &slots, &[], 0)?;
+    let pins = pinned::plan(&j, &slots, 0, &directions)?;
+    assert_eq!(pins.iter().flatten().filter(|p| p.partner().is_some()).count(), 1);
+    let result = pinned_sparrow(&j)?;
+    let report = beta_marker_core::validate(&j, &result);
+    assert!(report.ok, "{:?}", report.errors);
+    // One half on each fold, side by side across the width: one length only.
+    assert!(result.length < 61.0, "{}", result.length);
+    let ys: Vec<f64> = result
+        .placements
+        .iter()
+        .map(|pl| beta_marker_core::rules::cut_outline(&j.pieces[0], pl))
+        .map(|points| beta_marker_core::geometry::bbox(&points).expect("outline")[1])
+        .collect();
+    assert!(ys.iter().any(|y| y.abs() < 1e-6) && ys.iter().any(|y| (y - 60.0).abs() < 1e-6), "{ys:?}");
+    Ok(())
+}
+
+#[test]
+fn tube_halves_too_deep_to_share_the_width_stay_single() -> Result<()> {
+    let j = fold_job(Layout::Tubular, 100.0, 120.0, 2);
+    let slots = layers::slots(&j, false)?;
+    let directions = directions(&j, &slots, &[], 0)?;
+    let pins = pinned::plan(&j, &slots, 0, &directions)?;
+    assert_eq!(pins.iter().flatten().count(), 2);
+    assert!(pins.iter().flatten().all(|p| p.partner().is_none()));
+    Ok(())
+}
+
+#[test]
+fn fold_edge_note_explains_a_marker_set_by_its_fold_pieces() -> Result<()> {
+    // A full cut 80 mm deep and a 40 mm half cannot share a 100 mm table.
+    let j = fold_job(Layout::Folded, 100.0, 80.0, 3);
+    let result = super::nest(&j, &options(), &mut |_| {})?;
+    let note = result.warnings.iter().find(|w| w.starts_with("Fold edge:"));
+    assert!(note.is_some(), "{:?}", result.warnings);
+    // An even count is cut as full two-layer pieces side by side: no note.
+    let mut short = fold_job(Layout::Folded, 100.0, 40.0, 4);
+    short.pieces[0].fold_line = None;
+    let result = super::nest(&short, &options(), &mut |_| {})?;
+    assert!(!result.warnings.iter().any(|w| w.starts_with("Fold edge:")), "{:?}", result.warnings);
     Ok(())
 }

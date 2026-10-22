@@ -238,6 +238,9 @@ pub(crate) fn checked(job: &Job, mut result: MarkerResult) -> Result<MarkerResul
     result.length = report.length;
     result.piece_area = report.piece_area;
     result.efficiency = report.efficiency;
+    result.useful_piece_area = report.useful_piece_area;
+    result.useful_yield = report.useful_yield;
+    result.surplus_copies = report.surplus_copies;
     Ok(result)
 }
 

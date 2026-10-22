@@ -15,6 +15,7 @@ Do not commit their machine-specific values.
 node marker/deploy/release-build.mjs marker-wasm
 node marker/deploy/release-build.mjs pattern-wasm
 node marker/deploy/release-build.mjs floor-wasm
+node marker/deploy/release-build.mjs cutroom-wasm
 npm run build -w @beta/marker-web
 node marker/deploy/release-build.mjs cli
 ```

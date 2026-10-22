@@ -43,6 +43,9 @@ fn fixture() -> (Job, MarkerResult) {
         length: 30.,
         piece_area: 200.,
         efficiency: 200. / 3000.,
+        useful_piece_area: 200.,
+        useful_yield: 200. / 3000.,
+        surplus_copies: 0,
         engine: "handmade".into(),
         seed: None,
         runtime_s: 0.,
@@ -73,6 +76,8 @@ fn has(j: &Job, r: &MarkerResult, code: &str) -> bool {
 fn explicit_layers_serve_two_garments_with_exact_handed_counts() {
     let (mut j, mut r) = fixture();
     j.fabric.layout = Layout::Folded;
+    // A handed piece: a square's mirrored layer could serve either hand.
+    j.pieces[0].outline = vec![[0., 0.], [10., 0.], [10., 10.], [3., 10.]];
     j.pieces[0].quantity = 1;
     j.pieces[0].mirror_quantity = 1;
     j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 2)]) });
@@ -144,6 +149,16 @@ fn explicit_surplus_is_not_useful_and_cannot_cross_sizes_or_open_fabric() {
     let report = validate(&j, &r);
     assert!(report.ok, "{:?}", report.errors);
     assert!(report.warnings.iter().any(|w| w.code == "surplus_copy"));
+    assert_eq!(report.surplus_copies, 1);
+    assert_eq!(report.useful_piece_area, 100.);
+    assert_eq!(report.useful_yield, report.efficiency / 2.);
+    // Legacy JSON has no cached yield. Validation still recomputes it.
+    let mut legacy = r.clone();
+    legacy.placements[0].layer_allocations.clear();
+    let old = validate(&j, &legacy);
+    assert!(old.ok);
+    assert_eq!(old.useful_yield, report.useful_yield);
+    assert_eq!(old.surplus_copies, 1);
     assert_eq!(layer_copies(j.fabric.layout, &r.placements[0]), (1, 0));
     j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 1), ("L".into(), 1)]) });
     r.placements[0].layer_allocations[0].as_mut().unwrap().bundle = 1;
@@ -166,7 +181,14 @@ fn declared_symmetric_full_layers_can_fill_two_normal_demands() {
         Some(LayerAllocation { bundle: 1, mirrored: false }),
     ];
     assert!(validate(&j, &r).ok, "{:?}", validate(&j, &r).errors);
+    let report = validate(&j, &r);
+    assert_eq!(report.useful_piece_area, 200.);
+    assert_eq!(report.useful_yield, report.efficiency);
+    assert_eq!(report.surplus_copies, 0);
     j.pieces[0].fold_line = None;
+    assert!(validate(&j, &r).ok);
+    // An asymmetric outline must still reject the exchanged hand.
+    j.pieces[0].outline[2] = [8., 9.];
     assert!(has(&j, &r, "layer_allocation"));
 }
 

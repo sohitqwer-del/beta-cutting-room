@@ -22,26 +22,34 @@ pub(crate) fn run() -> anyhow::Result<()> {
     }
     let reply = match api::route(&Method::Post, path, &body) {
         Route::Nest(input) => {
-            let width = input.job.fabric.width;
-            let area = progress_area(&input.job);
+            let mut last_layout: Option<std::time::Instant> = None;
+            let mut progress = |p: beta_marker_nest::NestProgress| {
+                if last_layout.is_none_or(|last| last.elapsed().as_secs_f64() >= 0.5) {
+                    last_layout = Some(std::time::Instant::now());
+                    emit(json!({"progress":{"running":true,"elapsed_s":p.seconds,
+                        "best_length_mm":p.length,"best_efficiency":p.result.efficiency,"result":p.result}}));
+                }
+            };
             let result = if beta_marker_match::needs_rules(&input.job) {
-                beta_marker_match::nest_with_rules(&input.job, &input.options)
+                beta_marker_match::nest_with_rules_and_progress(
+                    &input.job,
+                    &input.options,
+                    &mut progress,
+                )
             } else {
-                beta_marker_nest::nest_with_progress(&input.job, &input.options, |p| {
-                    emit(
-                        json!({"progress":{"running":true,"elapsed_s":p.seconds,"best_length_mm":p.length,"best_efficiency":area.map(|a| a/(width*p.length))}}),
-                    );
-                })
+                beta_marker_nest::nest_with_progress(&input.job, &input.options, &mut progress)
             };
             match result {
                 Ok(r) => Reply::json(r),
                 Err(e) => Reply::error(400, &format!("{e:#}")),
             }
         }
-        Route::Plan(input) => match beta_marker_plan::plan(&input.order, &input.options) {
-            Ok(r) => Reply::json(r),
-            Err(e) => Reply::error(400, &format!("{e:#}")),
-        },
+        Route::Plan(input) => {
+            match beta_marker_api::plan(&input, &mut beta_marker_plan::checked_nest, |_| Ok(())) {
+                Ok(r) => Reply::json(r),
+                Err(e) => Reply::error(400, &format!("{e:#}")),
+            }
+        }
         Route::Reply(r) => r,
         Route::Status => Reply::error(400, "Worker needs a search request"),
     };
@@ -54,6 +62,7 @@ fn emit(value: serde_json::Value) {
     let _ = writeln!(out, "{value}");
     let _ = out.flush();
 }
+#[cfg(test)]
 pub(crate) fn progress_area(job: &beta_marker_core::Job) -> Option<f64> {
     if job.fabric.layout != beta_marker_core::Layout::Open {
         return None;

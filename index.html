@@ -3,24 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BETA Cutting Room: open-source cutting-room software for garment factories</title>
-<meta name="description" content="Open-source, self-hosted cutting-room software for garment factories: pattern, marker, cut planning, rolls, spreading and bundles. Runs offline on your own computers.">
+<title>BETA Cutting Room: free, open-source cutting-room software for garment factories</title>
+<meta name="description" content="Free, open-source cutting-room software for garment factories: patterns, markers and cut plans, in your browser. See a real T-shirt marker in 60 seconds, with no install and no account.">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#fbfaf6">
 <meta name="referrer" content="no-referrer">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="BETA Cutting Room">
-<meta property="og:title" content="BETA Cutting Room: open-source cutting-room software for garment factories">
-<meta property="og:description" content="Open-source, self-hosted cutting-room software for garment factories: pattern, marker, cut planning, rolls, spreading and bundles. Runs offline on your own computers.">
+<meta property="og:title" content="BETA Cutting Room: free, open-source cutting-room software for garment factories">
+<meta property="og:description" content="Free, open-source cutting-room software for garment factories: patterns, markers and cut plans, in your browser. See a real T-shirt marker in 60 seconds, with no install and no account.">
 <meta property="og:url" content="https://sohitqwer-del.github.io/beta-cutting-room/">
-<meta property="og:image" content="https://sohitqwer-del.github.io/beta-cutting-room/assets/brand/social-preview.png">
-<meta property="og:image:width" content="1280">
-<meta property="og:image:height" content="640">
-<meta property="og:image:alt" content="BETA Cutting Room logo with garment pieces nested on fabric">
+<meta property="og:locale" content="en_GB">
+<meta property="og:image" content="https://sohitqwer-del.github.io/beta-cutting-room/assets/brand/social-card.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BETA Cutting Room: a real T-shirt marker made in the browser, with the line &quot;Free, open-source cutting-room software for garment factories&quot;">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BETA Cutting Room: free, open-source cutting-room software for garment factories">
+<meta name="twitter:description" content="Free, open-source cutting-room software for garment factories: patterns, markers and cut plans, in your browser. See a real T-shirt marker in 60 seconds, with no install and no account.">
+<meta name="twitter:image" content="https://sohitqwer-del.github.io/beta-cutting-room/assets/brand/social-card.png">
+<meta name="twitter:image:alt" content="BETA Cutting Room: a real T-shirt marker made in the browser, with the line &quot;Free, open-source cutting-room software for garment factories&quot;">
+<meta name="application-name" content="BETA Cutting Room">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/brand/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/site.css">
 <script>(function(){var r=document.documentElement;try{if(window.matchMedia&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){r.classList.add('motion');setTimeout(function(){if(!r.classList.contains('motion-ready'))r.classList.remove('motion');},2500);}}catch(e){}})();</script>
@@ -33,7 +41,7 @@
     <a class="brand" href="index.html"><svg class="logo-mark" viewBox="0 0 64 64" width="34" height="34" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="15" fill="#176b52"/><path d="M16 11H26V53H16V36L19.5 32L16 28Z" fill="#ffffff"/><path d="M29 11H38.5A10 10 0 0 1 38.5 31H29Z" fill="#f4b740"/><path d="M29 34H40.5A9.5 9.5 0 0 1 40.5 53H29Z" fill="#c9ecd9"/></svg><span class="brand-name"><b>BETA</b> Cutting Room</span></a>
     <nav class="nav-desktop" aria-label="Main"><ul class="nav-list"><li><a href="index.html" aria-current="page">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
     <div class="header-tools">
-      <a class="btn btn-primary btn-small header-cta" href="index.html#download">Download</a>
+      <a class="btn btn-primary btn-small header-cta" href="app/#/tour">Try it now</a>
       <details class="nav-mobile">
         <summary><span class="sr-only">Menu</span><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary>
         <nav aria-label="Main (small screens)"><ul class="nav-list-mobile"><li><a href="index.html" aria-current="page">Home</a></li><li><a href="benchmark.html">Benchmark</a></li><li><a href="compare.html">Compare</a></li><li><a href="install.html">Install</a></li><li><a href="docs.html">Help</a></li><li><a href="open-source.html">Open source</a></li></ul></nav>
@@ -43,62 +51,64 @@
 </header>
 <main id="main" tabindex="-1">
 
-<div class="hero">
+<div class="hero hero-launch">
   <div class="hero-bg" aria-hidden="true"><span class="blob blob-1"></span><span class="blob blob-2"></span><span class="blob blob-3"></span></div>
   <div class="wrap hero-inner">
     <div class="hero-copy">
-      <p class="hero-pills"><span class="pill">Version 0.7.0</span><span class="pill">Free and open source</span><a class="pill pill-fun" href="#fun"><span aria-hidden="true">✦</span> A fun project, built with modern AI tools</a></p>
-      <h1 class="hero-title"><span class="nowrap">Open-source,</span> <span class="nowrap">self-hosted</span> <span class="hl"><span class="nowrap">cutting-room</span> software</span> for garment factories</h1>
-      <p class="hero-lead">Pattern, marker, cut planning, rolls, spreading and bundles in one program. It runs on your own Windows PC or factory server and works offline. Your patterns never leave your factory.</p>
+      <p class="hero-pills"><span class="pill">Version 0.8.0</span><span class="pill">Free and open source</span><a class="pill pill-fun" href="#help"><span aria-hidden="true">✦</span> A fun project, built with modern AI tools</a></p>
+      <h1 class="hero-title">Free, open-source <span class="hl"><span class="nowrap">cutting-room</span> software</span> for garment factories</h1>
+      <p class="hero-lead">Patterns, markers and cut plans, in your browser. Nothing to install, no account, and your files stay on your device.</p>
       <div class="cta-row">
-        <a class="btn btn-secondary btn-large" href="app/"><span class="btn-label">Open the app in your browser</span></a>
-        <a class="btn btn-primary btn-large" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_x64-setup.exe"><span class="btn-label">Download for Windows</span><span class="btn-sub">Installer · 11.08 MiB</span></a>
-        <a class="btn btn-secondary btn-large" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_windows-x64-portable.zip"><span class="btn-label">Portable ZIP</span><span class="btn-sub">No install · 12.85 MiB</span></a>
-        <a class="btn btn-secondary btn-large" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_linux-x86_64.tar.gz"><span class="btn-label">Linux server</span><span class="btn-sub">tar.gz · 11.74 MiB</span></a>
+        <a class="btn btn-primary btn-large btn-try" href="app/#/tour"><span class="btn-label">Try it now, no install</span><span class="btn-sub">A 60-second tour on a real T-shirt</span></a>
+        <a class="btn btn-secondary btn-large" href="#download"><span class="btn-label">Download</span><span class="btn-sub">Windows app · Linux server</span></a>
       </div>
-      <p class="small muted">Best for trying and small jobs; for big markers use the desktop app</p>
+      <p class="small muted hero-note">Or <a href="app/">open the app in your browser</a> without the tour. Best for trying and small jobs; for big markers use the desktop app.</p>
       <ul class="trust-list">
-        <li>No account</li><li>No cloud</li><li>No licence fee</li><li>Works offline</li>
+        <li>Free · Apache-2.0</li><li>Runs on your device</li><li>No account</li><li>No tracking</li>
       </ul>
-      <p class="humble"><span class="humble-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M13 22 Q3 15 3 9 Q3 4 8 4 Q11 4 13 7 Q15 4 18 4 Q23 4 23 9 Q23 15 13 22 Z"/></svg></span><span><strong>BETA is young and not perfect yet.</strong> We need your help to improve it. <a href="#help">Tell us what to fix</a>.</span></p>
     </div>
-    <figure class="hero-figure" data-tilt>
-      <div class="hero-card">
-        <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>Marker · shirt · sizes S, M, L</span><span class="badge">Illustration</span></div>
-        <div class="hero-stage is-playing" id="hero-stage">
-          <svg class="illus hero-marker" viewBox="-10 0 646 280" role="img" aria-labelledby="hero-illus-t">
-<title id="hero-illus-t">Illustration of a marker: shirt fronts, backs, sleeves, collars and pockets in three sizes nested on a strip of fabric.</title>
-<rect class="fabric" x="20" y="30" width="604" height="200" rx="2"/>
-<path class="selvedge" d="M20 30 H624 M20 230 H624"/>
-<g class="pieces"><g class="fly" style="--fx:295px;--fy:-110px;--fr:16deg;--i:0"><g class="pc pc-1" transform="translate(24 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g></g>
-<g class="fly" style="--fx:399px;--fy:-36px;--fr:116deg;--i:1"><g class="pc pc-1" transform="translate(24 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g></g>
-<g class="fly" style="--fx:312px;--fy:-53px;--fr:-73deg;--i:2"><g class="pc pc-1" transform="translate(128 34) rotate(180 50 34) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g></g>
-<g class="fly" style="--fx:416px;--fy:-82px;--fr:-69deg;--i:3"><g class="pc pc-1" transform="translate(128 106) rotate(180 50 60)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g></g>
-<g class="fly" style="--fx:489px;--fy:-111px;--fr:91deg;--i:4"><g class="pc pc-2" transform="translate(232 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g></g>
-<g class="fly" style="--fx:269px;--fy:-151px;--fr:-23deg;--i:5"><g class="pc pc-2" transform="translate(232 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g></g>
-<g class="fly" style="--fx:410px;--fy:119px;--fr:29deg;--i:6"><g class="pc pc-2" transform="translate(336 34) rotate(180 50 34) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g></g>
-<g class="fly" style="--fx:500px;--fy:-77px;--fr:-42deg;--i:7"><g class="pc pc-2" transform="translate(336 106) rotate(180 50 60)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g></g>
-<g class="fly" style="--fx:488px;--fy:-136px;--fr:15deg;--i:8"><g class="pc pc-3" transform="translate(440 34)"><path d="M0 22 Q8 2 30 0 L42 0 Q50 16 58 16 Q66 16 74 0 L86 0 Q104 2 100 22 L96 52 Q90 60 92 72 L94 120 L6 120 L8 72 Q10 60 4 52 Z"/><path class="grain" d="M50 36 V98.39999999999999 M46 43.199999999999996 L50 36 L54 43.199999999999996"/></g></g>
-<g class="fly" style="--fx:483px;--fy:-100px;--fr:-89deg;--i:9"><g class="pc pc-3" transform="translate(440 158) scale(1 0.85)"><path d="M0 66 Q6 14 50 0 Q94 14 100 66 L92 80 L8 80 Z"/></g></g>
-<g class="fly" style="--fx:279px;--fy:-119px;--fr:2deg;--i:10"><rect class="pc pc-1" x="548" y="34" width="13" height="92" rx="5"/></g>
-<g class="fly" style="--fx:419px;--fy:207px;--fr:-92deg;--i:11"><rect class="pc pc-2" x="566" y="34" width="13" height="92" rx="5"/></g>
-<g class="fly" style="--fx:417px;--fy:11px;--fr:39deg;--i:12"><rect class="pc pc-3" x="584" y="34" width="13" height="92" rx="5"/></g>
-<g class="fly" style="--fx:503px;--fy:-6px;--fr:-81deg;--i:13"><rect class="pc pc-1" x="602" y="34" width="13" height="92" rx="5"/></g>
-<g class="fly" style="--fx:277px;--fy:-123px;--fr:-118deg;--i:14"><g class="pc pc-1" transform="translate(548 134)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g></g>
-<g class="fly" style="--fx:464px;--fy:15px;--fr:-106deg;--i:15"><g class="pc pc-2" transform="translate(584 134)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g></g>
-<g class="fly" style="--fx:332px;--fy:-35px;--fr:30deg;--i:16"><g class="pc pc-3" transform="translate(548 180)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g></g>
-<g class="fly" style="--fx:267px;--fy:98px;--fr:103deg;--i:17"><g class="pc pc-1" transform="translate(584 180)"><path d="M0 0 H30 V26 L15 36 L0 26 Z"/></g></g></g>
-<rect class="scan" x="18" y="26" width="5" height="208" rx="2.5"/>
-<g class="dim dim-width"><path d="M10 34 V226 M6 38 L10 30 L14 38 M6 222 L10 230 L14 222"/><text x="0" y="0" transform="translate(6 130) rotate(-90)" text-anchor="middle">fabric width</text></g>
-<g class="dim dim-length"><path class="dim-line" d="M20 250 H624"/><path d="M28 246 L20 250 L28 254 M616 246 L624 250 L616 254"/><text x="322" y="272" text-anchor="middle">marker length: shorter is better</text></g>
-<g class="legend-sizes" transform="translate(20 8)"><rect class="pc pc-1" width="12" height="12" rx="2"/><text x="18" y="10">S</text><rect class="pc pc-2" x="40" width="12" height="12" rx="2"/><text x="58" y="10">M</text><rect class="pc pc-3" x="80" width="12" height="12" rx="2"/><text x="98" y="10">L</text></g>
-</svg>
-          <p class="hero-status" aria-hidden="true"><span class="st st-1"><span class="spinner"></span>Nesting 18 pieces…</span><span class="st st-2"><span class="tick">✓</span>All pieces placed. Checked by the validator.</span></p>
-        </div>
-        <button type="button" class="replay" data-replay="hero-stage" hidden><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M4 10a6 6 0 1 0 2-4.5M4 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Replay</button>
-      </div>
-      <figcaption>Illustration. A marker places every pattern piece on the fabric so the lay uses as little length as possible.</figcaption>
-    </figure>
+    <figure class="hero-figure hero-live" data-hero-live data-final="2.90 m" aria-labelledby="hero-live-cap">
+  <div class="hero-card">
+    <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>Make a style · Sample T-shirt · Marker</span><span class="badge badge-final">Real app</span></div>
+    <div class="hz-stage"><svg class="hz-svg" viewBox="-40 -40 3663 1674" role="img" aria-labelledby="hz-title hz-desc">
+<title id="hz-title">A real T-shirt marker made by BETA in the browser</title>
+<desc id="hz-desc">Sizes S, M, L, XL on fabric 152.4 cm wide. While the search ran, the best marker got shorter: 3.58 m, 3.27 m, 3.06 m, 2.91 m, 2.90 m. Final length 2.90 m, 81.5% of the fabric in pieces.</desc>
+<rect class="hz-table" x="0" y="0" width="3583" height="1524"/>
+<g class="hz-frame" data-frame="0" data-length="3583">
+<rect class="hz-fabric" x="0" y="0" width="3583" height="1524"/>
+<polygon class="hz-pc hz-3" style="--k:0" points="5,1214 5,1519 495,1519 497,1501 508,1487 523,1475 552,1459 593,1444 636,1433 671,1427 698,1430 732,1274 719,1271 712,1264 705,1250 701,1230 701,1198 707,1174 716,1160 732,1154 698,998 671,1001 636,996 593,985 552,969 523,953 508,941 497,927 495,909 5,909"/><polygon class="hz-pc hz-3" style="--k:1" points="5,604 5,909 495,909 497,891 508,877 523,865 552,849 593,834 636,823 671,817 698,820 732,664 697,654 673,641 658,626 653,609 656,586 663,576 673,567 697,554 732,544 698,388 671,391 636,386 593,375 552,359 523,343 508,331 497,317 495,299 5,299"/><polygon class="hz-pc hz-2" style="--k:2" points="732,1229 732,1519 1216,1519 1218,1503 1225,1493 1243,1478 1270,1464 1309,1449 1349,1439 1388,1434 1410,1437 1444,1287 1431,1283 1424,1277 1417,1263 1413,1244 1412,1219 1418,1191 1428,1177 1444,1171 1410,1021 1388,1024 1349,1019 1309,1009 1270,994 1243,980 1225,965 1218,955 1216,939 732,939"/><polygon class="hz-pc hz-2" style="--k:3" points="732,649 732,939 1216,939 1218,923 1228,909 1249,894 1277,881 1318,867 1357,858 1388,854 1410,857 1444,707 1410,697 1391,688 1375,673 1367,653 1371,632 1386,614 1410,601 1444,591 1410,441 1388,444 1357,440 1318,431 1277,417 1249,404 1228,389 1218,375 1216,359 732,359"/><polygon class="hz-pc hz-1" style="--k:4" points="2141,1244 2141,969 1661,969 1660,984 1650,996 1631,1010 1604,1023 1567,1035 1529,1044 1499,1046 1478,1044 1444,1189 1458,1193 1464,1199 1471,1212 1475,1230 1475,1259 1469,1280 1460,1294 1444,1300 1478,1445 1499,1442 1529,1444 1567,1453 1604,1465 1631,1478 1650,1492 1660,1504 1661,1519 2141,1519"/><polygon class="hz-pc hz-1" style="--k:5" points="1444,664 1444,939 1923,939 1925,924 1934,912 1954,898 1980,885 2018,873 2055,864 2085,862 2106,865 2141,719 2107,710 2090,701 2074,687 2067,668 2070,648 2085,631 2107,619 2141,609 2106,464 2085,466 2055,464 2018,455 1980,443 1954,430 1934,416 1925,404 1923,389 1444,389"/><polygon class="hz-pc hz-0" style="--k:6" points="2141,1199 2141,1459 2615,1459 2617,1445 2625,1434 2643,1422 2668,1410 2703,1399 2738,1391 2767,1389 2788,1392 2823,1252 2809,1247 2802,1242 2796,1230 2792,1213 2792,1185 2797,1165 2807,1152 2823,1146 2788,1006 2767,1009 2738,1007 2703,999 2668,988 2643,976 2625,964 2617,953 2615,939 2141,939"/><polygon class="hz-pc hz-0" style="--k:7" points="2141,559 2141,819 2615,819 2617,805 2625,794 2643,782 2668,770 2704,759 2739,751 2767,749 2788,752 2823,612 2790,602 2769,590 2756,577 2751,563 2754,544 2769,528 2790,516 2823,506 2788,366 2767,369 2739,367 2704,359 2668,348 2643,336 2625,324 2617,313 2615,299 2141,299"/><polygon class="hz-pc hz-3" style="--k:8" points="2823,949 2823,1354 2864,1355 2940,1363 2973,1364 2976,1332 2989,1301 3005,1279 3055,1226 3075,1193 3081,1173 3083,1156 3082,1138 3077,1118 3068,1097 3055,1078 3001,1019 2985,997 2975,968 2973,939 2940,940 2850,949"/><polygon class="hz-pc hz-3" style="--k:9" points="2823,809 2823,404 2865,403 2940,395 2973,394 2976,426 2989,457 3006,479 3055,533 3075,565 3081,585 3083,602 3082,620 3078,640 3068,661 3055,680 3006,734 2989,756 2976,787 2973,819 2940,818 2850,809"/><polygon class="hz-pc hz-2" style="--k:10" points="3083,1369 3083,979 3117,979 3198,971 3239,969 3242,1001 3254,1030 3268,1051 3313,1103 3331,1135 3336,1157 3338,1174 3333,1206 3324,1227 3313,1245 3268,1297 3254,1318 3242,1348 3239,1379 3110,1369"/><polygon class="hz-pc hz-2" style="--k:11" points="3338,809 3338,419 3303,418 3223,411 3181,409 3179,440 3167,470 3152,491 3108,543 3090,574 3086,589 3083,614 3088,646 3096,667 3108,685 3152,737 3167,758 3179,788 3181,819 3223,817 3311,809"/><polygon class="hz-pc hz-1" style="--k:12" points="3083,24 3083,398 3118,399 3204,407 3246,409 3249,378 3259,349 3272,329 3311,279 3327,249 3332,227 3333,211 3332,195 3327,173 3311,143 3272,93 3259,73 3249,44 3246,13 3110,24"/><polygon class="hz-pc hz-1" style="--k:13" points="3333,390 3333,15 3368,15 3454,7 3496,5 3499,36 3509,65 3522,85 3561,134 3577,165 3582,187 3583,203 3582,219 3577,240 3561,271 3522,321 3509,341 3499,370 3496,400 3360,390"/><polygon class="hz-pc hz-0" style="--k:14" points="1444,15 1444,375 1615,385 1617,355 1623,333 1634,313 1670,260 1684,231 1688,211 1689,187 1681,153 1667,125 1626,63 1617,35 1615,5 1471,15"/><polygon class="hz-pc hz-0" style="--k:15" points="1934,15 1934,375 1763,385 1761,355 1754,333 1744,313 1707,260 1694,231 1690,211 1689,187 1696,153 1711,125 1752,63 1761,35 1763,5 1906,15"/><polygon class="hz-pc hz-3" style="--k:16" points="792,359 792,16 732,16 732,359"/><polygon class="hz-pc hz-2" style="--k:17" points="852,359 852,26 792,26 792,359"/><polygon class="hz-pc hz-1" style="--k:18" points="912,348 912,26 852,26 852,348"/><polygon class="hz-pc hz-0" style="--k:19" points="972,327 972,16 912,16 912,327"/>
+<path class="hz-end" d="M3583 -24 V1548"/>
+</g>
+<g class="hz-frame" data-frame="1" data-length="3265">
+<rect class="hz-fabric" x="0" y="0" width="3265" height="1524"/>
+<polygon class="hz-pc hz-2" style="--k:0" points="10,1200 10,1490 495,1490 497,1473 507,1460 528,1445 556,1432 596,1418 635,1409 667,1405 688,1408 722,1258 709,1254 702,1248 695,1234 691,1215 691,1185 697,1162 706,1148 722,1142 688,992 667,995 635,991 596,982 556,968 528,955 507,940 497,927 495,910 10,910"/><polygon class="hz-pc hz-1" style="--k:1" points="2348,1235 2348,960 1869,960 1867,975 1858,988 1838,1001 1812,1014 1774,1027 1737,1035 1707,1038 1686,1035 1651,1180 1663,1183 1671,1190 1678,1203 1682,1221 1682,1250 1677,1271 1667,1285 1651,1291 1686,1436 1707,1433 1737,1436 1774,1444 1812,1457 1838,1469 1858,1483 1867,1495 1869,1510 2348,1510"/><polygon class="hz-pc hz-0" style="--k:2" points="973,1258 973,1518 1447,1518 1449,1504 1457,1493 1475,1481 1500,1469 1536,1458 1571,1450 1599,1448 1620,1451 1655,1312 1641,1307 1635,1301 1628,1289 1624,1272 1624,1245 1629,1224 1639,1211 1655,1205 1620,1065 1599,1068 1571,1066 1536,1059 1500,1047 1475,1036 1457,1023 1449,1012 1447,998 973,998"/><polygon class="hz-pc hz-3" style="--k:3" points="1440,693 1440,388 951,388 950,403 942,416 922,433 894,448 852,464 802,476 769,480 748,478 713,633 726,637 733,643 740,658 744,677 744,709 739,733 729,748 713,753 748,909 769,906 802,910 852,923 894,939 922,954 942,970 950,983 951,998 1440,998"/><polygon class="hz-pc hz-2" style="--k:4" points="2348,1228 2348,1518 2833,1518 2834,1502 2845,1488 2866,1473 2894,1459 2934,1446 2973,1436 3004,1433 3026,1436 3060,1285 3026,1276 3007,1266 2991,1252 2983,1232 2987,1211 2995,1200 3003,1193 3026,1180 3060,1170 3026,1020 3004,1022 2973,1019 2934,1010 2894,996 2866,982 2845,967 2834,953 2833,938 2348,938"/><polygon class="hz-pc hz-1" style="--k:5" points="1442,685 1442,960 1921,960 1923,945 1932,933 1952,919 1978,906 2016,894 2053,885 2083,883 2104,886 2139,740 2113,733 2087,722 2072,708 2064,689 2068,669 2083,652 2105,640 2139,630 2104,484 2083,487 2053,485 2016,476 1978,464 1952,451 1932,437 1923,425 1921,410 1442,410"/><polygon class="hz-pc hz-0" style="--k:6" points="2614,265 2614,5 2140,5 2138,19 2130,30 2112,43 2087,54 2052,66 2017,73 1988,75 1967,72 1932,212 1965,222 1987,234 1999,247 2004,261 2001,280 1987,297 1965,308 1932,318 1967,458 1988,455 2017,457 2052,465 2087,476 2112,488 2130,500 2138,511 2140,525 2614,525"/><polygon class="hz-pc hz-3" style="--k:7" points="5,604 5,909 495,909 497,890 508,877 530,860 560,846 603,831 644,821 677,817 698,819 732,664 697,654 678,644 660,627 653,608 657,586 663,576 673,567 697,554 732,544 698,388 671,390 636,385 594,374 552,358 524,343 504,327 497,315 495,299 5,299"/><polygon class="hz-pc hz-2" style="--k:8" points="656,373 656,40 596,40 596,373"/><polygon class="hz-pc hz-1" style="--k:9" points="2712,87 2712,409 2772,409 2772,87"/><polygon class="hz-pc hz-0" style="--k:10" points="1483,56 1483,367 1543,367 1543,56"/><polygon class="hz-pc hz-3" style="--k:11" points="596,348 596,5 536,5 536,348"/><polygon class="hz-pc hz-2" style="--k:12" points="746,16 746,405 781,406 861,414 903,416 905,384 917,354 932,333 977,282 994,250 1000,227 1001,211 997,178 988,158 977,139 932,88 917,67 905,37 903,5 773,15"/><polygon class="hz-pc hz-2" style="--k:13" points="3019,258 3019,647 2984,648 2904,656 2862,657 2860,626 2848,596 2833,575 2789,523 2771,492 2767,477 2764,452 2769,420 2777,399 2789,381 2833,329 2848,309 2860,279 2862,247 2904,249 2992,257"/><polygon class="hz-pc hz-1" style="--k:14" points="1571,16 1571,391 1606,391 1735,401 1737,370 1744,347 1760,321 1799,272 1815,241 1820,219 1821,203 1820,187 1815,166 1799,135 1760,85 1744,60 1737,36 1735,6 1598,16"/><polygon class="hz-pc hz-1" style="--k:15" points="722,1508 722,1133 758,1133 843,1125 886,1123 888,1154 896,1177 908,1198 951,1252 966,1283 971,1305 972,1321 971,1337 966,1358 951,1389 908,1444 896,1464 888,1488 886,1518 750,1508"/><polygon class="hz-pc hz-0" style="--k:16" points="3020,257 3020,616 3190,626 3192,596 3199,574 3212,549 3246,502 3259,472 3264,452 3264,428 3257,394 3243,366 3212,323 3201,304 3192,276 3190,246 3047,256"/><polygon class="hz-pc hz-0" style="--k:17" points="3203,628 3203,987 3033,997 3031,967 3022,940 2977,873 2964,843 2959,823 2959,799 2966,765 2980,737 3011,694 3022,675 3031,647 3033,617 3176,627"/><polygon class="hz-pc hz-3" style="--k:18" points="2766,919 2766,515 2724,514 2648,506 2615,504 2613,537 2599,568 2583,590 2533,643 2514,676 2508,695 2506,713 2506,730 2511,751 2520,772 2533,791 2583,845 2603,872 2613,898 2615,930 2648,929 2738,920"/><polygon class="hz-pc hz-3" style="--k:19" points="2182,940 2182,536 2224,535 2299,527 2332,525 2335,558 2348,589 2365,611 2414,664 2434,697 2440,716 2442,734 2441,751 2437,772 2419,806 2365,866 2348,888 2335,919 2332,951 2292,949 2209,941"/>
+<path class="hz-end" d="M3265 -24 V1548"/>
+</g>
+<g class="hz-frame" data-frame="2" data-length="3064">
+<rect class="hz-fabric" x="0" y="0" width="3064" height="1524"/>
+<polygon class="hz-pc hz-2" style="--k:0" points="18,997 18,1287 503,1287 504,1271 515,1257 535,1242 564,1228 604,1214 643,1205 674,1202 696,1205 730,1055 717,1051 710,1044 703,1030 699,1012 699,981 705,959 714,945 730,939 696,789 674,791 643,788 604,779 564,765 535,751 515,736 504,722 503,707 18,707"/><polygon class="hz-pc hz-1" style="--k:1" points="1608,1243 1608,1518 2088,1518 2089,1503 2099,1490 2118,1477 2145,1464 2182,1451 2219,1443 2249,1440 2271,1443 2305,1298 2293,1295 2285,1288 2278,1275 2274,1257 2274,1228 2280,1207 2289,1193 2305,1187 2271,1042 2249,1045 2219,1042 2182,1034 2145,1021 2118,1009 2099,995 2089,983 2088,968 1608,968"/><polygon class="hz-pc hz-0" style="--k:2" points="1608,1248 1608,988 1133,988 1132,1002 1123,1013 1105,1025 1080,1037 1045,1048 1010,1056 981,1058 960,1055 926,1194 940,1199 946,1205 953,1217 957,1234 957,1262 951,1282 942,1295 926,1301 960,1441 981,1438 1010,1440 1045,1447 1080,1459 1105,1470 1123,1483 1132,1494 1133,1508 1608,1508"/><polygon class="hz-pc hz-3" style="--k:3" points="1414,683 1414,378 924,378 922,396 911,410 889,426 867,437 825,453 783,464 743,470 721,467 687,622 700,627 707,633 714,647 718,667 718,699 712,723 703,737 687,743 721,898 748,896 783,901 825,912 867,928 895,943 915,960 922,971 924,988 1414,988"/><polygon class="hz-pc hz-2" style="--k:4" points="2308,1226 2308,1516 2792,1516 2795,1499 2804,1486 2825,1472 2853,1458 2893,1444 2933,1435 2964,1432 2986,1434 3020,1284 2986,1274 2962,1261 2949,1247 2943,1231 2947,1209 2962,1191 2986,1178 3020,1168 2986,1018 2964,1021 2933,1017 2893,1008 2853,994 2825,981 2804,966 2795,953 2792,936 2308,936"/><polygon class="hz-pc hz-1" style="--k:5" points="1414,692 1414,967 1893,967 1895,952 1904,940 1924,926 1950,914 1988,901 2025,893 2055,890 2076,893 2111,748 2077,738 2055,726 2042,712 2036,696 2040,677 2055,659 2077,647 2111,637 2076,492 2055,495 2025,492 1988,484 1950,471 1924,458 1904,445 1895,432 1893,417 1414,417"/><polygon class="hz-pc hz-0" style="--k:6" points="2573,265 2573,5 2098,5 2097,19 2088,30 2070,43 2046,54 2010,66 1975,73 1946,75 1925,72 1891,212 1916,219 1941,231 1955,244 1963,261 1960,280 1945,297 1923,308 1891,318 1925,458 1946,455 1975,457 2010,465 2046,476 2070,488 2088,500 2097,511 2098,525 2573,525"/><polygon class="hz-pc hz-3" style="--k:7" points="7,331 7,636 497,636 498,621 506,608 526,591 554,576 596,560 646,548 679,544 700,546 734,391 699,381 680,371 662,354 655,335 659,313 665,303 675,294 699,280 734,271 700,115 679,117 646,114 596,101 554,85 526,70 506,54 498,41 497,26 7,26"/><polygon class="hz-pc hz-2" style="--k:8" points="2467,526 2467,858 2527,858 2527,526"/><polygon class="hz-pc hz-1" style="--k:9" points="2577,18 2577,339 2637,339 2637,18"/><polygon class="hz-pc hz-0" style="--k:10" points="1389,56 1389,367 1449,367 1449,56"/><polygon class="hz-pc hz-3" style="--k:11" points="1853,366 1853,23 1793,23 1793,366"/><polygon class="hz-pc hz-2" style="--k:12" points="744,17 744,407 779,407 859,415 901,417 903,385 915,356 930,335 974,283 992,251 996,237 999,212 994,180 978,147 930,89 912,63 903,38 901,7 771,17"/><polygon class="hz-pc hz-2" style="--k:13" points="2637,411 2637,22 2672,21 2752,13 2794,11 2796,43 2808,73 2823,94 2867,145 2885,177 2891,200 2892,216 2887,249 2879,269 2867,287 2823,339 2808,360 2796,390 2794,422 2752,420 2664,412"/><polygon class="hz-pc hz-1" style="--k:14" points="1476,16 1476,391 1511,391 1640,401 1642,370 1650,347 1665,321 1705,272 1720,241 1725,219 1726,203 1725,187 1720,166 1705,135 1665,85 1650,60 1642,36 1640,6 1504,16"/><polygon class="hz-pc hz-1" style="--k:15" points="922,1103 922,1477 887,1478 758,1488 756,1457 745,1428 733,1408 697,1364 678,1328 674,1314 672,1290 674,1267 678,1252 693,1222 733,1172 748,1147 756,1123 758,1093 894,1103"/><polygon class="hz-pc hz-0" style="--k:16" points="3064,580 3064,220 2893,210 2891,240 2884,263 2871,287 2837,335 2822,371 2819,408 2826,443 2837,465 2882,532 2891,560 2893,590 3036,580"/><polygon class="hz-pc hz-0" style="--k:17" points="3033,628 3033,987 2862,997 2860,967 2853,945 2840,920 2806,873 2791,837 2788,799 2795,765 2809,737 2840,694 2851,675 2860,647 2862,617 3005,627"/><polygon class="hz-pc hz-3" style="--k:18" points="2578,434 2578,838 2620,840 2688,847 2729,849 2731,817 2745,785 2761,764 2811,710 2831,677 2836,658 2838,641 2838,623 2833,603 2824,581 2811,562 2761,509 2741,481 2731,456 2729,423 2696,425 2606,433"/><polygon class="hz-pc hz-3" style="--k:19" points="2147,941 2147,536 2189,535 2256,528 2297,526 2300,558 2313,589 2330,611 2379,665 2399,697 2405,717 2407,734 2406,752 2402,772 2392,793 2379,812 2330,866 2310,894 2300,919 2297,951 2264,950 2174,941"/>
+<path class="hz-end" d="M3064 -24 V1548"/>
+</g>
+<g class="hz-frame" data-frame="3" data-length="2913">
+<rect class="hz-fabric" x="0" y="0" width="2913" height="1524"/>
+<polygon class="hz-pc hz-2" style="--k:0" points="5,1229 5,1519 490,1519 491,1503 502,1489 523,1474 551,1460 591,1447 630,1437 661,1434 683,1437 717,1287 704,1283 697,1276 690,1263 686,1244 686,1214 692,1191 701,1177 717,1171 683,1021 661,1023 630,1020 591,1011 551,997 523,983 502,968 491,955 490,939 5,939"/><polygon class="hz-pc hz-1" style="--k:1" points="1996,281 1996,6 1517,6 1515,21 1506,33 1486,47 1460,59 1422,72 1385,80 1355,83 1333,80 1299,225 1311,229 1319,235 1326,248 1330,266 1331,290 1324,317 1315,330 1299,336 1333,481 1355,478 1385,481 1422,489 1460,502 1486,515 1506,528 1515,541 1517,556 1996,556"/><polygon class="hz-pc hz-0" style="--k:2" points="718,1258 718,1518 1192,1518 1193,1504 1202,1493 1220,1481 1245,1470 1280,1458 1315,1451 1344,1448 1365,1451 1400,1312 1385,1307 1379,1301 1373,1289 1369,1272 1368,1249 1374,1224 1383,1211 1400,1205 1365,1065 1344,1069 1315,1066 1280,1059 1245,1047 1220,1036 1202,1023 1193,1012 1192,998 718,998"/><polygon class="hz-pc hz-3" style="--k:3" points="2834,1212 2834,907 2344,907 2343,924 2335,935 2315,951 2287,966 2245,982 2203,993 2168,998 2141,996 2107,1152 2120,1155 2127,1162 2134,1176 2138,1196 2138,1228 2132,1252 2123,1266 2107,1272 2141,1428 2163,1425 2203,1430 2245,1441 2287,1457 2309,1469 2331,1485 2343,1500 2344,1517 2834,1517"/><polygon class="hz-pc hz-2" style="--k:4" points="669,704 669,994 1153,994 1155,979 1165,965 1186,950 1214,936 1254,922 1293,913 1325,910 1346,912 1381,762 1346,752 1323,740 1309,725 1304,709 1307,688 1315,676 1323,669 1346,656 1381,647 1346,496 1320,499 1286,494 1254,487 1214,473 1186,459 1165,444 1155,430 1153,414 669,414"/><polygon class="hz-pc hz-1" style="--k:5" points="1997,280 1997,555 2477,555 2478,540 2488,528 2507,514 2533,502 2571,489 2608,481 2638,478 2660,481 2694,335 2661,326 2643,317 2627,303 2620,284 2623,264 2638,247 2661,235 2694,225 2660,80 2638,82 2608,80 2571,71 2533,59 2507,46 2488,33 2478,20 2477,5 1997,5"/><polygon class="hz-pc hz-0" style="--k:6" points="5,266 5,526 480,526 481,512 490,501 508,489 532,477 568,466 603,458 632,456 653,459 687,319 662,312 637,301 620,284 615,270 618,251 633,235 655,223 687,213 653,73 632,76 603,74 568,67 532,55 508,44 490,31 481,20 480,6 5,6"/><polygon class="hz-pc hz-3" style="--k:7" points="1390,861 1390,1166 1880,1166 1881,1149 1888,1138 1908,1121 1937,1106 1978,1090 2028,1078 2061,1074 2083,1076 2117,921 2082,911 2063,901 2045,884 2038,865 2041,843 2048,833 2058,824 2082,811 2117,801 2083,645 2061,648 2028,644 1978,631 1937,615 1908,600 1888,584 1881,572 1880,556 1390,556"/><polygon class="hz-pc hz-2" style="--k:8" points="2759,339 2759,6 2699,6 2699,339"/><polygon class="hz-pc hz-1" style="--k:9" points="1040,346 1040,24 980,24 980,346"/><polygon class="hz-pc hz-0" style="--k:10" points="1724,1166 1724,1477 1784,1477 1784,1166"/><polygon class="hz-pc hz-3" style="--k:11" points="2911,1240 2911,897 2851,897 2851,1240"/><polygon class="hz-pc hz-2" style="--k:12" points="2105,1504 2105,1114 2070,1114 1990,1106 1948,1104 1945,1136 1937,1160 1923,1181 1874,1238 1857,1270 1850,1301 1850,1318 1854,1341 1863,1362 1874,1380 1923,1437 1937,1458 1945,1483 1948,1514 1990,1513 2077,1504"/><polygon class="hz-pc hz-2" style="--k:13" points="1044,406 1044,16 1079,15 1159,7 1201,6 1203,37 1212,61 1226,83 1275,140 1292,171 1298,194 1299,211 1295,243 1286,264 1275,282 1226,339 1212,360 1203,384 1201,416 1159,414 1072,406"/><polygon class="hz-pc hz-1" style="--k:14" points="717,16 717,390 752,391 838,399 880,400 883,370 893,341 906,321 945,271 961,241 966,219 967,203 966,187 961,165 945,135 902,80 890,59 883,36 880,5 744,15"/><polygon class="hz-pc hz-1" style="--k:15" points="2127,940 2127,566 2162,565 2248,557 2291,556 2293,586 2301,610 2316,635 2356,685 2371,716 2376,737 2377,753 2376,769 2371,791 2356,822 2316,871 2303,891 2293,920 2291,951 2155,941"/><polygon class="hz-pc hz-0" style="--k:16" points="19,551 19,910 190,921 192,890 201,863 246,796 259,766 264,746 264,723 257,688 243,660 201,598 192,570 190,540 47,550"/><polygon class="hz-pc hz-0" style="--k:17" points="2480,896 2480,537 2651,527 2653,557 2660,579 2673,604 2707,651 2720,681 2725,717 2723,739 2718,759 2704,787 2673,830 2662,849 2653,877 2651,907 2508,897"/><polygon class="hz-pc hz-3" style="--k:18" points="633,928 633,524 592,523 516,514 483,513 480,546 467,577 451,598 401,652 381,685 375,704 373,722 375,744 379,760 396,794 455,859 471,881 480,906 483,939 524,937 606,929"/><polygon class="hz-pc hz-3" style="--k:19" points="2913,315 2913,720 2871,721 2796,729 2763,730 2760,698 2747,667 2730,645 2681,591 2661,559 2655,539 2653,522 2655,500 2658,484 2676,450 2735,385 2750,362 2760,337 2763,305 2796,306 2886,315"/>
+<path class="hz-end" d="M2913 -24 V1548"/>
+</g>
+<g class="hz-frame is-final" data-frame="4" data-length="2902">
+<rect class="hz-fabric" x="0" y="0" width="2902" height="1524"/>
+<polygon class="hz-pc hz-2" style="--k:0" points="5,1229 5,1519 490,1519 491,1503 502,1489 523,1474 551,1460 591,1447 630,1437 661,1434 683,1437 717,1287 704,1283 697,1276 690,1263 686,1244 686,1214 692,1191 701,1177 717,1171 683,1021 661,1023 630,1020 591,1011 551,997 523,983 502,968 491,955 490,939 5,939"/><polygon class="hz-pc hz-1" style="--k:1" points="1983,281 1983,6 1503,6 1502,21 1492,33 1473,47 1446,59 1409,72 1372,80 1342,83 1320,80 1286,225 1298,229 1306,235 1313,248 1317,266 1317,295 1311,317 1302,330 1286,336 1320,481 1342,478 1372,481 1409,489 1446,502 1473,515 1492,528 1502,541 1503,556 1983,556"/><polygon class="hz-pc hz-0" style="--k:2" points="718,1258 718,1518 1192,1518 1193,1504 1202,1493 1220,1481 1245,1470 1280,1458 1315,1451 1344,1448 1365,1451 1400,1312 1385,1307 1379,1301 1373,1289 1369,1272 1368,1249 1374,1224 1383,1211 1400,1205 1365,1065 1344,1069 1315,1066 1280,1059 1245,1047 1220,1036 1202,1023 1193,1012 1192,998 718,998"/><polygon class="hz-pc hz-3" style="--k:3" points="2828,1212 2828,907 2338,907 2337,924 2330,935 2310,951 2281,966 2240,982 2198,993 2162,998 2135,996 2101,1152 2114,1155 2121,1162 2128,1176 2132,1196 2132,1228 2126,1252 2117,1266 2101,1272 2135,1428 2157,1425 2198,1430 2240,1441 2281,1457 2303,1469 2326,1485 2337,1500 2338,1517 2828,1517"/><polygon class="hz-pc hz-2" style="--k:4" points="669,704 669,994 1153,994 1155,979 1165,965 1186,950 1214,936 1254,922 1293,913 1325,910 1346,912 1381,762 1346,752 1323,740 1309,725 1304,709 1307,688 1315,676 1323,669 1346,656 1381,647 1346,496 1320,499 1286,494 1254,487 1214,473 1186,459 1165,444 1155,430 1153,414 669,414"/><polygon class="hz-pc hz-1" style="--k:5" points="1985,280 1985,555 2465,555 2466,540 2476,528 2495,514 2522,502 2560,489 2597,481 2627,478 2648,481 2682,335 2649,326 2631,317 2616,303 2608,284 2611,264 2626,247 2649,235 2682,225 2648,80 2627,82 2597,80 2560,71 2522,59 2495,46 2476,33 2466,20 2465,5 1985,5"/><polygon class="hz-pc hz-0" style="--k:6" points="5,266 5,526 480,526 481,512 490,501 508,489 532,477 568,466 603,458 632,456 653,459 687,319 662,312 637,301 620,284 615,270 618,251 633,235 655,223 687,213 653,73 632,76 603,74 568,67 532,55 508,44 490,31 481,20 480,6 5,6"/><polygon class="hz-pc hz-3" style="--k:7" points="1390,861 1390,1166 1880,1166 1881,1149 1888,1138 1908,1121 1937,1106 1978,1090 2028,1078 2061,1074 2083,1076 2117,921 2082,911 2063,901 2045,884 2038,865 2041,843 2048,833 2058,824 2082,811 2117,801 2083,645 2061,648 2028,644 1978,631 1937,615 1908,600 1888,584 1881,572 1880,556 1390,556"/><polygon class="hz-pc hz-2" style="--k:8" points="2749,349 2749,16 2689,16 2689,349"/><polygon class="hz-pc hz-1" style="--k:9" points="971,14 971,335 1031,335 1031,14"/><polygon class="hz-pc hz-0" style="--k:10" points="1724,1166 1724,1477 1784,1477 1784,1166"/><polygon class="hz-pc hz-3" style="--k:11" points="2900,1240 2900,897 2840,897 2840,1240"/><polygon class="hz-pc hz-2" style="--k:12" points="2099,1505 2099,1115 2064,1114 1984,1106 1942,1105 1940,1136 1928,1166 1913,1187 1868,1239 1851,1270 1846,1285 1844,1310 1848,1342 1864,1375 1913,1433 1931,1459 1940,1483 1942,1515 1984,1513 2072,1505"/><polygon class="hz-pc hz-2" style="--k:13" points="1031,405 1031,16 1066,15 1146,7 1188,5 1190,37 1202,67 1217,88 1262,139 1279,171 1285,194 1286,210 1282,243 1273,263 1262,281 1217,333 1202,354 1190,384 1188,416 1058,405"/><polygon class="hz-pc hz-1" style="--k:14" points="717,16 717,390 752,391 838,399 880,400 883,370 893,341 906,321 945,271 961,241 966,219 967,203 966,187 961,165 945,135 902,80 890,59 883,36 880,5 744,15"/><polygon class="hz-pc hz-1" style="--k:15" points="2122,940 2122,566 2157,565 2242,557 2285,556 2287,586 2295,610 2307,630 2350,685 2365,716 2371,737 2372,753 2371,769 2365,791 2350,822 2307,876 2298,891 2287,920 2285,951 2149,941"/><polygon class="hz-pc hz-0" style="--k:16" points="19,551 19,910 190,921 192,890 201,863 246,796 259,766 264,746 264,723 257,688 243,660 201,598 192,570 190,540 47,550"/><polygon class="hz-pc hz-0" style="--k:17" points="2470,895 2470,536 2641,525 2643,555 2650,578 2663,602 2697,650 2710,679 2715,716 2713,738 2708,758 2693,786 2663,829 2652,848 2643,876 2641,906 2498,896"/><polygon class="hz-pc hz-3" style="--k:18" points="633,928 633,524 592,523 516,514 483,513 480,546 467,577 451,598 401,652 381,685 375,704 373,722 375,744 379,760 396,794 455,859 471,881 480,906 483,939 524,937 606,929"/><polygon class="hz-pc hz-3" style="--k:19" points="2902,331 2902,736 2860,737 2784,745 2751,746 2749,714 2735,683 2719,661 2669,607 2650,574 2644,555 2642,538 2642,520 2647,500 2656,478 2669,460 2719,406 2735,384 2749,353 2751,321 2792,322 2874,331"/>
+<path class="hz-end" d="M2902 -24 V1548"/>
+</g>
+<g class="hz-dim"><path d="M0 1564 H2902"/><path d="M0 1552 V1576 M2902 1552 V1576"/></g>
+</svg></div>
+    <div class="hz-foot">
+      <p class="hz-status" aria-hidden="true"><span class="hz-run"><span class="spinner"></span>Best so far <b data-hz-length>3.58 m</b></span><span class="hz-done"><span class="tick">✓</span><b>2.90 m</b> · 81.5% of the fabric in pieces · checked</span></p>
+      <ul class="hz-legend" aria-label="Sizes"><li><i class="hz-0"></i>S</li><li><i class="hz-1"></i>M</li><li><i class="hz-2"></i>L</li><li><i class="hz-3"></i>XL</li></ul>
+      <button type="button" class="btn-icon hz-toggle" data-hz-toggle hidden aria-pressed="false"><svg class="i-pause" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><svg class="i-play" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M7 4.5v11l9-5.5z" fill="currentColor"/></svg><span class="sr-only" data-hz-label>Pause the animation</span></button>
+    </div>
+  </div>
+  <figcaption id="hero-live-cap">Recorded in the browser app: a T-shirt in sizes S, M, L, XL, 15 seconds of search. The marker got shorter from 3.58 m to 2.90 m. Shorter is better.</figcaption>
+</figure>
   </div>
 </div>
 
@@ -108,63 +118,70 @@
       <p class="eyebrow">Demo video</p>
       <h2 id="demo-title">Watch the demo</h2>
       <p class="lead" id="demo-title-desc">What a pattern and a marker are, then the real app: nest a marker, plan the cut, rolls and bundles, photo to marker on a phone, and our honest benchmark.</p>
-      <p class="video-meta"><span>3 min 45 s</span><span>Captions in English</span><span>Real app, sample data</span></p>
+      <p class="video-meta"><span>3 min 9 s</span><span>Captions in English</span><span>Real app, sample data</span></p>
       <p class="small muted">Sound is optional. Every word is also on screen.</p>
     </div>
-    <div class="video-frame" data-reveal><video class="demo-video" controls preload="none" playsinline poster="assets/video/beta-demo-poster.jpg" width="1920" height="1080" aria-describedby="demo-title-desc">
-  <source src="assets/video/beta-demo-en.mp4" type="video/mp4">
-  <track kind="captions" srclang="en" label="English" src="assets/video/beta-demo-en.vtt" default>
-  <a href="assets/video/beta-demo-en.mp4">Download the demo video (MP4)</a>
+    <div class="video-frame" data-reveal><video class="demo-video" controls preload="none" playsinline poster="assets/video/beta-08-poster-1280x720.png" width="1920" height="1080" aria-describedby="demo-title-desc">
+  <source src="assets/video/beta-08-walkthrough.mp4" type="video/mp4">
+  <track kind="captions" srclang="en" label="English" src="assets/video/beta-08-walkthrough.vtt" default>
+  <a href="assets/video/beta-08-walkthrough.mp4">Download the demo video (MP4)</a>
 </video></div>
   </div>
 </section>
 
-<section class="stats" aria-label="BETA in numbers">
-  <div class="wrap"><ul class="stat-band" data-reveal data-stagger>
-    <li><span class="stat-big"><span class="count" data-count="8" data-decimals="0">8</span></span><span class="stat-text">steps from pattern to sewing line, in one program</span></li>
-    <li><span class="stat-big"><span class="count" data-count="300" data-decimals="0">300</span></span><span class="stat-text">real Lectra nesting tasks in our public benchmark</span></li>
-    <li><span class="stat-big"><span class="count" data-count="100" data-decimals="0">100</span><small>%</small></span><span class="stat-text">of markers checked by an independent validator before export</span></li>
-    <li><span class="stat-big">0</span><span class="stat-text">accounts, cloud services or licence fees</span></li>
-  </ul></div>
-</section>
-
-<section class="section " id="workflow" aria-labelledby="workflow-title">
+<section class="section " id="paths" aria-labelledby="paths-title">
   <div class="wrap">
     <div class="section-head" data-reveal>
-      <p class="eyebrow">One program</p>
-      <h2 id="workflow-title">From pattern to sewing line</h2>
-      <p class="lead">One record follows the style through the cutting room. Each step uses the result of the step before, so numbers are not typed twice.</p>
+      <p class="eyebrow">Three ways in</p>
+      <h2 id="paths-title">Start where you are</h2>
+      <p class="lead">Paper patterns on a phone, a pattern master’s drafting table, or a cutting room with CAD files: each one works in the browser.</p>
     </div>
     
-<div class="flow" data-flow>
-  <div class="flow-track" aria-hidden="true"><span class="flow-fill"></span><span class="flow-runner"></span></div>
-  <ol class="flow-steps">
-    <li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M6 4 L10 3 Q12 6 14 6 Q16 6 18 3 L22 4 L21 9 L19 9 L19 21 L9 21 L9 9 L7 9 Z"/></svg></span></span><span class="step-num">Step 1</span><h3>Pattern</h3><p>Draft, grade and digitize patterns. Import DXF-AAMA or a supported Seamly2D file.</p><span class="step-module">BETA Pattern</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="2" y="5" width="22" height="16" rx="1.5"/><path d="M6 8 V18 M11 8 V18 M16 8 L20 12 L16 18"/></svg></span></span><span class="step-num">Step 2</span><h3>Marker</h3><p>Nest all pieces on the fabric width with grain, nap, pairs and size ratio. Edit by hand.</p><span class="step-module">BETA Marker</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="4" width="20" height="18" rx="2"/><path d="M3 9 H23 M3 14 H23 M10 4 V22 M16 4 V22"/></svg></span></span><span class="step-num">Step 3</span><h3>Cut plan</h3><p>Turn an order into size ratios, ply heights and lay lengths.</p><span class="step-module">BETA Marker</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><ellipse cx="9" cy="13" rx="5" ry="8"/><path d="M9 5 H19 Q24 5 24 13 Q24 21 19 21 H9"/><ellipse cx="9" cy="13" rx="1.5" ry="2.5"/></svg></span></span><span class="step-num">Step 4</span><h3>Rolls</h3><p>Inspect rolls (4-point), group shade and shrinkage, allocate rolls to lays.</p><span class="step-module">BETA Marker</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M3 18 L13 22 L23 18 M3 14 L13 18 L23 14 M3 10 L13 14 L23 10 L13 6 Z"/></svg></span></span><span class="step-num">Step 5</span><h3>Spread</h3><p>Print spreading sheets with roll order, plies, splice zones and end allowances.</p><span class="step-module">Floor</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><circle cx="7" cy="18" r="3"/><circle cx="7" cy="8" r="3"/><path d="M9.5 16.5 L23 6 M9.5 9.5 L23 20"/></svg></span></span><span class="step-num">Step 6</span><h3>Cut</h3><p>Plot the marker 1:1 (PLT/HPGL or PDF) or send a cutter file. Track each lay.</p><span class="step-module">Floor</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="4" y="8" width="18" height="13" rx="1.5"/><path d="M4 12 H22 M13 8 V21 M8 8 L10 3 H16 L18 8"/></svg></span></span><span class="step-num">Step 7</span><h3>Bundles</h3><p>Number plies, make bundles and print QR tickets and stickers. Plan re-cuts.</p><span class="step-module">Floor</span></li><li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M4 20 H22 M7 20 V9 Q7 5 11 5 H20 V12 H11 M17 12 V17"/><path d="M17 17 L17 19" /></svg></span></span><span class="step-num">Step 8</span><h3>Sewing</h3><p>Scan bundles out to sewing lines. Export work-in-progress and fabric use.</p><span class="step-module">Floor</span></li>
-  </ol>
-  <button type="button" class="replay replay-inline" data-flow-replay hidden><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M4 10a6 6 0 1 0 2-4.5M4 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Play the steps again</button>
-</div>
+<div class="paths"><article class="path-card path-card-phone" id="path-paper" data-reveal>
+  <div class="path-pic"><div class="path-phone"><img src="assets/screens/path-paper-390.webp" srcset="assets/screens/path-paper-390.webp 390w, assets/screens/path-paper-600.webp 600w" sizes="(max-width: 700px) 60vw, 240px" alt="Photo to marker on a phone: the pieces BETA found in a photo of paper patterns, outlined, with an A4 sheet for scale" width="390" height="700" loading="lazy" decoding="async"></div></div>
+  <div class="path-copy">
+    <p class="path-who"><span class="path-num">1</span>Small unit with paper patterns</p>
+    <h3>Photo of your paper patterns</h3>
+    <ul class="check-list"><li>Photograph the paper pieces on a dark cloth, with an A4 sheet beside them for scale.</li><li>Check one tape measurement, name each part and set its fabric.</li><li>Get a marker, full-size tiles to print, or a chalk guide. No CAD needed.</li></ul>
+    <a class="btn btn-secondary btn-small" href="app/#/quick">Digitize paper patterns<span aria-hidden="true"> →</span></a>
+  </div>
+</article><article class="path-card" id="path-pattern" data-reveal>
+  <div class="path-pic"><div class="path-shot"><img src="assets/screens/path-pattern-800.webp" srcset="assets/screens/path-pattern-800.webp 800w, assets/screens/path-pattern-1200.webp 1200w" sizes="(max-width: 700px) 92vw, (max-width: 1100px) 46vw, 400px" alt="Make a style: the T-shirt block on the drafting canvas with front and back pieces, notches and grain lines" width="800" height="500" loading="lazy" decoding="async"></div></div>
+  <div class="path-copy">
+    <p class="path-who"><span class="path-num">2</span>Pattern master</p>
+    <h3>Make a style from a block</h3>
+    <ul class="check-list"><li>Start from seven basic blocks (T-shirt, shirt, trouser, skirt, kurta, polo, track pant) or a blank sheet.</li><li>Grade every size from one size chart, with seam checks and a spec sheet.</li><li>Export DXF-AAMA, plotter PLT and a 1:1 PDF.</li></ul>
+    <a class="btn btn-secondary btn-small" href="app/#/style">Make a style<span aria-hidden="true"> →</span></a>
+  </div>
+</article><article class="path-card" id="path-room" data-reveal>
+  <div class="path-pic"><div class="path-shot"><img src="assets/screens/path-marker-800.webp" srcset="assets/screens/path-marker-800.webp 800w, assets/screens/path-marker-1200.webp 1200w" sizes="(max-width: 700px) 92vw, (max-width: 1100px) 46vw, 400px" alt="A T-shirt marker in four sizes, every piece labelled with its name and size, all checks passed" width="800" height="500" loading="lazy" decoding="async"></div></div>
+  <div class="path-copy">
+    <p class="path-who"><span class="path-num">3</span>Cutting room</p>
+    <h3>From DXF to the cutting floor</h3>
+    <ul class="check-list"><li>Open DXF-AAMA pieces from your CAD and nest a marker on your fabric width.</li><li>Plan the cut: lays, plies and fabric for the whole order, and compare widths by cost.</li><li>Rolls, spreading sheets, bundles, tickets and the sewing hand-off.</li></ul>
+    <a class="btn btn-secondary btn-small" href="app/#/marker">Open DXF files<span aria-hidden="true"> →</span></a>
+  </div>
+</article></div>
+<p class="note">Real screens of the app with sample data. Every path has a sample, so you can try it before you use your own files.</p>
   </div>
 </section>
 
-<section class="section section-alt" id="screens" aria-labelledby="screens-title">
+<section class="section section-alt" id="features" aria-labelledby="features-title">
   <div class="wrap">
     <div class="section-head" data-reveal>
-      <p class="eyebrow">Screenshots</p>
-      <h2 id="screens-title">See the real app</h2>
-      
+      <p class="eyebrow">Features</p>
+      <h2 id="features-title">What BETA does today</h2>
+      <p class="lead">Everything runs on your own computer. The heavy work (geometry, nesting, checks, files) is written in Rust for speed.</p>
     </div>
     
-<div class="showcase" data-carousel data-reveal>
-  <div class="showcase-frame">
-    <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>BETA Cutting Room 0.7.0</span></div>
-    <div class="slides"><figure class="slide is-active" id="slide-marker-editor" data-slide><img src="assets/screens/marker-editor.png" alt="Screenshot of the Marker editor screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Marker editor: nest, bump, compact and check every piece.</figcaption></figure><figure class="slide" id="slide-style-pattern" data-slide><img src="assets/screens/style-pattern.png" alt="Screenshot of the Style pattern canvas screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Style: start with a block or blank sheet, then draft, grade and prepare the cut.</figcaption></figure><figure class="slide" id="slide-pattern" data-slide><img src="assets/screens/pattern.png" alt="Screenshot of the Pattern screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Pattern: draft, grade and check all sizes.</figcaption></figure><figure class="slide" id="slide-cut-plan" data-slide><img src="assets/screens/cut-plan.png" alt="Screenshot of the Cut plan screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Cut plan: ratios, plies and lay lengths for an order.</figcaption></figure><figure class="slide" id="slide-rolls" data-slide><img src="assets/screens/rolls.png" alt="Screenshot of the Rolls screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Rolls: inspection, shade groups and allocation.</figcaption></figure><figure class="slide" id="slide-spreading" data-slide><img src="assets/screens/spreading.png" alt="Screenshot of the Spreading screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Floor: spreading sheets and lay tracking.</figcaption></figure><figure class="slide" id="slide-bundles" data-slide><img src="assets/screens/bundles.png" alt="Screenshot of the Bundles screen in BETA Cutting Room" width="1920" height="1200" loading="lazy" decoding="async"><figcaption>Bundles: QR tickets, stickers and re-cuts.</figcaption></figure></div>
-  </div>
-  <div class="showcase-controls">
-    <div class="tabs" data-tablist aria-label="App screens" hidden><button type="button" class="tab" id="tab-marker-editor" data-tab aria-selected="true"><span>Marker editor</span><i class="tab-progress" aria-hidden="true"></i></button><button type="button" class="tab" id="tab-style-pattern" data-tab aria-selected="false"><span>Style pattern canvas</span><i class="tab-progress" aria-hidden="true"></i></button><button type="button" class="tab" id="tab-pattern" data-tab aria-selected="false"><span>Pattern</span><i class="tab-progress" aria-hidden="true"></i></button><button type="button" class="tab" id="tab-cut-plan" data-tab aria-selected="false"><span>Cut plan</span><i class="tab-progress" aria-hidden="true"></i></button><button type="button" class="tab" id="tab-rolls" data-tab aria-selected="false"><span>Rolls</span><i class="tab-progress" aria-hidden="true"></i></button><button type="button" class="tab" id="tab-spreading" data-tab aria-selected="false"><span>Spreading</span><i class="tab-progress" aria-hidden="true"></i></button><button type="button" class="tab" id="tab-bundles" data-tab aria-selected="false"><span>Bundles</span><i class="tab-progress" aria-hidden="true"></i></button></div>
-    <button type="button" class="btn-icon" data-toggle hidden aria-pressed="false"><svg class="i-pause" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><svg class="i-play" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M7 4.5v11l9-5.5z" fill="currentColor"/></svg><span class="sr-only" data-toggle-label>Pause slideshow</span></button>
-  </div>
+<div class="card-grid card-grid-4 feature-groups" data-reveal data-stagger>
+  <article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M6 4 L10 3 Q12 6 14 6 Q16 6 18 3 L22 4 L21 9 L19 9 L19 21 L9 21 L9 9 L7 9 Z"/></svg></span><h3>Pattern</h3><ul class="check-list"><li>Seven editable basic blocks or a blank sheet, on a drafting canvas</li><li>Size-chart grading, all sizes stacked, seam checks</li><li>Spec sheet: points of measure per size (PDF, Excel)</li><li>DXF-AAMA, plotter PLT and 1:1 PDF out; DXF-AAMA and a Seamly2D subset in</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="2" y="5" width="22" height="16" rx="1.5"/><path d="M6 8 V18 M11 8 V18 M16 8 L20 12 L16 18"/></svg></span><h3>Marker</h3><ul class="check-list"><li>Automatic nesting with grain, one-way nap, left/right pairs, ratios and gaps</li><li>The marker improves live on screen; stop and keep the best</li><li>Improve one area by hand: preview, apply, undo <span class="new-tag">New in 0.8</span></li><li>Keeps your previous marker when it is shorter and still valid <span class="new-tag">New in 0.8</span></li><li>Every marker checked by an independent validator; plotter, DXF, PDF and cutter files</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="4" width="20" height="18" rx="2"/><path d="M3 9 H23 M3 14 H23 M10 4 V22 M16 4 V22"/></svg></span><h3>Cutting room</h3><ul class="check-list"><li>Cut plans: ratios, plies, passes and fabric for an order</li><li>Compare fabric widths, ratios and the cost of the whole order <span class="new-tag">New in 0.8</span></li><li>Rolls: 4-point inspection, shade and shrinkage groups</li><li>Spreading sheets, bundles, QR tickets, re-cuts and the sewing hand-off</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><circle cx="18" cy="9" r="2.8"/><path d="M2.5 22 Q3 14 9 14 Q15 14 15.5 22 M15 15 Q22 13.5 23.5 21"/></svg></span><h3>Small factories</h3><ul class="check-list"><li>Photo to marker on a phone, with an A4 sheet as the scale</li><li>Reusable paper pattern sets with a tape check <span class="new-tag">New in 0.8</span></li><li>Fabric groups (main, lining, rib, fusing) with GSM, one marker each <span class="new-tag">New in 0.8</span></li><li>Full-size tiles, chalk guide and projector mode; works offline as an app</li></ul></article>
 </div>
-<p class="note">Real screens from version 0.7.0, with original sample data. No factory data.</p>
+<div class="callout callout-plain not-yet" data-reveal>
+  <h3>Not yet, or not proven</h3>
+  <p>We prefer to tell you before you find out.</p>
+  <ul><li>The 0.8 additions (area improvement, order-cost comparison, paper pattern sets) are new and tested only in parts.</li><li>Basic blocks pass 10,806 automatic checks, but they need sewn samples and a fit review by a pattern master.</li><li>Folded and tube lays use more fabric than open lays on many orders. The app shows the real yield so you can see it.</li><li>Real-photo accuracy of Photo to marker is not yet measured in factories. Check sizes against the paper before cutting.</li><li>Plotter and cutter profiles are generic. Test them on your machines before production.</li><li>The browser plans on one thread (about 2 seconds per marker). Big jobs are much better in the desktop app.</li><li>The Windows installer is not code-signed yet, so Windows may show a warning. Hindi and Tamil are drafts.</li></ul>
+</div>
   </div>
 </section>
 
@@ -172,12 +189,12 @@
   <div class="wrap">
     <div class="section-head" data-reveal>
       <p class="eyebrow">Public benchmark</p>
-      <h2 id="benchmark-title">Honest numbers, not big claims</h2>
-      <p class="lead">We test BETA on the public Lectra dataset: real nesting tasks from fashion companies, with the efficiency that Lectra’s own engine reached on each one.</p>
+      <h2 id="benchmark-title">Honest numbers: mixed, not a win</h2>
+      <p class="lead">We test BETA on the public Lectra dataset: real nesting tasks from fashion companies, with the efficiency Lectra’s own engine reached on each one.</p>
     </div>
     
 <div class="bench-grid"><article class="bench-card" data-reveal>
-  <header><h3>With Lectra’s own time per task</h3><p class="muted small">About 5 minutes per task · 60 tasks</p></header>
+  <header><h3>Historical 20 October: with Lectra’s own time per task</h3><p class="muted small">About 5 minutes per task · 60 tasks</p></header>
   <div class="bench-numbers">
     <div class="bench-stat"><span class="bench-value"><span class="count" data-count="0.42081770123333334" data-decimals="2" data-signed="1">+0.42</span><small> pp</small></span><span class="bench-label">Mean difference</span></div>
     <div class="bench-stat"><span class="bench-value is-neg"><span class="count" data-count="-0.30439356900000003" data-decimals="2" data-signed="1">−0.30</span><small> pp</small></span><span class="bench-label">Median task</span></div>
@@ -186,41 +203,26 @@
   <div class="wtl-bar" aria-hidden="true"><span class="wtl-win" style="width:41.67%"></span><span class="wtl-tie" style="width:5.00%"></span><span class="wtl-loss" style="width:53.33%"></span></div>
   <p class="wtl-legend"><span><i class="dot dot-win"></i>25 wins</span><span><i class="dot dot-tie"></i>3 ties</span><span><i class="dot dot-loss"></i>32 losses</span></p>
 </div>
-  <p class="small muted">60 of 60 BETA layouts passed the independent validator. A tie is within 0.1 points.</p>
+  <p class="small muted">60 of 60 BETA layouts passed the independent validator. A tie is within 0.1 points. Measured 2026-10-19.</p>
 </article><article class="bench-card" data-reveal>
-  <header><h3>With 60 seconds per task</h3><p class="muted small">300 tasks</p></header>
+  <header><h3>0.8, 28 October: 60 seconds per task</h3><p class="muted small">300 tasks</p></header>
   <div class="bench-numbers">
-    <div class="bench-stat"><span class="bench-value is-neg"><span class="count" data-count="-0.7295743608366668" data-decimals="2" data-signed="1">−0.73</span><small> pp</small></span><span class="bench-label">Mean difference</span></div>
-    <div class="bench-stat"><span class="bench-value is-neg"><span class="count" data-count="-1.220970932" data-decimals="2" data-signed="1">−1.22</span><small> pp</small></span><span class="bench-label">Median task</span></div>
+    <div class="bench-stat"><span class="bench-value is-neg"><span class="count" data-count="-1.3913843062899969" data-decimals="2" data-signed="1">−1.39</span><small> pp</small></span><span class="bench-label">Mean difference</span></div>
+    <div class="bench-stat"><span class="bench-value is-neg"><span class="count" data-count="-1.5709280775000032" data-decimals="2" data-signed="1">−1.57</span><small> pp</small></span><span class="bench-label">Median task</span></div>
   </div>
   <div class="wtl-block">
-  <div class="wtl-bar" aria-hidden="true"><span class="wtl-win" style="width:28.00%"></span><span class="wtl-tie" style="width:4.00%"></span><span class="wtl-loss" style="width:68.00%"></span></div>
-  <p class="wtl-legend"><span><i class="dot dot-win"></i>84 wins</span><span><i class="dot dot-tie"></i>12 ties</span><span><i class="dot dot-loss"></i>204 losses</span></p>
+  <div class="wtl-bar" aria-hidden="true"><span class="wtl-win" style="width:25.67%"></span><span class="wtl-tie" style="width:4.00%"></span><span class="wtl-loss" style="width:70.33%"></span></div>
+  <p class="wtl-legend"><span><i class="dot dot-win"></i>77 wins</span><span><i class="dot dot-tie"></i>12 ties</span><span><i class="dot dot-loss"></i>211 losses</span></p>
 </div>
-  <p class="small muted">300 of 300 BETA layouts passed the independent validator. A tie is within 0.1 points.</p>
+  <p class="small muted">300 of 300 BETA layouts passed the independent validator. A tie is within 0.1 points. Measured 2026-10-28.</p>
 </article></div>
 <div class="bench-foot" data-reveal>
   <p><strong>No general win over Lectra.</strong> BETA is close to Lectra’s recorded results, but it still loses more tasks than it wins. We publish every number so you can check. Points (pp) are BETA’s marker efficiency minus Lectra’s; below zero means BETA’s marker was longer.</p>
   <a class="link-arrow" href="benchmark.html">Method, assumptions and all results<span aria-hidden="true"> →</span></a>
 </div>
-  </div>
-</section>
-
-<section class="section " id="features" aria-labelledby="features-title">
-  <div class="wrap">
-    <div class="section-head" data-reveal>
-      <p class="eyebrow">Features</p>
-      <h2 id="features-title">What it does today</h2>
-      <p class="lead">Each of these runs on your own computer. The heavy work (nesting, checks, file output) is written in Rust for speed.</p>
-    </div>
-    
-<div class="card-grid" data-reveal data-stagger>
-  <article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M6 4 L10 3 Q12 6 14 6 Q16 6 18 3 L22 4 L21 9 L19 9 L19 21 L9 21 L9 9 L7 9 Z"/></svg></span><h3>Pattern making</h3><ul class="check-list"><li>Seven editable basic blocks or a blank sheet, with a drafting canvas</li><li>Size-chart grading, stacked sizes and seam checks</li><li>Digitize a paper pattern from a photo</li><li>DXF-AAMA export; Seamly2D file subset import</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="2" y="5" width="22" height="16" rx="1.5"/><path d="M6 8 V18 M11 8 V18 M16 8 L20 12 L16 18"/></svg></span><h3>Marker making</h3><ul class="check-list"><li>Automatic nesting with garment rules: grain, one-way nap, left/right pairs, size ratio, gaps</li><li>Folded and tubular fabric, shade bands, fabric defects</li><li>Manual editing: bump, compact, swap, sections, marker library</li><li>Every marker is checked by an independent validator before export</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="4" width="20" height="18" rx="2"/><path d="M3 9 H23 M3 14 H23 M10 4 V22 M16 4 V22"/></svg></span><h3>Cut planning and costing</h3><ul class="check-list"><li>Size ratios, ply heights and lay lengths from an order</li><li>Fabric consumption and cost estimates</li><li>Compare fabric widths (command line)</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><ellipse cx="9" cy="13" rx="5" ry="8"/><path d="M9 5 H19 Q24 5 24 13 Q24 21 19 21 H9"/><ellipse cx="9" cy="13" rx="1.5" ry="2.5"/></svg></span><h3>Rolls and spreading</h3><ul class="check-list"><li>4-point roll inspection and defect maps</li><li>Shade and shrinkage groups</li><li>Roll allocation, splice zones and end bits</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="4" y="8" width="18" height="13" rx="1.5"/><path d="M4 12 H22 M13 8 V21 M8 8 L10 3 H16 L18 8"/></svg></span><h3>Bundles and the floor</h3><ul class="check-list"><li>Ply numbering, bundles, QR tickets and stickers</li><li>Re-cut planning for damaged parts</li><li>Bundle scan-out to sewing lines with a USB scanner</li></ul></article><article class="card feature-card"><span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M7 3 H16 L21 8 V23 H7 Z M16 3 V8 H21"/><path d="M10 13 H18 M10 17 H18"/></svg></span><h3>Files and data</h3><ul class="check-list"><li>Plot: PLT/HPGL and 1:1 PDF; SVG, DXF, generic ISO cutter file, also in the browser</li><li>Import orders and rolls from CSV or Excel</li><li>Export consumption and work-in-progress as CSV</li></ul></article>
-</div>
-<div class="callout callout-plain not-yet" data-reveal>
-  <h3>Not yet</h3>
-  <p>We prefer to tell you before you find out.</p>
-  <ul><li>Basic blocks pass 10,806 automatic checks, but they need sewn samples and a fit review by a pattern master. Extend and trim work between straight lines.</li><li>The browser edition does everything except the board-photo digitizer. Cut planning in the browser runs on one thread, about 2 seconds per marker.</li><li>Quick Marker real-photo accuracy is untested. Check dimensions against the paper before cutting.</li><li>Plotter and cutter profiles are generic. Test them on your machines before production.</li><li>Folded and tubular lays now show real yield and unused copies. Waste fell a lot in 0.7 (shirt test 3.34 to 1.68 m per garment), but folded fabric is still behind open fabric.</li><li>No direct Tally or SAP connector yet. Exchange data with CSV or Excel files.</li><li>Server access is local by default. Factory-network use needs an access token and an HTTPS proxy.</li><li>The Windows installer is not code-signed yet. Windows may show a warning.</li><li>Hindi and Tamil are drafts and need native review.</li></ul>
+<div class="callout callout-plain fold-note" data-reveal>
+  <h3>Folded fabric is still behind open fabric</h3>
+  <p>In our 0.7 tests, folded T-shirt orders with odd counts per size needed 23% to 74% more fabric than an open lay, and tubes about 11% to 12% more. 0.8 tries mixed fold choices per piece: in a small pilot on 12 public jobs the change ranged from 1.9% more fabric (folded hoodie) to 5.7% less (shirt with a locked piece); the folded T-shirt did not change. The app shows the real yield and the pieces cut but not used, so you can decide.</p>
 </div>
   </div>
 </section>
@@ -229,15 +231,15 @@
   <div class="wrap split split-even">
     <div data-reveal>
       <p class="eyebrow">Privacy</p>
-      <h2 id="privacy-title">Your data stays in your factory</h2>
-      <p class="lead">BETA runs on computers you control. There is no BETA cloud to send your patterns to.</p>
+      <h2 id="privacy-title">Your files stay on your device</h2>
+      <p class="lead">BETA runs in your browser, in the desktop app, or on a factory server you choose. There is no BETA cloud.</p>
       <ul class="check-list check-list-big">
-        <li>Patterns, markers, orders and roll data stay on your PCs and your server.</li>
-        <li>No account, no tracking, no usage data and no crash reports sent anywhere.</li>
-        <li>Works with no internet. Install and update from a USB drive.</li>
-        <li>The server listens only on its own computer unless you turn on factory network access with a token.</li>
+        <li>Patterns, markers, orders and roll data stay in this browser or on your own PCs and server.</li>
+        <li>No account, no tracking, no usage data and no crash reports sent anywhere. This website has no cookies.</li>
+        <li>Works without internet once installed or opened once. Keep backup files of your work.</li>
+        <li>Feedback is your choice. GitHub issues are public, so do not attach factory files there.</li>
       </ul>
-      <p><a class="link-arrow" href="install.html#privacy">Read about privacy and self-hosting<span aria-hidden="true"> →</span></a></p>
+      <p><a class="link-arrow" href="install.html#privacy">Privacy and self-hosting<span aria-hidden="true"> →</span></a></p>
     </div>
     <div class="factory-wrap" data-reveal><svg class="illus factory" viewBox="0 0 560 320" role="img" aria-labelledby="factory-t">
 <title id="factory-t">Diagram: inside your factory, a PC, a server and a plotter share data. There is no link to a cloud service.</title>
@@ -256,17 +258,38 @@
   </div>
 </section>
 
-<section class="section section-alt" id="who" aria-labelledby="who-title">
+<section class="section section-alt" id="help" aria-labelledby="help-title">
+  <div class="wrap fun-grid">
+    <div class="fun-card" data-reveal>
+      <span class="fun-badge"><span aria-hidden="true">✦</span> A fun project</span>
+      <h2 id="help-title">A fun project, built with modern AI tools: we need your help</h2>
+      <p>BETA Cutting Room is a fun project by a small team. We build it with the help of modern AI coding assistants, and we test it like serious software: an independent validator checks every marker before you can export it.</p>
+      <p><strong>BETA is young and not perfect yet.</strong> Try it on a real job and tell us what is wrong, confusing or missing. Pattern masters, cutting masters and developers are all welcome.</p>
+      <div class="contribute-row">
+        <a class="btn btn-secondary btn-small" href="https://github.com/sohitqwer-del/beta-cutting-room" rel="noopener noreferrer external">See the code on GitHub<span class="sr-only"> (external site)</span></a>
+        <a class="btn btn-secondary btn-small" href="https://github.com/sohitqwer-del/beta-cutting-room/blob/main/CONTRIBUTING.md" rel="noopener noreferrer external">How to contribute<span class="sr-only"> (external site)</span></a>
+      </div>
+    </div>
+    <div class="help-block" data-reveal>
+      <h3 class="h-help">Tell us what to fix</h3>
+      <p>A short note is enough, and every report helps.</p>
+      <ul class="help-links " data-stagger>
+  <li><a class="help-link" href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=bug" rel="noopener noreferrer external"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="8" y="8" width="10" height="13" rx="5"/><path d="M10 8 Q10 5 13 5 Q16 5 16 8 M8 12 H4 M18 12 H22 M8 17 H4 M18 17 H22 M13 11 V21 M9 4 L10.5 6 M17 4 L15.5 6"/></svg></span><span><strong>Report a bug</strong><span class="help-text">Something broke or gave a wrong result? Tell us what you did and what happened.</span></span><span class="sr-only"> (GitHub, external site)</span></a></li><li><a class="help-link" href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=missing-feature" rel="noopener noreferrer external"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="15" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="15" width="8" height="8" rx="1.5"/><path d="M19 15 V23 M15 19 H23" /></svg></span><span><strong>Tell us what is missing</strong><span class="help-text">A step your cutting room needs that BETA cannot do yet.</span></span><span class="sr-only"> (GitHub, external site)</span></a></li><li><a class="help-link" href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=feedback" rel="noopener noreferrer external"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M9 17 Q5 14 5 10 Q5 3 13 3 Q21 3 21 10 Q21 14 17 17 V19 H9 Z M10 22 H16"/></svg></span><span><strong>Share feedback</strong><span class="help-text">Anything else: ideas, confusing screens, words that are hard to read.</span></span><span class="sr-only"> (GitHub, external site)</span></a></li>
+  <li><a class="help-link" href="mailto:sohitqwer@gmail.com"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="6" width="20" height="15" rx="2"/><path d="M3 8 L13 15 L23 8"/></svg></span><span><strong>Email us</strong><span class="help-text">No GitHub account? Write to sohitqwer@gmail.com.</span></span></a></li>
+</ul>
+      <p class="small muted samples-note"><strong>Have a real job to compare?</strong> Send 3 to 5 styles as DXF-AAMA with the marker your CAD made (width, ratio, length, efficiency) to <a href="mailto:sohitqwer@gmail.com">sohitqwer@gmail.com</a>. Your files stay private; we publish nothing without your written permission.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section " id="faq" aria-labelledby="faq-title">
   <div class="wrap">
     <div class="section-head" data-reveal>
-      
-      <h2 id="who-title">Who it is for</h2>
+      <p class="eyebrow">FAQ</p>
+      <h2 id="faq-title">Questions people ask first</h2>
       
     </div>
-    
-<div class="card-grid card-grid-5" data-reveal data-stagger>
-  <article class="card audience-card"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><circle cx="18" cy="9" r="2.8"/><path d="M2.5 22 Q3 14 9 14 Q15 14 15.5 22 M15 15 Q22 13.5 23.5 21"/></svg></span><h3>Garment factories</h3><p>Cutting rooms that want control of their own data and no per-seat licence fees. First users are in India.</p></article><article class="card audience-card"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="2" y="5" width="22" height="16" rx="1.5"/><path d="M6 8 V18 M11 8 V18 M16 8 L20 12 L16 18"/></svg></span><h3>CAD and marker operators</h3><p>People who make markers every day and need grain, nap, pairs, ratios, folds and shade rules to be right.</p></article><article class="card audience-card"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="4" width="20" height="18" rx="2"/><path d="M3 9 H23 M3 14 H23 M10 4 V22 M16 4 V22"/></svg></span><h3>Merchandisers and planners</h3><p>Fabric consumption, width comparison and cut plans from the same marker the cutting room uses.</p></article><article class="card audience-card"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="4" y="3" width="18" height="8" rx="1.5"/><rect x="4" y="15" width="18" height="8" rx="1.5"/><path d="M8 7 H12 M8 19 H12"/><circle cx="18" cy="7" r="0.8"/><circle cx="18" cy="19" r="0.8"/></svg></span><h3>Factory IT</h3><p>A Windows installer, a command-line server and plain files. No cloud service to approve.</p></article><article class="card audience-card"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M9 7 L3 13 L9 19 M17 7 L23 13 L17 19 M15 4 L11 22"/></svg></span><h3>Researchers and developers</h3><p>Open code, open benchmark and open data formats. Improve the nesting engine and prove it.</p></article>
-</div>
+    <div class="faq"><details class="disclosure"><summary>Is it free?</summary><p>Yes. The code is Apache-2.0 and there is no licence fee. Your own computers, hosting, printing and any training or support you choose to buy still cost money.</p></details><details class="disclosure"><summary>Is it open source?</summary><p>Yes, all of it, under Apache-2.0. Third-party code and data keep their own licences; see <a href="https://github.com/sohitqwer-del/beta-cutting-room/blob/main/marker/THIRD-PARTY-LICENSES.md" rel="noopener noreferrer external">the notices</a>.</p></details><details class="disclosure"><summary>Who built it?</summary><p>Sohit and contributors, with the help of modern AI coding tools. It is a young project: it needs review by real pattern masters, cutting masters and factory owners.</p></details><details class="disclosure"><summary>Can I trust the results?</summary><p>An independent validator and many tests check every marker, but they do not replace your own checks. Before production, check the scale, the fit, the ply and layer counts and the files on your plotter or cutter.</p></details><details class="disclosure"><summary>Can it replace my commercial CAD?</summary><p>Not proven. We make no general claim that BETA is better. On the public Lectra benchmark the results are mixed: see <a href="#benchmark">the numbers</a>.</p></details><details class="disclosure"><summary>What happens to my data?</summary><p>It stays on your device: in this browser, in the desktop app, or on a factory server you choose. There is no account and no analytics. If you attach files to a public GitHub issue, those files become public.</p></details><details class="disclosure"><summary>Does it work offline?</summary><p>Yes. The desktop app is fully local. The browser app works offline after its first complete visit (it keeps an offline copy). Save backup files of your work either way.</p></details><details class="disclosure"><summary>How good is the nesting?</summary><p>Close to a commercial engine on some jobs and behind on others. On public Lectra tasks, against Lectra's recorded results: with 60 seconds per task (300 tasks, measured 2026-10-28): 1.39 points less efficient on average, median 1.57 points less efficient; 77 wins, 12 ties, 211 losses. Historical 20 October, with Lectra&#39;s own time per task (60 tasks, measured 2026-10-19): 0.42 points more efficient on average, median 0.30 points less efficient; 25 wins, 3 ties, 32 losses. See <a href="benchmark.html">the benchmark</a> for the method.</p></details></div><p class="note"><a class="link-arrow" href="docs.html#faq">More questions and the manuals<span aria-hidden="true"> →</span></a></p>
   </div>
 </section>
 
@@ -280,24 +303,24 @@
     
 <div class="card-grid card-grid-4" data-reveal data-stagger>
   <article class="card download-card download-main">
-    <span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M13 3 V16 M8 11 L13 16 L18 11 M4 20 V23 H22 V20"/></svg></span>
-    <h3>Windows installer</h3>
-    <p>For one PC. Windows 10 or 11, 64-bit. 11.08 MiB. No administrator rights needed.</p>
-    <a class="btn btn-primary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_x64-setup.exe"><span class="btn-label">Download installer</span></a>
-    <p class="small muted"><a href="install.html#windows">Installation steps</a></p>
+    <span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M13 3 L15 11 L23 13 L15 15 L13 23 L11 15 L3 13 L11 11 Z"/></svg></span>
+    <h3>Try in the browser</h3>
+    <p>Nothing to install. The 60-second tour shows a real T-shirt from pattern to cut plan, then you can try your own.</p>
+    <a class="btn btn-primary" href="app/#/tour"><span class="btn-label">Start the tour</span></a>
+    <p class="small muted"><a href="app/">Open the app without the tour</a></p>
   </article>
   <article class="card download-card">
-    <span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M6 3 H20 V23 H6 Z"/><path d="M13 3 V5 M11 6 H13 M13 7 H15 M11 8 H13 M13 9 H15 M11 10 H13"/><rect x="10.5" y="12" width="5" height="5" rx="1"/></svg></span>
-    <h3>Portable ZIP</h3>
-    <p>No installation. Unzip, run <code>start-server.cmd</code> and open the app in your browser. 12.85 MiB.</p>
-    <a class="btn btn-secondary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_windows-x64-portable.zip"><span class="btn-label">Download ZIP</span></a>
-    <p class="small muted"><a href="install.html#portable">Portable steps</a></p>
+    <span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M13 3 V16 M8 11 L13 16 L18 11 M4 20 V23 H22 V20"/></svg></span>
+    <h3>Windows app</h3>
+    <p>For one PC. Windows 10 or 11, 64-bit. 11.65 MiB. No administrator rights needed. Or the portable ZIP (14.41 MiB).</p>
+    <a class="btn btn-secondary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.8.0/BETA-Cutting-Room_0.8.0_x64-setup.exe"><span class="btn-label">Download installer</span></a>
+    <p class="small muted"><a class="link-plain" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.8.0/BETA-Cutting-Room_0.8.0_windows-x64-portable.zip"><span class="btn-label">Portable ZIP</span></a> · <a href="install.html#windows">Installation steps</a></p>
   </article>
   <article class="card download-card">
     <span class="card-icon"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="4" y="3" width="18" height="8" rx="1.5"/><rect x="4" y="15" width="18" height="8" rx="1.5"/><path d="M8 7 H12 M8 19 H12"/><circle cx="18" cy="7" r="0.8"/><circle cx="18" cy="19" r="0.8"/></svg></span>
     <h3>Linux server</h3>
-    <p>The <code>beta-marker serve</code> command runs the same app in a web browser. 11.74 MiB. Needs glibc 2.31 or newer (tested with 2.31 and 2.43).</p>
-    <a class="btn btn-secondary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_linux-x86_64.tar.gz"><span class="btn-label">Download server</span></a>
+    <p>Runs the same app for a whole factory network with <code>beta-marker serve</code>. 13.26 MiB. Needs glibc 2.31 or newer.</p>
+    <a class="btn btn-secondary" href="https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.8.0/BETA-Cutting-Room_0.8.0_linux-x86_64.tar.gz"><span class="btn-label">Download server</span></a>
     <p class="small muted"><a href="install.html#server">Server steps</a></p>
   </article>
   <article class="card download-card">
@@ -311,59 +334,12 @@
   </div>
 </section>
 
-<section class="section section-alt" id="fun" aria-labelledby="fun-title">
-  <div class="wrap fun-grid">
-    <div class="fun-card" data-reveal>
-      <span class="fun-badge"><span aria-hidden="true">✦</span> A fun project</span>
-      <h2 id="fun-title">Built for fun, with the help of modern AI tools</h2>
-      <p>BETA Cutting Room is a fun project by a small team. We build it with the help of modern AI coding assistants, and we test it like serious software: an independent validator checks every marker before you can export it.</p>
-      <p>The code is open. You are welcome to read it, try it and help us make it better.</p>
-      <a href="https://github.com/sohitqwer-del/beta-cutting-room" rel="noopener noreferrer external">See the code on GitHub<span aria-hidden="true"> →</span><span class="sr-only"> (external site)</span></a>
-    </div>
-    <div class="help-block" id="help" data-reveal>
-      <h2 id="help-title" class="h-help">Help us improve</h2>
-      <p>BETA is young and not perfect yet. We need your help to improve it. A short note is enough, and every report helps.</p>
-      <ul class="help-links " data-stagger>
-  <li><a class="help-link" href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=bug" rel="noopener noreferrer external"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="8" y="8" width="10" height="13" rx="5"/><path d="M10 8 Q10 5 13 5 Q16 5 16 8 M8 12 H4 M18 12 H22 M8 17 H4 M18 17 H22 M13 11 V21 M9 4 L10.5 6 M17 4 L15.5 6"/></svg></span><span><strong>Report a bug</strong><span class="help-text">Something broke or gave a wrong result? Tell us what you did and what happened.</span></span><span class="sr-only"> (GitHub, external site)</span></a></li><li><a class="help-link" href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=missing-feature" rel="noopener noreferrer external"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="15" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="15" width="8" height="8" rx="1.5"/><path d="M19 15 V23 M15 19 H23" /></svg></span><span><strong>Tell us what is missing</strong><span class="help-text">A step your cutting room needs that BETA cannot do yet.</span></span><span class="sr-only"> (GitHub, external site)</span></a></li><li><a class="help-link" href="https://github.com/sohitqwer-del/beta-cutting-room/issues/new?labels=feedback" rel="noopener noreferrer external"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><path d="M9 17 Q5 14 5 10 Q5 3 13 3 Q21 3 21 10 Q21 14 17 17 V19 H9 Z M10 22 H16"/></svg></span><span><strong>Share feedback</strong><span class="help-text">Anything else: ideas, confusing screens, words that are hard to read.</span></span><span class="sr-only"> (GitHub, external site)</span></a></li>
-  <li><a class="help-link" href="mailto:sohitqwer@gmail.com"><span class="card-icon card-icon-small"><svg class="icon" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true" focusable="false"><rect x="3" y="6" width="20" height="15" rx="2"/><path d="M3 8 L13 15 L23 8"/></svg></span><span><strong>Email us</strong><span class="help-text">No GitHub account? Write to sohitqwer@gmail.com.</span></span></a></li>
-</ul>
-    </div>
-  </div>
-</section>
-
-<section class="section " id="samples" aria-labelledby="samples-title">
-  <div class="wrap">
-    <div class="section-head" data-reveal>
-      
-      <h2 id="samples-title">Send us your markers</h2>
-      
-    </div>
-    
-<div class="split">
-  <div data-reveal>
-    <p>We want to compare BETA with your current CAD on your own styles: same pieces, same fabric width, same rules. You get the results, and they stay private.</p>
-    <h3>What to send</h3>
-    <ol class="plain-steps">
-      <li>3 to 5 real styles exported as <strong>DXF-AAMA or ASTM</strong> from your CAD (for example a shirt, trouser, T-shirt or jeans).</li>
-      <li>For each style, the marker your CAD made: fabric width, size ratio, rules (nap, 0/180, gaps), <strong>marker length and efficiency</strong>, and how long the auto-nest ran.</li>
-      <li>If you can, one plotter file (PLT) from your cutting room, so we can check the plot scale on your plotter.</li>
-    </ol>
-  </div>
-  <aside class="callout callout-accent" aria-label="Privacy promise" data-reveal>
-    <h3>Your files stay private</h3>
-    <p>We never commit, publish or share your patterns or markers without your written permission. Published results name no style, buyer or factory unless you agree.</p>
-    <p><strong>Contact:</strong> <a href="mailto:sohitqwer@gmail.com">sohitqwer@gmail.com</a></p>
-  </aside>
-</div>
-  </div>
-</section>
-
 </main>
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <div class="footer-about">
       <p class="footer-brand"><svg class="logo-mark" viewBox="0 0 64 64" width="34" height="34" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="15" fill="#176b52"/><path d="M16 11H26V53H16V36L19.5 32L16 28Z" fill="#ffffff"/><path d="M29 11H38.5A10 10 0 0 1 38.5 31H29Z" fill="#f4b740"/><path d="M29 34H40.5A9.5 9.5 0 0 1 40.5 53H29Z" fill="#c9ecd9"/></svg><span class="brand-name"><b>BETA</b> Cutting Room</span></p>
-      <p>Open-source cutting-room software for garment factories. Version 0.7.0. Self-hosted: your patterns stay in your factory.</p>
+      <p>Free, open-source cutting-room software for garment factories: patterns, markers and cut plans, in your browser. Version 0.8.0. Your files stay on your device.</p>
       <p class="footer-fun"><span aria-hidden="true">✦</span> A fun project, built with the help of modern AI tools.</p>
       <p class="muted small">This website has no trackers and no cookies, and it loads nothing from other servers.</p>
     </div>

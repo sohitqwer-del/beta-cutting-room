@@ -1,0 +1,193 @@
+1
+00:00:00,000 --> 00:00:04,848
+BETA Cutting Room is free, open-source
+software for garment factories. It runs in
+
+2
+00:00:04,848 --> 00:00:10,068
+your browser, with no account. This is
+the real browser app, using only synthetic
+
+3
+00:00:10,068 --> 00:00:14,133
+sample patterns.
+Let us follow three ways to start.
+
+4
+00:00:14,133 --> 00:00:18,841
+First, a small unit with paper patterns.
+Open Photo to marker. Photograph your
+
+5
+00:00:18,841 --> 00:00:24,273
+pieces beside an A four sheet on a
+flat surface. Here we load an original
+
+6
+00:00:24,273 --> 00:00:29,333
+synthetic test image through the real
+photo reader, not the practice button.
+
+7
+00:00:29,333 --> 00:00:34,422
+Review each outline. Give it a name and
+size. Check copies, pairs, fabric group
+
+8
+00:00:34,422 --> 00:00:39,510
+and grain. Keep main fabric, lining, rib
+and fusing separate. They can each have
+
+9
+00:00:39,510 --> 00:00:41,667
+their own fabric settings.
+
+10
+00:00:41,667 --> 00:00:46,390
+Before cutting real cloth, check a
+distance against your paper pattern with a
+
+11
+00:00:46,390 --> 00:00:51,114
+tape. Choose two points, enter the measured
+distance and review the difference. A
+
+12
+00:00:51,114 --> 00:00:55,467
+clean test image does not prove
+accuracy on factory photographs.
+
+13
+00:00:55,467 --> 00:01:00,904
+Set the fabric width and how many garments
+you need. Make the marker. The real
+
+14
+00:01:00,904 --> 00:01:05,254
+nesting engine places the accepted pieces
+across the fabric. Review the result
+
+15
+00:01:05,254 --> 00:01:09,967
+before printing, and save your
+pattern set for the next order.
+
+16
+00:01:09,967 --> 00:01:14,809
+Second, the pattern master. This sample
+tour starts from the T-shirt block. The
+
+17
+00:01:14,809 --> 00:01:20,397
+pattern is a starting draft, not a
+promise of fit. Edit the style for your
+
+18
+00:01:20,397 --> 00:01:23,733
+customer, then sew a
+sample before production.
+
+19
+00:01:23,733 --> 00:01:29,180
+Grade from the size chart. Here the same
+style has small, medium, large and extra
+
+20
+00:01:29,180 --> 00:01:33,537
+large sizes. Review the graded outlines
+and seam checks. Changing a measurement
+
+21
+00:01:33,537 --> 00:01:37,900
+changes the draft, so check
+your work again after editing.
+
+22
+00:01:37,900 --> 00:01:42,610
+Third, the cutting room. Choose the
+fabric width and lay. Set layers, face
+
+23
+00:01:42,610 --> 00:01:46,594
+direction and garment rules.
+Open, folded and tube fabric need different
+
+24
+00:01:46,594 --> 00:01:51,667
+treatment. Gaps and stripe matching
+also affect how the pieces can fit.
+
+25
+00:01:51,667 --> 00:01:56,747
+Now make the marker. You are watching
+the actual search, at its recorded speed.
+
+26
+00:01:56,747 --> 00:02:02,191
+The layout updates as a better result
+arrives. You can stop and keep the best
+
+27
+00:02:02,191 --> 00:02:07,267
+result so far. Review the length, fabric
+use and validation before cutting.
+
+28
+00:02:07,267 --> 00:02:11,987
+The cut view shows marker length,
+layers, passes and fabric needed for this
+
+29
+00:02:11,987 --> 00:02:17,070
+sample. Use the cut plan for the whole
+order. From there, continue to rolls,
+
+30
+00:02:17,070 --> 00:02:21,433
+spreading sheets, bundles and
+tickets as your cutting room needs.
+
+31
+00:02:21,433 --> 00:02:26,647
+Export plotter files, DXF and full-size
+or tiled PDF files from the browser. Here
+
+32
+00:02:26,647 --> 00:02:31,861
+we actually download three sample files.
+Test a small file on your own plotter
+
+33
+00:02:31,861 --> 00:02:37,033
+first. These files do not prove
+support for every cutter or machine.
+
+34
+00:02:37,033 --> 00:02:42,483
+BETA is young and not perfect. It does not
+establish a general win over commercial
+
+35
+00:02:42,483 --> 00:02:47,569
+CAD. Folded and tube jobs still need
+care. Real photo accuracy, fit and machine
+
+36
+00:02:47,569 --> 00:02:52,267
+compatibility need more factory testing.
+Always check a sample before production.
+
+37
+00:02:52,267 --> 00:02:57,334
+Help us improve it. Open Feedback and
+describe what went wrong, what you expected
+
+38
+00:02:57,334 --> 00:03:02,763
+and the steps to repeat it. Share files
+only if you have permission. Nothing is
+
+39
+00:03:02,763 --> 00:03:08,533
+sent until you choose to send it.
+Try the sample tour on the website.

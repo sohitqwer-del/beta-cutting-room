@@ -1,4 +1,4 @@
-# Third-party licences: BETA Cutting Room 0.7.0
+# Third-party licences: BETA Cutting Room 0.8.0
 
 Generated from Cargo metadata, local npm package manifests and installed package.json files.
 No network licence service is used. Re-run after lockfile or dependency changes.
@@ -50,30 +50,30 @@ Inventoried packages: **524**. Review-required selected packages: **0**.
 | Rust | autocfg | 1.5.1 | Apache-2.0 OR MIT | permissive |
 | Rust | base64 | 0.22.1 | MIT OR Apache-2.0 | permissive |
 | Rust | base64 | 0.23.1 | MIT OR Apache-2.0 | permissive |
-| Rust | beta-cutting-room | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-api | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-cli | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-cluster | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-core | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-cutroom | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-cutroom-wasm | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-dxf | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-edit | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-export | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-floor | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-gpu | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-learn | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-match | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-nest | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-plan | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-queue | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-roll | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-marker-wasm | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-open-patterns-check | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-pattern-core | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-pattern-digitize | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-pattern-wasm | 0.7.0 | Apache-2.0 | permissive |
-| Rust | beta-public-bench | 0.7.0 | Apache-2.0 | permissive |
+| Rust | beta-cutting-room | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-api | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-cli | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-cluster | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-core | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-cutroom | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-cutroom-wasm | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-dxf | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-edit | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-export | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-floor | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-gpu | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-learn | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-match | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-nest | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-plan | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-queue | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-roll | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-marker-wasm | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-open-patterns-check | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-pattern-core | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-pattern-digitize | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-pattern-wasm | 0.8.0 | Apache-2.0 | permissive |
+| Rust | beta-public-bench | 0.8.0 | Apache-2.0 | permissive |
 | Rust | bit-set | 0.10.0 | Apache-2.0 OR MIT | permissive |
 | Rust | bit-vec | 0.9.1 | Apache-2.0 OR MIT | permissive |
 | Rust | bitflags | 1.3.2 | MIT/Apache-2.0 | permissive |
@@ -458,10 +458,10 @@ Inventoried packages: **524**. Review-required selected packages: **0**.
 | Rust | zopfli | 0.8.4 | Apache-2.0 | permissive |
 | Rust | zune-core | 0.4.12 | MIT OR Apache-2.0 OR Zlib | permissive |
 | Rust | zune-jpeg | 0.4.21 | MIT OR Apache-2.0 OR Zlib | permissive |
-| npm | @beta/marker-desktop | 0.7.0 | Apache-2.0 | permissive |
-| npm | @beta/marker-site | 0.7.0 | Apache-2.0 | permissive |
-| npm | @beta/marker-wasm | 0.7.0 | Apache-2.0 | permissive |
-| npm | @beta/marker-web | 0.7.0 | Apache-2.0 | permissive |
+| npm | @beta/marker-desktop | 0.8.0 | Apache-2.0 | permissive |
+| npm | @beta/marker-site | 0.8.0 | Apache-2.0 | permissive |
+| npm | @beta/marker-wasm | 0.8.0 | Apache-2.0 | permissive |
+| npm | @beta/marker-web | 0.8.0 | Apache-2.0 | permissive |
 | npm | @esbuild/win32-x64 | 0.25.12 | MIT | permissive |
 | npm | @esbuild/win32-x64 | 0.28.2 | MIT | permissive |
 | npm | @freesewing/bella | 4.10.2 | MIT | permissive |
@@ -502,8 +502,8 @@ Inventoried packages: **524**. Review-required selected packages: **0**.
 | npm | @vitest/spy | 3.2.7 | MIT | permissive |
 | npm | @vitest/utils | 3.2.7 | MIT | permissive |
 | npm | assertion-error | 2.0.1 | MIT | permissive |
-| npm | beta-open-patterns-freesewing | 0.7.0 | Apache-2.0 | permissive |
-| npm | beta-open-patterns-garmentcode | 0.7.0 | Apache-2.0 | permissive |
+| npm | beta-open-patterns-freesewing | 0.8.0 | Apache-2.0 | permissive |
+| npm | beta-open-patterns-garmentcode | 0.8.0 | Apache-2.0 | permissive |
 | npm | bezier-js | 6.1.4 | MIT | permissive |
 | npm | cac | 6.7.14 | MIT | permissive |
 | npm | chai | 5.3.3 | MIT | permissive |

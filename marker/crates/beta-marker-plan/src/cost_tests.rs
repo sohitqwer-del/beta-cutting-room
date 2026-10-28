@@ -287,12 +287,20 @@ fn stock_must_not_mix_incompatible_shrinkage_bands() -> Result<()> {
         allocation: Default::default(),
     };
     let mut calls = 0;
-    let err = compare_with_engine(&request, |_| Ok(()), &mut |_, _| {
+    let comparison = compare_with_engine(&request, |_| Ok(()), &mut |_, _| {
         calls += 1;
         anyhow::bail!("Unexpected nest")
     })
-    .expect_err("incompatible stock");
-    assert!(err.to_string().contains("shrinkage bands"));
+    .expect("invalid stock remains a failed alternative");
+    assert!(comparison.chosen.is_none());
+    assert!(!comparison.trials[0].feasible);
+    assert!(
+        comparison.trials[0]
+            .error
+            .as_ref()
+            .unwrap()
+            .contains("shrinkage bands")
+    );
     assert_eq!(calls, 0);
     Ok(())
 }

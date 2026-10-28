@@ -1,4 +1,5 @@
 // Records the demo video scenes in a headless browser. It drives the real app (beta-marker serve) and the title cards.
+// For the 0.8 static browser app and tour, use launch8.mjs record; this driver retains the historical workflow.
 // Usage: node record.mjs --app http://127.0.0.1:7891/ --work <work dir> [--playwright <path to playwright-core>] [--chrome <exe>]
 // Needs <work>/tts/durations.json (from make-video.mjs tts). Writes <work>/frames/<scene>/*.jpg and <work>/timeline.json.
 //

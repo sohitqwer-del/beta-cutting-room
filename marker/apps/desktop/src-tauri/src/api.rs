@@ -69,6 +69,8 @@ struct MarkerRequest {
 pub(crate) struct NestRequest {
     pub job: Job,
     pub options: NestOptions,
+    #[serde(default)]
+    pub adaptive: bool,
 }
 pub(crate) use beta_marker_api::PlanRequest;
 #[derive(Deserialize)]

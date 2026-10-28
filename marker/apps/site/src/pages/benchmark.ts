@@ -82,7 +82,7 @@ function runCard(run: Run): Raw {
   }
   return html`<article class="run-card${run.status !== 'final' ? ` run-${run.status}` : ''}" id="run-${run.id}-${run.status}">
   <header class="run-head">
-    <h3>${run.title}</h3>
+    <h3>${run.date === '2026-10-20' ? 'Historical 20 October: ' : ''}${run.title}</h3>
     <div class="run-badges">${statusBadge(run)}</div>
   </header>
   ${run.status_note ? html`<p class="status-note">${run.status === 'provisional' ? html`<strong>Provisional:</strong> ` : ''}${run.status_note}</p>` : ''}
@@ -175,17 +175,20 @@ function sizeSentence(run: Run | undefined): string {
 
 export function benchmarkPage(ctx: BuildContext): Raw {
   const runs = ctx.runs;
-  const l60 = pick(runs, 'lectra-60s'); const lm = pick(runs, 'lectra-matched'); const ac = pick(runs, 'academic-60s');
+  const l60 = pick(runs, 'lectra-60s-08') ?? pick(runs, 'lectra-60s'); const lm = pick(runs, 'lectra-matched'); const ac = pick(runs, 'academic-60s');
   const nonFinal = runs.some((r) => r.status !== 'final');
   const tiles: Raw[] = [];
-  if (lm) tiles.push(html`<div class="tile"><span class="tile-value">${diffText(headlineGroup(lm).mean_diff_pp)}</span><span class="tile-label">Mean vs Lectra with Lectra’s own time per task (${headlineGroup(lm).valid} tasks)</span><span class="tile-sub">${tileDetail(headlineGroup(lm))}</span>${lm.status !== 'final' ? statusBadge(lm) : ''}</div>`);
-  if (l60) tiles.push(html`<div class="tile"><span class="tile-value">${diffText(headlineGroup(l60).mean_diff_pp)}</span><span class="tile-label">Mean vs Lectra at 60 seconds per task (${headlineGroup(l60).valid} tasks)</span><span class="tile-sub">${tileDetail(headlineGroup(l60))}</span>${l60.status !== 'final' ? statusBadge(l60) : ''}</div>`);
+  if (lm) tiles.push(html`<div class="tile"><span class="tile-value">${diffText(headlineGroup(lm).mean_diff_pp)}</span><span class="tile-label">Historical 20 October: mean vs Lectra with Lectra’s own time per task (${headlineGroup(lm).valid} tasks)</span><span class="tile-sub">${tileDetail(headlineGroup(lm))}</span>${lm.status !== 'final' ? statusBadge(lm) : ''}</div>`);
+  if (l60) tiles.push(html`<div class="tile"><span class="tile-value">${diffText(headlineGroup(l60).mean_diff_pp)}</span><span class="tile-label">0.8, 28 October: mean vs Lectra at 60 seconds per task (${headlineGroup(l60).valid} tasks)</span><span class="tile-sub">${tileDetail(headlineGroup(l60))}</span>${l60.status !== 'final' ? statusBadge(l60) : ''}</div>`);
   if (ac) tiles.push(html`<div class="tile"><span class="tile-value">${diffText(headlineGroup(ac).mean_diff_pp)}</span><span class="tile-label">vs the sparrow paper’s 20-minute means, with 60 seconds</span>${ac.status !== 'final' ? statusBadge(ac) : ''}</div>`);
   const lectraRuns = [l60, lm].filter((r): r is Run => r !== undefined);
   const valid = lectraRuns.reduce((s, r) => s + headlineGroup(r).valid, 0); const attempts = lectraRuns.reduce((s, r) => s + headlineGroup(r).attempts, 0);
   if (attempts) tiles.push(html`<div class="tile"><span class="tile-value">${valid} / ${attempts}</span><span class="tile-label">BETA layouts on Lectra tasks that passed the independent validator (${lectraRuns.map((r) => `${headlineGroup(r).attempts} at ${r.conditions.budget_s === null ? 'Lectra’s time' : `${r.conditions.budget_s} s`}`).join(', ')})</span></div>`);
 
-  const kindSection = (kind: Run['kind']) => runs.filter((r) => r.kind === kind).map(runCard);
+  // Engine-against-engine runs (this release against the previous one) get their own section, not the garment one.
+  const isRelease = (r: Run) => (r.reference.type as string) === 'engine-baseline';
+  const release = runs.filter(isRelease);
+  const kindSection = (kind: Run['kind']) => runs.filter((r) => r.kind === kind && !isRelease(r)).map(runCard);
 
   return html`
 ${pageHead('Benchmark', 'We publish how BETA markers compare with a commercial engine’s recorded results and with published research. Every number comes with its method, its assumptions and the commands to repeat it.', 'Honest, repeatable results')}
@@ -203,6 +206,10 @@ ${section('summary', 'In short', html`
 ${section('lectra', 'Lectra dataset: real client markers', html`
 <div class="prose"><p>The Lectra nesting dataset has 100,000 real nesting tasks from about 100 fashion customers. For each task it records the efficiency that <strong>Lectra’s own nesting engine</strong> reached. It is the only public source of commercial-engine results on real garment markers. We take a fixed, balanced sample, run BETA on the same pieces and fabric width, and compare.</p></div>
 ${kindSection('lectra')}`, { cls: 'section-alt' })}
+
+${release.length ? section('release', 'Release comparison: this engine against the last release', html`
+<div class="prose"><p>The same tasks, time and seeds, run with this release’s engine and with the previous release. It shows what changed between releases. It is not a comparison with another company’s software.</p></div>
+${release.map(runCard)}`) : ''}
 
 ${section('academic', 'Academic instances', html`
 <div class="prose"><p>Research papers use a small set of standard nesting instances, including shirts, trousers and swimwear. The best open-source result is the sparrow paper. BETA uses sparrow as its search engine, so this test checks that BETA’s adapter does not lose quality, at a much shorter time.</p></div>

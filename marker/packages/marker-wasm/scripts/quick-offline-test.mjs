@@ -50,6 +50,21 @@ function check(ok, label) { if (!ok) throw new Error(label); report.cases.push(l
 async function click(selector) {
   await evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('missing control');e.click()})()`);
 }
+async function reviewSyntheticTape() {
+  // Synthetic workflow check only: use the scanned edge as a simulated tape value.
+  // This tests the required review gate, not real-camera dimensional accuracy.
+  await click('.q-piece');
+  const farPoint = await evaluate("(()=>{const a=document.querySelector('#q-tape-svg .q-piece-shape').getAttribute('d').match(/-?[0-9]+(?:[.][0-9]+)?(?:e[-+]?[0-9]+)?/gi).map(Number);let best=1,dist=0;for(let i=2;i<a.length;i+=2){const d=Math.hypot(a[i]-a[0],a[i+1]-a[1]);if(d>dist){dist=d;best=i/2+1}}return String(best)})()");
+  for (const [id, value] of [['q-tape-a', '1'], ['q-tape-b', farPoint]]) {
+    await evaluate(`(()=>{const e=document.getElementById(${JSON.stringify(id)});e.value=${JSON.stringify(value)};e.dispatchEvent(new Event('change',{bubbles:true}))})()`);
+  }
+  const tapeMm = await evaluate("(()=>{const p=[...document.querySelectorAll('#q-tape-svg circle')];return Math.hypot(Number(p[1].getAttribute('cx'))-Number(p[0].getAttribute('cx')),Number(p[1].getAttribute('cy'))-Number(p[0].getAttribute('cy')))})()");
+  await evaluate(`(()=>{const e=document.querySelector('#q-tape-mm');e.value=${tapeMm};e.dispatchEvent(new Event('input',{bubbles:true}))})()`);
+  await click('[data-q="check-tape"]');
+  await wait("!!document.querySelector('.q-tape-result.ok')");
+  check(true, 'synthetic paper review passes before marker creation (not a physical accuracy trial)');
+  await evaluate("document.querySelector('#q-sheet').close()");
+}
 async function shot(name) {
   const result = await send('Page.captureScreenshot', { format: 'png' });
   writeFileSync(join(out, name), Buffer.from(result.data, 'base64'));
@@ -111,6 +126,7 @@ try {
   await click('#q-to-review');
   await wait("document.querySelectorAll('.q-piece').length > 0");
   report.scanned_pieces = await evaluate("document.querySelectorAll('.q-piece').length");
+  await reviewSyntheticTape();
   await click('#q-accept-all'); await click('#q-to-order');
   await wait("!!document.querySelector('#q-width')");
   await evaluate("(()=>{const e=document.querySelector('#q-width');e.value='150';e.dispatchEvent(new Event('input',{bubbles:true}))})()");
@@ -140,8 +156,8 @@ try {
     await click('#q-proj-exit');
     await evaluate("window.confirm = () => true");
     await click('#q-restart'); await click('#q-sample');
-    await wait("document.querySelectorAll('.q-photo-card').length === 2 && !document.querySelector('.q-status.q-reading')");
-    await click('#q-to-review'); await click('#q-accept-all'); await click('#q-to-order');
+    await wait("document.querySelectorAll('.q-photo-card').length === 1 && !document.querySelector('.q-status.q-reading')");
+    await click('#q-to-review'); await reviewSyntheticTape(); await click('#q-accept-all'); await click('#q-to-order');
     await click('#q-unit-cm');
     await evaluate("(()=>{const e=document.querySelector('#q-width');e.value='150';e.dispatchEvent(new Event('input',{bubbles:true}))})()");
     await click('#q-budget-20'); await click('#q-make');

@@ -1,0 +1,86 @@
+{
+  "note": "Incremental real-browser checks. The final cost view and table/cut-section checks use the final build.",
+  "functional": {
+    "coldNest": {
+      "button": "Nest marker",
+      "checks": "Length 0.011 m · table 0.100 m · efficiency 1.0% · 2 placed / 0 unplaced · 0 gap/overlap pairs · 0 rule errors",
+      "polygons": [
+        "1,199 11,199 11,189 1,189",
+        "1,186.998 11,186.998 11,176.998 1,176.998"
+      ],
+      "stats": "Marker length\n0.011m\nEfficiency\n9.1%\nCopies cut / required\n2/ 2\nPer garment\n0.011m"
+    },
+    "cost": {
+      "retainedRows": 3,
+      "rows": [
+        {
+          "enabled": true,
+          "text": "offer-1 / automatic\t200\tRecommended · final checked\t0.044\t0.000\t1\t0\t0.88\t0.00\t0.88\tUse plan"
+        },
+        {
+          "enabled": false,
+          "text": "offer-2 / automatic\t1\tOrder quantities are incomplete.\t—\t—\t0\t0\t—\t—\t—\tUse plan"
+        },
+        {
+          "enabled": false,
+          "text": "offer-3 / automatic\t200\tOffer offer-3 has no eligible stock at this width.\t—\t—\t—\t—\t—\t—\t—\tUse plan"
+        }
+      ],
+      "status": "Choose offer-1 at 200.0 mm, ratio set automatic: lowest feasible final cost 0.88 INR (0.2201 per ordered garment), 0.044 consumed m, 0.000 recoverable end-bit m, 0.000 charged end-bit m. Actual final lengths and fresh roll allocation decide this shortlist; unfinalized alternatives are not production choices.",
+      "stopComplete": true,
+      "stopStatus": "Comparison stopped. No partial alternative was selected. Previous completed comparison, if any, is retained.",
+      "used": "Using a final checked plan from the saved cost-comparison inputs."
+    },
+    "guard": {
+      "engine": "original QA",
+      "invalidRejected": true,
+      "length": 50,
+      "retained": true
+    },
+    "region": {
+      "after": [
+        "1,199 11,199 11,189 1,189",
+        "30,199 40,199 40,189 30,189"
+      ],
+      "before": [
+        "1,199 11,199 11,189 1,189",
+        "40,199 50,199 50,189 40,189"
+      ],
+      "cancelNoChange": true,
+      "notice": "Area preview: marker end reduced by 10.000 mm; selected area end reduced by 10.000 mm. Outside, crossing and locked pieces stayed fixed.",
+      "preview": [
+        "1,1 11,1 11,11 1,11",
+        "30,1 40,1 40,11 30,11"
+      ],
+      "unchangedOutside": true,
+      "undo": [
+        "1,199 11,199 11,189 1,189",
+        "40,199 50,199 50,189 40,189"
+      ],
+      "undoExact": true
+    }
+  },
+  "final_cost_view": {
+    "rows": [
+      {
+        "enabled": true,
+        "text": "offer-1 / automatic1500Recommended · final checked2.8400.0002056.800.0056.80Use saved plan"
+      },
+      {
+        "enabled": false,
+        "text": "offer-2 / automatic1Order quantities are incomplete.——00———Use saved plan"
+      }
+    ],
+    "source": "Saved comparison inputs: Everyday shirt · demo · Everyday shirt · demo",
+    "status": "Choose offer-1 at 1500.0 mm, ratio set automatic: lowest feasible final cost 56.80 INR (14.2009 per ordered garment), 2.840 consumed m, 0.000 recoverable end-bit m, 0.000 charged end-bit m. Actual final lengths and fresh roll allocation decide this shortlist; unfinalized alternatives are not production choices.",
+    "title": "Cut plan · BETA Cutting Room"
+  },
+  "final_boundaries": {
+    "adaptiveDisabled": true,
+    "appReady": true,
+    "sectionError": "Width/ratio comparison does not yet support saved cut sections. Remove those lines before comparing.",
+    "sectionsRejected": true,
+    "tableEndNoWinner": true,
+    "tableError": "Order quantities are incomplete."
+  }
+}

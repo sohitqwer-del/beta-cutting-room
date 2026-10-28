@@ -1,5 +1,6 @@
 //! Bounded obstacle construction and incremental compaction. Search never owns
 //! the only complete layout: a checked incumbent survives every interruption.
+mod horizontal;
 use super::{NestOptions, NestProgress, Slot, checks, mirror_state, renumber};
 use crate::Instant;
 use anyhow::{Context, Result, ensure};
@@ -16,6 +17,7 @@ struct Shape {
     points: Vec<Pt>,
     bounds: [f64; 4],
     polygon: Polygon<f64>,
+    convex: bool,
 }
 
 impl Shape {
@@ -23,6 +25,7 @@ impl Shape {
         Ok(Self {
             bounds: bbox(&points).context("empty cut outline")?,
             polygon: crate::safety::polygon(&points),
+            convex: horizontal::convex(&points),
             points,
         })
     }
@@ -37,6 +40,7 @@ impl Shape {
                 self.bounds[3] + y,
             ],
             polygon: crate::safety::polygon(&points),
+            convex: self.convex,
             points,
         }
     }
@@ -235,9 +239,17 @@ pub(super) fn fold_orientations(
         }
         let b = o.shape.bounds;
         let edge = job.spacing.edge_gap + job.pieces[slot.piece].buffer;
-        let low = if job.fabric.layout == Layout::Tubular { 0.0 } else { edge };
+        let low = if job.fabric.layout == Layout::Tubular {
+            0.0
+        } else {
+            edge
+        };
         let high = job.fabric.width;
-        let edges = if job.fabric.layout == Layout::Tubular { 2 } else { 1 };
+        let edges = if job.fabric.layout == Layout::Tubular {
+            2
+        } else {
+            1
+        };
         for (index, &y) in o.ys.iter().take(edges).enumerate() {
             if b[1] + y >= low - 1e-8 && b[3] + y <= high + 1e-8 {
                 let mut pl = o.placement.clone();
@@ -277,6 +289,86 @@ struct Search<'a> {
 }
 
 impl Search<'_> {
+    /// Rearrange a group while keeping every outside piece and defect fixed.
+    /// An interrupted or incomplete trial is discarded as a whole.
+    #[allow(clippy::too_many_arguments)]
+    fn neighborhood(
+        &self,
+        placed: &[Placed],
+        slots: &[usize],
+        remaining: &[Slot],
+        prepared: &[Vec<Orientation>],
+        obstacles: &[Obstacle],
+        pass: usize,
+        rng: &mut Xoshiro256PlusPlus,
+    ) -> Option<Vec<Placed>> {
+        if placed.len() < 2 || self.limit.stopped() {
+            return None;
+        }
+        let mut ids: Vec<_> = (0..placed.len()).collect();
+        ids.sort_by(|&a, &b| {
+            placed[b].obstacle.shape.bounds[2].total_cmp(&placed[a].obstacle.shape.bounds[2])
+        });
+        let count = placed.len().clamp(2, 8);
+        let tail = count.div_ceil(2);
+        let mut rest = ids.split_off(tail);
+        rest.shuffle(rng);
+        ids.extend(rest.into_iter().take(count - tail));
+        if pass.is_multiple_of(3) {
+            ids.sort_by(|&a, &b| {
+                area(&placed[b].obstacle.shape.points)
+                    .total_cmp(&area(&placed[a].obstacle.shape.points))
+            });
+        } else if pass % 3 == 1 {
+            ids.sort_by(|&a, &b| {
+                area(&placed[a].obstacle.shape.points)
+                    .total_cmp(&area(&placed[b].obstacle.shape.points))
+            });
+        } else {
+            ids.shuffle(rng);
+        }
+        let mut absent = vec![false; placed.len()];
+        for &i in &ids {
+            absent[i] = true;
+        }
+        let mut trial = placed.to_vec();
+        let deadline = self
+            .limit
+            .deadline
+            .min(Instant::now() + Duration::from_millis(500));
+        for i in ids {
+            if self.limit.stopped() || Instant::now() >= deadline {
+                return None;
+            }
+            let all: Vec<_> = obstacles
+                .iter()
+                .chain(
+                    trial
+                        .iter()
+                        .enumerate()
+                        .filter(|(j, _)| !absent[*j])
+                        .map(|(_, p)| &p.obstacle),
+                )
+                .collect();
+            let length = all
+                .iter()
+                .filter(|o| !o.defect)
+                .map(|o| o.shape.bounds[2])
+                .fold(0., f64::max);
+            let slot = slots[i];
+            let candidate = self.place(
+                &prepared[slot],
+                self.job.pieces[remaining[slot].piece].buffer,
+                &all,
+                length,
+                Mode::Exact,
+                deadline.min(Instant::now() + Duration::from_millis(90)),
+            )?;
+            trial[i] = candidate;
+            absent[i] = false;
+        }
+        Some(trial)
+    }
     // Return the best completed placement when interrupted. The caller keeps
     // the old placement if this search found no safe improvement.
     fn place(
@@ -387,6 +479,48 @@ impl Search<'_> {
                             break;
                         }
                         if mode == Mode::Exact {
+                            // Contact enumeration is quadratic in vertex count.
+                            // Keep complex CAD curves on the inexpensive search;
+                            // small concave pairs can afford an interval sweep.
+                            if (!choice.shape.convex || !ob.shape.convex)
+                                && choice
+                                    .shape
+                                    .points
+                                    .len()
+                                    .saturating_mul(ob.shape.points.len())
+                                    <= 1024
+                            {
+                                let Some(events) = horizontal::events(
+                                    &choice.shape.points,
+                                    &ob.shape.points,
+                                    y,
+                                    g,
+                                    x,
+                                    next,
+                                    || self.limit.stopped() || Instant::now() >= slice,
+                                ) else {
+                                    return best.map(|b| b.3);
+                                };
+                                let mut feasible = None;
+                                for candidate in events {
+                                    if self.limit.stopped() || Instant::now() >= slice {
+                                        return best.map(|b| b.3);
+                                    }
+                                    if !conflict(
+                                        &choice.shape.translated(candidate, y),
+                                        &ob.shape,
+                                        g,
+                                    ) {
+                                        feasible = Some(candidate);
+                                        break;
+                                    }
+                                }
+                                let Some(candidate) = feasible else {
+                                    break;
+                                };
+                                x = candidate;
+                                continue;
+                            }
                             let (mut left, mut right) = (x, next);
                             for _ in 0..10 {
                                 if self.limit.stopped() || Instant::now() >= slice {
@@ -479,27 +613,138 @@ fn checked(job: &Job, result: &MarkerResult) -> Result<()> {
     checks::independently_validate(job, result)
 }
 
+struct Continuation {
+    remaining: Vec<Slot>,
+    obstacles: Vec<Obstacle>,
+    fixed_length: f64,
+    prepared: Vec<Vec<Orientation>>,
+    order: Vec<usize>,
+    best: Option<MarkerResult>,
+    passes: usize,
+    rng: Xoshiro256PlusPlus,
+    prepare_s: f64,
+    construct_s: f64,
+    cycle_order: Vec<usize>,
+    cursor: usize,
+}
+
+/// Prepared outlines, construction order, incumbent and RNG survive browser yields.
+pub(crate) struct Session {
+    job: Job,
+    slots: Vec<Slot>,
+    fixed: Vec<Placement>,
+    options: NestOptions,
+    variant: usize,
+    directions: BTreeMap<u32, f64>,
+    state: Option<Continuation>,
+}
+impl Session {
+    pub(super) fn new(
+        job: Job,
+        slots: Vec<Slot>,
+        fixed: Vec<Placement>,
+        options: NestOptions,
+        variant: usize,
+        directions: BTreeMap<u32, f64>,
+    ) -> Self {
+        Self {
+            job,
+            slots,
+            fixed,
+            options,
+            variant,
+            directions,
+            state: None,
+        }
+    }
+    pub(crate) fn step(
+        &mut self,
+        seconds: f64,
+        progress: &mut dyn FnMut(NestProgress),
+    ) -> Result<MarkerResult> {
+        let mut options = self.options.clone();
+        options.time_limit_s = seconds;
+        pack_inner(
+            &self.job,
+            &self.slots,
+            &self.fixed,
+            &options,
+            self.variant,
+            &self.directions,
+            progress,
+            None,
+            &mut self.state,
+            &[],
+        )
+    }
+    pub(crate) fn accepts(&self, result: &MarkerResult) -> bool {
+        let mut used = vec![false; self.slots.len()];
+        result.placements.iter().all(|p| {
+            let found = self.slots.iter().enumerate().position(|(i, s)| {
+                !used[i]
+                    && s.placement.piece_id == p.piece_id
+                    && s.placement.bundle == p.bundle
+                    && (self.job.fabric.layout != Layout::Open
+                        || beta_marker_core::rules::flip_allowed(
+                            &self.job,
+                            &self.job.pieces[s.piece],
+                        )
+                        || s.placement.mirrored == p.mirrored)
+                    && s.placement
+                        .layer_allocations
+                        .iter()
+                        .flatten()
+                        .eq(p.layer_allocations.iter().flatten())
+            });
+            if let Some(i) = found {
+                used[i] = true;
+                true
+            } else {
+                false
+            }
+        }) && used.iter().all(|b| *b)
+    }
+    pub(crate) fn offer(&mut self, result: &MarkerResult) -> Result<()> {
+        ensure!(
+            self.accepts(result),
+            "incumbent has different physical layer allocation"
+        );
+        checked(&self.job, result)?;
+        ensure!(
+            self.fixed.iter().all(|p| result.placements.contains(p)),
+            "incumbent moved a fixed piece"
+        );
+        if let Some(state) = &mut self.state {
+            if state
+                .best
+                .as_ref()
+                .is_none_or(|old| result.length < old.length)
+            {
+                state.best = Some(result.clone());
+            }
+        } else {
+            self.options.warm_start = Some(result.clone());
+        }
+        Ok(())
+    }
+    #[cfg(test)]
+    pub(crate) fn passes(&self) -> usize {
+        self.state.as_ref().map_or(0, |s| s.passes)
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
-pub(super) fn pack(
+fn initialize(
     job: &Job,
     slots: &[Slot],
     fixed: &[Placement],
     opts: &NestOptions,
     variant: usize,
     directions: &BTreeMap<u32, f64>,
-    progress: &mut dyn FnMut(NestProgress),
-    cancel: Option<&AtomicBool>,
-) -> Result<MarkerResult> {
-    let _phase = crate::profile::Phase::new("obstacle_pack");
-    let started = Instant::now();
-    let duration = Duration::try_from_secs_f64(opts.time_limit_s).context("invalid time budget")?;
-    let deadline = started
-        .checked_add(duration)
-        .context("time budget too large")?;
-    let search = Search {
-        job,
-        limit: Limit { deadline, cancel },
-    };
+    search: &Search<'_>,
+    deadline: Instant,
+    hints: &[Placement],
+) -> Result<Continuation> {
     let mut remaining = slots.to_vec();
     let mut obstacles = Vec::new();
     for zone in &job.fabric.defects {
@@ -538,17 +783,6 @@ pub(super) fn pack(
         .warm_start
         .clone()
         .filter(|r| fixed.iter().all(|p| r.placements.contains(p)));
-    // Warm starts have already passed the public gate. Preparation may stop
-    // immediately if one is available; otherwise build a cheap complete seed.
-    if best.is_some() && search.limit.stopped() {
-        let mut result = best.context("missing incumbent")?;
-        if cancel.is_some_and(|c| c.load(Ordering::Relaxed)) {
-            result.warnings.push(
-                "Search cancelled; best independently valid complete marker retained.".into(),
-            );
-        }
-        return Ok(result);
-    }
     let prepare_started = Instant::now();
     let mut prepared = Vec::new();
     let mut cache: BTreeMap<(usize, bool, bool, u64), Vec<Orientation>> = BTreeMap::new();
@@ -599,24 +833,90 @@ pub(super) fn pack(
     let mut placed_slots = Vec::new();
     let mut length = fixed_length;
     let mut construction_error = None;
+    let mut hinted = vec![false; remaining.len()];
+    for hint in hints {
+        let Some(i) = remaining.iter().enumerate().position(|(i, slot)| {
+            !hinted[i]
+                && slot.placement.piece_id == hint.piece_id
+                && slot.placement.bundle == hint.bundle
+                && (slot.placement.mirrored == hint.mirrored
+                    || beta_marker_core::rules::flip_allowed(job, &job.pieces[slot.piece]))
+        }) else {
+            continue;
+        };
+        let piece = &job.pieces[remaining[i].piece];
+        if !beta_marker_core::allowed_rotations(job, piece, hint.mirrored).allows(hint.rotation_deg)
+        {
+            continue;
+        }
+        let Ok(points) = checks::outline(piece, hint) else {
+            continue;
+        };
+        if !checks::bounds_ok(job, piece, hint, &points) {
+            continue;
+        }
+        let Ok(shape) = Shape::new(points) else {
+            continue;
+        };
+        if obstacles
+            .iter()
+            .chain(placed.iter().map(|p: &Placed| &p.obstacle))
+            .any(|ob| conflict(&shape, &ob.shape, gap(job, piece.buffer, ob)))
+        {
+            continue;
+        }
+        let mut placement = hint.clone();
+        placement.copy = remaining[i].placement.copy;
+        placement
+            .layer_allocations
+            .clone_from(&remaining[i].placement.layer_allocations);
+        hinted[i] = true;
+        length = length.max(shape.bounds[2]);
+        placed.push(Placed {
+            placement,
+            obstacle: Obstacle {
+                shape,
+                buffer: piece.buffer,
+                defect: false,
+            },
+        });
+        placed_slots.push(i);
+    }
     for &i in &order {
+        if hinted[i] {
+            continue;
+        }
         let all: Vec<_> = obstacles
             .iter()
             .chain(placed.iter().map(|p: &Placed| &p.obstacle))
             .collect();
         let mode = if search.limit.stopped() {
             Mode::Shelf
-        } else {
+        } else if hints.is_empty() {
             Mode::Boxes
+        } else {
+            Mode::Exact
         };
-        if let Some(p) = search.place(
-            &prepared[i],
-            job.pieces[remaining[i].piece].buffer,
-            &all,
-            length,
-            mode,
-            deadline,
-        ) {
+        if let Some(p) = search
+            .place(
+                &prepared[i],
+                job.pieces[remaining[i].piece].buffer,
+                &all,
+                length,
+                mode,
+                deadline.min(Instant::now() + Duration::from_millis(120)),
+            )
+            .or_else(|| {
+                search.place(
+                    &prepared[i],
+                    job.pieces[remaining[i].piece].buffer,
+                    &all,
+                    length,
+                    Mode::Boxes,
+                    deadline,
+                )
+            })
+        {
             length = length.max(p.obstacle.shape.bounds[2]);
             placed.push(p);
             placed_slots.push(i);
@@ -642,11 +942,122 @@ pub(super) fn pack(
         "constrained packing failed: {}",
         construction_error.unwrap_or_default()
     );
+    Ok(Continuation {
+        remaining,
+        obstacles,
+        fixed_length,
+        prepared,
+        order,
+        best,
+        passes: 0,
+        rng: Xoshiro256PlusPlus::seed_from_u64(opts.seed.unwrap_or(0)),
+        prepare_s,
+        construct_s,
+        cycle_order: vec![],
+        cursor: 0,
+    })
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn pack(
+    job: &Job,
+    slots: &[Slot],
+    fixed: &[Placement],
+    opts: &NestOptions,
+    variant: usize,
+    directions: &BTreeMap<u32, f64>,
+    progress: &mut dyn FnMut(NestProgress),
+    cancel: Option<&AtomicBool>,
+) -> Result<MarkerResult> {
+    pack_inner(
+        job,
+        slots,
+        fixed,
+        opts,
+        variant,
+        directions,
+        progress,
+        cancel,
+        &mut None,
+        &[],
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn repair(
+    job: &Job,
+    slots: &[Slot],
+    fixed: &[Placement],
+    opts: &NestOptions,
+    variant: usize,
+    directions: &BTreeMap<u32, f64>,
+    progress: &mut dyn FnMut(NestProgress),
+    hints: &[Placement],
+) -> Result<MarkerResult> {
+    pack_inner(
+        job, slots, fixed, opts, variant, directions, progress, None, &mut None, hints,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn pack_inner(
+    job: &Job,
+    slots: &[Slot],
+    fixed: &[Placement],
+    opts: &NestOptions,
+    variant: usize,
+    directions: &BTreeMap<u32, f64>,
+    progress: &mut dyn FnMut(NestProgress),
+    cancel: Option<&AtomicBool>,
+    resume: &mut Option<Continuation>,
+    hints: &[Placement],
+) -> Result<MarkerResult> {
+    let _phase = crate::profile::Phase::new("obstacle_pack");
+    let started = Instant::now();
+    let duration = Duration::try_from_secs_f64(opts.time_limit_s).context("invalid time budget")?;
+    let deadline = started
+        .checked_add(duration)
+        .context("time budget too large")?;
+    let search = Search {
+        job,
+        limit: Limit { deadline, cancel },
+    };
+    if search.limit.stopped()
+        && let Some(mut result) = resume
+            .as_ref()
+            .and_then(|s| s.best.clone())
+            .or_else(|| opts.warm_start.clone())
+            .filter(|r| fixed.iter().all(|p| r.placements.contains(p)))
+    {
+        checked(job, &result)?;
+        result.runtime_s = started.elapsed().as_secs_f64();
+        return Ok(result);
+    }
+    let state = match resume.take() {
+        Some(state) => state,
+        None => initialize(
+            job, slots, fixed, opts, variant, directions, &search, deadline, hints,
+        )?,
+    };
+    let Continuation {
+        remaining,
+        obstacles,
+        fixed_length,
+        prepared,
+        mut order,
+        mut best,
+        mut passes,
+        mut rng,
+        prepare_s,
+        construct_s,
+        mut cycle_order,
+        mut cursor,
+    } = state;
+    let mut placed = Vec::<Placed>::new();
+    let mut placed_slots = Vec::<usize>::new();
     let mut reported = f64::INFINITY;
-    let mut passes = 0;
     let mut rejected = 0;
     let search_started = Instant::now();
-    let mut rng = Xoshiro256PlusPlus::seed_from_u64(opts.seed.unwrap_or(0));
     while !search.limit.stopped() {
         let incumbent = best.as_ref().context("missing incumbent")?;
         if incumbent.length < reported {
@@ -695,18 +1106,68 @@ pub(super) fn pack(
                 },
             });
         }
-        let mut move_order: Vec<_> = (0..placed.len()).collect();
-        if passes % 3 == 2 {
-            move_order.shuffle(&mut rng);
-        } else {
-            move_order.sort_by(|&a, &b| {
-                placed[a].obstacle.shape.bounds[0].total_cmp(&placed[b].obstacle.shape.bounds[0])
-            });
+        if cycle_order.is_empty() {
+            let mut move_order: Vec<_> = (0..placed.len()).collect();
+            let regional = job.fabric.layout == Layout::Open
+                || !fixed.is_empty()
+                || !job.fabric.defects.is_empty();
+            if regional
+                && let Some(trial) = search.neighborhood(
+                    &placed,
+                    &placed_slots,
+                    &remaining,
+                    &prepared,
+                    &obstacles,
+                    passes,
+                    &mut rng,
+                )
+            {
+                let candidate = marker(job, fixed, &trial, opts.seed)?;
+                let old = best.as_ref().context("missing incumbent")?;
+                let internal = |items: &[Placed]| {
+                    items
+                        .iter()
+                        .map(|p| p.obstacle.shape.bounds[2])
+                        .sum::<f64>()
+                };
+                if candidate.length < old.length - 1e-7
+                    || ((candidate.length - old.length).abs() < 1e-7
+                        && internal(&trial) < internal(&placed) - 1e-7)
+                {
+                    if checked(job, &candidate).is_ok() {
+                        best = Some(candidate);
+                        placed = trial;
+                    } else {
+                        rejected += 1;
+                    }
+                }
+            }
+            if passes % 3 == 2 {
+                move_order.shuffle(&mut rng);
+            } else {
+                move_order.sort_by(|&a, &b| {
+                    if regional {
+                        placed[b].obstacle.shape.bounds[2]
+                            .total_cmp(&placed[a].obstacle.shape.bounds[2])
+                    } else {
+                        placed[a].obstacle.shape.bounds[0]
+                            .total_cmp(&placed[b].obstacle.shape.bounds[0])
+                    }
+                });
+            }
+            cycle_order = move_order.iter().map(|&i| placed_slots[i]).collect();
+            cursor = 0;
         }
-        for index in move_order {
+        while cursor < cycle_order.len() {
             if search.limit.stopped() {
                 break;
             }
+            let slot = cycle_order[cursor];
+            let index = placed_slots
+                .iter()
+                .position(|&i| i == slot)
+                .context("resumed slot missing")?;
+            cursor += 1;
             let all: Vec<_> = obstacles
                 .iter()
                 .chain(
@@ -765,13 +1226,20 @@ pub(super) fn pack(
         let result = marker(job, fixed, &placed, opts.seed)?;
         if result.length < best.as_ref().context("missing incumbent")?.length - 1e-7
             || ((result.length - best.as_ref().context("missing incumbent")?.length).abs() <= 1e-7
-                && result.surplus_copies <= best.as_ref().context("missing incumbent")?.surplus_copies) {
+                && result.surplus_copies
+                    <= best.as_ref().context("missing incumbent")?.surplus_copies)
+        {
             if checked(job, &result).is_ok() {
                 best = Some(result);
             } else {
                 rejected += 1;
             }
         }
+        if cursor < cycle_order.len() {
+            continue;
+        }
+        cycle_order.clear();
+        cursor = 0;
         passes += 1;
         if remaining.is_empty() {
             break;
@@ -839,7 +1307,7 @@ pub(super) fn pack(
             }
         }
     }
-    let mut result = best.context("missing incumbent")?;
+    let mut result = best.as_ref().context("missing incumbent")?.clone();
     checked(job, &result)?;
     result.runtime_s = started.elapsed().as_secs_f64();
     if result.length < reported {
@@ -860,5 +1328,19 @@ pub(super) fn pack(
             .warnings
             .push("Search cancelled; best independently valid complete marker retained.".into());
     }
+    *resume = Some(Continuation {
+        remaining,
+        obstacles,
+        fixed_length,
+        prepared,
+        order,
+        best,
+        passes,
+        rng,
+        prepare_s,
+        construct_s,
+        cycle_order,
+        cursor,
+    });
     Ok(result)
 }

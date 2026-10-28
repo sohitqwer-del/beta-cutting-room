@@ -10,7 +10,7 @@ export interface PageMeta {
 }
 
 export const pages: PageMeta[] = [
-  { file: 'index.html', navLabel: 'Home', title: 'BETA Cutting Room: open-source cutting-room software for garment factories', description: 'Open-source, self-hosted cutting-room software for garment factories: pattern, marker, cut planning, rolls, spreading and bundles. Runs offline on your own computers.' },
+  { file: 'index.html', navLabel: 'Home', title: 'BETA Cutting Room: free, open-source cutting-room software for garment factories', description: 'Free, open-source cutting-room software for garment factories: patterns, markers and cut plans, in your browser. See a real T-shirt marker in 60 seconds, with no install and no account.' },
   { file: 'benchmark.html', navLabel: 'Benchmark', title: 'Benchmark: honest, repeatable marker results | BETA Cutting Room', description: 'How BETA markers compare with Lectra’s recorded results and published research, with method, assumptions and commands to repeat every number.' },
   { file: 'compare.html', navLabel: 'Compare', title: 'Compare with commercial cutting-room software | BETA Cutting Room', description: 'Feature comparison with Tukatech, Gerber AccuMark, Lectra, Optitex, Audaces and Richpeace/BOKE, based on vendor documents.' },
   { file: 'install.html', navLabel: 'Install', title: 'Install and self-host | BETA Cutting Room', description: 'Install BETA Cutting Room on a Windows PC or run it on your own server. System requirements, privacy and offline use.' },
@@ -36,9 +36,12 @@ function absolute(path: string): string | null {
   return site.siteUrl ? `${site.siteUrl.replace(/\/?$/, '/')}${path}` : null;
 }
 
+/** Social card (1200 x 630, real app screen, logo and one line): made by the launch tools, see assets/brand/README.md. */
+export const SOCIAL_IMAGE = { path: 'assets/brand/social-card.png', width: 1200, height: 630, alt: 'BETA Cutting Room: a real T-shirt marker made in the browser, with the line "Free, open-source cutting-room software for garment factories"' };
+
 /** Wraps page content in the shared header, navigation and footer. */
 export function layout(meta: PageMeta, main: Part): string {
-  const ogImage = absolute('assets/brand/social-preview.png');
+  const ogImage = absolute(SOCIAL_IMAGE.path);
   const pageUrl = absolute(meta.file === 'index.html' ? '' : meta.file);
   const feedback = feedbackLinks();
   const doc = html`<!doctype html>
@@ -56,14 +59,22 @@ export function layout(meta: PageMeta, main: Part): string {
 <meta property="og:title" content="${meta.title}">
 <meta property="og:description" content="${meta.description}">
 ${pageUrl ? html`<meta property="og:url" content="${pageUrl}">` : ''}
+<meta property="og:locale" content="en_GB">
 ${ogImage ? html`<meta property="og:image" content="${ogImage}">
-<meta property="og:image:width" content="1280">
-<meta property="og:image:height" content="640">
-<meta property="og:image:alt" content="BETA Cutting Room logo with garment pieces nested on fabric">
-<meta name="twitter:card" content="summary_large_image">` : ''}
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="${SOCIAL_IMAGE.width}">
+<meta property="og:image:height" content="${SOCIAL_IMAGE.height}">
+<meta property="og:image:alt" content="${SOCIAL_IMAGE.alt}">` : ''}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${meta.title}">
+<meta name="twitter:description" content="${meta.description}">
+${ogImage ? html`<meta name="twitter:image" content="${ogImage}">
+<meta name="twitter:image:alt" content="${SOCIAL_IMAGE.alt}">` : ''}
+<meta name="application-name" content="${site.name}">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/brand/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/site.css">
 <script>${raw(motionBoot)}</script>
@@ -76,7 +87,7 @@ ${ogImage ? html`<meta property="og:image" content="${ogImage}">
     <a class="brand" href="index.html">${logo}${brandName}</a>
     <nav class="nav-desktop" aria-label="Main">${navLinks(meta.file, 'nav-list')}</nav>
     <div class="header-tools">
-      <a class="btn btn-primary btn-small header-cta" href="index.html#download">Download</a>
+      ${site.tourUrl ? html`<a class="btn btn-primary btn-small header-cta" href="${site.tourUrl}">Try it now</a>` : html`<a class="btn btn-primary btn-small header-cta" href="index.html#download">Download</a>`}
       <details class="nav-mobile">
         <summary><span class="sr-only">Menu</span><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary>
         <nav aria-label="Main (small screens)">${navLinks(meta.file, 'nav-list-mobile')}</nav>
@@ -91,7 +102,7 @@ ${main}
   <div class="wrap footer-inner">
     <div class="footer-about">
       <p class="footer-brand">${logo}${brandName}</p>
-      <p>Open-source cutting-room software for garment factories. Version ${site.version}. Self-hosted: your patterns stay in your factory.</p>
+      <p>${site.tagline} Version ${site.version}. Your files stay on your device.</p>
       <p class="footer-fun"><span aria-hidden="true">✦</span> A fun project, built with the help of modern AI tools.</p>
       <p class="muted small">This website has no trackers and no cookies, and it loads nothing from other servers.</p>
     </div>

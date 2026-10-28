@@ -18,9 +18,11 @@ when opened from disk (`dist/index.html`), from a USB drive, or from any static 
 All animations use only `transform` and `opacity` and run under the `.motion` class.
 The head script sets that class only when the visitor has not asked for reduced
 motion. With `prefers-reduced-motion: reduce`, or without JavaScript, there is no
-motion and every element shows in its final place: the hero marker is already
-nested, all workflow steps are lit, counters show their final value and the
-screenshots show as a grid without a slideshow. If `assets/site.js` does not run
+motion and every element shows in its final place: the hero shows the final
+recorded marker, all workflow steps are lit and counters show their final value.
+The hero plays real markers recorded from the app while it searched
+(`data/hero-marker.json`): each frame is shorter than the one before. It has a
+pause button, and it waits while it is off screen or the tab is hidden. If `assets/site.js` does not run
 within 2.5 s, the head script removes `.motion` again, so content is never hidden.
 The slideshow has a pause button and pauses on hover and keyboard focus. Other
 animations run once and finish within about 5 seconds; the hero and the workflow
@@ -46,6 +48,9 @@ There are no runtime npm dependencies; TypeScript and Vitest come from the root 
 | Download links, file size, SHA-256 (installer, portable ZIP, Linux server) | `src/config.ts` → `downloads` |
 | Feedback links (bug, missing feature, feedback, email) | `src/config.ts` → `feedback` |
 | Public address of the site (social previews) | `src/config.ts` → `siteUrl` |
+| The app's 60-second tour (hero "Try it now") | `src/config.ts` → `tourUrl` (default `app/#/tour`) |
+| Social cards (1200 x 630 and 1080 x 1080) | `node marker/apps/site/scripts/make-social.ts` after the screenshots change |
+| Recorded hero marker | `data/hero-marker.json` (from the launch QA capture of the sample tour; the build checks it) |
 | Public repository URL | `src/config.ts` → `repoUrl` (turns document paths into links) |
 | Contact address | `src/config.ts` → `contactEmail` |
 | Real screenshots | `public/assets/screens/*.png` (names in that folder's README) |
@@ -92,6 +97,9 @@ a page makes any non-local request or logs an error.
 | `src/benchmark.ts` | Benchmark JSON loader and validator (pure functions) |
 | `src/charts.ts` | Plain SVG charts (diverging bars, dot plot, bars); values are also text |
 | `src/illustrations.ts` | Original illustrative SVGs and screenshot placeholders |
+| `src/hero-live.ts` | Home hero: draws the recorded live marker (`data/hero-marker.json`) |
+| `src/faq.ts` | The top eight questions (home and Help); the nesting answer is written from the benchmark data |
+| `scripts/make-social.ts` | Writes the social cards from a real app screen, the logo and the tagline |
 | `src/pages/*.ts` | One file per page |
 | `src/style.css` | All styles (light theme) and all motion |
 | `data/benchmark/` | Benchmark data and its schema |

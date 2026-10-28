@@ -339,3 +339,63 @@ Hidden-screen text (parking); 12 screen choices (five jobs + More tools); room o
 7. Grade and Stripes step switches take about 120 ms longer with fit7's redrafted blocks (engine geometry), still under 0.2 s.
 4. Pattern formulas (advanced) keeps millimetre formulas.
 5. Hindi and Tamil strings added this round are drafts for native review.
+
+## Launch 0.8: first minute for a visitor (launch-ui)
+
+Most visitors come from a LinkedIn or X post, on a phone, for about a minute. They must see what BETA is, see it work on a real garment without a file, trust it, and know how to help. Before shots and numbers: `<data-dir>/launch8-shots/launch-ui/before/`, `load/`.
+
+### See it in 60 seconds (`src/tour/`)
+
+Home opens with one card, **New here? See BETA work in one minute**, and the button **See it in 60 seconds** (also the address `#/tour`). The tour drives the real Style screen through a small control surface (`StyleControl` in `style/ui.ts`); it never reaches into the screen's elements.
+
+| Step | What the visitor sees | Card text (real numbers of the sample) |
+|---|---|---|
+| Loading | Style screen, engines start (pattern and marker WASM now load in parallel) | "The real engine starts in this browser… nothing is uploaded." |
+| 1 Pattern | The engine's T-shirt block in S, M, L, XL | pieces and their names |
+| 2 Grade | Size chart, stacked sizes, seam check | "5 of 5 match in every size" |
+| 3 Lay | Open lay, 60 in, 40 plies, 1 garment per size | Next says **Make the marker** |
+| 4 Marker | The browser nester draws the best marker so far (15 s) | live "Best so far: 3.58 m, 66.0%…"; Next = **Use the best so far** |
+| 5 Cut plan | Cut step: fabric, plies, passes, garments, files | "For 40 plies you need … m of fabric and you get 160 garments" |
+| End | "That was the real app" with the time it took and **Try your own** | Make your own style · Photograph paper patterns · Open DXF files · Change this sample |
+
+- **Skip** at any time (button or Escape). Leaving by the menu or Back also ends it.
+- The visitor's own style is safe: the tour keeps a snapshot (also in `beta-tour-backup`, so a closed tab gives it back on the next start) and restores it however the tour ends. "Change this sample" is offered only when there was no style before.
+- While the tour leads, the Style screen hides its own Back/Next, help strip and file menu (one Next on screen). On phones the card is a bottom sheet, the drawing tools step aside on the Pattern step, and the chips, time choice and zoom step aside on the Marker step, so the live marker is visible above the card. On wide screens the Marker and Cut steps keep the room left of the card.
+- Strings: `src/tour/locales` (Hindi and Tamil drafts).
+
+### First load
+
+| Static build, phone 390 x 844, Slow 4G (1.44 Mbit/s, 562 ms, shared by page and service worker, measured at the server) + CPU x4, median of 3 | Before | After |
+|---|---|---|
+| Something on screen | blank until 4.8 s | logo, one line and a progress bar at 1.75 s |
+| Home usable | 4.8 s | 4.7 s (script 21 KB larger; start-up CPU about the same on a quiet machine) |
+| Downloaded in the first 30 s on Home | 861 KB (offline copy and idle engines start at once) | 353 KB (no engine until a screen needs one) |
+| From the website's "Try it now" (`#/tour`) to the T-shirt pattern / first live marker / checked marker | n/a (no tour) | 21.3 s / 23.8 s / 39.1 s (29.6 s / 32.1 s / 47.4 s without the preload and the hold) |
+| Same without throttling (laptop CPU, local server) | n/a | 0.55 s / 1.2 s / 16.0 s |
+
+The forced whole-app layout at start-up costs 0.42 s on a quiet machine but 2.35 s when the machine is busy (CPU x4 trace).
+
+- `index.html` has a loading screen in plain HTML and CSS (logo, "Free, open-source software for garment cutting rooms…", a progress bar that creeps while the script downloads and jumps at "Starting the app…"; `src/boot.ts` removes it after the first screen paints). Reload button if the script fails; a calm note after 20 s.
+- Start-up layout: `installShell` read `window.innerWidth` (rail default) and the editor read it for the Tools panel while all screens were still in the page; each read forced a layout of the whole app (2.35 s + 0.45 s on the phone profile). Both use `matchMedia` now, and the rail no longer fires a synthetic resize at start.
+- `#/tour` (the website's "Try it now") preloads the pattern and marker engines from `index.html`, next to the app script, and the tour holds background downloads (`holdBackground`) so the floor engine does not compete with them.
+- Engines load when needed: the marker engine when a screen that uses it opens (editor, cut plan, …), not on Home. `whenIdle` background downloads run only in the desktop app, or after 8 s on a fast connection without data saver (`backgroundLoadAllowed`, tested). The offline copy (service worker, about 5 MB compressed) registers after 30 s on the page and never with data saver or 2G/3G.
+
+### Newer screens polished
+
+- **Photo to marker, paper pattern sets:** one-row pattern-set tools (not on the start step), parts table by fabric and size (stacked rows on phones), fabric group names in plain words (Main fabric, Lining, Rib, Fusing, Pocketing), tape check as three numbered steps with a clear pass/fail result **in the app unit, like its fields** (qa8), a practice-mode note, and GSM labelled "Fabric weight (GSM)" with what it does and does not do. All new strings moved to `src/quick/locales` with Hindi and Tamil drafts.
+- **Cut plan · Compare fabric widths and order cost:** a card per choice (width, status, total, per garment, fabric to buy, lays, costs, remnants, over-cut, **Use this plan**), recommended first; the full table under "All numbers as a table". **Try with a sample** fills an order and two widths. "Ratios measured per choice" can no longer be set below the number of ordered sizes (qa8). A width that fits no marker says so instead of "Order quantities are incomplete" (qa8). Fits 390 px and 1366 px with no sideways scroll (offer fieldsets had `min-width: min-content`).
+- **Marker editor · Improve one area:** three plain steps, the dialog opens again by itself after the box is drawn, and the preview says how much shorter the marker gets ("0.5 mm" for small gains). The kept-marker message names both lengths.
+- **Style · Marker:** a visible notice when the previous, shorter marker was kept ("Kept the previous marker. It is 2.90 m long and still passes every check. The new search only found 2.95 m.").
+- **Home:** the built-in demo is no longer listed under Continue (qa8); a fresh browser says "Nothing to continue yet"; a style in progress is listed.
+- Version 0.8.0 in the app (About, sidebar).
+
+### Checks
+
+Vitest (web: tour steps and storage recovery, background-load policy, cost helpers), web typecheck, `npm run build:static`, the 14-step Style smoke and the cutting-room journey on the static build, and new headless drivers outside the repository (`<data-dir>/launch8-shots/launch-ui/tools/`): `tour-smoke.mjs` (12 checks at 390 x 844 and 1366 x 768, real mouse), `quick-real.mjs` (real scan of a public synthetic A4 photo, tape check in cm and inch), `cost-walk.mjs` (7 checks, both sizes), `region-walk.mjs`, `load.mjs` (cold load with a shared throttled link counted at the server), `trace-start.mjs` and `profile-start.mjs` (start-up layout and CPU).
+
+### Open issues
+
+1. The main script is 305 KB compressed (285 KB before; the tour and the moved strings). Hindi and Tamil tables (~50 KB compressed) could load on demand.
+2. The tour's pattern step on a phone shows the whole sheet, so the T-shirt is small; a "fit to pieces" view would help.
+3. Tour strings in Hindi and Tamil are drafts.
+4. The sample tour uses a 15 s search; on a slow phone the marker is less tight than on a laptop (the card shows the real numbers either way).

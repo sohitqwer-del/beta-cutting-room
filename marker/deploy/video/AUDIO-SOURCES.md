@@ -1,5 +1,11 @@
 # Audio sources and licences
 
+Launch 0.8 uses the same local Kokoro `af_heart` weights and dictionary files below.
+There is no music. New explicit dictionary entries cover patterns, the letter T
+in T-shirt, arrives, copies and tickets. Narration remains synthetic US English;
+listen for naturalness and pronunciation before posting. `launch-scenes.mjs` drives
+both the narrated text and the captions without paraphrases.
+
 Only local CPU inference runs during rendering. Downloads happen in the separate setup step. Model files and audio stay outside git. The manifest `audio-models.json` pins each byte hash; `setup-audio.py --verify-only` checks it without a network request.
 
 ## Models and frontend data

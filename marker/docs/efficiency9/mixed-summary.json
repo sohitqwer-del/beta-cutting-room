@@ -1,0 +1,39 @@
+{
+  "all_fixed_transforms_preserved": true,
+  "all_valid": true,
+  "cases": [
+    {
+      "after_m": 0.083002,
+      "after_useful_pct": 92.52789089419531,
+      "after_wall_s": 2.0005909,
+      "before_m": 0.123002,
+      "before_useful_pct": 62.4380091380628,
+      "before_wall_s": 2.000495,
+      "id": "original-mixed-fold",
+      "locked_end_m": 0.0,
+      "max_saved_pct": 32.519796426074365,
+      "min_saved_pct": 32.519796426074365,
+      "saved_pct": 32.519796426074365,
+      "trials": 1
+    }
+  ],
+  "trials": [
+    {
+      "after_m": 0.083002,
+      "after_surplus": 0,
+      "after_useful_pct": 92.52789089419531,
+      "after_wall_s": 2.0005909,
+      "before_m": 0.123002,
+      "before_surplus": 0,
+      "before_useful_pct": 62.4380091380628,
+      "before_wall_s": 2.000495,
+      "fixed_preserved": true,
+      "id": "original-mixed-fold",
+      "locked_end_m": 0.0,
+      "requested_s": 2.0,
+      "saved_pct": 32.519796426074365,
+      "seed": 1,
+      "valid": true
+    }
+  ]
+}

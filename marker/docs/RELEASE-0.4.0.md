@@ -1,5 +1,9 @@
 # BETA Cutting Room 0.4.0 release record
 
+> Historical release evidence. For current browser capabilities and limits,
+> use [0.7](RELEASE-0.7.0.md) and [the feature map](FEATURES.md).
+> Counts and package hashes below apply only to 0.4.0.
+
 Historical record: the opening text and artifact hashes below describe the
 original build and are retained for traceability. Version 0.4.0 is now public;
 this record must not be read as a current publication-status check. For new

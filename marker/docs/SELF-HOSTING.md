@@ -1,4 +1,9 @@
-# Self-host BETA Cutting Room 0.4.0
+# Self-host BETA Cutting Room
+
+The static browser edition also works without a Rust server. Use this guide
+when you choose factory-server computation or need the board-photo digitizer.
+Keep CLI and web assets from a matching package. Check the
+[release record](RELEASE-0.7.0.md) for actual Linux package availability.
 
 BETA can run on a factory PC or server. It makes no outbound runtime requests.
 An administrator controls access, HTTPS, backups and updates. The HTTP server

@@ -110,10 +110,12 @@ export interface Loaders {
  * Loaders are injectable for tests. */
 export async function loadStyleEngine(options: { loaders?: Loaders } = {}): Promise<LoadResult> {
   const l = { style: () => wasm.loadStyleCore(), pattern: () => wasm.loadPatternCore(), marker: () => wasm.loadMarkerCore(), ...options.loaders };
+  // Both downloads start together (about 1 MB and 1.4 MB compressed): on a slow phone connection this halves the wait.
+  const markerLoading = l.marker().catch(() => undefined);
   let pattern: PatternCore;
   try { pattern = await l.pattern(); }
   catch (error) { return { ok: false, error: error instanceof Error ? error.message : String(error) }; }
-  const marker = await l.marker().catch(() => undefined);
+  const marker = await markerLoading;
   try { return { ok: true, engine: joinCores(await l.style(), pattern, marker, 'style') }; }
   catch (error) { return { ok: false, error: error instanceof Error ? error.message : String(error) }; }
 }

@@ -4,6 +4,7 @@ import { downloadFile } from '../transport';
 import { PatternHistory } from '../pattern-state';
 import type { DocumentState } from '../state';
 import { exportMarker, isPracticeResult, loadStyleEngine, nestMarker, practiceRequested, type StyleEngine } from './adapter';
+import { loadEditorCore } from '../editor-core';
 import { BLOCK_ART, FACE_ART, LAYOUT_ART, NAP_ART, REPEAT_ART } from './art';
 import { placed, ruleReports, stripeStep, styleRuleOf, type MarkerMatch, type RuleReport } from './match-report';
 import { arrangeOps, installCanvas } from './canvas';
@@ -42,7 +43,32 @@ const BUDGETS: Array<[StyleKey, number]> = [['time_fast', 20], ['time_better', 6
 const pts = (list: Pt[]) => list.map(([x, y]) => `${x},${-y}`).join(' ');
 const human = (name: string) => name.replaceAll('_', ' ').replace(/^./, c => c.toUpperCase());
 
-export function installStyle(host: StyleHost, content: HTMLElement): { root: HTMLElement } {
+/** What the sample tour (src/tour) may do with this screen. The tour never reaches into the screen's elements. */
+export interface StyleControl {
+  /** Load the Rust engines (pattern and marker). False with the reason in `engineError()`. */
+  load(): Promise<boolean>;
+  engineError(): string;
+  /** The current style as saved on this computer (null when there is none), and putting it back after the tour. */
+  snapshot(): string | null;
+  restore(snapshot: string | null): Promise<void>;
+  /** Replace the style with a block in the given sizes and lay (no confirm: the tour keeps a snapshot). */
+  sample(options: { block: BlockKind; name: string; sizes: string[]; lay: Partial<S.LaySetup> }): Promise<boolean>;
+  go(step: S.Step): boolean;
+  /** Make the marker with this search time; resolves when it is done or stopped. */
+  nest(budgetS: number): Promise<boolean>;
+  stop(): void;
+  /** Hide this screen's own Back/Next and step help while the tour leads. */
+  touring(on: boolean): void;
+  progress(): { running: boolean; elapsedS: number; budgetS: number; bestLengthMm: number | null; efficiency: number | null };
+  facts(): StyleFacts | null;
+}
+export interface StyleFacts {
+  name: string; pieces: number; pieceNames: string[]; sizes: string[]; baseSize: string; seamChecks: number; seamChecksOk: number;
+  widthMm: number; layout: string; plies: number; passes: number; garmentsPerMarker: number;
+  lengthMm: number | null; efficiency: number | null; checksOk: boolean | null; fabricMm: number | null; garmentsInLay: number | null;
+}
+
+export function installStyle(host: StyleHost, content: HTMLElement): { root: HTMLElement; control: StyleControl } {
   let state: S.Session = S.restore() ?? S.initialSession();
   // One unit for the whole app (top bar). The saved session follows it.
   state = { ...state, unit: appUnit(), lay: { ...state.lay, widthUnit: appUnit() } };
@@ -53,6 +79,8 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   let gradePiece = '', gradePoint = '', nest: Record<string, GradedPiece[]> = {}, hiddenSizes = new Set<string>();
   let matchPick: { a?: { piece: string; point: string }; pieceA: string; pieceB: string } = { pieceA: '', pieceB: '' };
   let budget = 20, abort: AbortController | null = null, progress = { elapsed: 0, best: null as MarkerResult | null };
+  /** Set when the last search found a longer marker and the previous checked marker was kept (shown on the Marker step). */
+  let kept: { foundMm: number } | null = null;
   let layers = { stripes: true, matches: true, previous: false, sizes: true, labels: true };
   /** Style match rule picked with "Show on marker"; its points are highlighted and the others dimmed. */
   let focusRule: number | null = null;
@@ -87,6 +115,7 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   const MM = (mm: number) => `${(Math.round(mm * 10) / 10).toFixed(1)} mm`;
   /** Long lengths (marker, fabric) in the app unit: metres for cm, yards for inch; the unit word is translated. */
   const LL = (mm: number) => { const v = longLength(mm, unit()); return { m: v.value, u: t(v.unit === 'yd' ? 'unit_yd' : 'unit_m') }; };
+  const lengthText = (mm: number) => { const v = LL(mm); return `${v.m} ${v.u}`; };
   const LLtile = (mm: number, digits = 3) => { const v = longLength(mm, unit(), digits); return `${v.value}<small>${v.unit}</small>`; };
 
   function emptyDoc(): PatternDocument { return { format: 'beta-pattern.doc/v1', name: '', sizes: ['M'], base_size: 'M', measurements: { M: {} }, variables: {}, drawing: {}, pieces: [] }; }
@@ -205,7 +234,8 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   const HOW_KEY = 'beta-style-how-seen';
   let howSeen = new Set<string>(), howToggled: Partial<Record<S.Step, boolean>> = {};
   try { howSeen = new Set(JSON.parse(localStorage.getItem(HOW_KEY) ?? '[]') as string[]); } catch { /* first visit */ }
-  function howOpen(): boolean { return howToggled[state.step] ?? !howSeen.has(state.step); }
+  let touring = false;
+  function howOpen(): boolean { return !touring && (howToggled[state.step] ?? !howSeen.has(state.step)); }
   /** The three numbered actions are folded on a first visit (one line of help) and shown when opened with "?". */
   const howSteps: Partial<Record<S.Step, boolean>> = {};
   function markHowSeen(step: S.Step): void {
@@ -659,6 +689,7 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     const notes = [
       (m.status === 'failed' || m.error) && !running ? `<div class="notice error st-note" role="alert">${icon('alert')}<div><strong>${tx('nest_failed')}</strong> ${esc(m.error)}<br><span>${tx('nest_failed_hint')}</span></div></div>` : '',
       m.stale && r && !running ? `<p class="notice warn st-note">${icon('alert')}${tx('marker_stale')}</p>` : '',
+      kept && r && !running && !m.stale ? `<div class="notice info st-note st-kept" role="note">${icon('check')}<div><strong>${tx('kept_title')}</strong> <span>${tx('kept_previous', { kept: lengthText(r.length), found: lengthText(kept.foundMm) })}</span></div></div>` : '',
       practice ? `<p class="notice warn st-note">${icon('alert')}${tx('practice_marker')}</p>` : '',
       someNotMatched ? `<p class="notice warn st-note">${icon('alert')}${tx('browser_no_match')}</p>` : '',
       r && !running && surplusCopies(rep) ? `<p class="notice warn st-note">${icon('alert')}${tx('surplus_note', { n: surplusCopies(rep) })}</p>` : '',
@@ -860,18 +891,25 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
     let job: Job;
     try { job = await engine.toJob(state.doc, S.jobSettings(state)); job.meta = { ...job.meta, beta_style_name: state.info.name, beta_style_number: state.info.number }; }
     catch (error) { update({ ...state, marker: { ...state.marker, status: 'failed', error: errorText(error) } }); return; }
-    abort = new AbortController(); progress = { elapsed: 0, best: null }; live = null; liveNext = null; mbox = null;
+    abort = new AbortController(); progress = { elapsed: 0, best: null }; live = null; liveNext = null; mbox = null; kept = null;
     update({ ...state, marker: { ...state.marker, status: 'running', error: undefined } });
     say(t('nest_started'));
     const started = performance.now(), timer = window.setInterval(() => { progress.elapsed = (performance.now() - started) / 1000; if (state.step === 'marker') renderProgress(); }, 500);
     try {
-      const result = await nestMarker(job, { budgetS: budget, signal: abort.signal, practice: practiceRequested(location.search), onProgress: p => { progress.best = p.best; queueLive(job, p.best); } });
+      let result = await nestMarker(job, { budgetS: budget, signal: abort.signal, practice: practiceRequested(location.search), onProgress: p => { progress.best = p.best; queueLive(job, p.best); } });
       if (!result) throw new Error(t('nest_none'));
+      let retained = false;
+      const found = result;
+      if (old && !isPracticeResult(old.result) && !isPracticeResult(result)) {
+        const choice = (await loadEditorCore()).chooseSearch?.({job,result:old.result},result,[]);
+        if (choice) { result = choice.result; retained = choice.retained; }
+      }
+      kept = retained ? { foundMm: found.length } : null;
       const report = await engine.validate(job, result).catch(() => undefined);
       const overlay = await engine.overlay(job, result, { ...(old ? { previous: old } : {}) }).catch(error => { host.message(errorText(error), true); return undefined; });
       await attachMatches(overlay, report, job, result);
       update({ ...state, marker: { status: 'done', job, result, report, overlay, previous: old, stale: false } });
-      say(t('nest_done', { ...LL(result.length), e: percent(result.efficiency) }));
+      say(retained ? `${t('kept_title')} ${t('kept_previous', { kept: lengthText(result.length), found: lengthText(found.length) })}` : t('nest_done', { ...LL(result.length), e: percent(result.efficiency) }));
     } catch (error) {
       update({ ...state, marker: { ...state.marker, status: state.marker.result ? 'done' : 'failed', error: errorText(error), stale: state.marker.stale } });
       host.message(errorText(error), true);
@@ -1161,5 +1199,59 @@ export function installStyle(host: StyleHost, content: HTMLElement): { root: HTM
   window.setTimeout(navLabel, 0);
   render();
   void fromMm;
-  return { root };
+
+  // ---------- Sample tour (src/tour) ----------
+  const seamOk = (x: SeamReport) => x.rows.every(row => row.pass);
+  const headlineFigure = (y: ReturnType<typeof markerYield>) => (y.headline === 'yield' && y.usefulYield != null ? y.usefulYield : y.efficiency);
+  let nestDone: Promise<void> | null = null;
+  const control: StyleControl = {
+    async load() { await ensureEngine(); return !!engine; },
+    engineError: () => engineError,
+    snapshot: () => { try { return localStorage.getItem('beta-style-v1'); } catch { return null; } },
+    async restore(snapshot) {
+      abort?.abort(); await nestDone;
+      window.clearTimeout(saveTimer);
+      const next = snapshot ? S.restore({ getItem: () => snapshot }) : null;
+      if (next) { state = { ...next, unit: appUnit(), lay: { ...next.lay, widthUnit: appUnit() } }; persist(); }
+      else { S.clearSaved(); state = S.initialSession(); }
+      history = new PatternHistory(state.doc ?? emptyDoc()); gradePiece = ''; gradePoint = ''; extraChecks = []; kept = null;
+      await refreshDoc(); canvas.reset(); render();
+    },
+    async sample({ block, name, sizes, lay }) {
+      if (!engine) { await ensureEngine(); }
+      if (!engine || !chart) return false;
+      const c = chart, use = c.sizes.filter(x => sizes.includes(x)), chosen = use.length ? use : c.sizes;
+      const useChart: SizeChart = { ...c, sizes: chosen, base_size: chosen.includes(c.base_size) ? c.base_size : chosen[Math.floor((chosen.length - 1) / 2)]!, measurements: Object.fromEntries(chosen.map(x => [x, c.measurements[x]!])) };
+      const fresh = S.initialSession();
+      state = { ...fresh, unit: appUnit(), info: { ...fresh.info, name, garment: blocks.find(b => b.id === block)?.name ?? '' } };
+      try {
+        const doc = await engine.create({ name, block, chart: useChart });
+        await useDoc(doc, { kind: 'block', block });
+        if (base) { const ops = arrangeOps(doc, base); if (ops.length) { try { await useDoc(await engine.edit(doc, ops), { kind: 'block', block }); } catch { /* keep the engine's layout */ } } }
+        state = S.setLay(state, { ...lay, widthUnit: appUnit() }); persist(); render();
+        return true;
+      } catch (error) { host.message(errorText(error), true); return false; }
+    },
+    go(step) { goStep(step); return state.step === step; },
+    async nest(budgetS) {
+      if (state.marker.status === 'running') return false;
+      budget = budgetS; if (state.step !== 'marker') goStep('marker');
+      nestDone = runNest(); await nestDone; nestDone = null;
+      return state.marker.status === 'done' && !!state.marker.result;
+    },
+    stop() { abort?.abort(); },
+    touring(on) { touring = on; root.classList.toggle('st-touring', on); renderChrome(); },
+    progress: () => ({ running: state.marker.status === 'running', elapsedS: progress.elapsed, budgetS: budget, bestLengthMm: progress.best?.length ?? state.marker.result?.length ?? null, efficiency: progress.best?.efficiency ?? state.marker.result?.efficiency ?? null }),
+    facts() {
+      const d = state.doc; if (!d) return null;
+      const r = state.marker.result, l = state.lay, f = r ? S.layFabric(r.length, l) : null, gm = S.garmentsPerMarker(l);
+      const all = [...seams, ...extraReports];
+      return { name: state.info.name, pieces: d.pieces.length, pieceNames: d.pieces.map(p => p.name), sizes: [...d.sizes], baseSize: d.base_size,
+        seamChecks: all.length, seamChecksOk: all.filter(x => seamOk(x)).length,
+        widthMm: l.widthMm, layout: l.layout, plies: l.plies, passes: S.layFabric(0, l).passes, garmentsPerMarker: gm,
+        lengthMm: r?.length ?? null, efficiency: r ? headlineFigure(markerYield(l.layout, r, state.marker.report)) : null, checksOk: state.marker.report ? state.marker.report.ok : null,
+        fabricMm: f ? f.totalMm : null, garmentsInLay: f ? gm * f.passes : null };
+    },
+  };
+  return { root, control };
 }

@@ -1,23 +1,27 @@
-# Public launch checklist: 0.4.0
+# Public launch checklist
+
+For the 0.8 launch, check the actual candidate version and retain all acceptance
+gates below. Public 0.7 results are in [its release record](RELEASE-0.7.0.md).
+Do not infer a passed gate from an older release or a partial engine report.
 
 This is a gate list, not a statement that every item passed. Record the exact
 commit, platform, command, result and reviewer. Rebuild packages after merging
 engine, UI or benchmark changes. Do not publish before approval.
 
-See the [0.4.0 release record](RELEASE-0.4.0.md) for executed checks, artifact
+See the historical [0.4.0 release record](RELEASE-0.4.0.md) for its checks, artifact
 sizes and hashes. Use that evidence to separate executed checks from remaining
 acceptance gates.
 
 ## Automated checks and package records
 
-- [ ] Verify all BETA workspace/npm/bundle/About versions are 0.4.0. Compatibility
+- [ ] Verify all BETA workspace/npm/bundle/About versions match the release candidate. Compatibility
   adapters retain upstream-compatible versions; document that exception.
 - [ ] Regenerate Cargo/npm lockfiles in the lead's checkout and review the diff.
 - [ ] Run `cargo test --workspace --no-fail-fast` in `marker/` and `pattern/`.
 - [ ] Run `cargo clippy --workspace --all-targets -- -D warnings` in both workspaces. Investigate
   warnings, especially in changed files.
 - [ ] Run `npx vitest run marker` and Marker TypeScript checks.
-- [ ] Rebuild Marker, Pattern and Floor WASM; check all three in `web/wasm/`.
+- [ ] Rebuild Marker, Pattern, Floor and Cutting-room WASM; check all four in `web/wasm/`.
 - [ ] Run the desktop licence gate and regenerate the complete dependency
   inventory. Retain upstream notices and jagua-rs source access. Audit optional
   platform dependencies separately.

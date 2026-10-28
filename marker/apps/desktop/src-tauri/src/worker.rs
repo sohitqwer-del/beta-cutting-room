@@ -30,7 +30,19 @@ pub(crate) fn run() -> anyhow::Result<()> {
                         "best_length_mm":p.length,"best_efficiency":p.result.efficiency,"result":p.result}}));
                 }
             };
-            let result = if beta_marker_match::needs_rules(&input.job) {
+            let result = if input.adaptive {
+                if beta_marker_match::needs_rules(&input.job) {
+                    Err(anyhow::anyhow!(
+                        "Strategy comparison currently requires no stripe/check or shade matching. Use ordinary search for this job."
+                    ))
+                } else {
+                    beta_marker_nest::nest_adaptive_with_progress(
+                        &input.job,
+                        &input.options,
+                        &mut progress,
+                    )
+                }
+            } else if beta_marker_match::needs_rules(&input.job) {
                 beta_marker_match::nest_with_rules_and_progress(
                     &input.job,
                     &input.options,

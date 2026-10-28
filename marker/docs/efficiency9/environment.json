@@ -1,0 +1,26 @@
+{
+  "baseline_engine_commit": "db5f4ff",
+  "candidate_engine_commit": "63b4571",
+  "toolchain": "Rust 1.98.1, Windows GNU",
+  "seeds": [
+    1,
+    7
+  ],
+  "requested_native_search_seconds": 6,
+  "native_layouts_audited": 50,
+  "all_native_valid": true,
+  "all_fixed_records_preserved": true,
+  "browser_smoke_cases": 3,
+  "browser_smoke_steps": 11,
+  "browser_stop_responses": 3,
+  "actual_browser_timed_cases": 1,
+  "actual_browser_target_seconds": 8,
+  "hashes": {
+    "baseline_exe": "2acd4a74c97273f7dfd711dd9631f376a163fc8dc60cf9d919d76b95c41d0566",
+    "candidate_exe": "da658c9158466448145121d7b113315053494b00d2fa2d8dd765b75bb9468dc7",
+    "common_cases": "064d5413a58e79e7930f9b8e830ad5b482b6011a2ad7c972f212865e32e19668",
+    "mixed_case": "1df0d87ecb339d95f94c342692c3a1e02cc2c9f5579d2c1971d8bce19fd15e66",
+    "before_wasm": "ad389069fef8d1136134a21474c635a4a204e303bb90b5e257f239afc5dd9523",
+    "after_wasm": "5f87963717dbf8e7ec7e1e86c70d5e6cc1b67cd5bc2e74135040a861a23f3373"
+  }
+}

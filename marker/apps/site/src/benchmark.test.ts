@@ -74,6 +74,12 @@ describe('parseRun', () => {
     expect(run({ x_runtime: { wall_s: 3600 }, extensions: { load: 'high' } }).id).toBe('lectra-60s');
   });
 
+  it('accepts a release engine baseline without calling it commercial', () => {
+    const r = run({ reference: { name: 'BETA Cutting Room 0.7.0', type: 'engine-baseline' } });
+    expect(r.reference.type).toBe('engine-baseline');
+    expect(headlineGroup(r).median_diff_pp).toBe(-1.2);
+  });
+
   it('requires null differences when there is no reference', () => {
     const bad = parseRun(minimal({ reference: { name: 'None', type: 'none' } }), 'x');
     expect(bad.ok).toBe(false);

@@ -510,6 +510,8 @@
   "nest_none": "No marker was found in the time. Try a longer search or check the fabric width.",
   "nest_done": "Marker ready: {m} {u}, {e}% efficiency.",
   "marker_stale": "Settings changed after this marker was made. Make the marker again to use them.",
+  "kept_title": "Kept the previous marker.",
+  "kept_previous": "It is {kept} long and still passes every check. The new search only found {found}.",
   "practice_marker": "Practice layout · not a real marker. Do not cut from it.",
   "browser_no_match": "Some match points are not matched. Make the marker again with a longer search, or check the repeat and the match points.",
   "marker_stats": "Marker results",

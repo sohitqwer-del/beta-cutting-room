@@ -1,4 +1,21 @@
-# Release screenshots
+# Screenshots
+
+## Home page paths (0.8)
+
+Real BETA Cutting Room browser app (static build, real Rust engines in the browser), captured headlessly with sample
+data only and saved as WebP in two widths each. Only these files are loaded by the website.
+
+| File | Data and screen |
+|---|---|
+| `path-paper-390.webp`, `-600.webp` | Photo to marker on a 390 px phone (2x): the built-in practice sample photo with the found pieces outlined |
+| `path-pattern-800.webp`, `-1200.webp` | Make a style · Pattern: the sample tour T-shirt block (sizes S–XL) on the drafting canvas |
+| `path-marker-800.webp`, `-1200.webp` | Make a style · Marker: the sample tour T-shirt marker with piece names, all checks passed |
+
+The launch QA tools (`site-shots.mjs`, `webp.mjs`, outside the repository) drive the sample tour and convert the
+PNG captures with the browser's own WebP encoder. No factory or private data.
+
+## Older release screenshots (0.7.0)
+
 
 Real BETA Cutting Room 0.7.0 browser app, captured headlessly against the local
 Rust server and the local Rust WASM. All seven files are 1920 x 1200 PNGs in

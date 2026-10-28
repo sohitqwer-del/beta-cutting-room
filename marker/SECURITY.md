@@ -15,8 +15,8 @@ report privately, assess scope, agree on disclosure and verify the fix.
 
 ## Version scope
 
-0.4.0 is public. It has not completed an independent security audit.
-Earlier milestones are development snapshots, without a maintenance guarantee.
+0.7.0 is public; 0.8.0 is in development. No independent security audit is
+complete. A published release is not a long-term maintenance guarantee.
 See the [release checklist](docs/RELEASE-CHECKLIST.md) for required acceptance.
 
 The desktop uses native Tauri IPC. The CLI HTTP server defaults to loopback.

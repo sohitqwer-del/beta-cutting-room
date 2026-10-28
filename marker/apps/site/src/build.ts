@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { loadRuns } from './benchmark.ts';
 import { site } from './config.ts';
 import { clientScript, usesNetwork } from './client-build.ts';
+import { readHero } from './hero-live.ts';
 import { layout, pages } from './layout.ts';
 import type { Raw } from './html.ts';
 import type { BuildContext } from './pages/context.ts';
@@ -33,7 +34,9 @@ if (errors.length) {
 const screensDir = join(publicDir, 'assets', 'screens');
 const screens = new Set(existsSync(screensDir) ? readdirSync(screensDir).filter((f) => f.endsWith('.png')) : []);
 const video = process.env.BETA_SITE_VIDEO === '1' || existsSync(join(publicDir, site.demoVideo.file));
-const ctx: BuildContext = { screens, runs, video };
+const heroFile = join(root, 'data', 'hero-marker.json');
+const hero = existsSync(heroFile) ? readHero(readFileSync(heroFile, 'utf8')) : undefined;
+const ctx: BuildContext = { screens, runs, video, hero };
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(join(dist, 'assets'), { recursive: true });
@@ -51,7 +54,7 @@ const renderers: Record<string, () => Raw> = {
   'benchmark.html': () => benchmarkPage(ctx),
   'compare.html': () => comparePage(),
   'install.html': () => installPage(),
-  'docs.html': () => docsPage(hasManual),
+  'docs.html': () => docsPage(hasManual, runs),
   'open-source.html': () => openSourcePage(),
 };
 
@@ -78,4 +81,4 @@ if (problems.length) {
 }
 
 const statuses = runs.map((r) => `${r.id} (${r.status})`).join(', ');
-console.log(`Built ${pages.length} pages into dist/. Benchmark runs: ${statuses}. Screenshots found: ${screens.size}. Demo video: ${video ? 'self-hosted' : site.demoVideo.demoVideoUrl ? 'link' : 'not shown'}.`);
+console.log(`Built ${pages.length} pages into dist/. Benchmark runs: ${statuses}. Hero: ${hero ? `${hero.frames.length} recorded markers` : 'illustration'}. Demo video: ${video ? 'self-hosted' : site.demoVideo.demoVideoUrl ? 'link' : 'not shown'}.`);

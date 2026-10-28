@@ -1,6 +1,23 @@
 /* Quick Marker (photo to marker). Phone first: one column 360-430 px, one hand, 48 px targets, the main
    action docked at the bottom within thumb reach. Uses the design-system tokens in style.css only. */
 .quick { max-width: 980px; padding-bottom: 0; }
+.q-set-tools { display: grid; grid-template-columns: minmax(180px,1fr) auto; gap: 10px 20px; width: 100%; padding: 16px 0; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.q-set-tools label { display: grid; gap: 6px; font-weight: 600; }
+.q-set-tools small { grid-column: 1/-1; color: var(--text-2); }
+.q-head { flex-wrap: wrap; }
+.q-table-wrap { overflow-x: auto; }
+.q-saved-pieces { display: grid; grid-template-columns: repeat(auto-fit,minmax(110px,1fr)); gap: 10px; }
+.q-saved-pieces button { display: grid; justify-items: center; gap: 8px; padding: 12px; }
+.q-inventory table { width: 100%; border-collapse: collapse; text-align: left; }
+.q-inventory th, .q-inventory td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.q-tape { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 12px; }
+.q-tape svg { width: 100%; height: 240px; background: var(--surface-2,var(--surface)); cursor: crosshair; border: 1px solid var(--line); border-radius: 10px; touch-action: manipulation; }
+.q-tape svg circle { fill: var(--accent); }
+.q-tape svg text { fill: var(--text); pointer-events: none; }
+.q-tape-line { stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-dasharray: 5 4; }
+.q-tape-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 12px 0; }
+.q-tape-fields label { display: grid; gap: 6px; }
+@media (max-width: 600px) { .q-set-tools, .q-tape-fields { grid-template-columns: minmax(0,1fr); } .q-set-tools .q-row button { flex: 1; } }
 .quick button, .q-sheet button, .q-projector button { min-height: 48px; }
 .quick .icon-btn, .q-sheet .icon-btn, .q-projector .icon-btn { width: 48px; }
 .quick input:not([type=checkbox]):not([type=radio]), .quick select, .q-sheet input:not([type=checkbox]):not([type=radio]), .q-sheet select, .q-projector input { min-height: 48px; }

@@ -1,6 +1,9 @@
 # Project BETA: complete cutting-room software plan
 
-Date: 19 October 2026. Status: proposal. Building a pattern-making product needs a new top-level folder, so the Project BETA lead must approve it.
+Date: 19 October 2026. Status: historical proposal. The `pattern/` product now
+exists. See [current features](FEATURES.md) and [roadmap](ROADMAP.md). Market
+claims, gap lists and proposed approvals below describe the original research,
+not a current implementation or supplier comparison.
 
 ## 1. Open-source pattern-making software (checked on GitHub, 19 October 2026)
 

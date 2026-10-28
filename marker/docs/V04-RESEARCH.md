@@ -1,5 +1,9 @@
 # BETA Marker v0.4: what other systems do
 
+> Historical research and proposed backlog, not today's feature matrix.
+> Later releases add editor tools, browser exports and cutting-room work;
+> see [features](FEATURES.md), [roadmap](ROADMAP.md) and [0.7](RELEASE-0.7.0.md).
+
 Research date: **19 October 2026**. Branch: `marker/research4`.
 
 ## Decision

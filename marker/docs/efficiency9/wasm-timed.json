@@ -1,0 +1,462 @@
+[
+  {
+    "all_fixed_preserved": true,
+    "all_valid": true,
+    "id": "teagan-browser",
+    "length": 5354.9022125,
+    "pkg": "old",
+    "records": [
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5687.367300000002,
+        "placements": 24,
+        "round": 0,
+        "seed": 1,
+        "useful_yield": 0.631077574797192,
+        "validation": {
+          "efficiency": 0.6310775747971875,
+          "errors": [],
+          "length": 5687.367300000002,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997244,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.631077574797192,
+          "warnings": []
+        },
+        "wall_s": 0.13359999999403954,
+        "warnings": [
+          "Bounded obstacle packing: 1 compaction passes; fixed transforms preserved. Prepare 0.003s; initial construction 0.026s; search/check 0.077s."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5378.26927265625,
+        "placements": 24,
+        "round": 1,
+        "seed": 1,
+        "useful_yield": 0.6673466464225982,
+        "validation": {
+          "efficiency": 0.6673466464225979,
+          "errors": [],
+          "length": 5378.26927265625,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.94399728,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6673466464225982,
+          "warnings": []
+        },
+        "wall_s": 2.5105,
+        "warnings": []
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5375.57933125,
+        "placements": 24,
+        "round": 2,
+        "seed": 2,
+        "useful_yield": 0.6676805868717882,
+        "validation": {
+          "efficiency": 0.6676805868717882,
+          "errors": [],
+          "length": 5375.57933125,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997283,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6676805868717882,
+          "warnings": []
+        },
+        "wall_s": 2.001199999988079,
+        "warnings": []
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5362.94518125,
+        "placements": 24,
+        "round": 3,
+        "seed": 3,
+        "useful_yield": 0.6692535242040807,
+        "validation": {
+          "efficiency": 0.6692535242040802,
+          "errors": [],
+          "length": 5362.94518125,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997279,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6692535242040807,
+          "warnings": []
+        },
+        "wall_s": 1.7755999999940395,
+        "warnings": []
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5354.9022125,
+        "placements": 24,
+        "round": 4,
+        "seed": 4,
+        "useful_yield": 0.6702587312027137,
+        "validation": {
+          "efficiency": 0.6702587312027133,
+          "errors": [],
+          "length": 5354.9022125,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997279,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6702587312027137,
+          "warnings": []
+        },
+        "wall_s": 1.820300000011921,
+        "warnings": []
+      }
+    ],
+    "steps": 5,
+    "target_wall_s": 8,
+    "useful_yield": 0.6702587312027137,
+    "wall_s": 8.35790000000596
+  },
+  {
+    "all_fixed_preserved": true,
+    "all_valid": true,
+    "id": "teagan-browser",
+    "length": 5274.3098,
+    "pkg": "new",
+    "records": [
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5687.367300000002,
+        "placements": 24,
+        "round": 0,
+        "seed": 1,
+        "useful_yield": 0.631077574797192,
+        "validation": {
+          "efficiency": 0.6310775747971875,
+          "errors": [],
+          "length": 5687.367300000002,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997244,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.631077574797192,
+          "warnings": []
+        },
+        "wall_s": 0.13419999998807908,
+        "warnings": [
+          "Bounded obstacle packing: 0 compaction passes; fixed transforms preserved. Prepare 0.002s; initial construction 0.018s; search/check 0.086s."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5375.57884296875,
+        "placements": 24,
+        "round": 1,
+        "seed": 1,
+        "useful_yield": 0.66768064751938,
+        "validation": {
+          "efficiency": 0.6676806475193799,
+          "errors": [],
+          "length": 5375.57884296875,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997282,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.66768064751938,
+          "warnings": []
+        },
+        "wall_s": 1.783800000011921,
+        "warnings": [
+          "Persistent browser separator: one model import, 1276 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5370.2033546875,
+        "placements": 24,
+        "round": 2,
+        "seed": 1,
+        "useful_yield": 0.6683489852450316,
+        "validation": {
+          "efficiency": 0.66834898524503,
+          "errors": [],
+          "length": 5370.2033546875,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.9439972695,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6683489852450316,
+          "warnings": []
+        },
+        "wall_s": 0.932800000011921,
+        "warnings": [
+          "Persistent browser separator: one model import, 2018 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5359.4631203125,
+        "placements": 24,
+        "round": 3,
+        "seed": 1,
+        "useful_yield": 0.6696883404350354,
+        "validation": {
+          "efficiency": 0.6696883404350359,
+          "errors": [],
+          "length": 5359.4631203125,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997286,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6696883404350354,
+          "warnings": []
+        },
+        "wall_s": 0.7885999999940395,
+        "warnings": [
+          "Persistent browser separator: one model import, 3126 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5348.7443703125,
+        "placements": 24,
+        "round": 4,
+        "seed": 1,
+        "useful_yield": 0.6710303791271217,
+        "validation": {
+          "efficiency": 0.6710303791271215,
+          "errors": [],
+          "length": 5348.7443703125,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997281,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6710303791271217,
+          "warnings": []
+        },
+        "wall_s": 0.5330999999940396,
+        "warnings": [
+          "Persistent browser separator: one model import, 3692 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5338.0471046875,
+        "placements": 24,
+        "round": 5,
+        "seed": 1,
+        "useful_yield": 0.6723751012824702,
+        "validation": {
+          "efficiency": 0.67237510128247,
+          "errors": [],
+          "length": 5338.0471046875,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997281,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6723751012824702,
+          "warnings": []
+        },
+        "wall_s": 0.5729000000059604,
+        "warnings": [
+          "Persistent browser separator: one model import, 4970 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5327.37083515625,
+        "placements": 24,
+        "round": 6,
+        "seed": 1,
+        "useful_yield": 0.6737225685471895,
+        "validation": {
+          "efficiency": 0.6737225685471895,
+          "errors": [],
+          "length": 5327.37083515625,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997283,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6737225685471895,
+          "warnings": []
+        },
+        "wall_s": 0.516699999988079,
+        "warnings": [
+          "Persistent browser separator: one model import, 14116 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5316.71605,
+        "placements": 24,
+        "round": 7,
+        "seed": 1,
+        "useful_yield": 0.6750727194966252,
+        "validation": {
+          "efficiency": 0.6750727194966246,
+          "errors": [],
+          "length": 5316.71605,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997278,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6750727194966252,
+          "warnings": []
+        },
+        "wall_s": 0.5732999999821186,
+        "warnings": [
+          "Persistent browser separator: one model import, 15214 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5306.08274921875,
+        "placements": 24,
+        "round": 8,
+        "seed": 1,
+        "useful_yield": 0.6764255538972347,
+        "validation": {
+          "efficiency": 0.6764255538972341,
+          "errors": [],
+          "length": 5306.08274921875,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997278,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6764255538972347,
+          "warnings": []
+        },
+        "wall_s": 0.6105,
+        "warnings": [
+          "Persistent browser separator: one model import, 19344 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5295.47044453125,
+        "placements": 24,
+        "round": 9,
+        "seed": 1,
+        "useful_yield": 0.677781133944666,
+        "validation": {
+          "efficiency": 0.6777811339446657,
+          "errors": [],
+          "length": 5295.47044453125,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.94399728,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.677781133944666,
+          "warnings": []
+        },
+        "wall_s": 0.6753000000119209,
+        "warnings": [
+          "Persistent browser separator: one model import, 20060 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5284.87962421875,
+        "placements": 24,
+        "round": 10,
+        "seed": 1,
+        "useful_yield": 0.6791393972753793,
+        "validation": {
+          "efficiency": 0.6791393972753785,
+          "errors": [],
+          "length": 5284.87962421875,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997276,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6791393972753793,
+          "warnings": []
+        },
+        "wall_s": 0.5295,
+        "warnings": [
+          "Persistent browser separator: one model import, 20226 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5274.3098,
+        "placements": 24,
+        "round": 11,
+        "seed": 1,
+        "useful_yield": 0.6805004064541023,
+        "validation": {
+          "efficiency": 0.680500406454101,
+          "errors": [],
+          "length": 5274.3098,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997272,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6805004064541023,
+          "warnings": []
+        },
+        "wall_s": 0.44069999998807907,
+        "warnings": [
+          "Persistent browser separator: one model import, 21640 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      }
+    ],
+    "steps": 12,
+    "target_wall_s": 8,
+    "useful_yield": 0.6805004064541023,
+    "wall_s": 8.21140000000596
+  }
+]

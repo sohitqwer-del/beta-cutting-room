@@ -1,6 +1,6 @@
 import { find } from '../screens';
-/** Quick Marker smoke. Run in the Vite app opened at `?quick-mock=1#/quick` (practice engine), or without
- * `quick-mock` once the Rust Quick Marker API is merged (then step "sample" still uses the practice photos).
+/** Legacy mock smoke. Run only at `?quick-mock=1#/quick` (explicit practice engine).
+ * The normal sample button now uses the real scanner. See sample-scan.mjs and launch8.mjs for real-engine checks.
  *   const s = await import('/src/quick/quick-smoke.mjs'); await s.runQuickSmoke();
  * Or one step at a time (the headless screenshot runner does this): await s.runStep('review').
  * Uses only visible controls and DOM text. Nesting uses the local Rust server when it answers. */

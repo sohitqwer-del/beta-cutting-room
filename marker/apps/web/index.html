@@ -1,3 +1,62 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="description" content="BETA Cutting Room: open-source pattern, marker, cut planning and cutting-floor software that runs on your own PC or server."><link rel="icon" type="image/svg+xml" href="./favicon.svg"><link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#176b52"><link rel="apple-touch-icon" href="./icon-192.png"><title>BETA Cutting Room</title></head>
-<body><div id="app"></div><script type="module" src="/src/main.ts"></script></body></html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="description" content="BETA Cutting Room: free, open-source pattern, marker, cut planning and cutting-floor software. Runs in your browser or on your own PC or server."><link rel="icon" type="image/svg+xml" href="./favicon.svg"><link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#176b52"><link rel="apple-touch-icon" href="./icon-192.png"><title>BETA Cutting Room</title>
+<style>
+/* Loading screen: plain HTML and CSS, so the first paint shows the brand and progress instead of a blank page.
+   src/boot.ts moves the bar and removes the screen when the first app screen is ready. */
+#boot{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:24px;background:#f2f5f3;color:#14201b;font:15px/1.45 "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Noto Sans",Roboto,Arial,sans-serif;transition:opacity .25s ease}
+#boot.boot-done{opacity:0;pointer-events:none}
+.boot-card{width:min(360px,100%);text-align:center}
+.boot-card svg{display:block;margin:0 auto 14px}
+.boot-name{margin:0;font-size:22px;letter-spacing:-.01em}.boot-name b{font-weight:700}.boot-name span{color:#1f5f4a}
+.boot-line{margin:6px 0 22px;color:#3b4a43}
+.boot-bar{height:6px;border-radius:999px;background:#d9e1dd;overflow:hidden}
+.boot-bar span{display:block;height:100%;width:100%;background:#1f5f4a;border-radius:inherit;transform-origin:left;transform:scaleX(.06);transition:transform 9s cubic-bezier(.1,.6,.3,1)}
+.boot-step{margin:10px 0 0;color:#56655e;font-size:14px;min-height:1.45em}
+.boot-step button{margin-left:6px;font:inherit;padding:6px 12px;border-radius:8px;border:1px solid #7a8a83;background:#fff;color:#14201b;cursor:pointer}
+:root[data-theme=dark] #boot{background:#0e1412;color:#e7eeea}
+:root[data-theme=dark] .boot-line{color:#c0cdc6}:root[data-theme=dark] .boot-step{color:#a5b4ac}
+:root[data-theme=dark] .boot-bar{background:#2e3b35}:root[data-theme=dark] .boot-bar span{background:#6fcca3}:root[data-theme=dark] .boot-name span{color:#8fdcb9}
+@media (prefers-color-scheme: dark){:root[data-theme=system] #boot{background:#0e1412;color:#e7eeea}:root[data-theme=system] .boot-line,:root[data-theme=system] .boot-step{color:#a5b4ac}:root[data-theme=system] .boot-bar{background:#2e3b35}:root[data-theme=system] .boot-bar span{background:#6fcca3}}
+@media (prefers-reduced-motion: reduce){#boot,.boot-bar span{transition:none}}
+</style>
+<script>
+// Theme before first paint (same rule as the app: light unless the user chose dark or "same as computer"),
+// then the loading-screen controller used by src/boot.ts.
+(function () {
+  var r = document.documentElement, theme = 'light', tour = location.hash === '#/tour';
+  try { theme = localStorage.getItem('beta-theme') || 'light'; } catch (e) { /* default */ }
+  r.dataset.theme = theme === 'dark' || theme === 'system' ? theme : 'light';
+  var done = false, slow = 0, fail = function (text) {
+    var step = document.getElementById('boot-step'); if (!step || done) return;
+    step.textContent = text + ' ';
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = 'Reload'; b.onclick = function () { location.reload(); }; step.appendChild(b);
+  };
+  window.__boot = function (percent, text) {
+    var boot = document.getElementById('boot'); if (!boot || done) return;
+    var bar = boot.querySelector('.boot-bar'), fill = boot.querySelector('.boot-bar span'), step = document.getElementById('boot-step');
+    if (bar) bar.setAttribute('aria-valuenow', String(Math.round(percent)));
+    if (fill) { fill.style.transitionDuration = percent >= 100 ? '.2s' : percent >= 60 ? '1.5s' : ''; fill.style.transform = 'scaleX(' + Math.min(1, percent / 100) + ')'; }
+    if (text && step) step.textContent = text;
+    if (percent >= 100) { done = true; clearTimeout(slow); boot.classList.add('boot-done'); setTimeout(function () { boot.remove(); }, 300); }
+  };
+  // A visitor who comes for the sample tour (#/tour, the website's "Try it now") waits for the pattern and marker
+  // engines: start both downloads now, next to the app script, instead of after start-up.
+  if (tour) ['beta_pattern_wasm_bg.wasm', 'beta_marker_wasm_bg.wasm'].forEach(function (f) {
+    var l = document.createElement('link'); l.rel = 'preload'; l.as = 'fetch'; l.crossOrigin = 'anonymous'; l.fetchPriority = 'low'; l.href = 'wasm/' + f; document.head.appendChild(l);
+  });
+  slow = setTimeout(function () { var s = document.getElementById('boot-step'); if (s && !done) s.textContent = 'Still loading. The first visit on a slow connection takes longer; later visits are faster.'; }, 20000);
+  window.addEventListener('error', function (e) { if (!done && e && /\.js|module|import/i.test(String(e.message || e.filename || ''))) fail('The app could not start.'); });
+  // While the app script downloads, the bar creeps towards 55 % (a slow compositor transition: it moves even while the
+  // page is busy). The app sets the real steps: starting, then ready.
+  var creep = function () { if (document.getElementById('boot')) { window.__boot(55, tour ? 'Downloading the app and the sample engine (about 2.7 MB, only the first time)…' : 'Downloading the app (about 300 KB)…'); } else requestAnimationFrame(creep); };
+  requestAnimationFrame(function () { requestAnimationFrame(creep); });
+})();
+</script></head>
+<body><div id="boot" role="status" aria-live="polite" aria-label="Loading BETA Cutting Room"><div class="boot-card">
+<svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="15" fill="#176b52"/><path d="M8 5.5H56M8 58.5H56" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="1.3" stroke-dasharray="3 2.2"/><path d="M16 11H26V53H16V36L19.5 32L16 28Z" fill="#fff"/><path d="M29 11H38.5A10 10 0 0 1 38.5 31H29Z" fill="#f4b740"/><path d="M29 34H40.5A9.5 9.5 0 0 1 40.5 53H29Z" fill="#c9ecd9"/><path d="M21.5 17V47M19.1 20.2L21.5 17L23.9 20.2M19.1 43.8L21.5 47L23.9 43.8" fill="none" stroke="#176b52" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="41" cy="43.5" r="1.7" fill="#176b52"/></svg>
+<p class="boot-name"><b>BETA</b> <span>Cutting Room</span></p>
+<p class="boot-line">Free, open-source software for garment cutting rooms. It runs in this browser; your files stay on this device.</p>
+<div class="boot-bar" role="progressbar" aria-label="Loading the app" aria-valuemin="0" aria-valuemax="100" aria-valuenow="6"><span></span></div>
+<p class="boot-step" id="boot-step">Downloading the app…</p>
+<noscript><p>This app needs JavaScript. Turn it on and reload the page.</p></noscript>
+</div></div><div id="app"></div><script type="module" src="/src/main.ts"></script></body></html>

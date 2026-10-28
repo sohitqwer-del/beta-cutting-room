@@ -1,4 +1,5 @@
 // Builds the BETA demo video from scenes.mjs: narration, recording, editing, captions and all deliverables.
+// 0.8 launch outputs use launch8.mjs (see README); this editor preserves earlier release reproducibility.
 // Usage (from the repository root):
 //   node marker/deploy/video/make-video.mjs <step> --out <output dir> [--app http://127.0.0.1:7878/] [--playwright <dir>]
 // Steps: tts | record | retime | build | stills | check | all  (all = tts, record, build, stills, check)

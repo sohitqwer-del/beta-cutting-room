@@ -1,9 +1,10 @@
 [package]
 name = "beta-public-bench"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2024"
 rust-version = "1.90"
 license = "Apache-2.0"
+default-run = "beta-public-bench"
 
 # Keep this orchestration tool outside the product workspace.
 [workspace]
@@ -11,6 +12,10 @@ license = "Apache-2.0"
 [[bin]]
 name = "beta-public-bench"
 path = "main.rs"
+
+[[bin]]
+name = "beta-launch8-bench"
+path = "launch8.rs"
 
 [dependencies]
 anyhow = "1.0"

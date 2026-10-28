@@ -1,4 +1,4 @@
-import type { Job, Layout, MarkerResult, Pt } from '@beta/marker-wasm';
+import type { Job, Layout, MarkerResult, Pt, TapeReport } from '@beta/marker-wasm';
 import type { QuickPiece, QuickScan, QuickSession, QuickWarning } from '@beta/marker-wasm';
 import { longAxis, turnLine } from './geometry';
 import { widthProblem, type WidthUnit } from './units';
@@ -18,22 +18,34 @@ export interface NestState {
   job?: Job; result?: MarkerResult; error?: string;
 }
 export interface QuickState {
+  setName: string;
+  material: string;
+  fabricProfiles: Record<string, PaperFabric>;
+  tapeChecks: Record<string, { outline: string; report: TapeReport }>;
+  /** Practice is explicit and must survive saving a sample set. */
+  practice: boolean;
   step: Step; reference: Reference;
   photos: Photo[]; pieces: ReviewPiece[]; duplicates: QuickSession['duplicates']; warnings: QuickWarning[];
   selected: string | null;
   defaultSize: string;
-  fabric: { widthMm: number | null; unit: WidthUnit; nap: boolean; layout: Layout };
+  fabric: PaperFabric;
   garments: Record<string, number>;
   nest: NestState;
   usualM: number | null;
 }
+export interface PaperFabric {
+  widthMm: number | null; unit: WidthUnit; nap: boolean; layout: Layout;
+  gsm: number | null; construction: 'unknown' | 'woven' | 'knit'; pieceGap: number; edgeGap: number;
+}
+export const defaultFabric = (): PaperFabric => ({ widthMm: 44 * 25.4, unit: 'inch', nap: false, layout: 'open', gsm: null, construction: 'unknown', pieceGap: 2, edgeGap: 5 });
 
 export const SIZE_PRESETS = ['FREE', 'S', 'M', 'L', 'XL', 'XXL'];
 export function initialState(): QuickState {
   return {
+    setName: '', material: 'main', fabricProfiles: {}, tapeChecks: {}, practice: false,
     step: 'start', reference: 'a4-sheet', photos: [], pieces: [], duplicates: [], warnings: [], selected: null,
     defaultSize: 'FREE',
-    fabric: { widthMm: 44 * 25.4, unit: 'inch', nap: false, layout: 'open' },
+    fabric: defaultFabric(),
     garments: {},
     nest: { status: 'idle', budgetS: 30, elapsedS: 0, bestLengthMm: null, bestEfficiency: null },
     usualM: null,
@@ -41,12 +53,12 @@ export function initialState(): QuickState {
 }
 
 // ---------- Steps and guards ----------
-export type Blocker = 'no_photo' | 'reading' | 'no_pieces' | 'pending' | 'width' | 'no_garments' | 'size_without_pieces' | 'no_result';
+export type Blocker = 'no_photo' | 'reading' | 'no_pieces' | 'pending' | 'width' | 'no_garments' | 'size_without_pieces' | 'no_result' | 'tape_check' | 'fabric_details';
 export function accepted(state: QuickState): ReviewPiece[] { return state.pieces.filter(p => p.status === 'accepted'); }
 export function pending(state: QuickState): ReviewPiece[] { return state.pieces.filter(p => p.status === 'pending'); }
 /** Sizes that have accepted pieces, in a stable shop order (FREE, S, M, L, XL, XXL, then others A–Z). */
 export function orderSizes(state: QuickState): string[] {
-  const sizes = [...new Set(accepted(state).map(p => p.piece.size ?? state.defaultSize))];
+  const sizes = [...new Set(accepted(state).filter(p => materialOf(p.piece) === state.material).map(p => p.piece.size ?? state.defaultSize))];
   const rank = (s: string) => { const i = SIZE_PRESETS.indexOf(s); return i < 0 ? 100 : i; };
   return sizes.sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
 }
@@ -69,6 +81,8 @@ export function blocker(state: QuickState, step: Step): Blocker | null {
   if (step === 'order') return null;
   if (widthProblem(state.fabric.widthMm)) return 'width';
   if (!totalGarments(state)) return 'no_garments';
+  if (fabricProblem(state.fabric)) return 'fabric_details';
+  if (!state.practice && uncheckedPhotos(state).length) return 'tape_check';
   if (step === 'nest') return null;
   return state.nest.result ? null : 'no_result';
 }
@@ -89,14 +103,14 @@ export function photoScanned(state: QuickState, id: string, scan: QuickScan): Qu
   return { ...state, photos: state.photos.map(p => p.id === id ? { ...p, status: 'done', scan } : p) };
 }
 export function removePhoto(state: QuickState, id: string): QuickState {
-  return { ...state, photos: state.photos.filter(p => p.id !== id), pieces: state.pieces.filter(p => p.piece.photoId !== id), selected: null };
+  return normalizeMaterial({ ...state, photos: state.photos.filter(p => p.id !== id), pieces: state.pieces.filter(p => p.piece.photoId !== id), selected: null });
 }
 /** Fold a merged session into the review list. Pieces the user already reviewed keep their edits and status. */
 export function applySession(state: QuickState, session: QuickSession): QuickState {
   const old = new Map(state.pieces.map(p => [p.piece.id, p]));
   const sizeOf = new Map(state.photos.map(p => [p.id, p.size]));
   const pieces = session.pieces.map(piece => old.get(piece.id) ?? { piece: { ...piece, size: piece.size ?? sizeOf.get(piece.photoId) ?? state.defaultSize }, status: 'pending' as const, dismissed: [] });
-  return { ...state, pieces, duplicates: session.duplicates, warnings: session.warnings };
+  return normalizeMaterial({ ...state, pieces, duplicates: session.duplicates, warnings: session.warnings });
 }
 /** Changing the size of a photo changes its pieces that the user has not set one by one. */
 export function setPhotoSize(state: QuickState, id: string, size: string): QuickState {
@@ -121,7 +135,7 @@ export function shownGrain(piece: QuickPiece): [Pt, Pt] { return piece.grain ?? 
 /** Accepting a piece also confirms the grain arrow shown on it (the engine needs a confirmed grain on every piece). */
 const confirm = (p: ReviewPiece): ReviewPiece => ({ ...p, status: 'accepted', piece: { ...p.piece, grain: shownGrain(p.piece) } });
 export function accept(state: QuickState, id: string): QuickState { return edit(state, id, confirm); }
-export function remove(state: QuickState, id: string): QuickState { return edit(state, id, p => ({ ...p, status: 'deleted' })); }
+export function remove(state: QuickState, id: string): QuickState { return normalizeMaterial(edit(state, id, p => ({ ...p, status: 'deleted' }))); }
 export function restore(state: QuickState, id: string): QuickState { return edit(state, id, p => ({ ...p, status: 'pending', removedAsPairOf: undefined, removedAsDuplicateOf: undefined })); }
 /** An explicit user action: accept every piece still waiting. Deleted pieces stay deleted. */
 export function acceptAllPending(state: QuickState): QuickState {
@@ -158,6 +172,10 @@ export function turnGrain(state: QuickState, id: string): QuickState {
   const p = state.pieces.find(r => r.piece.id === id)?.piece; if (!p) return state;
   return editPiece(state, id, { grain: turnLine(shownGrain(p)) });
 }
+/** Store the operator's arrow; Rust validates it when building the job. */
+export function setGrain(state: QuickState, id: string, grain: [Pt,Pt]): QuickState {
+  return editPiece(state,id,{ grain: structuredClone(grain) });
+}
 export function replacePiece(state: QuickState, piece: QuickPiece): QuickState { return edit(state, piece.id, p => ({ ...p, piece: { ...piece, size: p.piece.size, name: p.piece.name } })); }
 
 // ---------- Suggestions (chips the user taps) ----------
@@ -168,7 +186,7 @@ export function chips(state: QuickState, id: string): Chip[] {
   const p = r.piece, s = p.suggestions, out: Chip[] = [];
   const open = (k: SuggestionKind) => !r.dismissed.includes(k);
   if (s.name && open('name') && s.name.value !== p.name) out.push({ kind: 'name', value: s.name.value, confidence: s.name.confidence, reason: s.name.reason });
-  const mate = s.pairPieceId ? state.pieces.find(q => q.piece.id === s.pairPieceId) : undefined;
+  const mate = s.pairPieceId ? state.pieces.find(q => q.piece.id === s.pairPieceId && materialOf(q.piece) === materialOf(p) && q.piece.size === p.size) : undefined;
   if (s.pair === 'mirror' && mate && mate.status !== 'deleted' && open('pair')) out.push({ kind: 'pair', value: 'mirror', confidence: s.quantity?.confidence ?? 'medium', reason: 'Two pieces look like mirror images.', other: mate.piece.id });
   const q = s.quantity?.value;
   if (q && open('quantity') && !(s.pair === 'mirror' && mate && mate.status !== 'deleted') && (q.normal !== (p.quantity ?? 1) || q.mirrored !== (p.mirror_quantity ?? 0)))
@@ -176,7 +194,7 @@ export function chips(state: QuickState, id: string): Chip[] {
   if (s.cutOnFold?.value && s.symmetryAxis && !p.fold_line && open('fold')) out.push({ kind: 'fold', value: 'fold', confidence: s.cutOnFold.confidence, reason: s.cutOnFold.reason });
   if (s.grain && !p.grain && open('grain')) out.push({ kind: 'grain', value: 'grain', confidence: s.grain.confidence, reason: s.grain.reason });
   const dup = state.duplicates.find(d => d.pieceId === id);
-  const original = dup ? state.pieces.find(q2 => q2.piece.id === dup.duplicateOf) : undefined;
+  const original = dup ? state.pieces.find(q2 => q2.piece.id === dup.duplicateOf && materialOf(q2.piece) === materialOf(p) && q2.piece.size === p.size) : undefined;
   if (dup && original && original.status !== 'deleted' && open('duplicate')) out.push({ kind: 'duplicate', value: 'duplicate', confidence: dup.confidence, reason: 'Same shape and size as a piece in another photo.', other: dup.duplicateOf });
   return out;
 }
@@ -220,7 +238,58 @@ export function ensureGarments(state: QuickState): QuickState {
 /** Pieces of a size that is not ordered are left out of the job (the engine rejects unknown sizes). */
 export function jobPieces(state: QuickState): QuickPiece[] {
   const sizes = garmentsFor(state);
-  return accepted(state).map(p => p.piece).filter(p => (sizes[p.size ?? ''] ?? 0) > 0);
+  return accepted(state).map(p => p.piece).filter(p => materialOf(p) === state.material && (sizes[p.size ?? ''] ?? 0) > 0);
+}
+
+// ---------- Paper pattern sets ----------
+export function materialOf(piece: QuickPiece): string { return piece.material || 'main'; }
+export function materials(state: QuickState): string[] {
+  return [...new Set(state.pieces.filter(p => p.status !== 'deleted').map(p => materialOf(p.piece)))].sort();
+}
+function normalizeMaterial(state: QuickState): QuickState {
+  const groups = materials(state);
+  return groups.length && !groups.includes(state.material) ? selectMaterial(state,groups[0]!) : state;
+}
+export function setMaterial(state: QuickState, id: string, value: string): QuickState {
+  const material = value.trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 40);
+  if (!material || ['__proto__', 'constructor', 'prototype'].includes(material)) return state;
+  let next = editPiece(state, id, { material });
+  if (!materials(next).includes(next.material)) next = selectMaterial(next, materials(next)[0] ?? 'main');
+  return clearNest(next);
+}
+export function selectMaterial(state: QuickState, material: string): QuickState {
+  if (!materials(state).includes(material)) return state;
+  const profiles = { ...state.fabricProfiles, [state.material]: structuredClone(state.fabric) };
+  return clearNest({ ...state, material, fabricProfiles: profiles,
+    fabric: { ...(Object.hasOwn(profiles, material) ? profiles[material]! : defaultFabric()), unit: state.fabric.unit } });
+}
+export function fabricProblem(f: PaperFabric): boolean {
+  return (f.gsm != null && (!Number.isFinite(f.gsm) || f.gsm <= 0 || f.gsm > 5000))
+    || [f.pieceGap, f.edgeGap].some(n => !Number.isFinite(n) || n < 0 || n > 100);
+}
+export function recordTape(state: QuickState, id: string, report: TapeReport): QuickState {
+  const piece = state.pieces.find(p => p.piece.id === id)?.piece;
+  if (!piece) return state;
+  return clearNest({ ...state, tapeChecks: { ...state.tapeChecks, [id]: { outline: JSON.stringify(piece.outline), report } } });
+}
+export function tapeOf(state: QuickState, piece: QuickPiece): TapeReport | undefined {
+  const check = state.tapeChecks[piece.id];
+  return check?.outline === JSON.stringify(piece.outline) ? check.report : undefined;
+}
+/** One independent distance per source photo used by this marker. No global accuracy claim. */
+export function uncheckedPhotos(state: QuickState): string[] {
+  const pieces = jobPieces(state), photos = [...new Set(pieces.map(p => p.photoId))];
+  return photos.filter(photo => !pieces.some(p => p.photoId === photo && tapeOf(state, p)?.pass)
+    || pieces.some(p => p.photoId === photo && tapeOf(state,p)?.pass === false));
+}
+export function patternGroups(state: QuickState): Array<{ material: string; size: string; pieces: ReviewPiece[] }> {
+  const groups = new Map<string, { material: string; size: string; pieces: ReviewPiece[] }>();
+  for (const p of state.pieces.filter(p => p.status !== 'deleted')) {
+    const material = materialOf(p.piece), size = p.piece.size ?? state.defaultSize, key = JSON.stringify([material,size]);
+    if (!groups.has(key)) groups.set(key, { material, size, pieces: [] });
+    groups.get(key)!.pieces.push(p);
+  }
+  return [...groups.values()].sort((a,b) => a.material.localeCompare(b.material) || a.size.localeCompare(b.size));
 }
 
 // ---------- Nesting ----------

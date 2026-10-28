@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.0 - Cutting Room launch
+
+- Paired 300-task / 60-second benchmark: 0.8 vs Lectra mean -1.39 pp, median -1.57 pp, 77/12/211 wins/ties/losses. The same run's 0.7: -1.37 pp, -1.62 pp, 77/13/210. Ordinary open jobs are essentially tied with 0.7 (mean -0.02 pp, median -0.0004 pp, 47/187/66). Three open/start-defect garment jobs gain mean +15.52 pp, median +14.46 pp, 3/0/0; Titan falls from 9.55 m to 7.17 m. Three Simon folded/tube cases regress slightly. One seed, three workers per task, shared load: no broad win claim. See the 28 October report.
+
+- Stronger nesting on damaged and constrained jobs. Mixed folded layers can use full cuts for some pieces and fold halves for others. Results vary by job.
+- Keep a shorter valid marker. Improve one area with Preview, Apply and Undo.
+- Compare order cost across widths, metre and kilogram prices, GSM and allowances.
+- Paper-pattern sets have a tape check and separate fabric groups with GSM.
+- A file-free 60-second tour, loading screen, new website, share cards and launch videos.
+- New FEATURES, FAQ, ROADMAP, GETTING-STARTED, CONTRIBUTING and CODE_OF_CONDUCT guides.
+- Folded small orders still trail open lays. Blocks need sewn samples. Real photo accuracy and physical plotter/cutter output remain untested. Installers are unsigned. Hindi and Tamil are drafts. Strategy comparison is experimental and off by default.
+
 ## 0.7.0 - Make it good
 
 - More room to work. The menu has five jobs (Home, Make a style, Photo to

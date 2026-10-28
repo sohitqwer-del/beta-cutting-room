@@ -11,6 +11,84 @@ fn rectangle_job() -> Job {
     }))
     .expect("job")
 }
+
+#[test]
+fn measured_cost_route_keeps_failures_and_only_selects_final_valid_plans() {
+    let request = json!({
+        "order": order(4, 4), "currency":"INR",
+        "offers":[
+            {"id":"fits","width_mm":100.0,"price":{"unit":"metre","price":20.0},"lay_cost":1.0},
+            {"id":"too-narrow","width_mm":1.0,"price":{"unit":"metre","price":1.0},"lay_cost":0.0},
+            {"id":"no-stock","width_mm":100.0,"price":{"unit":"metre","price":0.0},"lay_cost":0.0,"rolls":{"rolls":[]}}
+        ],
+        "options":{"time_per_marker_s":0.05,"max_candidates":2,"max_refinements":1,"search_nodes":100},
+        "finalists":1,"final_time_s":0.05
+    });
+    let output = cutroom("/api/plan/cost", &serde_json::to_vec(&request).unwrap())
+        .unwrap()
+        .unwrap();
+    let comparison: beta_marker_plan::cost::CostComparison =
+        serde_json::from_slice(output.body()).unwrap();
+    assert_eq!(comparison.trials.len(), 3);
+    assert!(!comparison.trials[1].feasible);
+    assert!(!comparison.trials[2].feasible);
+    assert!(comparison.trials[2].error.is_some());
+    let winner = &comparison.trials[comparison.chosen.expect("a winner")];
+    assert!(winner.feasible && winner.final_evaluated);
+    assert!(winner.plan.as_ref().unwrap().complete);
+    assert!(winner.cost.as_ref().unwrap().total > 0.);
+}
+
+#[test]
+fn cost_route_rejects_unbounded_interactive_requests() {
+    let request =
+        json!({"order":order(4,4),"currency":"INR","offers":[],"finalists":1,"final_time_s":8.0});
+    let input: beta_marker_plan::cost::CostRequest = serde_json::from_value(request).unwrap();
+    assert!(check_cost_comparison(&input).is_err());
+}
+
+#[test]
+fn cost_comparison_preserves_table_end_and_rejects_unhandled_cut_sections() {
+    let mut request: beta_marker_plan::cost::CostRequest = serde_json::from_value(json!({
+        "order":order(4,4),"currency":"INR","offers":[{"id":"a","width_mm":100,"price":{"unit":"metre","price":20},"lay_cost":0}],
+        "finalists":1,"final_time_s":30
+    })).unwrap();
+    request
+        .order
+        .job
+        .meta
+        .insert("editor_v1".into(), json!({"table_length":25}));
+    assert_eq!(
+        prepare_cost_comparison(&request)
+            .unwrap()
+            .order
+            .job
+            .fabric
+            .max_length,
+        Some(25.)
+    );
+    request.order.job.fabric.max_length = Some(20.);
+    assert_eq!(
+        prepare_cost_comparison(&request)
+            .unwrap()
+            .order
+            .job
+            .fabric
+            .max_length,
+        Some(20.)
+    );
+    request
+        .order
+        .job
+        .meta
+        .insert("editor_v1".into(), json!({"sections":[10.]}));
+    assert!(
+        prepare_cost_comparison(&request)
+            .unwrap_err()
+            .to_string()
+            .contains("cut sections")
+    );
+}
 fn rectangle_marker() -> MarkerResult {
     serde_json::from_value(json!({
         "format": "beta-marker.result/v1", "job_name": "Rectangles", "width": 100.0,

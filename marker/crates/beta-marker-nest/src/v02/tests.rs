@@ -31,6 +31,145 @@ fn options() -> NestOptions {
     }
 }
 
+#[test]
+fn repaired_proposals_obey_new_locks_even_with_an_older_valid_warm_start() -> Result<()> {
+    let mut j = job();
+    j.fabric.defects.push(Zone {
+        id: "interior hole".into(),
+        polygon: vec![[35., 10.], [45., 10.], [45., 20.], [35., 20.]],
+        note: None,
+    });
+    let warm = crate::nest_with_cancellation(
+        &j,
+        &NestOptions {
+            time_limit_s: 0.1,
+            ..options()
+        },
+        &std::sync::atomic::AtomicBool::new(false),
+        &mut |_| {},
+    )?;
+    let mut fixed = warm.placements[0].clone();
+    fixed.translate = [200., 0.];
+    fixed.locked = true;
+    let opts = NestOptions {
+        time_limit_s: 2.0,
+        fixed: vec![fixed.clone()],
+        warm_start: Some(warm),
+        ..options()
+    };
+    let result = super::nest(&j, &opts, &mut |_| {})?;
+    assert!(result.placements.contains(&fixed));
+    assert!(beta_marker_core::validate(&j, &result).ok);
+    j.fabric.max_length = Some(199.);
+    assert!(
+        super::nest(&j, &opts, &mut |_| {}).is_err(),
+        "an old warm start must not bypass a new impossible lock"
+    );
+    Ok(())
+}
+
+#[test]
+fn partial_proposals_are_repaired_before_becoming_a_complete_incumbent() -> Result<()> {
+    let mut j = job();
+    j.fabric.defects.push(Zone {
+        id: "hole".into(),
+        polygon: vec![[35., 10.], [45., 10.], [45., 20.], [35., 20.]],
+        note: None,
+    });
+    let fixed = Placement {
+        piece_id: "panel".into(),
+        bundle: Some(0),
+        translate: [100., 0.],
+        locked: true,
+        ..Default::default()
+    };
+    let opts = NestOptions {
+        time_limit_s: 0.2,
+        fixed: vec![fixed.clone()],
+        ..options()
+    };
+    let templates = slots(&j)?;
+    let dirs = directions(&j, &templates, std::slice::from_ref(&fixed), 0)?;
+    let hint = Placement {
+        piece_id: "panel".into(),
+        bundle: Some(0),
+        copy: 1,
+        translate: [35., 0.],
+        ..Default::default()
+    };
+    let result = bounded::repair(
+        &j,
+        &templates,
+        std::slice::from_ref(&fixed),
+        &opts,
+        0,
+        &dirs,
+        &mut |_| {},
+        &[hint],
+    )?;
+    assert!(result.placements.contains(&fixed));
+    assert!(beta_marker_core::validate(&j, &result).ok);
+    Ok(())
+}
+
+#[test]
+fn concave_pocket_is_filled_without_moving_a_locked_piece() -> Result<()> {
+    // There is a 20 mm pocket at x=20..40. Binary search over the
+    // non-monotone collision range used to skip it and append at x=100.
+    let mut j = job();
+    j.pieces = vec![
+        Piece {
+            id: "concave".into(),
+            quantity: 1,
+            rotation: RotationRule::Fixed,
+            outline: vec![
+                [0., 0.],
+                [100., 0.],
+                [100., 100.],
+                [40., 100.],
+                [40., 20.],
+                [20., 20.],
+                [20., 100.],
+                [0., 100.],
+            ],
+            ..Default::default()
+        },
+        Piece {
+            id: "small".into(),
+            quantity: 1,
+            rotation: RotationRule::Fixed,
+            outline: vec![[0., 0.], [10., 0.], [10., 20.], [0., 20.]],
+            ..Default::default()
+        },
+    ];
+    for piece_gap in [0.0, 2.0] {
+        j.spacing.piece_gap = piece_gap;
+        let fixed = Placement {
+            piece_id: "concave".into(),
+            bundle: Some(0),
+            locked: true,
+            ..Default::default()
+        };
+        let result = super::nest(
+            &j,
+            &NestOptions {
+                time_limit_s: 0.3,
+                fixed: vec![fixed.clone()],
+                ..options()
+            },
+            &mut |_| {},
+        )?;
+        assert!(beta_marker_core::validate(&j, &result).ok);
+        assert!(result.placements.contains(&fixed));
+        assert!(
+            result.length <= 100.0 + 1e-7,
+            "gap {piece_gap}: {}",
+            result.length
+        );
+    }
+    Ok(())
+}
+
 fn internally_nest(job: &Job, options: &NestOptions, variant: usize) -> Result<MarkerResult> {
     let templates = slots(job)?;
     let fixed = fixed_placements(job, &templates, &options.fixed)?;
@@ -331,16 +470,35 @@ fn full_symmetric_layers_share_garments_and_survive_warm_fixed_refinement() -> R
     j.pieces[0].quantity = 1;
     j.pieces[0].size = Some("M".into());
     j.pieces[0].fold_line = Some([[0., 20.], [60., 20.]]);
-    j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 2)]) });
+    j.order = Some(Order {
+        sizes: BTreeMap::from([("M".into(), 2)]),
+    });
     let mut result = super::nest(&j, &options(), &mut |_| {})?;
     assert_eq!(result.placements.len(), 1);
-    assert_eq!(beta_marker_core::rules::placement_bundles(&result.placements[0]), BTreeSet::from([0, 1]));
+    assert_eq!(
+        beta_marker_core::rules::placement_bundles(&result.placements[0]),
+        BTreeSet::from([0, 1])
+    );
     assert!(!result.warnings.iter().any(|w| w.contains("surplus")));
-    let warm = super::nest(&j, &NestOptions { warm_start: Some(result.clone()), ..options() }, &mut |_| {})?;
+    let warm = super::nest(
+        &j,
+        &NestOptions {
+            warm_start: Some(result.clone()),
+            ..options()
+        },
+        &mut |_| {},
+    )?;
     assert!(warm.length <= result.length);
     result.placements[0].locked = true;
     let fixed = result.placements[0].clone();
-    let refined = super::nest(&j, &NestOptions { fixed: vec![fixed.clone()], ..options() }, &mut |_| {})?;
+    let refined = super::nest(
+        &j,
+        &NestOptions {
+            fixed: vec![fixed.clone()],
+            ..options()
+        },
+        &mut |_| {},
+    )?;
     assert_eq!(refined.placements, vec![fixed]);
     assert!(beta_marker_core::validate(&j, &refined).ok);
     Ok(())
@@ -353,10 +511,17 @@ fn asymmetric_layers_never_replace_an_unrequested_hand() -> Result<()> {
     j.pieces[0].quantity = 1;
     j.pieces[0].size = Some("M".into());
     j.pieces[0].outline[2] = [53., 32.];
-    j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 2)]) });
+    j.order = Some(Order {
+        sizes: BTreeMap::from([("M".into(), 2)]),
+    });
     let result = super::nest(&j, &options(), &mut |_| {})?;
     assert_eq!(result.placements.len(), 2);
-    assert!(result.placements.iter().all(|p| p.layer_allocations[1].is_none()));
+    assert!(
+        result
+            .placements
+            .iter()
+            .all(|p| p.layer_allocations[1].is_none())
+    );
     assert!(beta_marker_core::validate(&j, &result).ok);
     Ok(())
 }
@@ -369,7 +534,9 @@ fn inferred_symmetric_layers_use_both_hands_with_honest_odd_surplus() -> Result<
         j.fabric.width = 41.;
         j.pieces[0].quantity = 1;
         j.pieces[0].size = Some("M".into());
-        j.order = Some(Order { sizes: BTreeMap::from([("M".into(), 3)]) });
+        j.order = Some(Order {
+            sizes: BTreeMap::from([("M".into(), 3)]),
+        });
         let result = super::nest(&j, &options(), &mut |_| {})?;
         let report = beta_marker_core::validate(&j, &result);
         assert!(report.ok, "{:?}", report.errors);
@@ -403,14 +570,29 @@ fn explicit_fixed_faceless_layers_consume_pooled_hands() -> Result<()> {
     j.pieces[0].quantity = 1;
     j.pieces[0].mirror_quantity = 1;
     let fixed = Placement {
-        piece_id: "panel".into(), bundle: Some(0), locked: true,
+        piece_id: "panel".into(),
+        bundle: Some(0),
+        locked: true,
         layer_allocations: vec![
-            Some(beta_marker_core::LayerAllocation { bundle: 0, mirrored: false }),
-            Some(beta_marker_core::LayerAllocation { bundle: 0, mirrored: false }),
+            Some(beta_marker_core::LayerAllocation {
+                bundle: 0,
+                mirrored: false,
+            }),
+            Some(beta_marker_core::LayerAllocation {
+                bundle: 0,
+                mirrored: false,
+            }),
         ],
         ..Default::default()
     };
-    let result = super::nest(&j, &NestOptions { fixed: vec![fixed.clone()], ..options() }, &mut |_| {})?;
+    let result = super::nest(
+        &j,
+        &NestOptions {
+            fixed: vec![fixed.clone()],
+            ..options()
+        },
+        &mut |_| {},
+    )?;
     assert_eq!(result.placements, vec![fixed]);
     assert!(beta_marker_core::validate(&j, &result).ok);
     Ok(())
@@ -427,8 +609,14 @@ fn symmetric_mirror_pair_can_use_two_halves_when_a_full_cut_is_too_wide() -> Res
     let result = super::nest(&j, &options(), &mut |_| {})?;
     assert_eq!(result.placements.len(), 2);
     assert!(result.placements.iter().all(|p| p.on_fold));
-    assert_eq!(result.placements.iter().map(|p| beta_marker_core::rules::layer_copies(j.fabric.layout, p))
-        .fold((0, 0), |(a, b), (c, d)| (a + c, b + d)), (1, 1));
+    assert_eq!(
+        result
+            .placements
+            .iter()
+            .map(|p| beta_marker_core::rules::layer_copies(j.fabric.layout, p))
+            .fold((0, 0), |(a, b), (c, d)| (a + c, b + d)),
+        (1, 1)
+    );
     assert!(beta_marker_core::validate(&j, &result).ok);
     Ok(())
 }
@@ -566,8 +754,20 @@ fn no_order_uses_one_garment_per_size() -> Result<()> {
     medium.size = Some("M".into());
     j.pieces.push(medium);
     let result = super::nest(&j, &options(), &mut |_| {})?;
-    assert!(result.placements.iter().filter(|p| p.piece_id == "panel").all(|p| p.bundle == Some(0)));
-    assert!(result.placements.iter().filter(|p| p.piece_id == "medium").all(|p| p.bundle == Some(1)));
+    assert!(
+        result
+            .placements
+            .iter()
+            .filter(|p| p.piece_id == "panel")
+            .all(|p| p.bundle == Some(0))
+    );
+    assert!(
+        result
+            .placements
+            .iter()
+            .filter(|p| p.piece_id == "medium")
+            .all(|p| p.bundle == Some(1))
+    );
     assert!(beta_marker_core::validate(&j, &result).ok);
     Ok(())
 }
@@ -681,12 +881,22 @@ fn fold_halves_can_use_full_two_layer_cuts_to_share_the_width() -> Result<()> {
     );
     assert!(result.placements.iter().any(|p| !p.on_fold));
     assert_eq!(
-        result.placements.iter().map(|p| beta_marker_core::rules::layer_copies(j.fabric.layout, p))
+        result
+            .placements
+            .iter()
+            .map(|p| beta_marker_core::rules::layer_copies(j.fabric.layout, p))
             .fold((0, 0), |(a, b), (c, d)| (a + c, b + d)),
         (2, 0)
     );
-    let surplus = result.placements.iter().flat_map(|p| &p.layer_allocations).any(Option::is_none);
-    assert_eq!(result.warnings.iter().any(|w| w.contains("surplus")), surplus);
+    let surplus = result
+        .placements
+        .iter()
+        .flat_map(|p| &p.layer_allocations)
+        .any(Option::is_none);
+    assert_eq!(
+        result.warnings.iter().any(|w| w.contains("surplus")),
+        surplus
+    );
     Ok(())
 }
 
@@ -746,7 +956,9 @@ fn fold_job(layout: Layout, width: f64, depth: f64, garments: u32) -> Job {
     j.pieces[0].size = Some("M".into());
     j.pieces[0].outline = vec![[0.0, 0.0], [60.0, 0.0], [60.0, depth], [0.0, depth]];
     j.pieces[0].fold_line = Some([[0.0, depth / 2.0], [60.0, depth / 2.0]]);
-    j.order = Some(Order { sizes: BTreeMap::from([("M".into(), garments)]) });
+    j.order = Some(Order {
+        sizes: BTreeMap::from([("M".into(), garments)]),
+    });
     j
 }
 
@@ -755,14 +967,29 @@ fn pinned_sparrow(j: &Job) -> Result<MarkerResult> {
     assert!(slots.iter().all(|s| s.placement.on_fold));
     let directions = directions(j, &slots, &[], 0)?;
     let pins = pinned::plan(j, &slots, 0, &directions)?;
-    let options = NestOptions { time_limit_s: 0.3, ..options() };
-    sparrow_allocated(j, &slots, &[], &options, 0, &SearchTuning::default(), &mut |_| {}, Some(pins))
+    let options = NestOptions {
+        time_limit_s: 0.3,
+        ..options()
+    };
+    sparrow_allocated(
+        j,
+        &slots,
+        &[],
+        &options,
+        0,
+        &SearchTuning::default(),
+        &mut |_| {},
+        Some(pins),
+    )
 }
 
 #[test]
 fn pinned_fold_halves_nest_in_sparrow_and_sit_exactly_on_the_fold() -> Result<()> {
     let mut j = fold_job(Layout::Folded, 100.0, 40.0, 3);
-    j.spacing = Spacing { piece_gap: 2.0, edge_gap: 3.0 };
+    j.spacing = Spacing {
+        piece_gap: 2.0,
+        edge_gap: 3.0,
+    };
     let result = pinned_sparrow(&j)?;
     assert!(result.engine.starts_with("sparrow"), "{}", result.engine);
     let report = beta_marker_core::validate(&j, &result);
@@ -770,7 +997,11 @@ fn pinned_fold_halves_nest_in_sparrow_and_sit_exactly_on_the_fold() -> Result<()
     assert_eq!(result.placements.iter().filter(|p| p.on_fold).count(), 3);
     assert_eq!(result.surplus_copies, 0);
     // Halves are 20 mm deep, so the bars must not let them stack across the width.
-    assert!(result.length >= 3.0 * 60.0 + 2.0 * 2.0 - 1e-6, "{}", result.length);
+    assert!(
+        result.length >= 3.0 * 60.0 + 2.0 * 2.0 - 1e-6,
+        "{}",
+        result.length
+    );
     Ok(())
 }
 
@@ -780,7 +1011,13 @@ fn tube_pairs_use_both_folds_at_the_same_place() -> Result<()> {
     let slots = layers::slots(&j, false)?;
     let directions = directions(&j, &slots, &[], 0)?;
     let pins = pinned::plan(&j, &slots, 0, &directions)?;
-    assert_eq!(pins.iter().flatten().filter(|p| p.partner().is_some()).count(), 1);
+    assert_eq!(
+        pins.iter()
+            .flatten()
+            .filter(|p| p.partner().is_some())
+            .count(),
+        1
+    );
     let result = pinned_sparrow(&j)?;
     let report = beta_marker_core::validate(&j, &result);
     assert!(report.ok, "{:?}", report.errors);
@@ -792,7 +1029,10 @@ fn tube_pairs_use_both_folds_at_the_same_place() -> Result<()> {
         .map(|pl| beta_marker_core::rules::cut_outline(&j.pieces[0], pl))
         .map(|points| beta_marker_core::geometry::bbox(&points).expect("outline")[1])
         .collect();
-    assert!(ys.iter().any(|y| y.abs() < 1e-6) && ys.iter().any(|y| (y - 60.0).abs() < 1e-6), "{ys:?}");
+    assert!(
+        ys.iter().any(|y| y.abs() < 1e-6) && ys.iter().any(|y| (y - 60.0).abs() < 1e-6),
+        "{ys:?}"
+    );
     Ok(())
 }
 
@@ -818,6 +1058,10 @@ fn fold_edge_note_explains_a_marker_set_by_its_fold_pieces() -> Result<()> {
     let mut short = fold_job(Layout::Folded, 100.0, 40.0, 4);
     short.pieces[0].fold_line = None;
     let result = super::nest(&short, &options(), &mut |_| {})?;
-    assert!(!result.warnings.iter().any(|w| w.starts_with("Fold edge:")), "{:?}", result.warnings);
+    assert!(
+        !result.warnings.iter().any(|w| w.starts_with("Fold edge:")),
+        "{:?}",
+        result.warnings
+    );
     Ok(())
 }

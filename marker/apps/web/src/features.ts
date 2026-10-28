@@ -1,5 +1,6 @@
 import { installCuttingRoom } from './cutting-room';
 import { installFloor } from './floor-ui';
+import { installCostComparison } from './cost-comparison';
 import type { CutPlan, Job, Layout, MarkerCore, MarkerResult, MatchAxes, Nap, Pt, ShadeAxis } from '@beta/marker-wasm';
 import { bbox } from '@beta/marker-wasm/geometry';
 import type { DocumentState } from './state';
@@ -226,6 +227,13 @@ export function installFeatures(editor: Editor) {
     if(e.key==='Enter'){e.preventDefault();try{addPoint();}catch(e){editor.message(errorText(e),true);}}
   });
   function formValues():PlanForm{return {quantities:Object.fromEntries(sizeNames(editor.get().job).map((s,i)=>[s,n(`quantity-${i}`)])),maxPlies:n('max-plies'),maxGarments:n('max-garments'),overcut:n('overcut'),time:n('plan-time'),finalTime:n('plan-final-time'),endAllowance:n('end-allowance'),layCost:n('lay-cost')};}
+  installCostComparison({
+    input: () => planPayload(editor.get().job, formValues()), width: () => editor.get().job.fabric.width, busy: () => operation || editor.busy(),
+    setBusy: value => { operation = value; }, register: () => cuttingRoom.floorRegister(),
+    use: (chosen, job, allowance) => { plan = chosen; planJob = job; planEnd = allowance; planCost = 0; renderPlan(); savePlan(); $('#plan-error').textContent = 'Using a final checked plan from the cost comparison.'; },
+    quantities: () => formValues().quantities,
+    sampleOrder: () => { const q = formValues().quantities; if (!Object.values(q).some(n => n > 0)) sizeNames(editor.get().job).forEach((_, i) => { const input = find<HTMLInputElement>(`#quantity-${i}`); if (input) input.value = '20'; }); $('#plan-form').dispatchEvent(new Event('input')); },
+  });
   $('#plan-form').addEventListener('input',()=>{$('#plan-error').textContent=planErrors(formValues()).join(' ');});
   $('#plan-form').addEventListener('submit',async event=>{
     event.preventDefault();if(operation||editor.busy())return;

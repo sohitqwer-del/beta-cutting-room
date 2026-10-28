@@ -2,6 +2,8 @@ import { html, type Raw } from '../html.ts';
 import { ext, pageHead, section } from '../layout.ts';
 import { repoLink } from '../config.ts';
 import { helpSection } from './home.ts';
+import { faqList, topFaq } from '../faq.ts';
+import type { Run } from '../benchmark.ts';
 
 const technical: [string, string, string][] = [
   ['marker/README.md', 'BETA Marker overview', 'What the marker engine does, how it is built and where each part lives.'],
@@ -15,13 +17,12 @@ const technical: [string, string, string][] = [
   ['CONTRIBUTING.md', 'Contributing', 'How to propose changes and what each change needs.'],
 ];
 
-const faq: [string, Raw][] = [
-  ['Do I need an internet connection?', html`No. The desktop app and the server work offline. Install and update from a USB drive if you need to.`],
-  ['Which pattern files can I open?', html`DXF-AAMA and ASTM pattern files, BETA pattern files, and a supported subset of Seamly2D files. Test a few of your own styles first, because each CAD writes DXF a little differently.`],
+/** Practical questions after the shared top eight (see src/faq.ts). The full list is marker/docs/FAQ.md. */
+const moreFaq: [string, Raw][] = [
+  ['Which pattern files can I open?', html`DXF-AAMA and ASTM pattern files, BETA pattern and style files, and a supported subset of Seamly2D files. Test a few of your own styles first, because each CAD writes DXF a little differently.`],
   ['Can it drive my plotter or cutter?', html`It writes PLT/HPGL and 1:1 PDF for plotters, and a generic ISO file for cutters. Profiles for specific machines are not certified yet. Plot a 1,000 mm test line and check it before production.`],
-  ['Is BETA better than my current CAD?', html`We do not know yet, and we do not claim it. On the public Lectra data, results depend on the time allowed and the size of the marker, and BETA loses on many tasks. See the <a href="benchmark.html">benchmark</a>, and <a href="index.html#samples">send us your markers</a> for a comparison on your styles.`],
-  ['What does it cost?', html`The software is free and open source. You pay only for your own hardware, and for any support or training you choose to buy from someone.`],
-  ['Which languages are supported?', html`English today. Hindi and Tamil are planned.`],
+  ['Which languages are supported?', html`English. Hindi and Tamil drafts cover most screens; they need review by native speakers before factory use.`],
+  ['Do I need a powerful computer?', html`No. The browser app runs on an ordinary phone or PC. Big markers and long cut plans are much faster in the desktop app or on a factory server, which use all processor cores.`],
 ];
 
 function docLink(path: string, title: string): Raw {
@@ -29,7 +30,7 @@ function docLink(path: string, title: string): Raw {
   return href ? ext(href, title) : html`${title}`;
 }
 
-export function docsPage(hasManual: boolean): Raw {
+export function docsPage(hasManual: boolean, runs: Run[] = []): Raw {
   return html`
 ${pageHead('Help and documentation', 'Start with the user manual. The technical documents explain how BETA works, how it is tested and what is still missing.', 'Help')}
 
@@ -52,10 +53,8 @@ ${section('technical', 'Technical documents', html`
   ${technical.map(([path, title, text]) => html`<li><span class="doc-title">${docLink(path, title)}</span><span>${text}</span><code>${path}</code></li>`)}
 </ul>`, { cls: 'section-alt' })}
 
-${section('faq', 'Common questions', html`
-<div class="faq">
-  ${faq.map(([q, a]) => html`<details class="disclosure"><summary>${q}</summary><p>${a}</p></details>`)}
-</div>`)}
+${section('faq', 'Common questions', html`${faqList([...topFaq(runs), ...moreFaq])}
+<p class="note">${docLink('marker/docs/FAQ.md', 'All questions and answers (FAQ)')}</p>`)}
 
 ${helpSection('section-alt')}
 `;

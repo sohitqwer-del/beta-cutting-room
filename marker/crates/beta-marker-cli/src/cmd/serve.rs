@@ -214,6 +214,8 @@ struct MarkerRequest {
 struct NestRequest {
     job: Job,
     options: NestOptions,
+    #[serde(default)]
+    adaptive: bool,
 }
 use beta_marker_api::PlanRequest;
 #[derive(Default)]
@@ -1005,7 +1007,17 @@ fn dispatch(method: Method, url: String, body: Bytes, state: &ServiceState) -> R
                     status.last_layout = Some(Instant::now());
                 }
             };
-            let result = if beta_marker_match::needs_rules(&input.job) {
+            let result = if input.adaptive {
+                anyhow::ensure!(
+                    !beta_marker_match::needs_rules(&input.job),
+                    "Strategy comparison currently requires no stripe/check or shade matching. Use ordinary search for this job."
+                );
+                beta_marker_nest::nest_adaptive_with_progress(
+                    &input.job,
+                    &input.options,
+                    &mut on_progress,
+                )
+            } else if beta_marker_match::needs_rules(&input.job) {
                 beta_marker_match::nest_with_rules_and_progress(
                     &input.job,
                     &input.options,

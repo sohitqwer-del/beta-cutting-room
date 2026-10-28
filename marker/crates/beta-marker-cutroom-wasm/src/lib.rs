@@ -149,6 +149,29 @@ pub fn browser_nest(
     beta_marker_match::nest_with_rules_and_progress(job, &options, |_| {})
 }
 
+/// Compare measured width/ratio alternatives. Call in a Worker; progress is a checked partial plan.
+#[wasm_bindgen]
+pub fn compare_cost(request: &str, on_progress: &js_sys::Function) -> Result<String, JsValue> {
+    let input: beta_marker_plan::cost::CostRequest =
+        serde_json::from_str(request).map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let input = beta_marker_api::prepare_cost_comparison(&input)
+        .map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let result = beta_marker_plan::cost::compare_with_engine(
+        &input,
+        |partial| {
+            let json = serde_json::to_string(partial)?;
+            let answer = on_progress
+                .call1(&JsValue::NULL, &JsValue::from_str(&json))
+                .map_err(|_| anyhow::anyhow!("Comparison progress callback failed"))?;
+            anyhow::ensure!(answer.as_bool() != Some(false), "Comparison stopped");
+            Ok(())
+        },
+        &mut browser_nest,
+    )
+    .map_err(|e| JsValue::from_str(&format!("{e:#}")))?;
+    serde_json::to_string(&result).map_err(|e| JsValue::from_str(&e.to_string()))
+}
+
 /// Plan a cut order (the `/api/plan` body). Runs synchronously: call it in a
 /// Worker. `on_progress` receives each checked partial plan as JSON; returning
 /// `false` stops the search between markers. Returns the final plan as JSON.

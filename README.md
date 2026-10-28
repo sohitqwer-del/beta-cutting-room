@@ -1,92 +1,83 @@
 # BETA Cutting Room
 
-**Open-source, self-hosted cutting-room software for garment factories. Version 0.7.0.**
+**Free, open-source cutting-room software for garment factories.** Patterns, markers and cut plans, in your browser. Nothing to install, no account, and your files stay on your device.
 
-BETA takes a style from pattern to sewing line: draft and grade patterns, nest
-markers, plan cuts, inspect rolls, print spreading sheets, cut and make bundles.
-It runs offline on a Windows PC, or on your own factory server. No account,
-no cloud, no licence fee. Your patterns never leave your factory.
+Version 0.8.0 · Apache-2.0 · Browser, Windows, Linux server
 
-- Website: https://sohitqwer-del.github.io/beta-cutting-room/
-- **Try it now in your browser (no install):** https://sohitqwer-del.github.io/beta-cutting-room/app/
-- Demo video (3 min): on the website home page
-- Download: [Releases](https://github.com/sohitqwer-del/beta-cutting-room/releases)
-- Benchmark: [marker/docs/benchmarks.md](marker/docs/benchmarks.md)
-- Contact: sohitqwer@gmail.com
+[**▶ See it in 60 seconds — no install**](https://sohitqwer-del.github.io/beta-cutting-room/app/#/tour) · [Website](https://sohitqwer-del.github.io/beta-cutting-room/) · [Downloads](https://github.com/sohitqwer-del/beta-cutting-room/releases/latest) · [Features](marker/docs/FEATURES.md) · [FAQ](marker/docs/FAQ.md)
 
-> **A fun project, built with the help of modern AI tools.** BETA is young and
-> not perfect yet. **We need your help to improve it.** If something is wrong,
-> confusing or missing, please tell us: every report helps factories like yours.
->
-> - [Report a bug](https://github.com/sohitqwer-del/beta-cutting-room/issues/new?template=bug_report.yml)
-> - [Tell us what is missing](https://github.com/sohitqwer-del/beta-cutting-room/issues/new?template=missing_feature.yml)
-> - [Share feedback or an idea](https://github.com/sohitqwer-del/beta-cutting-room/issues/new?template=feedback.yml)
-> - [Join the discussion](https://github.com/sohitqwer-del/beta-cutting-room/discussions)
->
-> Please do not attach factory patterns unless you agree to make them public.
-> The app also has a **Feedback** button on every screen; it never sends anything by itself.
+![A T-shirt marker in sizes S to XL, drawing itself live in the browser](docs/images/marker-loop.gif)
 
-## New in 0.7.0: easier to use, and the whole cutting room in the browser
+> **A fun project, built with the help of modern AI tools.** It is young and not perfect. **We need your help:** try it on one real style and tell us what is wrong, confusing or missing. Start with the [10-minute guides](marker/docs/GETTING-STARTED.md).
 
-- **Roomier, simpler screens.** One "Start here" path, a short menu (Make a style, Photo to marker, Marker from files, Cutting floor, More tools), one cm/inch switch for the whole app, and the phone Back button works.
-- **Live marker.** The marker is drawn while it improves, with piece name and size on every piece, zoom, and tap for details.
-- **Everything in the browser, no server:** plotter (PLT/HPGL), DXF-AAMA, full-size and tiled PDF, DXF import with grade rules, cut plan, rolls, spreading sheet, bundles and tickets, floor tracking, reports and compare. Work stays on your device; save a backup file to move it.
-- **Honest folded and tube lays.** Results show the real fabric yield and pieces cut but not used. Waste on the worst test case is about halved, but folded fabric is still behind open fabric for small orders. See [FOLD7_RESULTS.md](marker/crates/beta-marker-nest/FOLD7_RESULTS.md).
-- **Better blocks.** Trouser, track pant and shirt yoke redrafted; 10,806 shape and seam checks pass for all 7 blocks in every size; new measurement spec sheet (PDF, CSV, Excel). Blocks are still starting drafts: sew a sample before production.
-- **Clear words.** A ply is one layer of fabric; a pass is one length laid from the roll (folded or tube = 2 plies per pass).
+## Who is it for?
 
-Full notes: [marker/docs/RELEASE-0.7.0.md](marker/docs/RELEASE-0.7.0.md). Real-user audit: [marker/docs/AUDIT-0.7.md](marker/docs/AUDIT-0.7.md).
+- **Small units without CAD:** photograph your paper patterns beside an A4 sheet, check one measurement with a tape, choose the fabric (width, GSM, open / folded / tube) and print or plot the marker.
+- **Pattern masters:** start from a T-shirt, shirt, trouser, skirt, kurta, polo or track-pant block, or a blank sheet. Draw, add darts and notches, grade from a size chart, check seams in every size, print a measurement spec sheet.
+- **Cutting rooms:** open DXF pieces from your CAD, make the marker, plan the cut for the whole order, inspect rolls, print spreading sheets, make bundles and tickets, and track every lay.
 
-### From 0.6.0: pattern to cut in one flow
+## See the workflow
 
-Start from a blank sheet or a ready block (T-shirt, shirt, trouser, skirt, kurta, polo, track pant), draw and edit the pattern, grade it from a size chart, choose the lay (open, folded or tube), set the cut gaps, add stripes or checks with a live overlay and match points, make the marker and export the cut files.
+![Pattern: editable pieces and sizes](docs/images/pattern-workspace.png)
+![Marker: labelled pieces across the fabric](docs/images/marker-workspace.png)
+![Cutting room: plan and spreading work](docs/images/cutting-room.png)
 
-## What is inside
+## What can it do?
 
-| Folder | What it is |
-|---|---|
-| [`marker/`](marker/README.md) | BETA Marker: nesting, marker editor, cut plan, rolls, spreading, bundles, floor tracking. Rust workspace, web app, Windows desktop app (Tauri) and the `beta-marker` server. |
-| [`pattern/`](pattern/README.md) | BETA Pattern: drafting, grading, DXF-AAMA and Seamly2D import, photo digitizing. Rust workspace. |
+### Pattern
+- Seven editable blocks driven by a size chart, or a blank sheet; curves, offsets, mirror, split, join, darts, pleats, notches, drill holes, seam allowance, grain and fold lines.
+- Grade from a size chart; all sizes stacked; seam checks in every size; 10,806 automatic shape and seam checks on the blocks.
+- DXF-AAMA/ASTM (with .rul grade rules) and Seamly2D import; DXF-AAMA, tiled PDF and plotter export; measurement spec sheet (PDF, CSV, Excel).
 
-All geometry and production calculations run in Rust. Nesting uses
-[sparrow](https://github.com/JeroenGar/sparrow) 0.3.0 (MIT) on
-[jagua-rs](https://github.com/JeroenGar/jagua-rs) 1.0.0 (MPL-2.0, used unmodified),
-plus BETA's garment rules and an independent validator that checks every marker.
+### Marker
+- Nesting in Rust (sparrow + jagua-rs) with garment rules: grain, rotation, mirror pairs, one-way fabric, gaps, fused blocks, defects, shade bands, stripes and checks with match points.
+- The marker draws itself live; stop at any time and keep the best. Open, folded and tube lays, with the real fabric yield shown.
+- Marker editor: move, rotate, lock, compact. **New in 0.8:** improve one area with preview, Apply and Undo; keep your previous marker if it is still valid and shorter.
+- Files: PLT/HPGL, DXF-AAMA, ISO, full-size and tiled PDF, SVG — made in the browser, byte-identical to the desktop app.
 
-## Benchmark in short
+### Cutting room
+- Cut plan for an order (plies, passes, fabric), rolls and inspection, spreading sheet, bundles and QR tickets, floor tracking, reports.
+- **New in 0.8:** compare fabric widths and size ratios by total order cost.
 
-On the public Lectra dataset (Zenodo 7030786, CC BY 4.0, real client nesting tasks):
+### Small factories (new in 0.8)
+- Reusable paper-pattern sets: name parts, sizes, copies and pairs; group by fabric (main, lining, rib, fusing), each with its own width, GSM, lay and gaps.
+- Tape check: a marker is blocked until a digital distance matches your tape measurement.
 
-| Time per task | Tasks | Mean vs Lectra | Median | Win / tie / loss |
-|---|---:|---:|---:|---|
-| 60 s | 300 | -0.73 points | -1.22 | 84 / 12 / 204 |
-| Lectra's recorded time (~5 min) | 60 | +0.42 points | -0.30 | 25 / 3 / 32 |
+See [every feature and where to find it](marker/docs/FEATURES.md).
 
-This is not a general win over Lectra: the median task is still behind.
-Tukatech, Gerber and Optitex are not yet compared. Details and caveats:
-[marker/bench/results/2026-10-20-public.md](marker/bench/results/2026-10-20-public.md).
+## How good is the nesting?
 
-## Install
+Mixed, and we show it plainly. On 300 real nesting tasks from Lectra's clients (public dataset, CC BY 4.0), 60 seconds per task on a shared machine, 0.8.0 is **1.39 points below Lectra on average** (median −1.57): **77 wins, 12 ties, 211 losses**. Dense markers with 150+ pieces are the weakest. An older run at Lectra's own recorded time (about 5 minutes, 60 tasks) was +0.42 on average with median −0.30.
 
-- **Browser:** open the app link above on a PC or phone. It works offline after the first visit and keeps your data on the device. Best for trying and small to medium jobs; for big markers and faster planning use the desktop app.
-- **Windows:** download `BETA-Cutting-Room_0.7.0_x64-setup.exe` from Releases
-  and check its SHA-256. The installer is not code-signed yet, so SmartScreen
-  may warn you. See [marker/docs/INSTALL.md](marker/docs/INSTALL.md).
-- **Server:** see [marker/docs/SELF-HOSTING.md](marker/docs/SELF-HOSTING.md).
-  The ready-made Linux build needs glibc 2.31 or newer (for example Ubuntu 20.04+).
+Compared with 0.7.0 on the same tasks, 0.8.0 is the same on ordinary open fabric. When the roll starts with a flaw, 0.8.0 used **15–25% less fabric** on three test garments. BETA does not claim a general win over commercial CAD. [Method, results and caveats](marker/docs/benchmarks.md).
 
-## Build from source
+## Install or build
 
-You need Rust (with the `wasm32-unknown-unknown` target and `wasm-bindgen`) and Node.js 22.18 or newer.
+- **Browser:** use the link above on a PC or phone. After the first visit it works offline. Save a backup file before clearing browser data.
+- **Windows:** `BETA-Cutting-Room_0.8.0_x64-setup.exe` or the portable ZIP from [Releases](https://github.com/sohitqwer-del/beta-cutting-room/releases/latest). Check the SHA-256. The installer is not code-signed yet, so SmartScreen may warn you.
+- **Linux server:** `BETA-Cutting-Room_0.8.0_linux-x86_64.tar.gz` (glibc 2.31+, e.g. Ubuntu 20.04+). See [self-hosting](marker/docs/SELF-HOSTING.md).
+- **Source:** Rust (with the `wasm32-unknown-unknown` target and matching `wasm-bindgen`) and Node.js 22.18+. Then `npm install`, `npm test`, and `cargo test --workspace` in `marker/` and `pattern/`. See [installation and source builds](marker/docs/INSTALL.md).
 
-```sh
-npm install
-npm test
-cd marker && cargo test --workspace
-cd ../pattern && cargo test --workspace
-```
+## Privacy
 
-## Licence
+No account, analytics, automatic upload or licence check. Browser work stays in that browser profile; desktop files stay on the PC; a factory server keeps data on your network. The Feedback button never sends anything by itself. Public issues are public: use synthetic examples, not factory patterns. [Privacy and storage](marker/docs/PRIVACY.md).
 
-Code: Apache-2.0 ([LICENSE](LICENSE)). Data: CC BY 4.0 where stated.
-Third-party notices: [NOTICE](NOTICE). Security reports: [SECURITY.md](SECURITY.md) (private, not public issues).
+## Status and limits
+
+- Folded and tube lays can still use more fabric than open lays, especially for small orders; the app tells you when the fold length limits the marker.
+- Blocks pass shape and seam checks but are starting drafts: sew a sample.
+- Photo accuracy on real factory photos, real plotters/cutters and clean-PC installs are not yet verified.
+- Hindi and Tamil are drafts. The optional nesting strategy comparison is experimental and off by default.
+
+See the [release notes](marker/docs/RELEASE-0.8.0.md), [roadmap](marker/docs/ROADMAP.md) and [FAQ](marker/docs/FAQ.md).
+
+## Help us improve it
+
+- [Report a bug or share feedback](https://github.com/sohitqwer-del/beta-cutting-room/issues/new/choose) · [Discussions](https://github.com/sohitqwer-del/beta-cutting-room/discussions) · [CONTRIBUTING.md](CONTRIBUTING.md) · [Code of conduct](CODE_OF_CONDUCT.md)
+- Private security reports: [SECURITY.md](SECURITY.md). Contact: sohitqwer@gmail.com.
+
+## Licence and credits
+
+BETA code is [Apache-2.0](LICENSE), including commercial use. Data and third-party assets keep their own licences: see [NOTICE](NOTICE) and [third-party licences](marker/THIRD-PARTY-LICENSES.md).
+
+Thanks to [sparrow](https://github.com/JeroenGar/sparrow) (MIT) and [jagua-rs](https://github.com/JeroenGar/jagua-rs) (MPL-2.0, used unmodified) for the nesting foundations; FreeSewing (MIT), GarmentCodeData and Open+Pattern (CC BY 4.0) for open test patterns; the Lectra dataset by Lallier and colleagues (Zenodo 7030786, CC BY 4.0), used for benchmarks only and not bundled. Demo narration uses the Kokoro voice model (Apache-2.0); see [audio sources](marker/deploy/video/AUDIO-SOURCES.md). AI tools helped build BETA; people still review its work.

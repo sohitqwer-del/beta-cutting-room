@@ -2,7 +2,9 @@
 
 export const site = {
   name: 'BETA Cutting Room',
-  version: '0.7.0',
+  version: '0.8.0',
+  /** One line that says what BETA is and who it is for (hero, social cards, page descriptions). */
+  tagline: 'Free, open-source cutting-room software for garment factories: patterns, markers and cut plans, in your browser.',
   /** Public source repository, e.g. "https://github.com/<org>/project-beta". */
   repoUrl: 'https://github.com/sohitqwer-del/beta-cutting-room' as string | null,
   /** Public address of this website, used for social preview tags. */
@@ -11,41 +13,44 @@ export const site = {
   repoBranch: 'main',
   /** Static app beside the website; no server or account is needed. */
   webAppUrl: 'app/' as string | null,
+  /** The app's 60-second sample tour (real engine, sample T-shirt): the first thing a new visitor should see. */
+  tourUrl: 'app/#/tour' as string | null,
   /** Contact address for sample markers and questions. */
   contactEmail: 'sohitqwer@gmail.com' as string | null,
+  /** Release candidates. The lead publishes them after verification. Update URL, size and SHA-256 together. */
   downloads: {
     windows: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_x64-setup.exe' as string | null,
-      file: 'BETA-Cutting-Room_0.7.0_x64-setup.exe',
-      size: '11.08 MiB',
-      sha256: '07e3e7e49332b3554555df46855498d08ed59126e48b17ff3f9348014ae7233e' as string | null,
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.8.0/BETA-Cutting-Room_0.8.0_x64-setup.exe' as string | null,
+      file: 'BETA-Cutting-Room_0.8.0_x64-setup.exe',
+      size: '11.65 MiB',
+      sha256: '2cf736d93aaf2e7ed395fc738f1d6fe0b451b9f00884ddba67e31d567f2a2307' as string | null,
     },
     portable: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_windows-x64-portable.zip' as string | null,
-      file: 'BETA-Cutting-Room_0.7.0_windows-x64-portable.zip',
-      size: '12.85 MiB',
-      sha256: 'ffb220923617fa9e0a5f590ddb71e84bd4b8d438d535dac33bc5bfecb4159eee' as string | null,
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.8.0/BETA-Cutting-Room_0.8.0_windows-x64-portable.zip' as string | null,
+      file: 'BETA-Cutting-Room_0.8.0_windows-x64-portable.zip',
+      size: '14.41 MiB',
+      sha256: '179547aa43e990d60f3eb98e3440d11a9412f13a03556943c62821dfbb2f1116' as string | null,
     },
     server: {
-      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.7.0/BETA-Cutting-Room_0.7.0_linux-x86_64.tar.gz' as string | null,
-      file: 'BETA-Cutting-Room_0.7.0_linux-x86_64.tar.gz (Linux server, glibc 2.31 target; tested with 2.31 and 2.43)',
-      size: '11.74 MiB',
-      sha256: 'de8d76fc78eef39d205ee8638be281d62adb48f3db4adebefb24eea9d5d74ae5' as string | null,
+      url: 'https://github.com/sohitqwer-del/beta-cutting-room/releases/download/v0.8.0/BETA-Cutting-Room_0.8.0_linux-x86_64.tar.gz' as string | null,
+      file: 'BETA-Cutting-Room_0.8.0_linux-x86_64.tar.gz (Linux server, glibc 2.31 target; tested with 2.31 and 2.43)',
+      size: '13.26 MiB',
+      sha256: '6ac89e9fb44e92f166b4e2a62713e237bd3ceddfa2d5eccab6953cf35492e4dc' as string | null,
     },
   },
   /**
-   * Demo video. The site plays `public/assets/video/beta-demo-en.mp4` when that file exists (copy it there
+   * Demo video. The site plays `public/assets/video/beta-08-walkthrough.mp4` when that file exists (copy it there
    * before building; it is not committed). Otherwise, set `demoVideoUrl` (for example a GitHub release asset):
    * the home page then shows the poster as a link to it, so the page itself still loads nothing remote.
    * Made by `marker/deploy/video/make-video.mjs`. Keep `length` and `size` in step with the file.
    */
   demoVideo: {
-    file: 'assets/video/beta-demo-en.mp4',
+    file: 'assets/video/beta-08-walkthrough.mp4',
     demoVideoUrl: null as string | null,
-    poster: 'assets/video/beta-demo-poster.jpg',
-    captions: 'assets/video/beta-demo-en.vtt',
-    length: '3 min 45 s',
-    size: '15 MB',
+    poster: 'assets/video/beta-08-poster-1280x720.png',
+    captions: 'assets/video/beta-08-walkthrough.vtt',
+    length: '3 min 9 s',
+    size: '6.4 MiB',
   },
   /** Where people report problems and send ideas. `null` hides a link. */
   feedback: {

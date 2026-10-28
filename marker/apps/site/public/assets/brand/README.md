@@ -23,7 +23,13 @@ or that the BETA project endorses you.
 | `favicon.svg`, `favicon-32.png` | Browser tab icon. |
 | `apple-touch-icon.png` | 180 x 180 home-screen icon. |
 | `icon-512.png` | 512 x 512 app icon. |
-| `social-preview.png` | 1280 x 640 image for GitHub (Settings, Social preview) and link previews. |
+| `icon-192.png` | 192 x 192 icon for the website manifest. |
+| `social-preview.png` | 1280 x 640 image for GitHub (Settings, Social preview). |
+| `social-card.png` | 1200 x 630 link preview (Open Graph and X) on every page: a real app screen, the logo and one line. |
+| `social-square.png` | 1080 x 1080 image for square posts (LinkedIn, Instagram). |
+
+`social-card.png` and `social-square.png` are made by `node marker/apps/site/scripts/make-social.ts`
+(add `--out <folder>` for copies) from `assets/screens/path-marker-1200.webp`, the logo and the tagline in `src/config.ts`.
 
 Keep clear space around the mark of at least a quarter of its width. Do not
 stretch, rotate or recolour the pieces. The smallest size is 16 px for the tile

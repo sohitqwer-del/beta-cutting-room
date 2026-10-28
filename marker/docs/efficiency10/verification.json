@@ -1,0 +1,16 @@
+{
+    "web_passed":  222,
+    "input_sha256":  "064D5413A58E79E7930F9B8E830AD5B482B6011A2AD7C972F212865E32E19668",
+    "public_release_changed":  false,
+    "source_base":  "47412d4",
+    "rust_ignored":  4,
+    "raw_summary_sha256":  "889479B1845391109ACA59C4423EE5B65D551C7A61951CD90CE0BA857240F29D",
+    "cutroom_wasm_sha256":  "91BAB13E48CC2D3A27A1961A4F9866A2DDA6249A227CFF2D538F0C6C7A3F2C76",
+    "native_layouts_independently_validated":  20,
+    "static_build_report_sha256":  "C37464ECC915D63797B7E5EDA265345110602B0B8EFA86DA85E3BD7EEC68ED7A",
+    "marker_wasm_sha256":  "44CD295864651BB6AD3B0978E4A403EBB9791F7E4DD8B4D46ADDEF3D5D232DC2",
+    "raw_pairs_sha256":  "ABCE35B02E7EC979C6ECA51C22B247DD96B15F99F9A66EE6E51576F6C323A8B9",
+    "web_skipped":  0,
+    "rust_passed":  186,
+    "hash_scope":  "Task-owned original artifacts before Git text normalization; generated WASM and static assets are not committed."
+}

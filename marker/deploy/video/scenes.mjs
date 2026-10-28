@@ -1,4 +1,6 @@
 // The demo video script as data. One source for narration (TTS), captions (en, hi, ta), the recorder and the editor.
+// The 0.8 launch is a separate edit: launch8.mjs consumes the following script.
+export { social as launchSocial, walkthrough as launchWalkthrough } from './launch-scenes.mjs';
 // Each scene is recorded in one "take": a title card page, the desktop app, or the phone app.
 // Each beat is one narration line and one caption (2 lines at most). The recorder runs the beat's action
 // when the line starts, then waits until the line (plus `gap`) is over, or longer when `min` asks for it.

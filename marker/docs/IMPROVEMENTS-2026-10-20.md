@@ -1,5 +1,10 @@
 # Product audit: 20 October 2026
 
+> Historical audit/backlog. Browser cutting-room work and backup arrived in
+> [0.7](RELEASE-0.7.0.md); a bounded width/ratio/order-cost screen is implemented
+> in unreleased 0.8. Use [features](FEATURES.md) and [roadmap](ROADMAP.md) for
+> current scope. The table below retains the original findings and estimates.
+
 Worktree role: `marker/audit`, based on `marker/mvp` at `0d7b298`.
 The lead later requested merges of `ebe07fe` and `176e453`. Both are included;
 the new UX layout, Pattern2, site work and refreshed lockfiles are preserved.

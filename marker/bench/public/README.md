@@ -14,6 +14,21 @@ on newer engine code measures that newer revision; it is not a replay of the
 recorded executable. The historical laptop results used a different, locally
 modified round-2 source and the earlier converter.
 
+## Paired 0.8 candidate versus 0.7.0
+
+The [28 October paired report](../results/2026-10-28-public-0.8.md) uses
+`beta-launch8-bench` in this package. It compares the frozen 300-task, 60-second
+Lectra suite and 18 public garment variants on both release engines. It keeps
+the older results and their version labels intact. Build each engine in its
+own fresh target directory: Cargo can reuse stale artifacts across source
+archives with preserved timestamps if they share a target directory.
+
+The tool checks the frozen input checksum, writes common replay inputs before
+searching, alternates engine order in 20-task Lectra blocks, and exports only
+after all stages finish. Export checks every scored marker against its saved
+independent validator report and recomputed metrics. See the report for exact
+commands, whole-call timing, effective process priority and limitations.
+
 ## Prepare public inputs once
 
 This preparation downloads public data. The benchmark itself makes no network

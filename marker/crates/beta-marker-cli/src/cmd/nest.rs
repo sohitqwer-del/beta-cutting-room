@@ -26,6 +26,9 @@ pub struct Args {
     /// Independent seeded runs sharing the search budget.
     #[arg(long, default_value_t = 1)]
     pub runs: u32,
+    /// Experimentally compare search strategies; ordinary search remains the default.
+    #[arg(long)]
+    pub adaptive: bool,
     /// Keep the locked placements from this result JSON.
     #[arg(long)]
     pub fixed: Option<PathBuf>,
@@ -61,24 +64,30 @@ pub fn run(args: Args) -> Result<()> {
             .collect::<Vec<_>>()
             .join("; ")
     );
-    let result = nest(
-        &job,
-        &NestOptions {
-            time_limit_s: args.time_limit_s,
-            seed: args.seed,
-            workers: args.workers,
-            early_termination: args.early_termination,
-            runs: args.runs,
-            fixed: args
-                .fixed
-                .as_deref()
-                .map(read_result)
-                .transpose()?
-                .map(|r| r.placements.into_iter().filter(|p| p.locked).collect())
-                .unwrap_or_default(),
-            warm_start: args.warm_start.as_deref().map(read_result).transpose()?,
-        },
-    )?;
+    let options = NestOptions {
+        time_limit_s: args.time_limit_s,
+        seed: args.seed,
+        workers: args.workers,
+        early_termination: args.early_termination,
+        runs: args.runs,
+        fixed: args
+            .fixed
+            .as_deref()
+            .map(read_result)
+            .transpose()?
+            .map(|r| r.placements.into_iter().filter(|p| p.locked).collect())
+            .unwrap_or_default(),
+        warm_start: args.warm_start.as_deref().map(read_result).transpose()?,
+    };
+    let result = if args.adaptive {
+        ensure!(
+            !beta_marker_match::needs_rules(&job),
+            "Adaptive strategy trials do not support stripe/check or shade matching. Use ordinary search."
+        );
+        beta_marker_nest::nest_adaptive_with_progress(&job, &options, |_| {})?
+    } else {
+        nest(&job, &options)?
+    };
     let mut writer = BufWriter::new(
         File::create(&args.output)
             .with_context(|| format!("could not write {}", args.output.display()))?,

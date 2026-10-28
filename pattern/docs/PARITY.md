@@ -1,5 +1,10 @@
 # Pattern making and grading: gap review
 
+> Historical gap review. Later Style work adds supported linked derivatives
+> and notch projection; use [STYLE-API.md](STYLE-API.md) and
+> [current features](../../marker/docs/FEATURES.md) for current scope.
+> The before/after tables retain the evidence from their original round.
+
 Reviewed 20 October 2026 against the code at `0d7b298`. This is a feature review,
 not a test of commercial products. Public supplier pages were read only to
 identify features. No supplier text, code, specifications, sample patterns or

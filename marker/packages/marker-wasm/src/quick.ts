@@ -65,7 +65,11 @@ export interface QuickSession {
   /** Suggestions only. All pieces remain until the operator removes duplicates. */
   duplicates: { pieceId: string; duplicateOf: string; confidence: QuickConfidence }[];
 }
-export interface QuickFabric { width_mm: number; nap?: Fabric['nap']; layout?: Fabric['layout'] }
+export interface QuickFabric { width_mm: number; nap?: Fabric['nap']; layout?: Fabric['layout'];
+  set_name?: string; material?: string; gsm?: number | null; construction?: string;
+  piece_gap_mm?: number; edge_gap_mm?: number }
+export interface TapeRequest { endpoints: [Pt, Pt]; measured_mm: number; tolerance_mm: number }
+export interface TapeReport extends TapeRequest { digital_mm: number; error_mm: number; pass: boolean }
 export interface TiledMarkerOptions { paper: 'A4' | 'A3'; overlap_mm?: number }
 export interface ChalkGuideOptions { language?: 'en' | 'hi' | 'ta' }
 export interface ProjectorLayout {
@@ -78,6 +82,7 @@ export interface ProjectorLayout {
     referencePoint: Pt; rotationDeg: number; mirrored: boolean; onFold: boolean }[];
 }
 export interface QuickMarkerCore {
+  checkTape?(piece: QuickPiece, request: TapeRequest): TapeReport;
   quickScan(photo: Uint8Array, options: QuickScanOptions): QuickScan;
   quickAssist(pieces: QuickPiece[]): QuickPiece[];
   quickMerge(scans: Pick<QuickScan, 'photoId' | 'pieces' | 'warnings'>[]): QuickSession;
@@ -88,6 +93,7 @@ export interface QuickMarkerCore {
   projectorLayout(job: Job, result: MarkerResult): ProjectorLayout;
 }
 interface RawQuick {
+  quick_check_tape?(piece: string, request: string): string;
   default(options: { module_or_path: URL }): Promise<unknown>;
   quick_scan(photo: Uint8Array, options: string): string;
   quick_assist(pieces: string): string;
@@ -101,6 +107,10 @@ interface RawQuick {
 export function bindQuickMarkerCore(raw: Omit<RawQuick, 'default'>): QuickMarkerCore {
   const json = JSON.stringify;
   return {
+    checkTape: (piece, request) => {
+      if (!raw.quick_check_tape) throw new Error('Update the local photo engine to use the tape check.');
+      return JSON.parse(raw.quick_check_tape(json(piece), json(request)));
+    },
     quickScan(photo, options) {
       const start = performance.now();
       const scan = JSON.parse(raw.quick_scan(photo, json(options))) as Omit<QuickScan, 'overlayPng'> & { overlayPng: number[] };

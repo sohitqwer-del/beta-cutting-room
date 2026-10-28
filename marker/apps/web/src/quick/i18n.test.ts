@@ -6,6 +6,12 @@ import { pieceName, sizeName, t, warningText } from './i18n';
 
 const holes = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map(m => m[1]).sort();
 describe('quick strings', () => {
+  it('uses locale plural rules for one and several detected pieces', () => {
+    expect(t('photo_found',{n:1},'en')).toBe('1 piece found');
+    expect(t('photo_found',{n:0},'en')).toBe('0 pieces found');
+    expect(t('photo_found',{n:5},'en')).toBe('5 pieces found');
+    for(const language of ['hi','ta'] as const){expect(t('photo_found',{n:1},language)).not.toBe(t('photo_found',{n:2},language).replace('2','1'));}
+  });
   it('has every key in Hindi and Tamil with the same placeholders, marked as drafts', () => {
     for (const [name, table] of [['hi', hi], ['ta', ta]] as const) {
       expect(table._status, name).toMatch(/draft.*review/i);

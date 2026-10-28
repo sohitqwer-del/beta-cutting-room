@@ -1,0 +1,85 @@
+{
+  "all_valid": true,
+  "cases": [
+    {
+      "after_efficiency_pct": 73.9208111754347,
+      "after_length_m": 4.861420453125,
+      "after_wall_s": 5.4342415,
+      "before_efficiency_pct": 74.4112229835114,
+      "before_length_m": 4.8240029609374995,
+      "before_wall_s": 5.437057866666667,
+      "fabric_saved_pct": -0.7756804197981637,
+      "id": "teagan-clean-control",
+      "saving_max_pct": 2.908292842636162,
+      "saving_min_pct": -5.278864330474797,
+      "trials": 3
+    },
+    {
+      "after_efficiency_pct": 65.83600498864034,
+      "after_length_m": 5.451682500000001,
+      "after_wall_s": 5.0171205,
+      "before_efficiency_pct": 65.8360049886403,
+      "before_length_m": 5.451682500000001,
+      "before_wall_s": 5.0235727,
+      "fabric_saved_pct": 0.0,
+      "id": "teagan-interior-control",
+      "saving_max_pct": 0.0,
+      "saving_min_pct": 0.0,
+      "trials": 1
+    }
+  ],
+  "trials": [
+    {
+      "after_efficiency_pct": 70.29869984051224,
+      "after_length_m": 5.10559935078125,
+      "after_wall_s": 5.4670738,
+      "before_efficiency_pct": 74.00967283118065,
+      "before_length_m": 4.84959576953125,
+      "before_wall_s": 5.5027045999999995,
+      "budget_s": 5.0,
+      "fabric_saved_pct": -5.278864330474797,
+      "id": "teagan-clean-control",
+      "seed": 1,
+      "valid": true
+    },
+    {
+      "after_efficiency_pct": 65.83600498864034,
+      "after_length_m": 5.451682500000001,
+      "after_wall_s": 5.0171205,
+      "before_efficiency_pct": 65.8360049886403,
+      "before_length_m": 5.451682500000001,
+      "before_wall_s": 5.0235727,
+      "budget_s": 5.0,
+      "fabric_saved_pct": 0.0,
+      "id": "teagan-interior-control",
+      "seed": 1,
+      "valid": true
+    },
+    {
+      "after_efficiency_pct": 75.5829243515134,
+      "after_length_m": 4.7486518859375,
+      "after_wall_s": 5.4806063,
+      "before_efficiency_pct": 75.5500229318784,
+      "before_length_m": 4.75071988515625,
+      "before_wall_s": 5.3667572,
+      "budget_s": 5.0,
+      "fabric_saved_pct": 0.043530228444144115,
+      "id": "teagan-clean-control",
+      "seed": 7,
+      "valid": true
+    },
+    {
+      "after_efficiency_pct": 75.88080933427844,
+      "after_length_m": 4.7300101226562505,
+      "after_wall_s": 5.3550444,
+      "before_efficiency_pct": 73.67397318747517,
+      "before_length_m": 4.871693228125,
+      "before_wall_s": 5.4417118,
+      "budget_s": 5.0,
+      "fabric_saved_pct": 2.908292842636162,
+      "id": "teagan-clean-control",
+      "seed": 42,
+      "valid": true
+    }
+  ]
+}

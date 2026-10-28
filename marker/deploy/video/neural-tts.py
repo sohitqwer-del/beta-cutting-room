@@ -65,6 +65,8 @@ class Lexicon:
         # BETA is spoken bay-tuh for this project. Brand pronunciations are explicit,
         # provisional editorial choices: the owner should review the sample.
         self.custom = {
+            "patterns": "pˈætɚnz", "t": "tˈiː", "arrives": "əɹˈIvz",
+            "copies": "kˈɑpiz", "tickets": "tˈɪkɪts",
             "beta": "bˈAtə", "lectra": "lˈɛktɹə", "lectra's": "lˈɛktɹəz",
             "tukatech": "tˈuːkətɛk", "rupees": "ɹuːpˈiːz", "a": "ə",
             "the": "ðə", "cad": "kˈæd", "pdf": "pˌiː dˌiː ˈɛf",

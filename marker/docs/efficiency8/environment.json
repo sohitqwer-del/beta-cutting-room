@@ -1,0 +1,18 @@
+{
+  "baseline_commit": "372ed68",
+  "candidate_engine_commit": "9f07d28",
+  "seeds": [
+    1,
+    7,
+    42
+  ],
+  "requested_search_seconds": 5,
+  "target_pairs": 15,
+  "control_pairs": 4,
+  "extra_repeat_pairs": 1,
+  "all_40_final_layouts_valid": true,
+  "binary_sha256": {
+    "baseline.exe": "a8ced35a1092450b3954c967b7bc81058615a4fb8f98aed90fcfa16a739cd800",
+    "candidate.exe": "3d75e25d0f46ff2ff4f49d0d2d810914e1bd452bfccd221457807fea75114c67"
+  }
+}

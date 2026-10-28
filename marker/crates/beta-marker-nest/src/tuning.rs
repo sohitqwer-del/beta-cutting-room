@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum PortfolioStrategy {
+    /// Preserve a long baseline, probe a job-class alternative, then focus on the winner.
+    Adaptive,
     /// Existing concurrent portfolio, dividing workers between runs.
     #[default]
     Parallel,
@@ -35,6 +37,8 @@ pub enum ConstructionOrder {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct SearchTuning {
+    /// Allow obstacle-free proposals followed by exact obstacle repair.
+    pub obstacle_proposals: bool,
     /// Fraction of time used for compression, between zero and one inclusive.
     pub compression_share: f64,
     /// Exploration length reduction per feasibility attempt.
@@ -60,6 +64,7 @@ pub struct SearchTuning {
 impl Default for SearchTuning {
     fn default() -> Self {
         Self {
+            obstacle_proposals: true,
             compression_share: 0.2,
             exploration_shrink: 0.001,
             pool_stddev: 0.25,
@@ -130,6 +135,9 @@ pub(crate) fn nest_with_tuning_and_progress(
         }) >= 150
     {
         tuning.compression_share = tuning.compression_share.max(0.4);
+    }
+    if tuning.portfolio == PortfolioStrategy::Adaptive {
+        return crate::adaptive::nest(job, opts, callback, &tuning);
     }
     if tuning.portfolio == PortfolioStrategy::Parallel || opts.runs <= 1 {
         return v02::nest_tuned(job, opts, callback, &tuning);

@@ -1,6 +1,6 @@
 import * as markerWasm from '@beta/marker-wasm';
 import type { Job, MarkerResult, MarkerNester, NestOptions } from '@beta/marker-wasm';
-import type { ChalkGuideOptions, ProjectorLayout, QuickFabric, QuickMarkerCore, QuickPiece, QuickScan, QuickScanOptions, QuickSession, TiledMarkerOptions } from '@beta/marker-wasm';
+import type { ChalkGuideOptions, ProjectorLayout, QuickFabric, QuickMarkerCore, QuickPiece, QuickScan, QuickScanOptions, QuickSession, TiledMarkerOptions, TapeRequest, TapeReport } from '@beta/marker-wasm';
 import { mockCore, mockNest, MOCK_ENGINE } from './mock';
 
 /** The only place the Quick Marker screens touch the engine.
@@ -10,6 +10,7 @@ import { mockCore, mockNest, MOCK_ENGINE } from './mock';
  *   when that worker cannot load. A search/validation error is never hidden. */
 export type EngineKind = 'wasm' | 'mock';
 export interface QuickEngine {
+  checkTape(piece: QuickPiece, request: TapeRequest): Promise<TapeReport>;
   kind: EngineKind;
   scan(photo: Uint8Array, options: QuickScanOptions): Promise<QuickScan>;
   assist(pieces: QuickPiece[]): Promise<QuickPiece[]>;
@@ -26,6 +27,10 @@ export function wrapCore(core: QuickMarkerCore, kind: EngineKind): QuickEngine {
   const call = <T>(f: () => T): Promise<T> => new Promise((resolve, reject) => { try { resolve(f()); } catch (error) { reject(error instanceof Error ? error : new Error(String(error))); } });
   return {
     kind,
+    checkTape: (piece, request) => call(() => {
+      if (!core.checkTape) throw new Error('Tape checks need the real photo engine. Practice pieces cannot verify a paper pattern.');
+      return core.checkTape(piece, request);
+    }),
     scan: (photo, options) => call(() => core.quickScan(photo, options)),
     assist: pieces => call(() => core.quickAssist(pieces)),
     merge: scans => call(() => core.quickMerge(scans)),

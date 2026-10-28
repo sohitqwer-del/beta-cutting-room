@@ -1,5 +1,9 @@
 # BETA Cutting Room 0.5.0 release record
 
+> Historical release evidence. Browser coverage and search have changed since
+> these selected performance tests. See [0.7](RELEASE-0.7.0.md) and
+> [current features](FEATURES.md); do not present these numbers as 0.8 results.
+
 This release builds on `marker/mvp` at `3f0f162`. It is a fun project created
 with the help of modern AI tools. The packages are unsigned release candidates.
 No release was pushed, published, deployed or uploaded to a public service.

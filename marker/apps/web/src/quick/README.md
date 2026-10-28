@@ -2,11 +2,14 @@
 
 Phone-first flow: photo of paper pattern pieces → check pieces → fabric and order → nest → print, chalk, projector or share. Design notes: `../../UX.md` ("Quick Marker").
 
+Paper-pattern sets now keep reusable outlines and settings, an inventory by fabric/size, per-group width/GSM/gaps and a Rust tape-measure comparison. See `marker/docs/PAPER-PATTERNS-MSME-2026-10-26.md` from the repository root for the operator workflow and limits. Reopened files require fresh review and paper checks; their original photos are not saved.
+
 | File | Role |
 |---|---|
 | `adapter.ts` | The only place that calls the engine. Real: `loadQuickMarkerCore()` from `@beta/marker-wasm` (Quick Marker API v1, `marker/docs/QUICK-MARKER-API.md`); scans run in `scan-worker.ts`. Nesting: local Sparrow WASM in a module Web Worker, in short validated warm-start rounds. If the worker cannot load, `/api/nest` provides the desktop/server fallback. |
 | `mock.ts` | Practice engine: original synthetic shirt pieces, a drawn sample photo, shelf layout, tiny PDFs. Used for tests, the smoke and "Try a sample photo". |
 | `state.ts` | Steps, guards and review actions as pure functions. Nothing from a photo is used without a user action. |
+| `pattern-set.ts` | Bounded local archive transport. Rust validates imported geometry; review and tape checks restart. |
 | `units.ts`, `geometry.ts`, `projector.ts` | Unit conversion, savings, homography for outlines over the photo, projector calibration and parts. |
 | `ui.ts`, `quick.css`, `art.ts` | The screen. |
 | `i18n.ts`, `locales/` | English source; Hindi and Tamil drafts for native review. |

@@ -1,5 +1,10 @@
 # Daily pattern checks and production details
 
+This guide records the separate Pattern tools. Later Style work adds linked
+derivatives and seam-distance notch projection for supported operations; the
+old gap list at the end is historical for that implementation round. See
+[STYLE-API.md](STYLE-API.md) and [current features](../../marker/docs/FEATURES.md).
+
 These tools run locally in Rust, through the existing Pattern WASM module or
 local server. No account, runtime internet access or extra service is needed.
 All lengths use millimetres.

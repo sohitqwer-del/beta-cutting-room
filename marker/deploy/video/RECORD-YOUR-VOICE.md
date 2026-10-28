@@ -1,5 +1,10 @@
 # Record the BETA demo on your phone
 
+This import guide applies to the earlier `make-video.mjs` edit. The current 0.8
+launch edit uses Kokoro `af_heart` through `launch8.mjs`; its beat list is in
+`launch-scenes.mjs` and the current `SCRIPT.md`. Do not use the old scene names
+below with the 0.8 launch edit. A human-voice import for that edit is not implemented.
+
 Your own voice can make this demo feel closer to your factory. Read the English lines in
 `SCRIPT.md`, or ask a native Hindi speaker to check the Hindi draft first. Use only the public
 demo script. Do not read customer names, orders or other factory data.

@@ -42,6 +42,7 @@ impl Output {
 
 /// Every POST route answered by [`cutroom`].
 pub const CUTROOM_ROUTES: &[&str] = &[
+    "/api/plan/cost",
     "/api/roll/inspect",
     "/api/roll/spread",
     "/api/cutroom/lay",
@@ -200,6 +201,11 @@ pub fn cutroom(path: &str, body: &[u8]) -> Option<Result<Output>> {
 
 fn cutroom_route(path: &str, body: &[u8]) -> Result<Output> {
     match path {
+        "/api/plan/cost" => {
+            let input: beta_marker_plan::cost::CostRequest = serde_json::from_slice(body)?;
+            let input = prepare_cost_comparison(&input)?;
+            Output::json(beta_marker_plan::cost::compare(&input)?)
+        }
         "/api/roll/inspect" => {
             let input: InspectRequest = serde_json::from_slice(body)?;
             Output::json(
@@ -347,6 +353,80 @@ fn cutroom_route(path: &str, body: &[u8]) -> Result<Output> {
         }
         _ => anyhow::bail!("Unknown cutting-room route"),
     }
+}
+
+/// Bounds for the interactive width/ratio comparison on all transports.
+pub fn check_cost_comparison(input: &beta_marker_plan::cost::CostRequest) -> Result<()> {
+    ensure_counts(&input.order.job).map_err(anyhow::Error::msg)?;
+    ensure!(
+        (1..=8).contains(&input.offers.len()),
+        "Compare one to eight width offers."
+    );
+    ensure!(
+        input.ratio_sets.len() <= 4 && input.offers.len() * input.ratio_sets.len().max(1) <= 16,
+        "Compare at most sixteen width/ratio alternatives."
+    );
+    ensure!(
+        input.ratio_sets.iter().all(|s| s.ratios.len() <= 32),
+        "A ratio menu supports at most 32 ratios."
+    );
+    ensure!(
+        (1..=4).contains(&input.finalists),
+        "Choose one to four finalists."
+    );
+    ensure!(
+        input.options.time_per_marker_s.is_finite()
+            && (0.05..=30.0).contains(&input.options.time_per_marker_s)
+            && input.final_time_s.is_finite()
+            && input.final_time_s >= input.options.time_per_marker_s
+            && input.final_time_s <= 120.0,
+        "Use 0.05–30 seconds per short marker and at most 120 seconds per final marker."
+    );
+    ensure!(
+        input.options.max_candidates <= 128
+            && input.options.max_refinements <= 16
+            && input.options.search_nodes <= 100_000,
+        "Interactive planning supports at most 128 candidates, 16 refinements and 100000 states."
+    );
+    Ok(())
+}
+
+/// Carry the operator's physical table end into every width/ratio trial.
+/// Saved cut sections need a section-aware planner and are explicitly rejected.
+pub fn prepare_cost_comparison(
+    input: &beta_marker_plan::cost::CostRequest,
+) -> Result<beta_marker_plan::cost::CostRequest> {
+    check_cost_comparison(input)?;
+    #[derive(Deserialize, Default)]
+    struct Boundaries {
+        #[serde(default)]
+        sections: Vec<f64>,
+        #[serde(default)]
+        table_length: Option<f64>,
+    }
+    let mut checked = input.clone();
+    if let Some(value) = input.order.job.meta.get("editor_v1") {
+        let boundaries: Boundaries = serde_json::from_value(value.clone())?;
+        ensure!(
+            boundaries.sections.is_empty(),
+            "Width/ratio comparison does not yet support saved cut sections. Remove those lines before comparing."
+        );
+        if let Some(end) = boundaries.table_length {
+            ensure!(
+                end.is_finite() && end > 0.,
+                "Saved table end must be finite and positive."
+            );
+            checked.order.job.fabric.max_length = Some(
+                checked
+                    .order
+                    .job
+                    .fabric
+                    .max_length
+                    .map_or(end, |maximum| maximum.min(end)),
+            );
+        }
+    }
+    Ok(checked)
 }
 
 /// Reject copy counts that would overflow before any geometry work starts.

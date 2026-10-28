@@ -8,8 +8,8 @@ pub struct NestSession {
     inner: Session,
 }
 enum Session {
-    Plain(BrowserSession),
-    Matching(MatchingSession),
+    Plain(Box<BrowserSession>),
+    Matching(Box<MatchingSession>),
 }
 impl Session {
     fn step(&mut self) -> Result<BrowserProgress, String> {
@@ -35,9 +35,13 @@ impl NestSession {
         let options: BrowserOptions = super::read(options)?;
         Ok(Self {
             inner: if beta_marker_match::needs_rules(&job) {
-                Session::Matching(MatchingSession::new(job, options).map_err(|e| e.to_string())?)
+                Session::Matching(Box::new(
+                    MatchingSession::new(job, options).map_err(|e| e.to_string())?,
+                ))
             } else {
-                Session::Plain(BrowserSession::new(job, options).map_err(|e| e.to_string())?)
+                Session::Plain(Box::new(
+                    BrowserSession::new(job, options).map_err(|e| e.to_string())?,
+                ))
             },
         })
     }

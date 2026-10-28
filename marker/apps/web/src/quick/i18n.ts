@@ -14,7 +14,9 @@ export function currentLanguage(): QuickLanguage {
 }
 /** Translate and fill {placeholders}. Missing draft strings fall back to English. */
 export function t(key: QuickKey, values: Record<string, string | number> = {}, language: QuickLanguage = currentLanguage()): string {
-  const text = quickLanguages[language][key] || en[key] || key;
+  const count = typeof values.n === 'number' ? values.n : undefined;
+  const plural = count === undefined ? key : `${key}_${new Intl.PluralRules(language).select(count)}`;
+  const text = quickLanguages[language][plural] || quickLanguages[language][key] || en[key] || key;
   return text.replace(/\{(\w+)\}/g, (_, name: string) => String(values[name] ?? `{${name}}`));
 }
 /** Piece names from the engine's shape classifier are English words; show them in the user's language when known. */

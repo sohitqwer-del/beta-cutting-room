@@ -1,5 +1,6 @@
 //! Single-thread browser search, yielding to the host between warm-start rounds.
 //! All geometry and acceptance decisions stay in Rust. No shared memory is needed.
+mod persistent;
 use crate::{Instant, NestOptions};
 use anyhow::{Result, ensure};
 use beta_marker_core::{Job, MarkerResult};
@@ -57,9 +58,16 @@ pub struct BrowserSession {
     best: Option<MarkerResult>,
     seeded: bool,
     round: u32,
+    stale_rounds: u32,
     cancelled: bool,
     done: bool,
     last_checkpoint: Option<Instant>,
+    persistent: Option<persistent::Session>,
+    obstacle: Option<crate::v02::ObstacleSession>,
+    #[cfg(test)]
+    persistent_builds: usize,
+    #[cfg(test)]
+    obstacle_builds: usize,
 }
 
 impl BrowserSession {
@@ -100,9 +108,16 @@ impl BrowserSession {
             seeded: false,
             started: None,
             round: 0,
+            stale_rounds: 0,
             cancelled: false,
             done: false,
             last_checkpoint: None,
+            persistent: None,
+            obstacle: None,
+            #[cfg(test)]
+            persistent_builds: 0,
+            #[cfg(test)]
+            obstacle_builds: 0,
         })
     }
 
@@ -139,12 +154,13 @@ impl BrowserSession {
                     // Keep the cheap seed as recovery, but let Sparrow use its
                     // own constructor on its first attempt. A box-based seed
                     // can trap its search in a much worse layout. A warm start
-                    // also fixes the two-layer allocation, so every third round
-                    // of a folded or tubular job starts fresh to try others.
+                    // also fixes the two-layer allocation. After two stagnant
+                    // rounds, probe a fresh policy; every eighth round ensures
+                    // occasional exploration even while repair keeps improving.
                     warm_start: if self.round == 0
                         || (self.job.fabric.layout != beta_marker_core::Layout::Open
                             && self.options.fixed.is_empty()
-                            && self.round.is_multiple_of(3))
+                            && (self.stale_rounds >= 2 || self.round.is_multiple_of(8)))
                     {
                         self.options.warm_start.clone()
                     } else {
@@ -159,6 +175,7 @@ impl BrowserSession {
                 let round = self.round + u32::from(self.seeded);
                 let best = &mut self.best;
                 let last_checkpoint = &mut self.last_checkpoint;
+                let round_seed = options.seed;
                 let mut on_progress = |event: crate::NestProgress| {
                     let mut candidate = event.result;
                     if best
@@ -170,7 +187,9 @@ impl BrowserSession {
                     if !beta_marker_core::validate(&self.job, &candidate).ok {
                         return;
                     }
-                    candidate.seed = options.seed;
+                    if candidate.seed.is_none() {
+                        candidate.seed = round_seed;
+                    }
                     candidate.runtime_s = started.elapsed().as_secs_f64();
                     *best = Some(candidate.clone());
                     improved = true;
@@ -188,18 +207,101 @@ impl BrowserSession {
                         });
                     }
                 };
-                let outcome = if !self.seeded {
-                    options.time_limit_s = options.time_limit_s.min(0.1);
-                    let cancel = std::sync::atomic::AtomicBool::new(false);
-                    crate::nest_with_cancellation(&self.job, &options, &cancel, &mut on_progress)
-                } else {
-                    self.round += 1;
-                    crate::nest_with_progress(&self.job, &options, &mut on_progress)
-                };
+                let outcome = (|| -> Result<MarkerResult> {
+                    if !self.seeded {
+                        options.time_limit_s = options.time_limit_s.min(0.1);
+                        let cancel = std::sync::atomic::AtomicBool::new(false);
+                        crate::nest_with_cancellation(
+                            &self.job,
+                            &options,
+                            &cancel,
+                            &mut on_progress,
+                        )
+                    } else {
+                        self.round += 1;
+                        if persistent::Session::eligible(&self.job, &options) {
+                            if self.persistent.is_none() {
+                                let mut initial = options.clone();
+                                initial.warm_start = self.options.warm_start.clone();
+                                self.persistent =
+                                    Some(persistent::Session::new(&self.job, &initial)?);
+                                #[cfg(test)]
+                                {
+                                    self.persistent_builds += 1;
+                                }
+                            }
+                            self.persistent
+                                .as_mut()
+                                .expect("initialized")
+                                .step(options.time_limit_s, &mut on_progress)
+                        } else {
+                            let constrained = self.job.fabric.layout
+                                == beta_marker_core::Layout::Open
+                                && (!options.fixed.is_empty()
+                                    || !self.job.fabric.defects.is_empty());
+                            let refresh =
+                                constrained && options.time_limit_s >= 2. && self.stale_rounds >= 3;
+                            if refresh {
+                                self.stale_rounds = 0;
+                                return crate::nest_with_progress(
+                                    &self.job,
+                                    &options,
+                                    &mut on_progress,
+                                );
+                            }
+                            if constrained || (self.round > 1 && options.warm_start.is_some()) {
+                                if let Some(warm) = &options.warm_start
+                                    && self.obstacle.as_ref().is_some_and(|s| !s.accepts(warm))
+                                {
+                                    self.obstacle = None;
+                                }
+                                if self.obstacle.is_none() {
+                                    self.obstacle = Some(crate::v02::browser_obstacle_session(
+                                        &self.job, &options,
+                                    )?);
+                                    #[cfg(test)]
+                                    {
+                                        self.obstacle_builds += 1;
+                                    }
+                                }
+                                let began = Instant::now();
+                                let budget = if constrained {
+                                    options.time_limit_s
+                                } else {
+                                    (options.time_limit_s * 0.15).clamp(0.001, 0.15)
+                                };
+                                let session = self.obstacle.as_mut().expect("initialized");
+                                if let Some(warm) = &options.warm_start {
+                                    session.offer(warm)?;
+                                }
+                                let repaired = session.step(budget, &mut on_progress)?;
+                                if constrained {
+                                    return Ok(repaired);
+                                }
+                                let left = options.time_limit_s - began.elapsed().as_secs_f64();
+                                if left <= 0.001 {
+                                    return Ok(repaired);
+                                }
+                                options.time_limit_s = left;
+                                if options
+                                    .warm_start
+                                    .as_ref()
+                                    .is_some_and(|old| repaired.length < old.length)
+                                {
+                                    options.warm_start = Some(repaired);
+                                }
+                            }
+                            // Folded/allocated jobs keep their stronger native
+                            // policy search, with a short resumable repair slice.
+                            crate::nest_with_progress(&self.job, &options, &mut on_progress)
+                        }
+                    }
+                })();
                 let candidate = match outcome {
                     Ok(candidate) => candidate,
                     Err(error) if self.best.is_some() => {
-                        self.done = true;
+                        self.persistent = None;
+                        self.obstacle = None;
                         let mut retained = self.best.clone().expect("checked above");
                         retained.warnings.push(format!(
                             "Browser improvement failed; checked incumbent retained: {error}"
@@ -231,13 +333,28 @@ impl BrowserSession {
                 self.seeded = true;
             }
         }
+        if self.seeded {
+            self.stale_rounds = if improved {
+                0
+            } else {
+                self.stale_rounds.saturating_add(1)
+            };
+        }
         let seconds = started.elapsed().as_secs_f64();
         self.done |= self.cancelled || seconds >= self.options.time_limit_s;
+        self.done |= self
+            .persistent
+            .as_ref()
+            .is_some_and(|state| state.finished());
         let result = self
             .best
             .as_mut()
             .ok_or_else(|| anyhow::anyhow!("no complete marker"))?;
         result.runtime_s = seconds;
+        let mut warnings = std::collections::BTreeSet::new();
+        result
+            .warnings
+            .retain(|warning| warnings.insert(warning.clone()));
         if self.cancelled
             && !result
                 .warnings
@@ -279,6 +396,93 @@ mod tests {
             ..Default::default()
         }
     }
+    #[test]
+    fn persistent_warm_start_normalizes_legacy_bundle_labels() -> Result<()> {
+        let input = job();
+        let mut first = BrowserSession::new(input.clone(), options())?;
+        let mut warm = first.step()?.result;
+        for pl in &mut warm.placements {
+            pl.bundle = None;
+        }
+        let mut session = BrowserSession::new(
+            input.clone(),
+            BrowserOptions {
+                time_limit_s: 2.,
+                round_time_s: 0.1,
+                seed: Some(7),
+                warm_start: Some(warm),
+                ..Default::default()
+            },
+        )?;
+        session.step()?;
+        let p = session.step()?;
+        assert!(beta_marker_core::validate(&input, &p.result).ok);
+        assert_eq!(session.persistent_builds, 1);
+        let unique: std::collections::BTreeSet<_> = p.result.warnings.iter().collect();
+        assert_eq!(unique.len(), p.result.warnings.len());
+        Ok(())
+    }
+    #[test]
+    fn plain_rounds_reuse_one_separator_and_advance_its_search() -> Result<()> {
+        let mut session = BrowserSession::new(
+            job(),
+            BrowserOptions {
+                time_limit_s: 3.,
+                round_time_s: 0.1,
+                seed: Some(7),
+                ..Default::default()
+            },
+        )?;
+        session.step()?;
+        session.step()?;
+        assert_eq!(session.persistent_builds, 1);
+        let before = session
+            .persistent
+            .as_ref()
+            .expect("persistent model")
+            .evaluations();
+        let event = session.step()?;
+        assert_eq!(session.persistent_builds, 1);
+        assert_eq!(event.result.seed, Some(7));
+        assert!(session.persistent.as_ref().unwrap().evaluations() >= before);
+        assert!(beta_marker_core::validate(&session.job, &event.result).ok);
+        session.cancel();
+        assert!(session.step()?.cancelled);
+        Ok(())
+    }
+    #[test]
+    fn constrained_rounds_keep_preparation_passes_and_the_incumbent() -> Result<()> {
+        let mut input = job();
+        input.fabric.defects.push(beta_marker_core::Zone {
+            id: "hole".into(),
+            polygon: vec![[0., 0.], [10., 0.], [10., 10.], [0., 10.]],
+            note: None,
+        });
+        let mut session = BrowserSession::new(
+            input,
+            BrowserOptions {
+                time_limit_s: 3.,
+                round_time_s: 0.1,
+                seed: Some(7),
+                ..Default::default()
+            },
+        )?;
+        session.step()?;
+        let first = session.step()?;
+        assert_eq!(session.obstacle_builds, 1);
+        let passes = session
+            .obstacle
+            .as_ref()
+            .expect("prepared obstacles")
+            .passes();
+        let next = session.step()?;
+        assert_eq!(session.obstacle_builds, 1);
+        assert!(session.obstacle.as_ref().unwrap().passes() >= passes);
+        assert!(next.result.length <= first.result.length);
+        assert!(beta_marker_core::validate(&session.job, &next.result).ok);
+        Ok(())
+    }
+
     #[test]
     fn within_round_checkpoints_are_valid_monotone_and_throttled() -> Result<()> {
         let job = job();

@@ -31,7 +31,7 @@ checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
 
 [[package]]
 name = "beta-marker-core"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -39,7 +39,7 @@ dependencies = [
 
 [[package]]
 name = "beta-marker-dxf"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -50,7 +50,7 @@ dependencies = [
 
 [[package]]
 name = "beta-pattern-core"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -62,7 +62,7 @@ dependencies = [
 
 [[package]]
 name = "beta-pattern-digitize"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",
@@ -73,7 +73,7 @@ dependencies = [
 
 [[package]]
 name = "beta-pattern-wasm"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "beta-marker-core",

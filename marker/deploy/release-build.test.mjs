@@ -27,3 +27,14 @@ test('detects native/slash and UTF-16 local paths, but permits remapped paths', 
   }
   assert.deepEqual(localPathLeaks(Buffer.from('/cargo/registry/src/lib.rs /build/marker/src/main.rs'), [root]), []);
 });
+
+test('scans even and odd binary lengths at both UTF-16 alignments', () => {
+  for (const prefix of [Buffer.alloc(0), Buffer.from([0xff])]) {
+    for (const suffix of [Buffer.alloc(0), Buffer.from([0xff])]) {
+      const bytes = Buffer.concat([prefix, Buffer.from('C:/Users/builder', 'utf16le'), suffix]);
+      assert.ok(localPathLeaks(bytes).length);
+    }
+  }
+  assert.deepEqual(localPathLeaks(Buffer.from([0xff])), []);
+  assert.deepEqual(localPathLeaks(Buffer.alloc(0)), []);
+});

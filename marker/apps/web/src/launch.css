@@ -1,0 +1,98 @@
+/* Round 0.8 polish of the newer screens: cost comparison (Cut plan), paper pattern sets (Photo to marker) and the
+   region improvement dialog (Marker editor). Design-system tokens only; imported after style.css. */
+
+/* ---------- Cut plan · Compare fabric widths and order cost ---------- */
+.cost-card { margin-top: var(--sp-5); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); box-shadow: var(--shadow-1); padding: 0 var(--sp-5); }
+.cost-card > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-4) 0; }
+.cost-card > summary::-webkit-details-marker { display: none; }
+.cost-card > summary::before { content: ""; width: 9px; height: 9px; flex: none; border-right: 2px solid var(--text-2); border-bottom: 2px solid var(--text-2); transform: rotate(-45deg); transition: transform var(--dur-1) var(--ease); }
+.cost-card[open] > summary::before { transform: rotate(45deg); }
+.cost-summary { display: grid; gap: 2px; }
+.cost-summary strong { font-size: var(--fs-l); }
+.cost-summary small { color: var(--text-3); font-size: var(--fs-s); }
+.cost-card[open] { padding-bottom: var(--sp-5); }
+/* Fieldsets size to their widest content by default; here they follow the card. */
+.cost-card fieldset { min-width: 0; }
+.cost-offers-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin: var(--sp-2) 0; }
+.cost-offers-head h3 { margin: 0; font-size: var(--fs-m); }
+.cost-offers { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: var(--sp-3); margin-bottom: var(--sp-3); }
+.cost-offer { position: relative; min-width: 0; margin: 0; padding: var(--sp-3) var(--sp-4); border: 1px solid var(--line); border-radius: var(--r-l); background: var(--surface-2); }
+.cost-offer legend { font-weight: 700; padding: 0 var(--sp-1); }
+.cost-offer .fields { min-width: 0; }
+.cost-offer label { min-width: 0; overflow-wrap: anywhere; }
+.cost-offer .cost-remove { position: absolute; top: 4px; right: 8px; min-height: 32px; }
+.cost-price { display: flex; gap: var(--sp-2); }
+.cost-price input { flex: 1 1 auto; min-width: 0; }
+.cost-price select { flex: 0 0 auto; width: auto; }
+.cost-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-3); }
+.cost-status { margin: var(--sp-3) 0; color: var(--text-2); }
+.cost-for { margin: var(--sp-3) 0; }
+.cost-alts { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: var(--sp-3); list-style: none; margin: 0 0 var(--sp-3); padding: 0; }
+.cost-alt { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-3) var(--sp-4); border: 1px solid var(--line); border-radius: var(--r-l); background: var(--surface); }
+.cost-alt.cost-best { border-color: var(--ok-line); box-shadow: 0 0 0 2px var(--ok-bg); }
+.cost-alt.cost-failed { background: var(--surface-2); }
+.cost-alt-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px var(--sp-2); }
+.cost-width { font-size: var(--fs-xl); font-weight: 700; font-variant-numeric: tabular-nums; }
+.cost-offer-name { color: var(--text-3); font-size: var(--fs-s); }
+.cost-badge { margin-left: auto; padding: 2px 8px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 600; background: var(--surface-3); color: var(--text-2); }
+.cost-best .cost-badge { background: var(--ok-bg); color: var(--ok); }
+.cost-short .cost-badge { background: var(--warn-bg); color: var(--warn); }
+.cost-failed .cost-badge { background: var(--danger-bg); color: var(--danger); }
+.cost-total { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px var(--sp-2); margin: 0; }
+.cost-total span { color: var(--text-3); font-size: var(--fs-s); }
+.cost-total strong { font-size: var(--fs-2xl); font-variant-numeric: tabular-nums; }
+.cost-total small { color: var(--text-3); }
+.cost-facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px var(--sp-3); margin: 0; font-size: var(--fs-s); }
+.cost-facts div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-2); white-space: nowrap; border-bottom: 1px dashed var(--line); padding: 2px 0; }
+.cost-facts dt { color: var(--text-3); }
+.cost-facts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+.cost-reason { margin: 0; color: var(--danger); font-size: var(--fs-s); }
+.cost-reason small { color: var(--text-3); }
+.cost-alt > button { margin-top: auto; align-self: flex-start; }
+@media (max-width: 699px) {
+  .cost-card { padding: 0 var(--sp-3); }
+  .cost-facts { grid-template-columns: 1fr; }
+  .cost-alt > button { align-self: stretch; }
+}
+
+/* ---------- Photo to marker · pattern sets, tape check, fabric groups ---------- */
+.q-set-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); margin: var(--sp-2) 0 var(--sp-3); padding: var(--sp-2) var(--sp-3); border: 1px solid var(--line); border-radius: var(--r-l); background: var(--surface); }
+.screen.quick .q-set-tools > label { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; text-align: left; gap: var(--sp-2); flex: 1 1 260px; margin: 0; font-weight: 600; font-size: var(--fs-s); }
+.q-set-tools > label input { flex: 1 1 auto; min-width: 0; }
+.q-set-tools .q-row { display: flex; gap: var(--sp-2); margin: 0; }
+.q-set-tools small { flex-basis: 100%; color: var(--text-3); }
+.q-inventory table td:first-child { text-transform: none; }
+.q-tape { margin-top: var(--sp-3); padding: var(--sp-3); border: 1px solid var(--line); border-radius: var(--r-l); background: var(--surface-2); }
+.q-tape h3 { margin: 0 0 var(--sp-1); font-size: var(--fs-l); }
+.q-tape-steps { margin: var(--sp-2) 0; padding-left: 1.3em; color: var(--text-2); }
+.q-tape-steps li { margin: 2px 0; }
+.q-tape-result { margin: var(--sp-2) 0; padding: var(--sp-2) var(--sp-3); border-radius: var(--r); font-weight: 600; }
+.q-tape-result.ok { background: var(--ok-bg); color: var(--ok); }
+.q-tape-result.bad { background: var(--danger-bg); color: var(--danger); }
+.q-tape-result small { display: block; font-weight: 400; color: var(--text-2); }
+/* The tape panel sits in the piece sheet dialog (outside the screen). `.q-tape svg` sizes the outline drawing, so
+   icons need their own size here. */
+.q-tape .q-tape-practice, .q-tape .q-tape-result { display: flex; align-items: flex-start; gap: var(--sp-2); flex-wrap: wrap; }
+.q-tape .q-tape-practice { margin: var(--sp-2) 0; }
+.q-tape svg.icon { width: 18px; height: 18px; flex: none; margin-top: 2px; background: none; border: 0; border-radius: 0; cursor: inherit; }
+.q-tape button svg.icon { margin-top: 0; }
+.q-tape .q-tape-result small { flex-basis: 100%; }
+.q-fabric-card .q-tape-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: var(--sp-3); }
+@media (max-width: 699px) {
+  .screen.quick .q-set-tools > label { flex-basis: 100%; flex-direction: column; align-items: stretch; }
+  .q-set-tools .q-row { flex: 1 1 100%; }
+  .q-set-tools .q-row button { flex: 1; }
+  .q-inventory table, .q-inventory thead, .q-inventory tbody, .q-inventory tr, .q-inventory td, .q-inventory th { display: block; }
+  .q-inventory thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .q-inventory tr { padding: var(--sp-2) 0; border-bottom: 1px solid var(--line); }
+  .q-inventory td { border: 0; padding: 2px 0; }
+  .q-inventory td[data-label]::before { content: attr(data-label) ": "; color: var(--text-3); }
+}
+
+/* ---------- Marker editor · Improve one area ---------- */
+.ed-area-how { margin: 0 0 var(--sp-3); padding-left: 1.3em; color: var(--text-2); }
+.ed-area-how li { margin: 4px 0; }
+.ed-area-pick, .ed-area-run { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); margin: var(--sp-2) 0; }
+.ed-area-pick .hint, .ed-area-run p { margin: 0; }
+#ed-area-drawing figure { padding: var(--sp-2); border: 1px solid var(--line); border-radius: var(--r); background: var(--paper); }
+#ed-area-drawing figcaption { font-weight: 600; font-size: var(--fs-s); margin-bottom: 4px; }

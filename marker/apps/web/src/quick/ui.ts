@@ -8,14 +8,17 @@ import { exportFile, isPractice, loadQuickEngine, mockRequested, nestAvailable, 
 import { ART, qicon } from './art';
 import { bounds, mmToOverlay, pathData } from './geometry';
 import { currentLanguage, pieceName, sizeName, t, warningText, type QuickKey } from './i18n';
-import { samplePhoto } from './mock';
+const samplePhotoUrl = new URL('./sample-tshirt.png', import.meta.url).href;
+import { samplePhoto as mockSamplePhoto } from './mock';
+import { scanWarnings } from './scan-status';
 import { correct, loadCalibration, measureProblem, saveCalibration, sections, squarePx, toScreen, type Calibration, type Section } from './projector';
 import { installPwa, type InstallState } from './pwa';
 import { t as feedbackText } from '../feedback/i18n';
 import * as S from './state';
+import { openPatternSet, savePatternSet } from './pattern-set';
 import { formatWidth, metres, metresPerGarment, parseNumber, percent, savingVsUsual, toMm, WIDTH_PRESETS, widthProblem } from './units';
 import { find, byId } from '../screens';
-import { appUnit, longLength, onUnit, setAppUnit } from '../units-pref';
+import { appUnit, longLength, onUnit, setAppUnit, shortLength } from '../units-pref';
 
 /** Quick Marker: photo of paper pattern pieces → checked pieces → fabric and order → nest → print, chalk,
  * projector or share. Phone first (360-430 px, one hand, 48 px targets), also works on desktop.
@@ -37,9 +40,11 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
   let engine: QuickEngine | null = null, engineProblem = '', practice = false, canNest: boolean | null = null;
   let markerCore: MarkerCore | undefined, photoCounter = 0, nestAbort: AbortController | null = null, nestTimer = 0, nestStart = 0, milestone = false;
   let install: InstallState = { canInstall: false, offline: 'unsupported' };
-  let paper: 'A4' | 'A3' = 'A4';
+  let paper: 'A4' | 'A3' = 'A4', sampleLoaded = false;
   const photoUrls = new Map<string, string>(), overlayUrls = new Map<string, string>();
   let viewPhoto = '';
+  let tapePoints: Pt[] = [], tapeMm = '', tapeTolerance = '3', tapeError = '';
+  let preparingNest = false;
 
   const root = document.createElement('section');
   root.id = `screen-${QUICK_SCREEN}`; root.className = 'screen quick'; root.hidden = true;
@@ -49,6 +54,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     <p class="q-foot no-print"><button type="button" class="fb-screen-link ghost small" data-fb-open="bug"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 5h16v11H10l-5 4v-4H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg><span data-fb="screen_link">${esc(feedbackText('screen_link'))}</span></button></p>
     <input id="q-camera" type="file" accept="image/*" capture="environment" multiple hidden>
     <input id="q-gallery" type="file" accept="image/jpeg,image/png,image/*" multiple hidden>
+    <input id="q-open-set" type="file" accept=".json,application/json" hidden>
     <p id="q-live" class="sr-only" role="status" aria-live="polite"></p>
     <svg width="0" height="0" class="sr-only" aria-hidden="true"><defs><marker id="q-arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--draw-grain)"/></marker></defs></svg>`;
   content.append(root);
@@ -64,7 +70,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     if (engine && (!forceMock || engine.kind === 'mock')) return engine;
     const loaded = await loadQuickEngine({ mock: forceMock || mockRequested(location.search) });
     if (!loaded.ok) { engineProblem = loaded.reason === 'missing' ? t('engine_missing') : t('engine_failed', { error: loaded.error }); return null; }
-    engine = loaded.engine; practice = engine.kind === 'mock'; engineProblem = '';
+    engine = loaded.engine; practice = engine.kind === 'mock'; state = { ...state, practice }; engineProblem = '';
     if (engine.kind === 'wasm' && typeof Worker !== 'undefined') {
       const moduleUrl = new URL('wasm/beta_marker_wasm.js', document.baseURI).href;
       engine = scanInWorker(engine, () => new Worker(new URL('./scan-worker.ts', import.meta.url), { type: 'module' }), moduleUrl);
@@ -84,6 +90,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     const active = document.activeElement as HTMLElement | null;
     const keep = active && root.contains(active) ? active.id : '';
     head.innerHTML = headHtml();
+    if (state.step !== 'start') head.insertAdjacentHTML('beforeend', `<div class="q-set-tools"><label>${tx('set_label')}<input id="q-set-name" value="${esc(state.setName)}" maxlength="80" ${state.step === 'use' || state.nest.status === 'running' ? 'disabled' : ''} placeholder="${tx('set_placeholder')}" data-q-input="set-name"></label><div class="q-row"><button type="button" class="small" data-q="open-set" ${state.nest.status === 'running' ? 'disabled' : ''}>${icon('open')}${tx('set_open')}</button><button type="button" class="small" data-q="save-set" ${state.pieces.some(p => p.status !== 'deleted') ? '' : 'disabled'}>${icon('save')}${tx('set_save')}</button></div><small>${tx('set_hint')}</small></div>`);
     body.innerHTML = ({ start: startHtml, capture: captureHtml, review: reviewHtml, order: orderHtml, nest: nestHtml, use: useHtml } as Record<S.Step, () => string>)[state.step]();
     root.dataset.step = state.step;
     if (focusTitle) { const h = root.querySelector<HTMLElement>('h1'); h?.focus({ preventScroll: true }); window.scrollTo(0, 0); }
@@ -113,6 +120,11 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     return `${state.step !== 'start' ? `<button type="button" class="q-back ghost" data-q="back" id="q-back" ${state.nest.status === 'running' ? 'disabled' : ''}>${icon('arrow-left')}<span>${tx('back')}</span></button>` : ''}
       ${state.step !== 'start' ? `<ol class="q-steps" aria-label="${tx('step_of', { n: at + 1, total: FLOW.length })}">${crumbs}</ol>` : ''}
       ${practice ? `<span class="chip warn q-practice-chip">${icon('alert')}${tx('practice')}</span>` : ''}`;
+  }
+  async function saveSet(): Promise<void> {
+    try {
+      await downloadFile(new Blob([savePatternSet(state)], { type: 'application/json' }), `${(state.setName.trim() || 'paper-pattern').replace(/[^a-zA-Z0-9_-]/g,'-').slice(0,60)}.paper-set.json`);
+    } catch (error) { host.message(errorText(error),true); }
   }
 
   // ----- Start -----
@@ -155,14 +167,18 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
   }
   function photoCard(photo: S.Photo, index: number): string {
     const scan = photo.scan, url = overlayUrls.get(photo.id) ?? photoUrls.get(photo.id) ?? '';
-    const warnings = state.warnings.filter(w => w.photoId === photo.id || (!w.photoId && index === 0));
+    const notices = state.warnings.filter(w => w.photoId === photo.id || (!w.photoId && index === 0));
+    // Routine operator review is guidance, not a failed scan. Missing grain stays a warning.
+    const warnings = scanWarnings(notices, state.pieces.filter(p => p.piece.photoId === photo.id).map(p => p.piece));
     const status = photo.status === 'reading' ? `<span class="q-spinner" aria-hidden="true"></span>${tx('photo_reading')}`
       : photo.status === 'failed' ? `${icon('alert')}${tx('photo_failed')}` : `${icon('check-circle')}${tx('photo_found', { n: state.pieces.filter(p => p.piece.photoId === photo.id).length })}`;
-    const scale = scan ? `<span class="chip ${scan.scale.confidence === 'high' ? 'ok' : scan.scale.confidence === 'low' ? 'bad' : 'warn'}">${tx(`scale_${scan.scale.confidence}` as QuickKey)} · ${tx('scale_error', { mm: scan.scale.expectedErrorMm.toFixed(1) })}</span>` : '';
+    const photoPieces = state.pieces.filter(p => p.piece.photoId === photo.id);
+    const tapePassed = scan?.scale.confidence !== 'low' && photoPieces.some(p => S.tapeOf(state,p.piece)?.pass) && !photoPieces.some(p => S.tapeOf(state,p.piece)?.pass === false);
+    const scale = scan ? `<span class="chip ${tapePassed || scan.scale.confidence === 'high' ? 'ok' : scan.scale.confidence === 'low' ? 'bad' : 'warn'}">${tapePassed ? `${tx('scale_high')} · ${tx('tape_checked')}` : `${tx(`scale_${scan.scale.confidence}` as QuickKey)} · ${tx('scale_error', { mm: scan.scale.expectedErrorMm.toFixed(1) })}`}</span>` : '';
     return `<article class="q-photo-card" aria-labelledby="q-ph-${photo.id}">
       ${url ? `<img src="${esc(url)}" alt="" class="q-thumb">` : '<div class="q-thumb"></div>'}
       <div class="q-photo-text"><h2 id="q-ph-${photo.id}">${tx('photo_label', { n: index + 1 })}</h2>
-        <p class="q-status q-${photo.status}">${status}</p>${scale}
+        <p class="q-status q-${photo.status}">${status}</p>${scale}${scan ? `<p class="hint">${tx('photo_review_guidance')}</p>` : ''}
         ${photo.error ? `<p class="error-text">${esc(photo.error)}</p>` : ''}
         ${photo.status !== 'failed' ? `<label class="q-inline">${tx('photo_size')}<select id="q-size-${photo.id}" data-q-change="photo-size" data-id="${photo.id}">${sizeOptions(photo.size)}</select></label><p class="hint q-size-hint">${tx('photo_every_size')}</p>` : ''}
       </div>
@@ -187,7 +203,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     const done = state.photos.filter(p => p.status === 'done');
     if (!done.some(p => p.id === viewPhoto)) viewPhoto = done[0]?.id ?? '';
     const acc = S.accepted(state).length, wait = S.pending(state).length;
-    return `<h1 id="q-title" tabindex="-1">${tx('review_title')}</h1><p class="q-lead">${tx('review_hint')}</p>${practiceNote()}
+    return `<h1 id="q-title" tabindex="-1">${tx('review_title')}</h1><p class="q-lead">${tx('review_hint')}</p>${practiceNote()}${inventoryHtml()}
       <div class="q-review">
         <div class="q-review-photo">
           ${done.length > 1 ? `<div class="segmented q-photo-tabs" role="group" aria-label="${tx('photos_title')}">${done.map(p => `<button type="button" data-q="view-photo" data-id="${p.id}" aria-pressed="${p.id === viewPhoto}">${tx('photo_label', { n: state.photos.indexOf(p) + 1 })}</button>`).join('')}</div>` : ''}
@@ -203,10 +219,21 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
       <div class="q-dock"><button type="button" class="primary q-big" data-q="goto" data-step="order" id="q-to-order" ${S.blocker(state, 'order') ? 'aria-disabled="true"' : ''}>${tx('to_order')}${icon('arrow-right')}</button>
         ${S.blocker(state, 'order') ? `<p class="hint q-why">${tx(`blocked_${S.blocker(state, 'order')}` as QuickKey)}</p>` : ''}</div>`;
   }
+  function inventoryHtml(): string {
+    const groups = S.patternGroups(state);
+    if (!groups.length) return '';
+    return `<details class="q-card q-inventory" open><summary><strong>${tx('inv_title')}</strong></summary><p class="hint">${tx('inv_hint')}</p><div class="q-table-wrap"><table><thead><tr><th scope="col">${tx('inv_fabric')}</th><th scope="col">${tx('inv_size')}</th><th scope="col">${tx('inv_parts')}</th><th scope="col">${tx('inv_checked')}</th></tr></thead><tbody>${groups.map(g => `<tr><td data-label="${tx('inv_fabric')}">${esc(materialName(g.material))}</td><td data-label="${tx('inv_size')}">${esc(sizeName(g.size))}</td><td data-label="${tx('inv_parts')}">${g.pieces.map(p => `${esc(pieceName(p.piece.name))} × ${S.copies(p.piece)}${S.isPair(p.piece) ? ` (${tx('inv_mirrored')})` : ''}`).join(' · ')}</td><td data-label="${tx('inv_checked')}">${g.pieces.filter(p => p.status === 'accepted').length} / ${g.pieces.length}</td></tr>`).join('')}</tbody></table></div></details>`;
+  }
+  /** Fabric group names: the usual ones translated, the operator's own as typed. */
+  function materialName(m: string): string {
+    const key = `material_${m.trim().toLowerCase()}`;
+    return ['material_main', 'material_lining', 'material_rib', 'material_fusing', 'material_pocketing'].includes(key) ? t(key as QuickKey) : m;
+  }
   function photoOverlay(photoId: string): string {
     const photo = state.photos.find(p => p.id === photoId), scan = photo?.scan;
     const url = overlayUrls.get(photoId) ?? photoUrls.get(photoId);
-    if (!photo || !scan || !url) return '';
+    if (!photo) return '';
+    if (!scan || !url) return `<section class="q-saved-outlines"><h2>Saved digital outlines</h2><p class="hint">Source photos are not in the saved set. Compare these outlines with the paper pieces and repeat a tape measurement.</p><div class="q-saved-pieces">${state.pieces.filter(p => p.piece.photoId === photoId && p.status !== 'deleted').map(p => `<button type="button" data-q="open-piece" data-id="${esc(p.piece.id)}">${thumb(p.piece,100)}<span>${esc(pieceName(p.piece.name))} · ${esc(p.piece.size)}</span></button>`).join('')}</div></section>`;
     const [w, h] = scan.processedSize;
     const map = scan.scale.method === 'a4-sheet' ? mmToOverlay(scan.scale.imageToMm, scan.sourceSize, scan.processedSize) : null;
     const shapes = map ? state.pieces.filter(p => p.piece.photoId === photoId).map(p => {
@@ -240,7 +267,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     const removed = r.removedAsPairOf ? tx('removed_pair', { name: label(r.removedAsPairOf) }) : r.removedAsDuplicateOf ? tx('removed_duplicate', { name: label(r.removedAsDuplicateOf) }) : '';
     return `<li><button type="button" class="q-piece q-${r.status}" data-q="open-piece" data-id="${esc(p.id)}" id="q-pc-${cssId(p.id)}" aria-haspopup="dialog">
       ${thumb(p)}<span class="q-piece-text"><strong>${esc(pieceName(p.name))}</strong>
-      <span class="q-piece-meta">${state.photos.length > 1 ? `<span>${tx('photo_label', { n: state.photos.findIndex(ph => ph.id === p.photoId) + 1 })}</span>` : ''}<span class="chip">${esc(sizeName(p.size ?? state.defaultSize))}</span><span>${copiesText}</span>${p.fold_line ? `<span class="q-mini">${qicon('fold')}</span>` : ''}${chipsN ? `<span class="q-mini q-sugg">${qicon('sparkle')}${chipsN}</span>` : ''}</span>
+      <span class="q-piece-meta"><span class="chip">${esc(materialName(S.materialOf(p)))}</span>${S.tapeOf(state,p)?.pass ? `<span class="chip ok">${icon('check')}${tx('tape_checked')}</span>` : ''}${state.photos.length > 1 ? `<span>${tx('photo_label', { n: state.photos.findIndex(ph => ph.id === p.photoId) + 1 })}</span>` : ''}<span class="chip">${esc(sizeName(p.size ?? state.defaultSize))}</span><span>${copiesText}</span>${p.fold_line ? `<span class="q-mini">${qicon('fold')}</span>` : ''}${chipsN ? `<span class="q-mini q-sugg">${qicon('sparkle')}${chipsN}</span>` : ''}</span>
       ${removed ? `<small>${removed}</small>` : ''}</span>
       <span class="q-badge q-${r.status}">${r.status === 'accepted' ? icon('check') : r.status === 'deleted' ? icon('close') : icon('alert')}${tx(`status_${r.status}` as QuickKey)}</span></button></li>`;
   }
@@ -249,6 +276,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
 
   // ----- Piece sheet (dialog) -----
   function openPiece(id: string): void {
+    tapePoints = []; tapeMm = ''; tapeError = '';
     state = S.select(state, id); renderSheet();
     if (!sheet.open) sheet.showModal();
     sheet.querySelector<HTMLElement>('#q-sheet-title')?.focus();
@@ -278,18 +306,49 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
       </section>
       <div class="q-fields">
         <label>${tx('name')}<input id="q-name" value="${esc(pieceName(p.name))}" data-q-change="name" autocomplete="off" maxlength="40"></label>
+        <label>${tx('fabric_group')}<input id="q-material" value="${esc(S.materialOf(p))}" data-q-change="material" list="q-material-list" maxlength="40" aria-describedby="q-material-hint"><datalist id="q-material-list">${[...new Set(['main','lining','rib','fusing','pocketing',...S.materials(state)])].map(m => `<option value="${esc(m)}">${esc(materialName(m))}</option>`).join('')}</datalist></label><p class="hint" id="q-material-hint">${tx('fabric_group_hint')}</p>
         <fieldset class="q-size-pick"><legend>${tx('size')}</legend><div class="q-pills">${[...new Set([...S.SIZE_PRESETS, p.size ?? state.defaultSize])].map(s => `<label class="q-pill"><input type="radio" name="q-psize" value="${esc(s)}" data-q-change="size" ${s === (p.size ?? state.defaultSize) ? 'checked' : ''}><span>${esc(sizeName(s))}</span></label>`).join('')}</div>
           <label class="q-other">${tx('size_other')}<input id="q-size-other" data-q-change="size-other" autocomplete="off" maxlength="12" placeholder="38, 40, 6-7Y…"></label></fieldset>
         ${switchRow('q-pair', 'pair', pair, 'pair', 'pair_hint')}
         ${stepper('q-copies', pair ? 'copies_pair' : 'copies', copies, 'copies', 1, 20)}
         ${S.canFold(p) ? switchRow('q-fold', 'fold', !!p.fold_line, 'fold', 'fold_hint') : `<p class="hint">${qicon('fold')} ${tx('fold_none')}</p>`}
         <div class="q-row"><button type="button" data-q="grain-turn" id="q-grain">${qicon('grain')}${tx('grain_turn')}</button><span class="hint">${tx('grain_hint')} ${tx(p.grain ? 'grain_confirmed' : 'grain_unconfirmed')}</span></div>
+        ${tapeHtml(p)}
       </div>
       <div class="q-sheet-actions">
         ${r.status === 'deleted' ? `<button type="button" data-q="restore" id="q-restore">${icon('undo')}${tx('restore')}</button>` : `<button type="button" class="danger" data-q="delete" id="q-delete">${icon('trash')}${tx('delete')}</button>`}
         ${r.status === 'accepted' ? `<button type="button" class="primary" data-q="next-piece" id="q-next">${tx(nextPending() ? 'next_piece' : 'done')}</button>` : r.status === 'pending' ? `<button type="button" class="primary" data-q="accept" id="q-accept">${icon('check')}${tx(p.grain ? 'use_piece' : 'use_piece_grain')}</button>` : `<button type="button" data-q="close-sheet" id="q-done">${tx('close')}</button>`}
       </div>`;
     if (keep) byId(keep)?.focus();
+  }
+  function tapeHtml(p: QuickPiece): string {
+    const b = bounds(p.outline), margin = Math.max(b.width,b.height) * .07, rr = Math.max(b.width,b.height)/65;
+    const report = S.tapeOf(state,p);
+    const pointIndex = (slot: number) => { const at = p.outline.findIndex(([x,y]) => tapePoints[slot]?.[0] === x && tapePoints[slot]?.[1] === y); return at >= 0 ? at+1 : ''; };
+    // The fields follow the app unit (cm or inch), so the result does too; the limit is small, so it keeps two decimals.
+    const L = (mm: number) => shortLength(mm, appUnit());
+    const result = report ? `<p class="q-tape-result ${report.pass ? 'ok' : 'bad'}">${report.pass ? icon('check') : icon('alert')} ${tx(report.pass ? 'tape_ok' : 'tape_bad')}<small>${tx('tape_numbers', { digital: L(report.digital_mm), paper: L(report.measured_mm), diff: L(report.error_mm), tol: L(report.tolerance_mm ?? Number(tapeTolerance)) })}</small></p>` : '';
+    return `<section class="q-tape" aria-labelledby="q-tape-title"><h3 id="q-tape-title">${tx('tape_title')}</h3>
+      ${practice ? `<p class="notice warn q-tape-practice">${icon('alert')}<span>${tx('tape_practice')}</span></p>` : ''}
+      <ol class="q-tape-steps"><li>${tx('tape_step1')}</li><li>${tx('tape_step2')}</li><li>${tx('tape_step3')}</li></ol>${sampleLoaded ? `<p class="hint">${tx('sample_tape_hint')}</p>` : ''}
+      <svg id="q-tape-svg" data-q="tape-pick" viewBox="${b.minX-margin} ${-b.maxY-margin} ${b.width+2*margin} ${b.height+2*margin}" role="img" aria-label="${tx('tape_svg')}"><path d="${pathData(p.outline.map(([x,y]) => [x,-y]),false)}" class="q-piece-shape"/>${p.outline.length <= 40 ? p.outline.map(([x,y],i) => `<text x="${x+rr}" y="${-y-rr}" font-size="${rr*1.6}">${i+1}</text>`).join('') : ''}${tapePoints.map(([x,y],i) => `<circle cx="${x}" cy="${-y}" r="${rr}"/><text x="${x+rr}" y="${-y+rr*2}" font-size="${rr*2}">${i ? 'B' : 'A'}</text>`).join('')}${tapePoints.length === 2 ? `<path d="M${tapePoints[0]![0]} ${-tapePoints[0]![1]}L${tapePoints[1]![0]} ${-tapePoints[1]![1]}" class="q-tape-line"/>` : ''}</svg>
+      <p class="hint">${tx('tape_points', { n: tapePoints.length })}</p><div class="q-tape-fields"><label>${tx('tape_point_a')}<input id="q-tape-a" type="number" min="1" max="${p.outline.length}" step="1" value="${pointIndex(0)}" data-q-change="tape-a"></label><label>${tx('tape_point_b')}<input id="q-tape-b" type="number" min="1" max="${p.outline.length}" step="1" value="${pointIndex(1)}" data-q-change="tape-b"></label><label>${tx('tape_paper')}<input id="q-tape-mm" type="number" min="0.1" max="10000" step="any" value="${esc(tapeMm)}" data-q-input="tape-mm"></label><label>${tx('tape_tolerance')}<input id="q-tape-tolerance" type="number" min="0.1" max="10" step="0.1" value="${esc(tapeTolerance)}" data-q-input="tape-tolerance"></label></div>
+      <button type="button" class="${practice ? '' : 'primary'}" data-q="check-tape" ${practice ? 'disabled' : ''}>${icon('measure')}${tx('tape_compare')}</button>
+      ${tapeError ? `<p class="error-text" role="alert">${esc(tapeError)}</p>` : ''}<div role="status">${result}</div>
+      <p class="hint">${tx('tape_note')}</p><details><summary>${tx('grain_title')}</summary><p class="hint">${tx('grain_points_hint')}</p><button type="button" data-q="grain-points" ${tapePoints.length === 2 ? '' : 'disabled'}>${tx('grain_use')}</button></details></section>`;
+  }
+
+  async function checkTape(): Promise<void> {
+    const piece = state.pieces.find(p => p.piece.id === state.selected)?.piece;
+    if (!piece || !engine) return;
+    if (tapePoints.length !== 2) { tapeError = t('tape_choose'); renderSheet(); return; }
+    const snapshot = JSON.stringify(piece.outline), id = piece.id;
+    try {
+      const report = await engine.checkTape(piece, { endpoints: tapePoints as [Pt,Pt], measured_mm: Number(tapeMm), tolerance_mm: Number(tapeTolerance) });
+      const current = state.pieces.find(p => p.piece.id === id)?.piece;
+      if (!current || JSON.stringify(current.outline) !== snapshot) return;
+      tapePoints = report.endpoints; tapeError = ''; state = S.recordTape(state,id,report); render();
+    } catch (error) { tapeError = errorText(error); renderSheet(); }
   }
   const nextPending = () => S.pending(state).find(p => p.piece.id !== state.selected)?.piece.id;
   function switchRow(id: string, action: string, on: boolean, title: QuickKey, hint: QuickKey): string {
@@ -318,6 +377,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     const problem = widthProblem(f.widthMm);
     const sizes = S.orderSizes(state);
     return `<h1 id="q-title" tabindex="-1">${tx('order_title')}</h1>${practiceNote()}
+      <section class="q-card q-fabric-card"><h2>${tx('fabric_title')}</h2>${S.materials(state).length > 1 ? `<label>${tx('fabric_group')}<select id="q-selected-material" data-q-change="selected-material">${S.materials(state).map(m => `<option value="${esc(m)}" ${m === state.material ? 'selected' : ''}>${esc(materialName(m))}</option>`).join('')}</select></label>` : ''}<p class="hint">${tx('fabric_only', { group: materialName(state.material) })}</p><div class="q-tape-fields"><label>${tx('construction')}<select id="q-construction" data-q-change="construction">${(['unknown','woven','knit'] as const).map(v => `<option value="${v}" ${f.construction === v ? 'selected' : ''}>${tx(`construction_${v}` as QuickKey)}</option>`).join('')}</select></label><label>${tx('gsm_label')}<input id="q-gsm" type="number" min="1" max="5000" step="any" value="${f.gsm ?? ''}" data-q-change="gsm" placeholder="${tx('gsm_placeholder')}" aria-describedby="q-gsm-hint"></label><label>${tx('piece_gap_label')}<input id="q-piece-gap" type="number" min="0" max="100" step="any" value="${f.pieceGap}" data-q-change="piece-gap"></label><label>${tx('edge_gap_label')}<input id="q-edge-gap" type="number" min="0" max="100" step="any" value="${f.edgeGap}" data-q-change="edge-gap"></label></div><p class="hint" id="q-gsm-hint">${tx('gsm_hint')}</p>${S.fabricProblem(f) ? `<p class="error-text">${tx('fabric_invalid')}</p>` : ''}</section>
       <section class="q-card" aria-labelledby="q-width-label"><h2 id="q-width-label">${tx('width')}</h2>
         <div class="q-width-row"><input id="q-width" type="text" inputmode="decimal" value="${esc(widthText)}" data-q-input="width" aria-labelledby="q-width-label" aria-describedby="q-width-error" aria-invalid="${!!problem}">
           <div class="segmented q-unit" role="group" aria-label="${tx('width_unit')}">${(['inch', 'cm'] as const).map(u => `<button type="button" data-q="unit" data-unit="${u}" aria-pressed="${unit === u}" id="q-unit-${u}">${u === 'inch' ? 'inch' : 'cm'}</button>`).join('')}</div></div>
@@ -330,6 +390,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
         <div class="q-garments">${sizes.map(s => stepper(`q-g-${cssId(s)}`, 'garments', state.garments[s] ?? 0, 'garments', 0, 99, s)).join('')}</div>
         ${S.totalGarments(state) ? '' : `<p class="error-text">${tx('garments_none')}</p>`}</section>
       <fieldset class="q-card"><legend>${tx('time')}</legend><div class="segmented q-time" role="group">${BUDGETS.map(([k, s]) => `<button type="button" data-q="budget" data-s="${s}" aria-pressed="${state.nest.budgetS === s}" id="q-budget-${s}">${tx(k)} <small>${s < 60 ? `${s} s` : `${s / 60} min`}</small></button>`).join('')}</div></fieldset>
+      ${!practice && S.uncheckedPhotos(state).length ? `<div class="notice warn q-card"><strong>${tx('unchecked_title')}</strong><p>${tx('unchecked_text', { photos: S.uncheckedPhotos(state).map(id => state.photos.find(p => p.id === id)?.name ?? id).join(', ') })}</p><button type="button" data-q="goto" data-step="review">${tx('unchecked_back')}</button></div>` : ''}
       <div class="q-dock"><button type="button" class="primary q-big" data-q="nest" id="q-make" ${S.blocker(state, 'nest') ? 'aria-disabled="true"' : ''}>${icon('play')}${tx('make_marker')}</button>
         ${S.blocker(state, 'nest') ? `<p class="hint q-why">${tx(`blocked_${S.blocker(state, 'nest')}` as QuickKey)}</p>` : ''}</div>`;
   }
@@ -398,12 +459,14 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
 
   // ---------- Photos ----------
   async function addFiles(files: File[], forceMock = false): Promise<void> {
+    if (practice && !forceMock) { host.message('Start again before adding real paper photos. This set is in practice mode.',true); return; }
     if (!files.length) return;
     const e = await ready(forceMock);
     if (!e) { render(); host.message(engineProblem, true); return; }
     if (state.step === 'start') { state = { ...state, step: 'capture' }; render(true); }
     for (const file of files) {
-      const id = `photo-${++photoCounter}`;
+      let id: string;
+      do { id = `photo-${++photoCounter}`; } while (state.photos.some(p => p.id === id));
       photoUrls.set(id, URL.createObjectURL(file));
       state = S.addPhoto(state, id, file.name); render(); say(t('photo_reading'));
       try {
@@ -411,7 +474,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
         const scan = await e.scan(new Uint8Array(await file.arrayBuffer()), { reference: state.reference, photoId: id });
         if (scan.overlayPng.length) overlayUrls.set(id, URL.createObjectURL(new Blob([scan.overlayPng as BlobPart], { type: 'image/png' })));
         state = S.photoScanned(state, id, scan);
-        const done = state.photos.filter(p => p.status === 'done' && p.scan).map(p => p.scan!);
+        const done = state.photos.filter(p => p.status === 'done').map(p => p.scan ?? { photoId: p.id, pieces: state.pieces.filter(r => r.piece.photoId === p.id).map(r => r.piece), warnings: [] });
         state = S.applySession(state, await e.merge(done));
         say(t('photo_found', { n: scan.pieces.length }));
       } catch (error) {
@@ -421,20 +484,40 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     }
   }
   async function trySample(): Promise<void> {
-    const blobs = await Promise.all([samplePhoto(0), samplePhoto(1)]);
-    await addFiles(blobs.map((b, i) => new File([b], `sample-${i + 1}.jpg`, { type: 'image/jpeg' })), true);
+    // Explicit test mode retains the legacy mock smoke. Normal visitors always use real WASM.
+    if (mockRequested(location.search)) {
+      sampleLoaded = false; state = { ...state, practice:true };
+      const blobs = await Promise.all([mockSamplePhoto(0),mockSamplePhoto(1)]);
+      await addFiles(blobs.map((b,i)=>new File([b],`practice-${i+1}.jpg`,{type:'image/jpeg'})),true); return;
+    }
+    if (state.photos.length) { host.message(t('sample_start_again'),true); return; }
+    const response = await fetch(samplePhotoUrl);
+    if (!response.ok) { host.message(t('photo_failed'),true); return; }
+    await addFiles([new File([await response.blob()], 'Synthetic T-shirt teaching set.png', {type:'image/png'})]);
+    sampleLoaded = true;
+    state = S.setGarments({ ...state, setName: t('sample_set_name'), fabric: { ...state.fabric, widthMm:450, construction:'knit', gsm:180 } }, state.defaultSize, 4);
+    widthText = ''; render();
   }
 
   // ---------- Nest ----------
   async function startNest(): Promise<void> {
+    if (preparingNest || state.nest.status === 'running') return;
+    preparingNest = true;
+    try { await runNest(); } finally { preparingNest = false; }
+  }
+  async function runNest(): Promise<void> {
     const why = S.blocker(state, 'nest');
     if (why) { flashWhy(t(`blocked_${why}` as QuickKey)); return; }
     if (!engine) return;
+    const sourceState = state;
     let job: Job;
     try {
-      job = await engine.toJob(S.jobPieces(state), { width_mm: state.fabric.widthMm!, nap: state.fabric.nap ? 'one_way' : 'none', layout: state.fabric.layout }, S.garmentsFor(state));
+      job = await engine.toJob(S.jobPieces(state), { width_mm: state.fabric.widthMm!, nap: state.fabric.nap ? 'one_way' : 'none', layout: state.fabric.layout,
+        set_name: state.setName.trim() || 'Paper pattern set', material: state.material, gsm: state.fabric.gsm, construction: state.fabric.construction,
+        piece_gap_mm: state.fabric.pieceGap, edge_gap_mm: state.fabric.edgeGap }, S.garmentsFor(state));
     } catch (error) { host.message(t('nest_failed', { error: errorText(error) }), true); return; }
     const real = await nester();
+    if (state !== sourceState) { host.message('Settings changed while the marker was preparing. Choose Make marker again.'); return; }
     state = S.nestStarted(state, state.nest.budgetS); state = { ...state, nest: { ...state.nest, job } };
     nestAbort = new AbortController(); nestStart = performance.now(); render(true);
     if (!real && !practice) { state = S.nestFailed(state, t('nest_no_engine')); nestAbort = null; render(); return; }
@@ -601,6 +684,27 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
 
   // ---------- Events ----------
   const camera = $<HTMLInputElement>('q-camera'), gallery = $<HTMLInputElement>('q-gallery');
+  const setFile = $<HTMLInputElement>('q-open-set');
+  setFile.addEventListener('change', () => {
+    const file = setFile.files?.[0]; setFile.value = '';
+    if (!file) return;
+    void (async () => {
+      if (state.photos.length && !window.confirm('Replace this working pattern set? Save it first if you need to keep it.')) return;
+      if (file.size > 8_000_000) throw new Error('Pattern set exceeds 8 MB.');
+      // Always validate saved geometry with the real Rust reader, including practice files.
+      const loaded = await loadQuickEngine();
+      if (!loaded.ok) throw new Error(loaded.error);
+      const next = await openPatternSet(await file.text(), loaded.engine.assist);
+      if (state.nest.status === 'running') throw new Error('Stop the marker search before opening a pattern set.');
+      for (const photo of state.photos) revoke(photo.id);
+      engine = next.practice ? null : loaded.engine;
+      state = S.setUnit(next,appUnit()); practice = next.practice;
+      if (practice) { engine = null; await ready(true); }
+      photoCounter = 0;
+      tapePoints = []; tapeError = ''; widthText = ''; render(true);
+      host.message('Pattern set opened. Review the pieces and repeat the paper measurement checks.');
+    })().catch(error => host.message(errorText(error),true));
+  });
   for (const input of [camera, gallery]) input.addEventListener('change', () => { const files = Array.from(input.files ?? []); input.value = ''; void addFiles(files); });
   document.addEventListener('click', event => {
     const el = (event.target as Element).closest<HTMLElement>('[data-q]');
@@ -608,6 +712,18 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     if (el.getAttribute('aria-disabled') === 'true' && el.dataset.q !== 'goto' && el.dataset.q !== 'nest' && el.dataset.q !== 'share-plt') return;
     const id = el.dataset.id ?? state.selected ?? '';
     switch (el.dataset.q) {
+      case 'open-set': if (state.nest.status !== 'running') setFile.click(); break;
+      case 'save-set': void saveSet(); break;
+      case 'check-tape': void checkTape(); break;
+      case 'grain-points': if (tapePoints.length === 2) { state = S.setGrain(state,id,tapePoints as [Pt,Pt]); changed(); say(t('grain_updated')); } break;
+      case 'tape-pick': {
+        const svg = el as unknown as SVGSVGElement, matrix = svg.getScreenCTM();
+        if (!matrix) break;
+        const point = svg.createSVGPoint(); point.x = event.clientX; point.y = event.clientY;
+        const p = point.matrixTransform(matrix.inverse());
+        if (tapePoints.length >= 2) tapePoints = [];
+        tapePoints.push([p.x,-p.y]); tapeError = ''; renderSheet(); break;
+      }
       case 'camera': void ready().then(e => { if (e) camera.click(); else { render(); host.message(engineProblem, true); } }); break;
       case 'gallery': void ready().then(e => { if (e) gallery.click(); else { render(); host.message(engineProblem, true); } }); break;
       case 'sample': void trySample(); break;
@@ -653,9 +769,22 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
   });
   document.addEventListener('change', event => {
     const el = event.target as HTMLInputElement;
-    if (!el.dataset.qChange || !(root.contains(el) || sheet.contains(el))) return;
+    if (!el.dataset.qChange || !(root.contains(el) || sheet.contains(el)) || state.nest.status === 'running') return;
     const id = el.dataset.id ?? state.selected ?? '';
     switch (el.dataset.qChange) {
+      case 'material': state = S.setMaterial(state,id,el.value); changed(); break;
+      case 'selected-material': state = S.ensureGarments(S.selectMaterial(state,el.value)); widthText = ''; changed(); break;
+      case 'gsm': state = { ...state, fabric: { ...state.fabric, gsm: el.value === '' ? null : Number(el.value) } }; changed(); break;
+      case 'construction': state = { ...state, fabric: { ...state.fabric, construction: el.value as S.PaperFabric['construction'] } }; changed(); break;
+      case 'piece-gap': state = { ...state, fabric: { ...state.fabric, pieceGap: Number(el.value) } }; changed(); break;
+      case 'edge-gap': state = { ...state, fabric: { ...state.fabric, edgeGap: Number(el.value) } }; changed(); break;
+      case 'tape-a': case 'tape-b': {
+        const p = state.pieces.find(p => p.piece.id === id)?.piece, index = Number(el.value)-1;
+        if (!p || !Number.isInteger(index) || !p.outline[index]) break;
+        const slot = el.dataset.qChange === 'tape-a' ? 0 : 1;
+        if (slot === 1 && !tapePoints[0]) tapePoints[0] = p.outline[0]!;
+        tapePoints[slot] = p.outline[index]!; tapeError = ''; renderSheet(); break;
+      }
       case 'mode': state = { ...state, reference: el.value as S.Reference }; render(); break;
       case 'photo-size': state = S.setPhotoSize(state, id, el.value); changed(); break;
       case 'name': state = S.rename(state, id, el.value); changed(); break;
@@ -672,7 +801,10 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
   // Text fields update as you type without re-rendering (keeps the keyboard open on phones).
   document.addEventListener('input', event => {
     const el = event.target as HTMLInputElement;
-    if (!el.dataset.qInput || !root.contains(el)) return;
+    if (!el.dataset.qInput || !(root.contains(el) || sheet.contains(el))) return;
+    if (el.dataset.qInput === 'set-name') { if (state.nest.status !== 'running') state = S.clearNest({ ...state, setName: el.value }); return; }
+    if (el.dataset.qInput === 'tape-mm') { tapeMm = el.value; return; }
+    if (el.dataset.qInput === 'tape-tolerance') { tapeTolerance = el.value; return; }
     if (el.dataset.qInput === 'width') {
       widthText = el.value; const value = parseNumber(el.value);
       state = S.clearNest(S.setWidth(state, value == null ? null : toMm(value, state.fabric.unit)));
@@ -696,7 +828,7 @@ export function installQuick(host: QuickHost, content: HTMLElement): { root: HTM
     if (state.photos.length && !window.confirm(t('start_again_confirm'))) return;
     for (const p of state.photos) revoke(p.id);
     const keep = { reference: state.reference, fabric: state.fabric, defaultSize: state.defaultSize };
-    state = { ...S.initialState(), ...keep }; widthText = '';
+    state = { ...S.initialState(), ...keep }; widthText = ''; sampleLoaded = false;
     if (practice) { engine = null; practice = false; }
     render(true);
   }

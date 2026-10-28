@@ -2,8 +2,8 @@ import type { Job, MarkerResult, Placement, Pt } from '@beta/marker-wasm';
 import type { ProjectorLayout, QuickFabric, QuickMarkerCore, QuickPiece, QuickScan, QuickScanOptions, QuickSession, QuickSuggestions, QuickWarning } from '@beta/marker-wasm';
 import { area, bounds } from './geometry';
 
-/** Typed stand-in for the Rust Quick Marker API, used by tests, the headless smoke and the "Try a sample photo"
- * practice mode. Shapes are original and synthetic (a simple shirt). Results are NOT real scans or real nests. */
+/** Typed stand-in for unit tests and explicit quick-mock smoke only.
+ * The built-in sample uses sample-tshirt.png and real Rust engines. These results are NOT real scans or nests. */
 export const MOCK_ENGINE = 'practice mock';
 
 /** Sample photo layout: 0.8 px per mm, origin (mm) at pixel (120, 1100), y up. 1600 × 1200 px. */

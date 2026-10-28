@@ -1,5 +1,11 @@
 # Cutting-room module audit
 
+> Historical module audit, 19 October. Browser cutting-room parity arrived in
+> [0.7](BROWSER-CUTROOM-API.md). Development 0.8 adds bounded area preview and an
+> open-fabric width/ratio/order-cost screen, so the old CLI-only/no-screen rows
+> below are superseded for those workflows. See [current features](FEATURES.md)
+> and [the exact new limits](WORKFLOW-IMPROVEMENTS-2026-10-25.md).
+
 Audit date: 19 October 2026. Branch: `marker/astra-cutroom`, based on
 `marker/mvp` at `25e1233`. The proposal's original “missing” labels predate much
 of the current implementation. This audit checked source, CLI registration,

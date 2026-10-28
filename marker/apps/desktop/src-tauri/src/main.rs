@@ -83,7 +83,7 @@ fn request(
         "POST" => Method::Post,
         _ => return Ok(Reply::error(405, "Use GET or POST")),
     };
-    if ["/api/pipeline", "/api/plan/pipeline"].contains(&path) {
+    if ["/api/pipeline", "/api/plan/pipeline", "/api/plan/cost"].contains(&path) {
         if method != Method::Post {return Ok(Reply::error(405,"Use POST for pipeline"));}
         if body.len() > 50 * 1024 * 1024 {
             return Ok(Reply::error(413, "Request exceeds 50 MB"));

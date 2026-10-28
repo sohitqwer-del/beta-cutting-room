@@ -5,6 +5,7 @@
 //! to the grain-aligned original outlines.
 //! Fixed pieces, defects and fold edges use the adapter's f64 obstacle packer.
 
+mod adaptive;
 pub mod browser;
 mod profile;
 mod safety;
@@ -35,10 +36,13 @@ use std::time::Duration;
 /// overhead to its exploration/compression budget. The constrained path includes
 /// construction and compaction in its allowance, with preparation, conservative
 /// seed completion and independent validation still adding overhead.
+/// Short leading defects on an open lay may compare that path with Sparrow on
+/// a clean suffix; the reserved prefix counts towards the final fabric length.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NestOptions {
     /// Total search budget in seconds. Sparrow runs split it 80/20 between
-    /// exploration and compression; constrained runs construct and compact.
+    /// exploration and compression; constrained runs construct and compact, or
+    /// compare a short damaged-prefix layout with a clean-suffix search.
     pub time_limit_s: f64,
     /// Random seed. The result records the seed, including an internally chosen one.
     #[serde(default)]
@@ -103,6 +107,20 @@ pub fn nest_with_progress(
     mut callback: impl FnMut(NestProgress),
 ) -> Result<MarkerResult> {
     tuning::nest_with_tuning_and_progress(job, opts, &SearchTuning::default(), &mut callback)
+}
+
+/// Opt-in strategy comparison. Short budgets keep the ordinary engine path.
+/// It preserves its checked baseline stage, not a separate full-budget baseline run.
+pub fn nest_adaptive_with_progress(
+    job: &Job,
+    opts: &NestOptions,
+    mut callback: impl FnMut(NestProgress),
+) -> Result<MarkerResult> {
+    let tuning = SearchTuning {
+        portfolio: PortfolioStrategy::Adaptive,
+        ..Default::default()
+    };
+    tuning::nest_with_tuning_and_progress(job, opts, &tuning, &mut callback)
 }
 
 /// Nest with cooperative cancellation and a checked complete incumbent.

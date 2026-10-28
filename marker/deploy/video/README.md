@@ -1,5 +1,85 @@
 # Demo video pipeline
 
+## Launch 0.8 (current)
+
+Use `launch8.mjs` for the 45-second social cuts and the three-path walkthrough.
+`launch-scenes.mjs` is the single source for English narration and captions;
+`SCRIPT.md` is generated from it. The older commands below retain the previous release edit.
+No mock engine or server API is used for 0.8. The sample button uses the real scanner.
+The recorder serves this checkout's static build on loopback and closes the server and
+headless Chrome when it finishes. It blocks requests outside loopback. All feature
+footage is the actual app; only the closing card is editorial graphics.
+
+First install the workspace dependencies and build all four Rust WASM modules:
+
+```sh
+npm --prefix marker run build:static --workspace @beta/marker-web
+```
+
+Set `CARGO_TARGET_DIR`, `CARGO_BUILD_JOBS=3` and `WASM_BINDGEN` for that build.
+Use an external output folder. Supply the absolute paths below through arguments
+or set `PLAYWRIGHT_CORE`, `NARRATION_PYTHON`, `NARRATION_MODELS` and `CHROME_PATH`.
+The recorder presses the built-in sample button. Its original PNG is generated
+from the real Rust T-shirt block: front, back, two sleeves and neck rib at 30%
+teaching scale, beside a complete A4 sheet. The image has drawn grain arrows,
+even light, slight perspective and no factory data. The rib's grain arrow runs
+along its long edge so the short teaching strip can show a detectable arrow.
+This is a demonstration fixture, not a fit or camera-accuracy claim.
+
+Regenerate it with one command, then copy the PNG into `src/quick/sample-tshirt.png`:
+
+```sh
+node marker/deploy/video/make-paper-sample.mjs <absolute-wasm-pkg> <external-fixture-dir> <playwright-core-dir>
+```
+
+Rust WASM supplies block geometry. The fixture manifest records original cut
+outlines and the known 143.8546 mm straight side edge. The tape check uses
+that independent fixture dimension (14.38546 cm), never a length inferred from
+the scan. The app explains the rounded 14.39 cm check to sample visitors.
+The A4 scanner intentionally reports medium confidence; only a passed tape
+check makes the UI's size-check chip good. Routine review remains guidance;
+actual quality warnings are not suppressed. `sample-scan.mjs` tests the real
+WASM reader: five pieces, five grain arrows, error estimate below 2.2 mm and
+no quality warnings. Single-sheet accuracy still needs physical validation.
+
+Social square/4:5 edits crop complete important regions. The photo scene
+combines enlarged crops of the actual outline view and passed-check status.
+The generated fixture is labelled as synthetic and at 30% scale.
+
+One command for the complete kit (build first):
+
+```sh
+node marker/deploy/video/launch8.mjs all --out <external-video-dir> --build <absolute-marker-dir>/out/static-app --playwright <playwright-core-dir> --python <venv>/Scripts/python.exe --models <audio-models-dir>
+```
+
+Steps can also run separately: `tts`, `record`, `build`, `stills`, `check`, `script`.
+After TTS and recording, each output has a single command:
+
+```sh
+node marker/deploy/video/launch8.mjs build --target square --out <external-video-dir> --playwright <playwright-core-dir>
+node marker/deploy/video/launch8.mjs build --target portrait --out <external-video-dir> --playwright <playwright-core-dir>
+node marker/deploy/video/launch8.mjs build --target wide --out <external-video-dir> --playwright <playwright-core-dir>
+node marker/deploy/video/launch8.mjs build --target silent --out <external-video-dir> --playwright <playwright-core-dir>
+node marker/deploy/video/launch8.mjs build --target walk --out <external-video-dir> --playwright <playwright-core-dir>
+node marker/deploy/video/launch8.mjs stills --out <external-video-dir>
+node marker/deploy/video/launch8.mjs check --out <external-video-dir>
+```
+
+Square and 4:5 are silent, with an AAC silence track and burned captions. Wide
+has voiced and silent choices. Walkthrough has burned captions plus SRT/VTT.
+No music is used. Voiced AAC must measure -16 LUFS within 1 LU. Check writes
+SHA-256, sizes, durations, stream metadata, loudness, and `VIDEO-0.8.md`.
+It decodes every MP4 and detects black frames. Review the five-second contact sheets
+and phone-size samples for cropping and privacy. Captions are split at phrase boundaries;
+the exact same words are passed to Kokoro. A human should listen before release.
+
+`work8/` retains source JPEG frames with real timestamps, clips, clean WAV lines,
+edit timings, exports and capture report. Actions are never sped up; short social
+clips select intervals, and longer explanations hold the last frame. Rebuilds can
+differ in nesting layout. Keep the source frames for an exact footage rebuild.
+
+## Earlier release pipeline
+
 This folder makes the BETA Cutting Room demo video again for each release. It records the real app in a
 headless browser, adds offline narration and burned-in captions, and writes all deliverables.
 Nothing opens on screen, and nothing is downloaded at run time.

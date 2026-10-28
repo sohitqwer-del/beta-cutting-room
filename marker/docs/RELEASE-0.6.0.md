@@ -1,5 +1,9 @@
 # BETA Cutting Room 0.6.0 release record
 
+> Historical release evidence. The browser export/server limitation below was
+> removed in [0.7](RELEASE-0.7.0.md). These counts, packages and performance
+> statements describe 0.6, not the current development branch.
+
 This release builds on `marker/mvp` at `6b1f5dc`. BETA is a fun project
 created with the help of modern AI tools. These are unsigned local release
 packages. No push, public upload, publication or deployment is part of this work.

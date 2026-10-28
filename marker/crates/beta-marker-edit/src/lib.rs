@@ -1,6 +1,70 @@
 //! Pure Rust editing commands. All distances use millimetres and all angles use degrees.
 //! Contact uses swept polygon boundaries and circular gap capsules, including concave parts.
 mod polygon;
+mod region;
+
+/// A checked search result, with a valid shorter incumbent retained when useful.
+#[derive(Debug, Serialize)]
+pub struct SearchChoice {
+    pub result: MarkerResult,
+    pub retained: bool,
+}
+
+/// Recompute both lengths and validate against current rules before choosing.
+/// Candidate errors are reported; an old layout never hides a broken search output.
+pub fn choose_search_result(
+    job: &Job,
+    incumbent: &MarkerResult,
+    candidate: &MarkerResult,
+    fixed: &[Placement],
+) -> Result<SearchChoice, String> {
+    check_counts(job)?;
+    if !beta_marker_core::check_job(job).is_empty() || candidate.placements.len() > 10000 {
+        return Err("Invalid job or excessive search placement count.".into());
+    }
+    let settings = settings(job)?;
+    let effective = effective_job(job);
+    let mut candidate = candidate.clone();
+    if candidate.job_name != job.name || candidate.width != job.fabric.width {
+        return Err("Search result belongs to a different job or width.".into());
+    }
+    let engine = candidate.engine.clone();
+    metrics(&effective, &mut candidate);
+    candidate.engine = engine;
+    let report = beta_marker_core::validate(job, &candidate);
+    if !report.ok
+        || !geometry_ok(&effective, &candidate, &settings)?
+        || !fixed.iter().all(|p| candidate.placements.contains(p))
+    {
+        return Err(
+            "Search result failed current rules, editor boundaries or fixed-placement checks."
+                .into(),
+        );
+    }
+    if incumbent.job_name != job.name
+        || incumbent.width != job.fabric.width
+        || incumbent.placements.len() > 10000
+    {
+        return Ok(SearchChoice {
+            result: candidate,
+            retained: false,
+        });
+    }
+    let mut old = incumbent.clone();
+    let engine = old.engine.clone();
+    metrics(&effective, &mut old);
+    old.engine = engine;
+    let retain = old.job_name == job.name
+        && old.width == job.fabric.width
+        && old.length < candidate.length
+        && fixed.iter().all(|p| old.placements.contains(p))
+        && beta_marker_core::validate(job, &old).ok
+        && geometry_ok(&effective, &old, &settings)?;
+    Ok(SearchChoice {
+        result: if retain { old } else { candidate },
+        retained: retain,
+    })
+}
 use beta_marker_core::{
     Job, Layout, MarkerResult, Placement, Pt, ValidationReport,
     geometry::{angle_diff_deg, bbox, norm_deg, transform_point},
@@ -122,6 +186,8 @@ pub enum Action {
     Select { field: String, value: String },
     /// Select copies fully enclosed by the two corners of a rectangle.
     Rectangle { from: Pt, to: Pt },
+    /// Improve fully enclosed unlocked pieces, preserving all outside transforms.
+    ImproveRegion { from: Pt, to: Pt },
     /// Add or remove a full-width cut line at `x`; reject crossing pieces.
     Section { x: f64, remove: bool },
     /// Save a physical table end without changing occupied marker metrics.
@@ -716,6 +782,7 @@ pub fn apply(job: &Job, result: &MarkerResult, request: Request) -> Result<Outpu
         request.action,
         Action::Select { .. }
             | Action::Rectangle { .. }
+            | Action::ImproveRegion { .. }
             | Action::Measure { .. }
             | Action::Section { .. }
             | Action::Length { .. }
@@ -975,6 +1042,12 @@ pub fn apply(job: &Job, result: &MarkerResult, request: Request) -> Result<Outpu
                 })
                 .map(|(i, _)| i)
                 .collect();
+        }
+        Action::ImproveRegion { from, to } => {
+            let (selected, notice) = region::improve(job, &effective, r, &s, from, to)?;
+            out.selected = selected;
+            out.notice = notice;
+            require_clear = true;
         }
         Action::Section { x, remove } => {
             if !x.is_finite() || x <= 0. || x >= limit(&effective, r, &s) {

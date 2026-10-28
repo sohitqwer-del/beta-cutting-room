@@ -1,0 +1,100 @@
+/* "See it in 60 seconds" tour card (src/tour). Design-system tokens only. Desktop: a card at the bottom right that
+   leaves the drawing and the step bar free. Phone: a bottom sheet in thumb reach. The end card sits in the middle. */
+.tour {
+  position: fixed; z-index: 60; right: var(--sp-4); bottom: var(--sp-4); width: min(400px, calc(100vw - 2 * var(--sp-4)));
+  max-height: calc(100vh - var(--topbar-h) - 2 * var(--sp-4)); overflow: auto;
+  background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: var(--r-xl);
+  box-shadow: var(--shadow-3); padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  animation: tour-in var(--dur-2) var(--ease);
+}
+.tour[hidden] { display: none; }
+@keyframes tour-in { from { opacity: 0; transform: translateY(8px); } }
+.tour-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-2); }
+.tour-eyebrow { font-size: var(--fs-xs); font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--accent-text); }
+.tour-skip { min-height: 32px; }
+.tour-dots { display: flex; gap: 6px; list-style: none; margin: 0 0 var(--sp-3); padding: 0; }
+.tour-dots li { flex: 1; height: 4px; border-radius: var(--r-pill); background: var(--surface-3); }
+.tour-dots li.done { background: var(--accent); opacity: .55; }
+.tour-dots li.now { background: var(--accent); }
+.tour h2 { margin: 0 0 var(--sp-2); font-size: var(--fs-xl); line-height: 1.25; outline-offset: 4px; }
+.tour-text { margin: 0 0 var(--sp-3); color: var(--text-2); }
+.tour-live, .tour-fail { display: flex; align-items: center; gap: var(--sp-2); margin: 0 0 var(--sp-3); padding: var(--sp-2) var(--sp-3); border-radius: var(--r); background: var(--accent-soft); color: var(--accent-text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tour-live .icon { width: 18px; height: 18px; }
+.tour-fail { background: var(--danger-bg); color: var(--danger); font-weight: 500; }
+.tour-spinner { width: 16px; height: 16px; flex: none; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: tour-spin .8s linear infinite; }
+@keyframes tour-spin { to { transform: rotate(360deg); } }
+.tour-bar { height: 4px; border-radius: var(--r-pill); background: var(--surface-3); overflow: hidden; margin: -4px 0 var(--sp-3); }
+.tour-bar span { display: block; height: 100%; width: 40%; background: var(--accent); border-radius: inherit; animation: tour-slide 1.4s var(--ease) infinite; }
+@keyframes tour-slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.tour-actions { display: flex; justify-content: flex-end; gap: var(--sp-2); }
+.tour-next { min-width: 9rem; justify-content: center; }
+.tour-next[aria-disabled=true] { opacity: .6; cursor: progress; }
+
+/* End card: in the middle, with the page dimmed behind it (the shadow is only a picture; nothing is blocked). */
+.tour.tour-end { left: 50%; right: auto; top: 50%; bottom: auto; transform: translate(-50%, -50%); width: min(560px, calc(100vw - 2 * var(--sp-4))); max-height: calc(100vh - 2 * var(--sp-4)); box-shadow: var(--shadow-3), 0 0 0 100vmax rgb(16 33 26 / 32%); animation: none; }
+.tour-end h2 { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-2xl); }
+.tour-end-icon { width: 28px; height: 28px; color: var(--ok); flex: none; }
+.tour-time { color: var(--text-3); white-space: nowrap; }
+.tour-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; margin: 0 0 var(--sp-4); padding: 0; }
+.tour-chips li { padding: 4px 10px; border-radius: var(--r-pill); background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-line); font-size: var(--fs-s); font-weight: 600; }
+.tour-try { margin: 0 0 var(--sp-2); font-size: var(--fs-l); }
+.tour-choices { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2); list-style: none; margin: 0 0 var(--sp-4); padding: 0; }
+.tour-choice { width: 100%; height: 100%; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--sp-3); text-align: left; padding: var(--sp-3); white-space: normal; }
+.tour-choice strong { display: block; }
+.tour-choice small { display: block; color: var(--text-3); font-size: var(--fs-xs); font-weight: 400; margin-top: 2px; }
+.tour-choice .action-arrow { width: 16px; height: 16px; color: var(--text-3); }
+.tour-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); border-top: 1px solid var(--line); padding-top: var(--sp-3); }
+.tour-foot #tour-close { margin-left: auto; }
+.tour-link { display: inline-flex; align-items: center; gap: 6px; min-height: var(--control-h); padding: 0 var(--sp-3); border-radius: var(--r); color: var(--accent-text); text-decoration: none; font-weight: 600; }
+.tour-link:hover { background: var(--accent-soft); }
+.tour-link .icon { width: 16px; height: 16px; }
+
+/* While the tour leads, the Style screen's own Back and Next step aside (one Next on the screen), and the step bar
+   only shows where we are. */
+.st-touring .st-back, .st-touring .st-next-wrap, .st-touring .st-how-btn, .st-touring .st-file-menu { display: none !important; }
+.st-touring .st-steps { pointer-events: none; }
+/* Wide screens: the live marker and the cut tiles keep the room left of the card. */
+@media (min-width: 1100px) { .st-touring[data-step=marker] .st-body, .st-touring[data-step=cut] .st-body { padding-right: 424px; } }
+
+/* Home: the first card a new visitor sees, and an honest empty Continue list. */
+.home-empty { margin: 0; padding: var(--sp-4); border: 1px dashed var(--line); border-radius: var(--r-l); color: var(--text-3); }
+.home-tour { margin-bottom: var(--sp-5); }
+.home-tour .tour-start-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--sp-5); align-items: center; padding: var(--sp-5); border-radius: var(--r-xl); background: linear-gradient(120deg, var(--accent-soft), var(--surface) 70%); border: 1px solid var(--ok-line); }
+.home-tour h2 { margin: 0 0 var(--sp-2); font-size: var(--fs-2xl); line-height: 1.2; }
+.home-tour p { margin: 0 0 var(--sp-3); color: var(--text-2); max-width: 60ch; }
+.home-tour .tour-start-steps { font-size: var(--fs-s); color: var(--accent-text); font-weight: 600; }
+.home-tour .tour-start-art { width: 220px; }
+.home-tour .tour-start-art svg { display: block; width: 100%; height: auto; }
+.home-tour .tour-start-art .p { fill: var(--fill-0); stroke: var(--size-0); stroke-width: 1.2; }
+.home-tour .tour-start-art .p1 { fill: var(--fill-1); stroke: var(--size-2); }
+.home-tour .tour-start-art .p2 { fill: var(--fill-2); stroke: var(--size-4); }
+.home-tour .tour-start-art .p3 { fill: var(--fill-3); stroke: var(--size-3); }
+.home-tour .tour-start-art .fab { fill: var(--paper); stroke: var(--paper-edge); stroke-dasharray: 4 3; }
+.home-tour [data-tour-start] .icon { width: 20px; height: 20px; }
+
+@media (max-width: 699px) {
+  .tour { left: 0; right: 0; bottom: 0; width: auto; max-height: 52vh; border-radius: var(--r-xl) var(--r-xl) 0 0; padding: var(--sp-3) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom)); border-bottom: 0; }
+  .tour h2 { font-size: var(--fs-l); }
+  .tour-text { font-size: var(--fs-s); }
+  .tour-actions .tour-next { flex: 1; min-height: var(--control-h-l); }
+  .tour.tour-end { top: auto; bottom: 0; left: 0; transform: none; width: auto; max-height: 88vh; border-radius: var(--r-xl) var(--r-xl) 0 0; }
+  .tour-choices { grid-template-columns: 1fr; }
+  .tour-end h2 { font-size: var(--fs-xl); }
+  .st-touring { padding-bottom: 46vh; }
+  /* Phone tour: the card replaces the Back/Next strip; tools and duplicate controls step aside so the T-shirt and
+     the live marker get the screen above the card. */
+  .screen.style.st-touring::after { display: none; }
+  .st-touring .sc-palette, .st-touring .sc-bar, .st-touring .sc-foot, .st-touring .sc-inspector { display: none !important; }
+  .st-touring .sc { grid-template-rows: minmax(260px, calc(100dvh - 380px)); }
+  .st-touring .st-marker-top, .st-touring .st-layers .st-progress, .st-touring .st-zoom, .st-touring .st-marker-keys { display: none !important; }
+  .home-tour .tour-start-card { grid-template-columns: 1fr; padding: var(--sp-4); gap: var(--sp-3); }
+  .home-tour .tour-start-art { display: none; }
+  .home-tour h2 { font-size: var(--fs-xl); }
+  .home-tour [data-tour-start] { width: 100%; justify-content: center; min-height: var(--control-h-l); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour { animation: none; }
+  .tour-spinner, .tour-bar span { animation: none; }
+  .tour-bar span { width: 100%; opacity: .5; }
+}
+@media print { .tour { display: none !important; } }

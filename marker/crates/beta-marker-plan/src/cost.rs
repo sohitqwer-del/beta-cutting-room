@@ -412,79 +412,87 @@ pub fn compare_with_engine(
         "Ratio-set ids must be nonempty and unique."
     );
     let mut ids = std::collections::BTreeSet::new();
+    let mut offer_errors = Vec::new();
     for offer in &request.offers {
         ensure!(
             !offer.id.trim().is_empty() && ids.insert(&offer.id),
             "Offer ids must be nonempty and unique."
         );
-        offer.price.per_metre(offer.width_mm)?;
-        if let Some(register) = &offer.rolls {
-            register.validate()?;
-            let mut count = 0;
-            for roll in register.rolls.iter().filter(|r| {
-                r.usable_width_mm >= offer.width_mm
-                    && (offer.eligible_roll_ids.is_empty()
-                        || offer.eligible_roll_ids.contains(&r.id))
-            }) {
-                count += 1;
-                ensure!(
-                    roll.shrinkage.length_pct
-                        <= request.order.job.fabric.shrinkage.length_pct + 1e-9
-                        && roll.shrinkage.width_pct
-                            <= request.order.job.fabric.shrinkage.width_pct + 1e-9,
-                    "Offer {} roll {} needs more shrinkage compensation than the common order; prepare compatible stock before comparing widths.",
-                    offer.id,
-                    roll.id
-                );
-            }
-            ensure!(
-                count > 0,
-                "Offer {} has no eligible stock at this width.",
-                offer.id
-            );
-            let eligible: std::collections::BTreeSet<_> = register
-                .rolls
-                .iter()
-                .filter(|r| {
+        let checked = (|| -> Result<()> {
+            offer.price.per_metre(offer.width_mm)?;
+            if let Some(register) = &offer.rolls {
+                register.validate()?;
+                let mut count = 0;
+                for roll in register.rolls.iter().filter(|r| {
                     r.usable_width_mm >= offer.width_mm
                         && (offer.eligible_roll_ids.is_empty()
                             || offer.eligible_roll_ids.contains(&r.id))
-                })
-                .map(|r| r.id.as_str())
-                .collect();
-            let bands: std::collections::BTreeSet<_> =
-                beta_marker_roll::group_rolls(register, &Default::default())?
-                    .into_iter()
-                    .filter(|g| g.roll_ids.iter().any(|id| eligible.contains(id.as_str())))
-                    .map(|g| (g.length_band, g.width_band))
+                }) {
+                    count += 1;
+                    ensure!(
+                        roll.shrinkage.length_pct
+                            <= request.order.job.fabric.shrinkage.length_pct + 1e-9
+                            && roll.shrinkage.width_pct
+                                <= request.order.job.fabric.shrinkage.width_pct + 1e-9,
+                        "Offer {} roll {} needs more shrinkage compensation than the common order; prepare compatible stock before comparing widths.",
+                        offer.id,
+                        roll.id
+                    );
+                }
+                ensure!(
+                    count > 0,
+                    "Offer {} has no eligible stock at this width.",
+                    offer.id
+                );
+                let eligible: std::collections::BTreeSet<_> = register
+                    .rolls
+                    .iter()
+                    .filter(|r| {
+                        r.usable_width_mm >= offer.width_mm
+                            && (offer.eligible_roll_ids.is_empty()
+                                || offer.eligible_roll_ids.contains(&r.id))
+                    })
+                    .map(|r| r.id.as_str())
                     .collect();
-            ensure!(
-                bands.len() <= 1,
-                "Offer {} spans incompatible shrinkage bands; restrict approved roll IDs to one band pair.",
-                offer.id
-            );
-        }
+                let bands: std::collections::BTreeSet<_> =
+                    beta_marker_roll::group_rolls(register, &Default::default())?
+                        .into_iter()
+                        .filter(|g| g.roll_ids.iter().any(|id| eligible.contains(id.as_str())))
+                        .map(|g| (g.length_band, g.width_band))
+                        .collect();
+                ensure!(
+                    bands.len() <= 1,
+                    "Offer {} spans incompatible shrinkage bands; restrict approved roll IDs to one band pair.",
+                    offer.id
+                );
+            }
+            Ok(())
+        })();
+        offer_errors.push(checked.err().map(|error| format!("{error:#}")));
     }
     let mut trials = Vec::new();
-    for i in 0..request.offers.len() {
+    for (i, offer_error) in offer_errors.iter().enumerate() {
         for ratios in sets {
             // Input/geometry failures isolate alternatives; callback errors must
             // propagate so callers can cancel rather than finishing the matrix.
             let mut callback_error = None;
-            let result = evaluate(
-                request,
-                i,
-                ratios,
-                None,
-                &mut |p| match progress(p) {
-                    Ok(()) => Ok(()),
-                    Err(e) => {
-                        callback_error = Some(e.to_string());
-                        Err(e)
-                    }
-                },
-                engine,
-            );
+            let result = match offer_error {
+                Some(error) => Err(anyhow::anyhow!(error.clone())),
+                None => evaluate(
+                    request,
+                    i,
+                    ratios,
+                    None,
+                    &mut |p| match progress(p) {
+                        Ok(()) => Ok(()),
+                        Err(e) => {
+                            callback_error = Some(e.to_string());
+                            Err(e)
+                        }
+                    },
+                    engine,
+                ),
+            };
             if let Some(e) = callback_error {
                 anyhow::bail!(e);
             }

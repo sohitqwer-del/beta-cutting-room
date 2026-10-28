@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mockMerge, mockScan } from './mock';
+import { recordTape } from './state';
 import {
   accept, acceptAllPending, addPhoto, applyChip, applySession, blocker, chips, clearNest, copies, dismissChip, ensureGarments, garmentsFor, go,
   initialState, isPair, jobPieces, nestFailed, nestFinished, nestProgress, nestStarted, orderSizes, photoFailed, photoScanned, remove,
@@ -43,6 +44,8 @@ describe('quick flow guards', () => {
   });
   it('blocks nesting without a width or garments, and Use without a result', () => {
     let s = ensureGarments(acceptAllPending(scanned()));
+    expect(blocker(s,'nest')).toBe('tape_check');
+    s = recordTape(s,s.pieces[0]!.piece.id,{ endpoints: [[0,0],[100,0]], measured_mm: 100, digital_mm: 100, tolerance_mm: 3, error_mm: 0, pass: true });
     expect(blocker(s, 'nest')).toBeNull();
     s = setWidth(s, null); expect(blocker(s, 'nest')).toBe('width');
     s = setWidth(s, 1500); s = setGarments(s, 'FREE', 0); expect(blocker(s, 'nest')).toBe('no_garments');

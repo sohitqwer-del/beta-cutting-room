@@ -17,9 +17,16 @@ export function installPwa(onChange: (state: InstallState) => void): { install()
   let current: InstallState = { canInstall: false, offline: supported ? 'pending' : 'unsupported' };
   const set = (patch: Partial<InstallState>) => { current = { ...current, ...patch }; onChange(current); };
   if (supported) {
-    navigator.serviceWorker.register('./sw.js', { scope: './' })
+    // The offline copy downloads every engine (about 5 MB compressed). Start it after the first 30 s on the page, so a
+    // first visit gets the network for what the visitor opens; skip it with data saver or a slow connection.
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    const slow = !!connection?.saveData || ['slow-2g', '2g', '3g'].includes(connection?.effectiveType ?? '');
+    const register = () => navigator.serviceWorker.register('./sw.js', { scope: './' })
       .then(registration => navigator.serviceWorker.ready.then(() => { void registration; set({ offline: 'ready' }); }))
       .catch(() => set({ offline: 'unsupported' }));
+    if (navigator.serviceWorker.controller) void register();
+    else if (slow) set({ offline: 'unsupported' });
+    else window.setTimeout(() => void register(), Math.max(0, 30000 - performance.now()));
   }
   window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); prompt = event as PromptEvent; set({ canInstall: true }); });
   window.addEventListener('appinstalled', () => { prompt = null; set({ canInstall: false }); });

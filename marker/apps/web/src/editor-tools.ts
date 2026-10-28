@@ -6,6 +6,7 @@ import { icon } from './icons';
 import './editor-tools.css';
 import { find, findAll } from './screens';
 import { appUnit, longLength, shortLength } from './units-pref';
+import { previewRegion } from './region-preview';
 interface Host {
   get(): DocumentState; core(): EditorCore | undefined; busy(): boolean;
   selection(): number[]; select(indices: number[]): void;
@@ -33,6 +34,8 @@ export function installEditorTools(host: Host) {
   let armed = -1;
   let library: LibraryEntry[] = [];
   let libraryProblem = '';
+  let areaPreview: { original: string; state: DocumentState; selected: number[] } | undefined;
+  let areaSearch: AbortController | undefined;
   try { library = readLibrary(localStorage.getItem(LIBRARY_KEY)); } catch (e) { libraryProblem = String(e); }
   // Same controls and ids as before, arranged by how often they are used:
   // daily tools in the toolbar (modes, flip, remove, compact, close end, help), the rest in the Tools panel.
@@ -42,6 +45,7 @@ export function installEditorTools(host: Host) {
   $('#rotate').insertAdjacentHTML('afterend', tool('id="ed-flip"', 'flip', 'Flip', 'Flip when the fabric allows · F', 'F'));
   $('#lock').insertAdjacentHTML('afterend', tool('id="ed-remove"', 'trash', 'Remove', 'Return to the piece bin · Delete', 'Delete'));
   $('#tool-tidy').insertAdjacentHTML('beforeend', `${tool('id="ed-compact"', 'compact', 'Compact all', 'Compact all pieces left · C', 'C')}${tool('id="ed-close-end"', 'close-end', 'Close the end', 'Pull the marker end to the pieces · E', 'E')}`);
+  $('#tool-tidy').insertAdjacentHTML('beforeend', '<button type="button" id="ed-area">Improve area</button>');
   $('#toggle-inspector').insertAdjacentHTML('beforebegin', tool('id="ed-help" aria-haspopup="dialog" data-tip-align="end"', 'keyboard', 'Keyboard help', 'All keyboard shortcuts · ?', '?'));
   $('#inspector-tools').insertAdjacentHTML('beforeend', `
     <section class="inspector-section editor-tools" aria-labelledby="ed-move-title"><h3 id="ed-move-title">Move and turn</h3>
@@ -67,11 +71,68 @@ export function installEditorTools(host: Host) {
   $('.validation-panel').insertAdjacentHTML('beforeend', `<p id="ed-status" class="ed-status" role="status" aria-live="polite"></p><details class="advanced"><summary>Overlaps and gaps</summary><div class="toolgroup"><label>Display tolerance (mm²)<input id="ed-tolerance" type="number" value="0" min="0" step="0.01"></label><label>Resolve direction<select id="ed-resolve-direction"><option>right</option><option>left</option><option>up</option><option>down</option></select></label><button id="ed-resolve">Resolve by bump</button></div><p id="ed-overlap" role="status"></p><ul id="ed-pairs"></ul><p class="hint">Display tolerance labels small overlaps only. Every overlap remains a cutting error. Areas are summed per intersecting pair.</p></details>`);
   $('.under-canvas').insertAdjacentHTML('afterend', `<section class="editor-supply" id="ed-supply" aria-labelledby="ed-bin-title"><details open><summary id="ed-bin-title">Piece bin: unplaced pieces <span id="ed-unplaced-count"></span></summary><p class="hint">Remove a piece to return it here. Choose a copy, then click a clear point on the marker, or use exact X/Y placement in the Tools panel. Rust bumps it left after placing.</p><div class="toolgroup"><button id="ed-fill">${icon('fill')}Fill gaps</button><button id="ed-empty">Build by hand (remove all unlocked)</button></div><div id="ed-unplaced" class="ed-unplaced"></div></details><details><summary>${icon('library')}Marker library</summary><p class="hint">Saved in this browser with the job, piece geometry and ratio. Reuse checks all rules and validates the saved layout. Export a backup before clearing browser storage.</p><div class="toolgroup"><label>Marker name<input id="ed-library-name" value="Finished marker"></label><button id="ed-library-save">Save finished marker</button><button id="ed-library-export">Export library JSON</button><label>Restore backup<input id="ed-library-import" type="file" accept=".json"></label></div><label>Saved marker<select id="ed-library-choice"></select></label><div class="toolgroup"><button id="ed-library-reuse">Reuse marker for current job</button><button id="ed-library-delete" class="danger">Delete selected saved marker</button></div><p id="ed-library-status" role="status"></p></details></section>`);
   document.body.insertAdjacentHTML('beforeend', `<dialog id="ed-shortcuts" aria-labelledby="ed-shortcut-title"><div class="dialog-body"><h2 id="ed-shortcut-title">Editor keyboard shortcuts</h2><p>All fields and tools also work with Tab, Enter and Space. Arrows act on the canvas. Select a group using the filter, Select all, Shift+click or Select box.</p><dl>${shortcuts.map(([key,help]) => `<dt><kbd>${key}</kbd></dt><dd>${help}</dd>`).join('')}</dl><form method="dialog" class="dialog-actions"><button class="primary">Close</button></form></div></dialog>`);
+  document.body.insertAdjacentHTML('beforeend', `<dialog id="ed-area-dialog" aria-labelledby="ed-area-title" aria-describedby="ed-area-how"><div class="dialog-body"><h2 id="ed-area-title">Improve one area of the marker</h2>
+    <ol class="ed-area-how" id="ed-area-how"><li><strong>Choose the area.</strong> Draw a box around the pieces to tighten, or type its corners.</li><li><strong>Preview.</strong> BETA pushes the pieces inside the box closer together. Pieces outside it, locked pieces and pieces that cross the box edge do not move.</li><li><strong>Apply</strong> if it is better. Undo puts the old marker back.</li></ol>
+    <div class="ed-area-pick"><button type="button" id="ed-area-box">${icon('select')}Draw a box on the marker</button><span class="hint" id="ed-area-box-state">No area chosen yet.</span></div>
+    <details class="advanced"><summary>Type the corners instead</summary><div class="fields two">
+    ${[['x1','Start, along the length'],['y1','Start, across the width'],['x2','End, along the length'],['y2','End, across the width']].map(([id,label])=>`<label>${label} (mm)<input id="ed-area-${id}" type="number" step="any" value="0"></label>`).join('')}</div></details>
+    <p class="hint">A quick local search: up to 32 pieces in the box, markers up to 1000 pieces. It may find nothing better; then nothing changes.</p>
+    <div class="ed-area-run"><button type="button" id="ed-area-preview" class="primary">${icon('eye')}Preview</button><p id="ed-area-status" role="status" aria-live="polite"></p></div><div id="ed-area-drawing"></div>
+    <div class="dialog-actions"><button type="button" id="ed-area-cancel">Cancel</button><button type="button" id="ed-area-apply" class="primary" disabled>Apply · one undo step</button></div></div></dialog>`);
+  const areaDialog = $<HTMLDialogElement>('#ed-area-dialog');
+  const clearAreaPreview = () => { areaSearch?.abort(); areaSearch = undefined; areaPreview = undefined; $<HTMLButtonElement>('#ed-area-apply').disabled = true; $('#ed-area-drawing').replaceChildren(); };
+  areaDialog.addEventListener('input', clearAreaPreview);
+  areaDialog.addEventListener('close', clearAreaPreview);
+  $('#ed-area-cancel').onclick = () => areaDialog.close();
+  $('#ed-area').onclick = () => guarded(() => { clearAreaPreview(); $('#ed-area-status').textContent = 'The marker does not change until you choose Apply.'; areaDialog.showModal(); });
+  let pickingArea = false;
+  $('#ed-area-box').onclick = () => { areaDialog.close(); setMode('select'); pickingArea = true; host.message('Drag a box from empty space on the marker, around the pieces to tighten. The area dialog opens again when you let go.'); };
+  $('#ed-area-preview').onclick = async () => {
+    if(host.busy())return;
+    clearAreaPreview();
+    const original = structuredClone(host.get());
+    const from: Pt = [n('#ed-area-x1'),n('#ed-area-y1')], to: Pt = [n('#ed-area-x2'),n('#ed-area-y2')];
+    const search = areaSearch = new AbortController();
+    $<HTMLButtonElement>('#ed-area-preview').disabled = true;
+    $('#ed-area-status').textContent = 'Looking for a tighter layout in this area… Cancel stops it.';
+    try {
+      const output = await previewRegion(original, { op: 'improve_region', from, to }, search.signal);
+      if(search.signal.aborted || JSON.stringify(host.get())!==JSON.stringify(original))throw new Error('The marker changed. Preview again.');
+      const next = documentFromEdit(output);
+      areaPreview = { original: JSON.stringify(original), state: next, selected: output.selected };
+      const same = JSON.stringify(next.result.placements) === JSON.stringify(original.result.placements);
+      const saved = original.result.length - next.result.length;
+      $('#ed-area-status').textContent = same ? `Nothing better found in this area. Try a bigger box. ${output.notice}`.trim()
+        : `${saved > 0.05 ? `The marker gets ${saved < 5 ? `${saved.toFixed(1)} mm` : shortLength(saved)} shorter. ` : 'The marker length stays the same; the pieces in the box sit tighter. '}${output.notice}`.trim();
+      $<HTMLButtonElement>('#ed-area-apply').disabled = same;
+      const draw = (state: DocumentState, label: string) => {
+        const outlines = core().drawing?.(state)?.outlines;
+        if (!outlines) return '';
+        return `<figure><figcaption>${label} · selected area</figcaption><svg style="width:100%;height:170px" viewBox="${Math.min(from[0],to[0])} ${original.job.fabric.width-Math.max(from[1],to[1])} ${Math.abs(to[0]-from[0])} ${Math.abs(to[1]-from[1])}" role="img" aria-label="${label} selected marker area"><g transform="translate(0 ${original.job.fabric.width}) scale(1 -1)">${outlines.map((points,i)=>`<polygon points="${points.map(p=>p.join(',')).join(' ')}" fill="${output.selected.includes(i)?'var(--accent-soft)':'var(--surface-3)'}" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke"><title>${esc(state.result.placements[i]?.piece_id)}</title></polygon>`).join('')}</g></svg></figure>`;
+      };
+      $('#ed-area-drawing').innerHTML = draw(original,'Before') + draw(next,'Preview');
+    } catch (e) { if(areaSearch===search){clearAreaPreview(); $('#ed-area-status').textContent = e instanceof Error ? e.message : String(e);} }
+    finally { $<HTMLButtonElement>('#ed-area-preview').disabled = false; if(areaSearch===search)areaSearch=undefined; }
+  };
+  $('#ed-area-apply').onclick = () => guarded(() => {
+    const preview = areaPreview;
+    if (!preview) return;
+    if (JSON.stringify(host.get()) !== preview.original) { clearAreaPreview(); $('#ed-area-status').textContent = 'The marker changed. Preview again before applying.'; return; }
+    host.commit(preview.state, true); host.select(preview.selected); host.redraw(); areaDialog.close();
+    host.message('Area improvement applied as one edit. Undo restores the previous marker.');
+  });
   function guarded(fn: () => void): void { if (host.busy()) return; try { fn(); } catch (e) { host.message(String(e), true); } }
   function core(): EditorCore { const c = host.core(); if (!c) throw new Error('Rust editing tools are loading. Rebuild marker WASM if this message persists.'); return c; }
   function run(action: Record<string, unknown>): void {
     guarded(() => {
       const out = core().apply(host.get(), host.selection(), action);
+      if (action.op === 'rectangle') {
+        const from = action.from as Pt, to = action.to as Pt;
+        for (const [id,value] of [['x1',from[0]],['y1',from[1]],['x2',to[0]],['y2',to[1]]] as const) $<HTMLInputElement>(`#ed-area-${id}`).value = String(value);
+        clearAreaPreview();
+        $('#ed-area-box-state').textContent = `Area chosen: ${shortLength(Math.abs(to[0] - from[0]))} along the length × ${shortLength(Math.abs(to[1] - from[1]))} across. ${out.selected.length} ${out.selected.length === 1 ? 'piece' : 'pieces'} inside.`;
+        if (pickingArea) { pickingArea = false; window.setTimeout(() => { if (!areaDialog.open) { areaDialog.showModal(); $<HTMLButtonElement>('#ed-area-preview').focus(); } }, 0); }
+      }
       if (out.measurement !== null) $('#ed-measurement').textContent = shortLength(out.measurement);
       if (!['select', 'rectangle', 'measure'].includes(String(action.op))) host.commit(documentFromEdit(out), true);
       host.select(out.selected);

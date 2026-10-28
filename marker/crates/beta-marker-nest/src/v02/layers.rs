@@ -1,5 +1,6 @@
 //! Allocate useful copies before choosing their physical cut geometry.
 use super::{Slot, bounded, checks};
+use crate::Instant;
 use crate::{NestOptions, NestProgress};
 use anyhow::{Result, ensure};
 use beta_marker_core::geometry::{bbox, grain_alignment_deg, transform_points};
@@ -7,7 +8,6 @@ use beta_marker_core::rules::{bundle_sizes, flip_allowed};
 use beta_marker_core::{Job, LayerAllocation, Layout, MarkerResult, Placement};
 use std::collections::BTreeMap;
 use std::sync::atomic::AtomicBool;
-use crate::Instant;
 
 /// Pair complementary hands across garments of the same piece/size. Symmetric
 /// pieces can use either physical layer. The alternative keeps those copies on
@@ -40,9 +40,18 @@ pub(super) fn slots_after(
     pair_symmetric: bool,
     fixed: &[Placement],
 ) -> Result<Vec<Slot>> {
+    slots_policy(job, &vec![pair_symmetric; job.pieces.len()], fixed)
+}
+
+fn slots_policy(job: &Job, pair_policy: &[bool], fixed: &[Placement]) -> Result<Vec<Slot>> {
+    ensure!(
+        pair_policy.len() == job.pieces.len(),
+        "allocation policy length mismatch"
+    );
     let sizes = bundle_sizes(job);
     let mut out = from_placements(job, fixed)?;
     for (index, piece) in job.pieces.iter().enumerate() {
+        let pair_symmetric = pair_policy[index];
         let mut normal = Vec::new();
         let mut mirrored = Vec::new();
         for (bundle, _) in sizes.iter().enumerate().filter(|(_, s)| **s == piece.size) {
@@ -321,6 +330,128 @@ fn compatible(slots: &[Slot], result: &MarkerResult) -> bool {
     unused.iter().all(|used| !used)
 }
 
+fn allocation_signature(slots: &[Slot]) -> Vec<String> {
+    let mut keys: Vec<_> = slots
+        .iter()
+        .map(|s| {
+            format!(
+                "{}:{}:{:?}",
+                s.piece, s.placement.on_fold, s.placement.layer_allocations
+            )
+        })
+        .collect();
+    keys.sort();
+    keys
+}
+
+/// A piece ID is size-specific. Each bit chooses useful two-layer pairing for
+/// that piece/size; the other pieces remain on the fold when possible.
+fn mixed_policies(job: &Job, fixed: &[Placement]) -> Result<Vec<Vec<Slot>>> {
+    let eligible: Vec<_> = job
+        .pieces
+        .iter()
+        .enumerate()
+        .filter(|(_, p)| p.fold_line.is_some() && p.block_margin.is_none_or(|m| m == 0.))
+        .map(|(i, _)| i)
+        .collect();
+    if eligible.len() < 2 {
+        return Ok(vec![]);
+    }
+    let dims: Vec<_> = job
+        .pieces
+        .iter()
+        .map(|p| {
+            let rotation = grain_alignment_deg(p.grain, false);
+            let full = beta_marker_core::rules::cut_outline(
+                p,
+                &Placement {
+                    rotation_deg: rotation,
+                    ..Default::default()
+                },
+            );
+            let half = beta_marker_core::rules::cut_outline(
+                p,
+                &Placement {
+                    rotation_deg: rotation,
+                    on_fold: true,
+                    ..Default::default()
+                },
+            );
+            bbox(&full)
+                .zip(bbox(&half))
+                .map(|(f, h)| (f[2] - f[0], f[3] - f[1], h[3] - h[1]))
+        })
+        .collect();
+    let useful_pair = |i: usize| {
+        let p = &job.pieces[i];
+        (u64::from(p.quantity) + u64::from(p.mirror_quantity))
+            * u64::from(beta_marker_core::rules::multiplier(job, p))
+            >= 2
+    };
+    // Rank the particular short panel worth keeping on the fold, rather than
+    // converting every narrow panel (including easy-to-pack trims) into halves.
+    let mut ranked = vec![];
+    for &b in &eligible {
+        if !useful_pair(b) {
+            continue;
+        }
+        let Some((lb, db, hb)) = dims[b] else {
+            continue;
+        };
+        let usable = job.fabric.width - job.spacing.edge_gap;
+        if db + job.pieces[b].buffer > usable {
+            continue;
+        }
+        let mut score = 0.0_f64;
+        for &a in &eligible {
+            if a == b || !useful_pair(a) {
+                continue;
+            }
+            let Some((la, da, _)) = dims[a] else {
+                continue;
+            };
+            let gap = job.spacing.piece_gap + job.pieces[a].buffer + job.pieces[b].buffer;
+            let before = la + lb + gap;
+            let saving = before - la.max(2. * lb + gap);
+            if saving > 0.03 * before && da + hb + gap <= usable + 1e-7 && da + db + gap > usable {
+                score = score.max(saving);
+            }
+        }
+        if score > 0. {
+            ranked.push((score, b));
+        }
+    }
+    ranked.sort_by(|a, b| b.0.total_cmp(&a.0));
+    let mut masks = vec![];
+    for &(_, b) in ranked.iter().take(2) {
+        let mut mask = vec![true; job.pieces.len()];
+        mask[b] = false;
+        masks.push(mask);
+    }
+    if ranked.len() >= 2 {
+        let mut mask = vec![true; job.pieces.len()];
+        mask[ranked[0].1] = false;
+        mask[ranked[1].1] = false;
+        masks.push(mask);
+    }
+    for &(_, b) in ranked.iter().skip(2).take(2) {
+        let mut mask = vec![true; job.pieces.len()];
+        mask[b] = false;
+        masks.push(mask);
+    }
+    let mut seen = std::collections::BTreeSet::new();
+    seen.insert(allocation_signature(&slots_after(job, false, fixed)?));
+    seen.insert(allocation_signature(&slots_after(job, true, fixed)?));
+    let mut out = vec![];
+    for mask in masks {
+        let candidate = slots_policy(job, &mask, fixed)?;
+        if seen.insert(allocation_signature(&candidate)) {
+            out.push(candidate);
+        }
+    }
+    Ok(out)
+}
+
 #[allow(clippy::too_many_arguments)]
 pub(super) fn pack(
     job: &Job,
@@ -333,7 +464,9 @@ pub(super) fn pack(
     cancel: Option<&AtomicBool>,
 ) -> Result<MarkerResult> {
     let started = Instant::now();
-    if original.iter().all(|s| !s.placement.on_fold) {
+    if original.iter().all(|s| !s.placement.on_fold)
+        && !job.pieces.iter().any(|p| p.fold_line.is_some())
+    {
         return super::run_allocated(
             job, original, fixed, opts, variant, tuning, progress, cancel,
         );
@@ -357,7 +490,7 @@ pub(super) fn pack(
     // Keep both garment directions equal for shared layers. This remains legal
     // for one-way-per-bundle and avoids coupling incompatible garment directions.
     let directions = directions(job, original, fixed)?;
-    let paired = slots(job, true)?;
+    let paired = slots_after(job, true, fixed)?;
     let sparrow = job.fabric.defects.is_empty()
         && job.pieces.iter().all(|p| p.buffer <= 0.0)
         && cancel.is_none()
@@ -385,6 +518,10 @@ pub(super) fn pack(
     {
         policies.push((original, true));
     }
+    let mut mixed = mixed_policies(job, fixed)?;
+    let mixed_budget = (opts.time_limit_s / 2.).ceil().clamp(1., 5.) as usize;
+    mixed.truncate(mixed_budget);
+    policies.extend(mixed.iter().map(|policy| (policy.as_slice(), true)));
     // Keep the old fold search as a checked incumbent. Without Sparrow, tubes
     // reserve half their budget for that established ordering before trying
     // the additional hands and full-cut allocations.
@@ -419,12 +556,18 @@ pub(super) fn pack(
         .or(opts.warm_start.as_ref())
         .is_some_and(|marker| fold_edge_note(job, marker).is_some())
     {
-        policies.retain(|(_, bounded_only)| !bounded_only);
         for policy in &mut policies {
             policy.1 = true;
         }
     }
-    let mut best = seed.clone();
+    let mut seen = std::collections::BTreeSet::new();
+    policies.retain(|(policy, bounded)| seen.insert((allocation_signature(policy), *bounded)));
+    let mut best = opts
+        .warm_start
+        .as_ref()
+        .filter(|warm| fixed.iter().all(|p| warm.placements.contains(p)))
+        .cloned()
+        .or_else(|| seed.clone());
     let mut errors = Vec::new();
     let mut reported = f64::INFINITY;
     for (index, &(policy, bounded_only)) in policies.iter().enumerate() {
@@ -446,6 +589,11 @@ pub(super) fn pack(
             // Sparrow searches share the remaining time equally.
             left / (policies.len() - index) as f64
         };
+        options.warm_start = opts
+            .warm_start
+            .as_ref()
+            .filter(|warm| compatible(policy, warm))
+            .cloned();
         if options.warm_start.is_none()
             && let Some(seed) = seed.as_ref().filter(|seed| compatible(policy, seed))
         {
@@ -460,9 +608,29 @@ pub(super) fn pack(
         };
         // Fold halves use pinned Sparrow when possible, else the bounded packer.
         let result = if bounded_only {
-            bounded::pack(job, policy, fixed, &options, variant, &directions, &mut on_progress, cancel)
+            self::directions(job, policy, fixed).and_then(|dirs| {
+                bounded::pack(
+                    job,
+                    policy,
+                    fixed,
+                    &options,
+                    variant,
+                    &dirs,
+                    &mut on_progress,
+                    cancel,
+                )
+            })
         } else {
-            super::run_allocated(job, policy, fixed, &options, variant, tuning, &mut on_progress, cancel)
+            super::run_allocated(
+                job,
+                policy,
+                fixed,
+                &options,
+                variant,
+                tuning,
+                &mut on_progress,
+                cancel,
+            )
         };
         match result {
             Ok(result)
@@ -480,7 +648,69 @@ pub(super) fn pack(
     }
     let mut best =
         best.ok_or_else(|| anyhow::anyhow!("layer packing failed: {}", errors.join("; ")))?;
+    if !mixed.is_empty() {
+        best.warnings.push(format!(
+            "Compared {} mixed per-piece/size half/full layer allocations.",
+            mixed.len()
+        ));
+    }
     checks::independently_validate(job, &best)?;
     best.runtime_s = started.elapsed().as_secs_f64();
     Ok(best)
+}
+
+#[cfg(test)]
+mod mixed_tests {
+    use super::*;
+    use beta_marker_core::{Fabric, JOB_FORMAT, Piece, RotationRule};
+    #[test]
+    fn useful_full_body_and_folded_small_panels_can_mix_without_surplus() -> Result<()> {
+        let make = |id: &str, length: f64, depth: f64| Piece {
+            id: id.into(),
+            quantity: 2,
+            outline: vec![[0., 0.], [length, 0.], [length, depth], [0., depth]],
+            grain: Some([[0., depth / 2.], [length, depth / 2.]]),
+            fold_line: Some([[0., depth / 2.], [length, depth / 2.]]),
+            rotation: RotationRule::Flip180,
+            ..Default::default()
+        };
+        let job = Job {
+            format: JOB_FORMAT.into(),
+            name: "original mixed fold fixture".into(),
+            fabric: Fabric {
+                width: 100.,
+                layout: Layout::Folded,
+                ..Default::default()
+            },
+            pieces: vec![make("body", 80., 80.), make("small", 40., 40.)],
+            ..Default::default()
+        };
+        let candidates = mixed_policies(&job, &[])?;
+        let policy = candidates
+            .iter()
+            .find(|slots| {
+                slots.iter().any(|s| s.piece == 0 && !s.placement.on_fold)
+                    && slots.iter().any(|s| s.piece == 1 && s.placement.on_fold)
+            })
+            .expect("per-piece policy");
+        let dirs = directions(&job, policy, &[])?;
+        let result = bounded::pack(
+            &job,
+            policy,
+            &[],
+            &NestOptions {
+                time_limit_s: 0.2,
+                seed: Some(1),
+                ..Default::default()
+            },
+            0,
+            &dirs,
+            &mut |_| {},
+            None,
+        )?;
+        assert!(beta_marker_core::validate(&job, &result).ok);
+        assert_eq!(result.surplus_copies, 0);
+        assert!(result.length < 81., "{}", result.length);
+        Ok(())
+    }
 }

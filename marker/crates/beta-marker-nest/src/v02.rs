@@ -1,8 +1,10 @@
 //! Version 0.2 orchestration. The ordinary job still uses the original adapter.
 mod bounded;
 mod checks;
+mod defects;
 mod layers;
 mod pinned;
+mod regions;
 #[cfg(test)]
 mod tests;
 
@@ -13,6 +15,35 @@ use beta_marker_core::geometry::grain_alignment_deg;
 use beta_marker_core::{Job, Layout, MarkerResult, Nap, Piece, Placement, RotationRule};
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::mpsc;
+
+pub(crate) use bounded::Session as ObstacleSession;
+
+pub(crate) fn browser_obstacle_session(input: &Job, opts: &NestOptions) -> Result<ObstacleSession> {
+    check_input(input, opts)?;
+    let job = beta_marker_core::rules::effective_job(input);
+    let mut opts = opts.clone();
+    if let Some(warm) = &mut opts.warm_start {
+        if warm.placements.iter().any(|p| p.bundle.is_none()) {
+            assign_bundles(&job, &mut warm.placements);
+        }
+        checks::refresh(&job, warm)?;
+        checks::complete(&job, warm)?;
+        checks::independently_validate(input, warm)?;
+    }
+    let templates = if job.fabric.layout != Layout::Open {
+        if let Some(warm) = &opts.warm_start {
+            layers::from_placements(&job, &warm.placements)?
+        } else {
+            layers::slots_after(&job, false, &opts.fixed)?
+        }
+    } else {
+        slots(&job)?
+    };
+    let fixed = fixed_placements(&job, &templates, &opts.fixed)?;
+    checks::geometry(&job, &fixed)?;
+    let dirs = directions(&job, &templates, &fixed, 0)?;
+    Ok(ObstacleSession::new(job, templates, fixed, opts, 0, dirs))
+}
 
 #[derive(Clone, Debug)]
 struct Slot {
@@ -601,6 +632,19 @@ fn run_allocated(
     progress: &mut dyn FnMut(NestProgress),
     cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<MarkerResult> {
+    if cancel.is_none()
+        && fixed.is_empty()
+        && let Some(prefix) = defects::short_prefix(job, slots, opts)
+    {
+        return defects::pack(job, slots, opts, variant, tuning, progress, prefix);
+    }
+    if cancel.is_none()
+        && tuning.obstacle_proposals
+        && regions::eligible(job, opts)
+        && (!fixed.is_empty() || !job.fabric.defects.is_empty())
+    {
+        return regions::pack(job, slots, fixed, opts, variant, tuning, progress);
+    }
     let simple = fixed.is_empty()
         && job.fabric.defects.is_empty()
         && job.fabric.layout == Layout::Open
@@ -621,8 +665,7 @@ fn run_allocated(
     let dirs = directions(job, slots, fixed, variant)?;
     if !fixed.is_empty()
         || !job.fabric.defects.is_empty()
-        || (job.fabric.layout != Layout::Open
-            && job.pieces.iter().any(|p| p.buffer > 0.0))
+        || (job.fabric.layout != Layout::Open && job.pieces.iter().any(|p| p.buffer > 0.0))
         || small_cpu
         || cancel.is_some()
     {
@@ -635,7 +678,16 @@ fn run_allocated(
     // or fails, the bounded packer uses the time that is left.
     let started = Instant::now();
     let attempt = pinned::plan(job, slots, variant, &dirs).and_then(|pins| {
-        sparrow_allocated(job, slots, fixed, opts, variant, tuning, progress, Some(pins))
+        sparrow_allocated(
+            job,
+            slots,
+            fixed,
+            opts,
+            variant,
+            tuning,
+            progress,
+            Some(pins),
+        )
     });
     match attempt {
         Ok(result) => Ok(result),
@@ -667,7 +719,11 @@ fn sparrow_allocated(
     let mut engine = job.clone();
     // Sparrow's open strip reserves equal margins at both edges. Enlarge its
     // virtual width to remove only the margins at physical fold boundaries.
-    let fold_offset = if job.fabric.layout == Layout::Tubular { job.spacing.edge_gap } else { 0.0 };
+    let fold_offset = if job.fabric.layout == Layout::Tubular {
+        job.spacing.edge_gap
+    } else {
+        0.0
+    };
     if job.fabric.layout != Layout::Open {
         engine.fabric.width += job.spacing.edge_gap + fold_offset;
     }
@@ -681,7 +737,11 @@ fn sparrow_allocated(
     engine.match_rules.clear();
     engine.pieces.clear();
     // The bottom half of a tube pair travels inside its partner's outline.
-    let partners: BTreeSet<usize> = pins.iter().flatten().filter_map(pinned::Pin::partner).collect();
+    let partners: BTreeSet<usize> = pins
+        .iter()
+        .flatten()
+        .filter_map(pinned::Pin::partner)
+        .collect();
     let mut owner = Vec::with_capacity(slots.len());
     for (i, slot) in slots.iter().enumerate() {
         if partners.contains(&i) {
@@ -704,7 +764,10 @@ fn sparrow_allocated(
             None => cut_piece(&job.pieces[slot.piece])?,
         };
         // The suffix tells the engine import to keep a pinned outline exact.
-        piece.id = format!("__slot_{i}{}", if pins[i].is_some() { crate::PINNED } else { "" });
+        piece.id = format!(
+            "__slot_{i}{}",
+            if pins[i].is_some() { crate::PINNED } else { "" }
+        );
         piece.flip = Some(false);
         // Every expanded engine item belongs to its private single garment.
         // Original size/bundle identity is restored after optimization.
@@ -734,23 +797,29 @@ fn sparrow_allocated(
         pinned::calibrate(&mut engine, &mut pins, &owner)?;
     }
     let mut options = opts.clone();
-    options.warm_start = opts.warm_start.as_ref().filter(|_| !pinned).and_then(|warm| {
-        let mut result = warm.clone();
-        result.width = engine.fabric.width;
-        for pl in &mut result.placements { pl.translate[1] += fold_offset; }
-        for (i, slot) in slots.iter().enumerate() {
-            let pl = result.placements.iter_mut().find(|p| {
-                p.piece_id == slot.placement.piece_id
-                    && p.bundle == slot.placement.bundle
-                    && p.mirrored == mirror_state(job, slot, variant)
-            })?;
-            pl.piece_id = format!("__slot_{i}");
-            pl.copy = 0;
-            pl.bundle = Some(0);
-            pl.layer_allocations.clear();
-        }
-        Some(result)
-    });
+    options.warm_start = opts
+        .warm_start
+        .as_ref()
+        .filter(|_| !pinned)
+        .and_then(|warm| {
+            let mut result = warm.clone();
+            result.width = engine.fabric.width;
+            for pl in &mut result.placements {
+                pl.translate[1] += fold_offset;
+            }
+            for (i, slot) in slots.iter().enumerate() {
+                let pl = result.placements.iter_mut().find(|p| {
+                    p.piece_id == slot.placement.piece_id
+                        && p.bundle == slot.placement.bundle
+                        && p.mirrored == mirror_state(job, slot, variant)
+                })?;
+                pl.piece_id = format!("__slot_{i}");
+                pl.copy = 0;
+                pl.bundle = Some(0);
+                pl.layer_allocations.clear();
+            }
+            Some(result)
+        });
     // Restore original identities and layer assignments before exposing a layout.
     let restore = |mut result: MarkerResult| -> Result<MarkerResult> {
         result.width = job.fabric.width;
@@ -765,7 +834,9 @@ fn sparrow_allocated(
                 .parse()?;
             let template = &slots.get(i).context("unknown engine slot")?.placement;
             if let Some(pin) = &pins[i] {
-                let mut halves = pin.placements(slots, i, pl.rotation_deg, pl.translate).into_iter();
+                let mut halves = pin
+                    .placements(slots, i, pl.rotation_deg, pl.translate)
+                    .into_iter();
                 *pl = halves.next().context("pinned outline without a half")?.1;
                 pinned::snap(job, pl)?;
                 for (_, mut partner) in halves {

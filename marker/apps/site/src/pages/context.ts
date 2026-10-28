@@ -1,4 +1,5 @@
 import type { Run } from '../benchmark.ts';
+import type { HeroData } from '../hero-live.ts';
 
 /** Inputs every page renderer may use. */
 export interface BuildContext {
@@ -8,4 +9,6 @@ export interface BuildContext {
   video?: boolean;
   /** Benchmark runs selected for display. */
   runs: Run[];
+  /** Recorded live marker for the home hero (data/hero-marker.json); the illustration shows without it. */
+  hero?: HeroData;
 }

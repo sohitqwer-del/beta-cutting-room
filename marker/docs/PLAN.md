@@ -1,5 +1,10 @@
 # BETA Marker plan
 
+> Historical proposal, not the current feature list or a commercial superiority
+> claim. See [features](FEATURES.md), [roadmap](ROADMAP.md) and
+> [measured benchmark caveats](benchmarks.md). The proposed engine choices and
+> version targets below are not promises or a record of shipped behaviour.
+
 Date: 18 October 2026.
 
 ## Goal

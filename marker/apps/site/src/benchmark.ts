@@ -5,7 +5,7 @@ export const SCHEMA_TAG = 'beta-site-benchmark/1';
 
 export type RunKind = 'lectra' | 'academic' | 'freesewing' | 'other';
 export type RunStatus = 'final' | 'provisional' | 'sample';
-export type ReferenceType = 'commercial-engine' | 'published-paper' | 'none';
+export type ReferenceType = 'commercial-engine' | 'published-paper' | 'engine-baseline' | 'none';
 
 export interface Group {
   label: string;
@@ -74,7 +74,7 @@ export const FORBIDDEN_KEYS = ['geometry', 'points', 'polygon', 'polygons', 'out
 
 const KINDS: RunKind[] = ['lectra', 'academic', 'freesewing', 'other'];
 const STATUSES: RunStatus[] = ['final', 'provisional', 'sample'];
-const REFERENCE_TYPES: ReferenceType[] = ['commercial-engine', 'published-paper', 'none'];
+const REFERENCE_TYPES: ReferenceType[] = ['commercial-engine', 'published-paper', 'engine-baseline', 'none'];
 
 type Obj = Record<string, unknown>;
 const isObj = (v: unknown): v is Obj => typeof v === 'object' && v !== null && !Array.isArray(v);

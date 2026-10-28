@@ -1,0 +1,375 @@
+[
+  {
+    "all_fixed_preserved": true,
+    "all_valid": true,
+    "id": "teagan-browser",
+    "pkg": "new",
+    "records": [
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5687.367300000002,
+        "placements": 24,
+        "round": 0,
+        "seed": 1,
+        "useful_yield": 0.631077574797192,
+        "validation": {
+          "efficiency": 0.6310775747971875,
+          "errors": [],
+          "length": 5687.367300000002,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997244,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.631077574797192,
+          "warnings": []
+        },
+        "wall_s": 0.1357999999821186,
+        "warnings": [
+          "Bounded obstacle packing: 0 compaction passes; fixed transforms preserved. Prepare 0.002s; initial construction 0.018s; search/check 0.088s."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5375.57884296875,
+        "placements": 24,
+        "round": 1,
+        "seed": 1,
+        "useful_yield": 0.66768064751938,
+        "validation": {
+          "efficiency": 0.6676806475193799,
+          "errors": [],
+          "length": 5375.57884296875,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997282,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.66768064751938,
+          "warnings": []
+        },
+        "wall_s": 1.558,
+        "warnings": [
+          "Persistent browser separator: one model import, 1276 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5370.2033546875,
+        "placements": 24,
+        "round": 2,
+        "seed": 1,
+        "useful_yield": 0.6683489852450316,
+        "validation": {
+          "efficiency": 0.66834898524503,
+          "errors": [],
+          "length": 5370.2033546875,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.9439972695,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6683489852450316,
+          "warnings": []
+        },
+        "wall_s": 0.5915999999940396,
+        "warnings": [
+          "Persistent browser separator: one model import, 2018 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5359.4631203125,
+        "placements": 24,
+        "round": 3,
+        "seed": 1,
+        "useful_yield": 0.6696883404350354,
+        "validation": {
+          "efficiency": 0.6696883404350359,
+          "errors": [],
+          "length": 5359.4631203125,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997286,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6696883404350354,
+          "warnings": []
+        },
+        "wall_s": 0.5954000000059605,
+        "warnings": [
+          "Persistent browser separator: one model import, 3126 cumulative evaluations; unfinished attempts and RNG retained."
+        ]
+      }
+    ],
+    "stop_kept_length": true,
+    "stopped": {
+      "cancelled": true,
+      "done": true,
+      "length": 5359.4631203125,
+      "round": 3,
+      "validation": {
+        "efficiency": 0.6696883404350359,
+        "errors": [],
+        "length": 5359.4631203125,
+        "matches": [],
+        "ok": true,
+        "piece_area": 5383754.943997286,
+        "surplus_copies": 0,
+        "useful_piece_area": 5383754.943997283,
+        "useful_yield": 0.6696883404350354,
+        "warnings": []
+      }
+    }
+  },
+  {
+    "all_fixed_preserved": true,
+    "all_valid": true,
+    "id": "teagan-front-locked",
+    "pkg": "new",
+    "records": [
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5687.453506054689,
+        "placements": 24,
+        "round": 0,
+        "seed": 1,
+        "useful_yield": 0.6310680094077138,
+        "validation": {
+          "efficiency": 0.6310680094077095,
+          "errors": [],
+          "length": 5687.453506054689,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997245,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6310680094077138,
+          "warnings": []
+        },
+        "wall_s": 0.14009999999403955,
+        "warnings": [
+          "Bounded obstacle packing: 0 compaction passes; fixed transforms preserved. Prepare 0.002s; initial construction 0.021s; search/check 0.086s."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5687.453506054689,
+        "placements": 24,
+        "round": 1,
+        "seed": 1,
+        "useful_yield": 0.6310680094077138,
+        "validation": {
+          "efficiency": 0.6310680094077095,
+          "errors": [],
+          "length": 5687.453506054689,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997245,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6310680094077138,
+          "warnings": []
+        },
+        "wall_s": 0.2681999999880791,
+        "warnings": [
+          "Bounded obstacle packing: 0 compaction passes; fixed transforms preserved. Prepare 0.000s; initial construction 0.006s; search/check 0.253s."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5687.453506054689,
+        "placements": 24,
+        "round": 2,
+        "seed": 1,
+        "useful_yield": 0.6310680094077138,
+        "validation": {
+          "efficiency": 0.6310680094077097,
+          "errors": [],
+          "length": 5687.453506054689,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997247,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6310680094077138,
+          "warnings": []
+        },
+        "wall_s": 0.27409999999403956,
+        "warnings": [
+          "Bounded obstacle packing: 0 compaction passes; fixed transforms preserved. Prepare 0.000s; initial construction 0.006s; search/check 0.260s."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 5687.453506054689,
+        "placements": 24,
+        "round": 3,
+        "seed": 1,
+        "useful_yield": 0.6310680094077138,
+        "validation": {
+          "efficiency": 0.6310680094077097,
+          "errors": [],
+          "length": 5687.453506054689,
+          "matches": [],
+          "ok": true,
+          "piece_area": 5383754.943997247,
+          "surplus_copies": 0,
+          "useful_piece_area": 5383754.943997283,
+          "useful_yield": 0.6310680094077138,
+          "warnings": []
+        },
+        "wall_s": 0.2781999999880791,
+        "warnings": [
+          "Bounded obstacle packing: 0 compaction passes; fixed transforms preserved. Prepare 0.000s; initial construction 0.006s; search/check 0.266s."
+        ]
+      }
+    ],
+    "stop_kept_length": true,
+    "stopped": {
+      "cancelled": true,
+      "done": true,
+      "length": 5687.453506054689,
+      "round": 3,
+      "validation": {
+        "efficiency": 0.6310680094077097,
+        "errors": [],
+        "length": 5687.453506054689,
+        "matches": [],
+        "ok": true,
+        "piece_area": 5383754.943997247,
+        "surplus_copies": 0,
+        "useful_piece_area": 5383754.943997283,
+        "useful_yield": 0.6310680094077138,
+        "warnings": []
+      }
+    }
+  },
+  {
+    "all_fixed_preserved": true,
+    "all_valid": true,
+    "id": "original-mixed-fold",
+    "pkg": "new",
+    "records": [
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 83.00200000000001,
+        "placements": 3,
+        "round": 0,
+        "seed": 1,
+        "useful_yield": 0.9252789089419531,
+        "validation": {
+          "efficiency": 0.9252789089419531,
+          "errors": [],
+          "length": 83.00200000000001,
+          "matches": [],
+          "ok": true,
+          "piece_area": 7680,
+          "surplus_copies": 0,
+          "useful_piece_area": 15360,
+          "useful_yield": 0.9252789089419531,
+          "warnings": []
+        },
+        "wall_s": 0.1082999999821186,
+        "warnings": [
+          "Bounded obstacle packing: 2 compaction passes; fixed transforms preserved. Prepare 0.000s; initial construction 0.000s; search/check 0.029s.",
+          "Compared 1 mixed per-piece/size half/full layer allocations.",
+          "Fold edge: 2 pieces cut on the fold, or too deep to sit beside them, measure about 0.08 m end to end; this marker is 0.08 m. Even counts per size (cut as full two-layer pieces), a tube or open fabric can make it shorter."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 83.00200000000001,
+        "placements": 3,
+        "round": 1,
+        "seed": 1,
+        "useful_yield": 0.9252789089419531,
+        "validation": {
+          "efficiency": 0.9252789089419531,
+          "errors": [],
+          "length": 83.00200000000001,
+          "matches": [],
+          "ok": true,
+          "piece_area": 7680,
+          "surplus_copies": 0,
+          "useful_piece_area": 15360,
+          "useful_yield": 0.9252789089419531,
+          "warnings": []
+        },
+        "wall_s": 0.253,
+        "warnings": [
+          "Bounded obstacle packing: 7 compaction passes; fixed transforms preserved. Prepare 0.000s; initial construction 0.000s; search/check 0.082s.",
+          "Compared 1 mixed per-piece/size half/full layer allocations.",
+          "Fold edge: 2 pieces cut on the fold, or too deep to sit beside them, measure about 0.08 m end to end; this marker is 0.08 m. Even counts per size (cut as full two-layer pieces), a tube or open fabric can make it shorter."
+        ]
+      },
+      {
+        "cancelled": false,
+        "done": false,
+        "fixed_preserved": true,
+        "length": 83.00200000000001,
+        "placements": 3,
+        "round": 2,
+        "seed": 1,
+        "useful_yield": 0.9252789089419531,
+        "validation": {
+          "efficiency": 0.9252789089419531,
+          "errors": [],
+          "length": 83.00200000000001,
+          "matches": [],
+          "ok": true,
+          "piece_area": 7680,
+          "surplus_copies": 0,
+          "useful_piece_area": 15360,
+          "useful_yield": 0.9252789089419531,
+          "warnings": []
+        },
+        "wall_s": 0.25260000002384186,
+        "warnings": [
+          "Bounded obstacle packing: 7 compaction passes; fixed transforms preserved. Prepare 0.000s; initial construction 0.000s; search/check 0.082s.",
+          "Compared 1 mixed per-piece/size half/full layer allocations.",
+          "Fold edge: 2 pieces cut on the fold, or too deep to sit beside them, measure about 0.08 m end to end; this marker is 0.08 m. Even counts per size (cut as full two-layer pieces), a tube or open fabric can make it shorter."
+        ]
+      }
+    ],
+    "stop_kept_length": true,
+    "stopped": {
+      "cancelled": true,
+      "done": true,
+      "length": 83.00200000000001,
+      "round": 2,
+      "validation": {
+        "efficiency": 0.9252789089419531,
+        "errors": [],
+        "length": 83.00200000000001,
+        "matches": [],
+        "ok": true,
+        "piece_area": 7680,
+        "surplus_copies": 0,
+        "useful_piece_area": 15360,
+        "useful_yield": 0.9252789089419531,
+        "warnings": []
+      }
+    }
+  }
+]

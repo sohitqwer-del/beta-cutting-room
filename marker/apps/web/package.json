@@ -1,7 +1,7 @@
 {
-  "name": "@beta/marker-web", "version": "0.7.0", "private": true,
+  "name": "@beta/marker-web", "version": "0.8.0", "private": true,
   "description": "Offline BETA Marker SVG editor", "license": "Apache-2.0", "type": "module",
   "scripts": { "dev": "vite --host 127.0.0.1", "build": "tsc -p tsconfig.json && vite build", "build:static": "node scripts/build-static.mjs", "typecheck": "tsc -p tsconfig.json", "build:floor-wasm": "node scripts/build-floor-wasm.mjs" },
-  "dependencies": { "@beta/marker-wasm": "0.7.0" },
+  "dependencies": { "@beta/marker-wasm": "0.8.0" },
   "devDependencies": { "vite": "^6.1.0" }
 }

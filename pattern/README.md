@@ -9,6 +9,11 @@ These are starting drafts, not fit-certified production patterns. See
 [verification report](docs/STYLE-REPORT.md), [SPEC.md](SPEC.md) and the
 [cutting-room plan](../marker/docs/CUTTING-ROOM-PLAN.md).
 
-Why we build it: no permissively licensed industrial pattern CAD exists. Seamly2D and Valentina are good open tools, but they are GPL, so their code cannot be part of BETA. BETA Pattern will read their files.
+BETA aims to make practical pattern tools easy to inspect and improve. Seamly2D
+and Valentina are GPL applications; their app code is not included. BETA reads a
+supported Seamly2D file subset, with warnings. This is not universal compatibility.
+See the [feature map](../marker/docs/FEATURES.md),
+[getting started](../marker/docs/GETTING-STARTED.md) and
+[production tools](docs/PRODUCTION-TOOLS.md).
 
 Licence: Apache-2.0.

@@ -1,5 +1,6 @@
 // Build one upload-ready GitHub Pages folder. This never publishes anything.
-// Usage: node marker/deploy/site/build-pages.mjs --out <folder> [--video <demo.web.mp4>]
+// Usage: node marker/deploy/site/build-pages.mjs --out <folder> [--video <walkthrough.mp4>]
+// A supplied launch video also stages adjacent MP4, VTT, SRT and PNG assets.
 import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { delimiter, dirname, join, resolve, sep } from 'node:path';
@@ -17,7 +18,7 @@ if (existsSync(out) && readdirSync(out).length && !existsSync(join(out, stamp)))
 const nearbyVideo = process.env.CARGO_TARGET_DIR ? resolve(process.env.CARGO_TARGET_DIR, '../../demo-video/beta-demo-en.web.mp4') : undefined;
 const video = option('--video', process.env.BETA_DEMO_VIDEO || (nearbyVideo && existsSync(nearbyVideo) ? nearbyVideo : undefined));
 if (video && !existsSync(video)) throw new Error(`Video does not exist: ${video}`);
-const publicVideo = join(marker, 'apps/site/public/assets/video/beta-demo-en.mp4');
+const publicVideo = join(marker, 'apps/site/public/assets/video/beta-08-walkthrough.mp4');
 const env = { ...releaseEnvironment(), BETA_WEB_BASE: '/beta-cutting-room/app/', ...(video ? { BETA_SITE_VIDEO: '1' } : {}) };
 function run(workspace, script) {
   const npmArgs = ['run', script, '-w', workspace];
@@ -37,9 +38,11 @@ writeFileSync(join(out, stamp), 'BETA Cutting Room Pages output; safe to rebuild
 cpSync(join(marker, 'apps/site/dist'), out, { recursive: true });
 cpSync(join(marker, 'out/static-app'), join(out, 'app'), { recursive: true });
 if (video) {
-  const target = join(out, 'assets/video/beta-demo-en.mp4');
+  const target = join(out, 'assets/video/beta-08-walkthrough.mp4');
   mkdirSync(dirname(target), { recursive: true });
   cpSync(resolve(video), target);
+  const sourceDir = dirname(resolve(video));
+  for (const name of readdirSync(sourceDir).filter(name => /\.(mp4|vtt|srt|png)$/.test(name))) cpSync(join(sourceDir, name), join(dirname(target), name));
   // Rendered site already supports local video. Re-render with the flag when staging a supplied file.
   const home = join(out, 'index.html');
   if (!readFileSync(home, 'utf8').includes('<video')) throw new Error('The site did not render the supplied local video.');

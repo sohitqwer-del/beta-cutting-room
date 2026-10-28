@@ -57,6 +57,107 @@ fn fixture() -> (Job, MarkerResult) {
     metrics(&job, &mut result);
     (job, result)
 }
+
+#[test]
+fn fresh_search_keeps_shorter_checked_marker_without_trusting_cached_lengths() {
+    let (j, r) = fixture();
+    let mut longer = r.clone();
+    longer.placements[1].translate[0] = 80.;
+    longer.length = 1.; // Recomputed in Rust; imported metadata cannot win.
+    let chosen = choose_search_result(&j, &r, &longer, &[]).unwrap();
+    assert!(chosen.retained);
+    assert_eq!(chosen.result.placements, r.placements);
+    assert_eq!(chosen.result.engine, r.engine);
+    let mut stale = r.clone();
+    stale.placements.pop();
+    stale.length = 0.;
+    let chosen = choose_search_result(&j, &stale, &longer, &[]).unwrap();
+    assert!(!chosen.retained);
+    assert!(chosen.result.length >= 90.);
+    let mut invalid = longer.clone();
+    invalid.placements[1] = invalid.placements[0].clone();
+    assert!(choose_search_result(&j, &r, &invalid, &[]).is_err());
+    let moved_lock = longer.placements[1].clone();
+    let chosen = choose_search_result(&j, &r, &longer, &[moved_lock]).unwrap();
+    assert!(!chosen.retained);
+}
+
+#[test]
+fn improve_area_preserves_outside_and_locked_records() {
+    let (j, mut r) = fixture();
+    r.placements[0].locked = true;
+    let original = r.clone();
+    let out = run(
+        &j,
+        &r,
+        &[],
+        Action::ImproveRegion {
+            from: [30., 0.],
+            to: [80., 100.],
+        },
+    )
+    .unwrap();
+    assert_eq!(out.selected, vec![1]);
+    assert_eq!(out.result.placements[0], original.placements[0]);
+    assert!(out.result.placements[1].translate[0] >= 30. - EPS);
+    assert!(out.result.length < original.length);
+    assert!(beta_marker_core::validate(&j, &out.result).ok);
+    assert_eq!(r, original);
+}
+
+#[test]
+fn improve_area_ignores_crossing_pieces_and_respects_defects() {
+    let (mut j, r) = fixture();
+    j.fabric.defects.push(beta_marker_core::Zone {
+        id: "flaw".into(),
+        polygon: vec![[30., 0.], [35., 0.], [35., 200.], [30., 200.]],
+        note: None,
+    });
+    let out = run(
+        &j,
+        &r,
+        &[],
+        Action::ImproveRegion {
+            from: [5., 0.],
+            to: [100., 100.],
+        },
+    )
+    .unwrap();
+    assert_eq!(out.selected, vec![1]);
+    assert_eq!(out.result.placements[0], r.placements[0]);
+    assert!(out.result.placements[1].translate[0] >= 35. - EPS);
+    assert!(beta_marker_core::validate(&j, &out.result).ok);
+}
+
+#[test]
+fn improve_area_rejects_incomplete_markers_and_bad_bounds() {
+    let (j, mut r) = fixture();
+    assert!(
+        run(
+            &j,
+            &r,
+            &[],
+            Action::ImproveRegion {
+                from: [0., 0.],
+                to: [f64::NAN, 100.]
+            }
+        )
+        .is_err()
+    );
+    r.placements.pop();
+    assert!(
+        run(
+            &j,
+            &r,
+            &[],
+            Action::ImproveRegion {
+                from: [0., 0.],
+                to: [100., 100.]
+            }
+        )
+        .is_err()
+    );
+}
 fn run(j: &Job, r: &MarkerResult, selected: &[usize], action: Action) -> Result<Output, String> {
     apply(
         j,

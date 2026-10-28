@@ -1,5 +1,12 @@
 # BETA Cutting Room audit, round 0.7
 
+> Historical audit of 0.6 and intermediate 0.7 builds. The browser/server gaps,
+> ply/pass mismatch, phone Back behaviour and spec-sheet access described below
+> were addressed in the [0.7 release](RELEASE-0.7.0.md). Read that record and
+> [today's feature map](FEATURES.md) before treating a row as still open.
+> Folded yield, real-photo accuracy, physical fit and hardware acceptance still
+> need work. The original measurements and statuses below are retained as evidence.
+
 Date: 2026-10-22. Auditor: audit7 (two sessions: GPT, then Claude).
 Question: why does the factory owner say "the software is still not great"?
 

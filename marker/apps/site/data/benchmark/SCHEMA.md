@@ -78,7 +78,7 @@ npx vitest run marker/apps/site
 | Field | Type | Required | Meaning |
 |---|---|---|---|
 | `name` | string | yes | e.g. "Lectra recorded efficiency", "sparrow paper means (1200 s)". |
-| `type` | `"commercial-engine"`, `"published-paper"`, `"none"` | yes | `none` = BETA results only (no comparison). |
+| `type` | `"commercial-engine"`, `"published-paper"`, `"engine-baseline"`, `"none"` | yes | `engine-baseline` compares BETA releases; `none` = BETA results only. |
 | `citation` | string | no | Full citation. |
 | `url` | string | no | DOI or link. |
 | `licence` | string | no | e.g. `"CC BY 4.0"`. |

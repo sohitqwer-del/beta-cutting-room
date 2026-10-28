@@ -11,6 +11,10 @@ import { t as styleText } from './style/i18n';
 import { find, findAll, screenTitle } from './screens';
 import { appUnit, onUnit, setAppUnit, type AppUnit } from './units-pref';
 import { label, type LabelKey } from './floor-i18n';
+import { bootDone } from './boot';
+import { installTour } from './tour/ui';
+import { recoverInterrupted } from './tour/steps';
+import { t as tourText } from './tour/i18n';
 import type { FloorLanguage } from './floor-types';
 
 /** App frame: sidebar navigation (full or icon rail), top bar, workflow steps with "Next", Home, Reports, About,
@@ -168,11 +172,14 @@ export function installShell(host: ShellHost) {
     railToggle.setAttribute('aria-label', rail ? 'Expand menu' : 'Collapse menu');
     railToggle.innerHTML = `${icon(rail ? 'chevrons-right' : 'chevrons-left')}<span class="nav-label">${rail ? 'Expand menu' : 'Collapse menu'}</span>`;
     if (remember) try { localStorage.setItem(RAIL_KEY, rail ? 'rail' : 'full'); } catch { /* session only */ }
-    window.dispatchEvent(new Event('resize'));
+    // Only a user's change needs drawings to re-measure. At start nothing has been laid out yet, and a resize
+    // event then (with every screen still in the page) forced a whole-app layout: 2.3 s on a slow phone.
+    if (remember) window.dispatchEvent(new Event('resize'));
   }
   let savedRail: string | null = null;
   try { savedRail = localStorage.getItem(RAIL_KEY); } catch { /* default */ }
-  setRail(savedRail ? savedRail === 'rail' : window.innerWidth < 1400, false);
+  // matchMedia, not window.innerWidth: reading innerWidth here forces a layout of the whole app before screens are parked.
+  setRail(savedRail ? savedRail === 'rail' : window.matchMedia('(max-width: 1399.98px)').matches, false);
   railToggle.addEventListener('click', () => setRail(!app.classList.contains('nav-rail'), true));
 
   // ----- Home and Reports screens -----
@@ -180,8 +187,12 @@ export function installShell(host: ShellHost) {
   const homeScreen = $<HTMLElement>('#screen-9');
   // Quick Marker: phone flow for small units (self-contained module in src/quick/).
   installQuick({ message: host.message }, content);
+  // A sample tour that was cut short (tab closed) gives the visitor's own style back before the Style screen reads it.
+  try { recoverInterrupted(localStorage); } catch { /* storage blocked */ }
   // Style flow: from a new style to a cut-ready marker (self-contained module in src/style/).
-  installStyle({ message: host.message, editorState: host.state }, content);
+  const style = installStyle({ message: host.message, editorState: host.state }, content);
+  // "See it in 60 seconds": a guided sample on the real engine (src/tour/), from Home or the address #/tour.
+  const tour = installTour({ control: style.control, show: index => go(index), message: host.message, styleScreen: STYLE_SCREEN, quickScreen: QUICK_SCREEN });
 
   // ----- Dialogs -----
   document.body.insertAdjacentHTML('beforeend', `
@@ -320,6 +331,7 @@ export function installShell(host: ShellHost) {
       case 'new-marker': go(0); click('#open-button'); break;
       case 'open-project': click('#project-open'); break;
       case 'demo': click('#demo'); go(0); break;
+      case 'tour': tour.start(); break;
       case 'new-pattern':
         if (await confirmAction('Start a blank pattern? The current pattern draft is replaced. Save it first with Save pattern JSON if you need it.', 'Start blank pattern')) { go(4); click('#pd-new'); }
         break;
@@ -342,9 +354,16 @@ export function installShell(host: ShellHost) {
     const card = (act: string, iconName: string, titleKey: string, title: string, textKey: string, text: string, extra = '') => `<button type="button" class="action-card${extra}" ${act}><span class="icon-tile">${icon(iconName)}</span><span class="action-text"><strong>${L(titleKey, title)}</strong><span>${L(textKey, text)}</span></span>${icon('arrow-right', 'action-arrow')}</button>`;
     const task = (go: string, iconName: string, key: string, title: string) => `<button type="button" class="task-chip" ${go}>${icon(iconName)}${L(key, title)}</button>`;
     const flow = ['style', 'pattern', 'grade', 'lay', 'gaps', 'stripes', 'marker', 'cut'];
+    const art = `<svg viewBox="0 0 220 120" aria-hidden="true" focusable="false"><rect class="fab" x="2" y="2" width="216" height="116" rx="4"/><path class="p" d="M10 10h46l6 10h10v50H10z"/><path class="p p1" d="M66 10h42v60H66z"/><path class="p p2" d="M10 76h52l8 34H10z"/><path class="p p3" d="M112 10h38l10 22-10 22h-38z"/><path class="p" d="M76 76h40v34H76z"/><path class="p p1" d="M120 60h40v50h-40z"/><path class="p p2" d="M154 10h30v40h-30z"/><path class="p p3" d="M166 56h22v54h-22z"/></svg>`;
     return `<section id="screen-9" class="screen home" hidden aria-labelledby="home-title">
+    <section class="home-section home-tour" aria-labelledby="home-tour-title"><div class="tour-start-card"><div class="tour-start-text">
+      <h2 id="home-tour-title">${L('tour_home_title', tourText('home_title'))}</h2><p>${L('tour_home_text', tourText('home_text'))}</p>
+      <p class="tour-start-steps">${L('tour_home_steps', tourText('home_steps'))}</p>
+      <button type="button" class="primary large" data-act="tour" data-tour-start id="tour-start">${icon('play')}${L('tour_start', tourText('start'))}</button></div>
+      <div class="tour-start-art">${art}</div></div></section>
     <div class="home-hero">${logo(48, `${PRODUCT} logo`)}<div class="home-hero-text"><h1 id="home-title">${PRODUCT}</h1><p>${L('home_lead', 'Make patterns and markers, plan the cut and track every lay, on your own computer.')}</p></div>
       <ul class="chips" aria-label="About this app"><li class="chip ok">${icon('check')}${L('home_chip_open', 'Open source · Apache-2.0')}</li><li class="chip">${L('home_chip_offline', 'Works offline')}</li><li class="chip">${L('home_chip_data', 'Your data stays in your factory')}</li></ul></div>
+    <section class="home-section" aria-labelledby="home-paper-title"><div class="start-card"><span class="icon-tile">${icon('photo-marker')}</span><div class="start-text"><h2 id="home-paper-title">Have paper patterns? Start here.</h2><p>No CAD operator needed to start. Photograph the paper pieces beside a scale reference, check a tape measurement, then group the parts by size and fabric.</p><ol class="start-flow"><li><b>1</b>Photograph</li><li><b>2</b>Check size</li><li><b>3</b>Group parts</li><li><b>4</b>Set fabric</li><li><b>5</b>Make marker</li></ol><div class="start-actions"><button type="button" class="primary large" data-go="${QUICK_SCREEN}" id="home-paper-start">${icon('photo-marker')}Digitize paper patterns</button><span class="hint">Keep and reuse your pattern set on your own device.</span></div></div></div></section>
     <div class="home-columns">
       <section class="home-section home-start" aria-labelledby="home-start"><h2 id="home-start">${L('home_start_here', 'Start here')}</h2>
         <div class="start-card">
@@ -373,7 +392,9 @@ export function installShell(host: ShellHost) {
   function renderHome(): void {
     const list: string[] = [];
     const job = host.state().job;
-    list.push(`<li><button type="button" data-go="0"><span class="icon-tile">${icon('marker')}</span><span><strong>${esc(job.name)}</strong><small>Current marker · ${job.pieces.length} pieces · ${(job.fabric.width / 10).toFixed(1)} cm wide</small></span>${icon('chevron-right', 'action-arrow')}</button></li>`);
+    // The built-in sample marker is not the visitor's work: it stays under "Try the demo", not under Continue.
+    const sample = job.meta?.source === 'Original synthetic demo' && job.name === 'Everyday shirt · demo';
+    if (!sample) list.push(`<li><button type="button" data-go="0"><span class="icon-tile">${icon('marker')}</span><span><strong>${esc(job.name)}</strong><small>Current marker · ${job.pieces.length} pieces · ${(job.fabric.width / 10).toFixed(1)} cm wide</small></span>${icon('chevron-right', 'action-arrow')}</button></li>`);
     try {
       const saved = JSON.parse(localStorage.getItem('beta-cutting-room-v1') ?? 'null') as { document?: { name?: string; sizes?: string[] } } | null;
       if (saved?.document?.name) list.push(`<li><button type="button" data-go="4"><span class="icon-tile">${icon('pattern')}</span><span><strong>${esc(saved.document.name)}</strong><small>Pattern draft on this computer · ${saved.document.sizes?.length ?? 0} sizes</small></span>${icon('chevron-right', 'action-arrow')}</button></li>`);
@@ -388,7 +409,9 @@ export function installShell(host: ShellHost) {
     try { style = JSON.parse(localStorage.getItem('beta-style-v1') ?? 'null'); } catch { /* none */ }
     const lang = (document.documentElement.dataset.language ?? 'en') as FloorLanguage, l: FloorLanguage = lang === 'hi' || lang === 'ta' ? lang : 'en';
     $('#home-style-continue').innerHTML = style?.doc && style.step ? `<button type="button" data-go="${STYLE_SCREEN}">${icon('arrow-right')}${esc(label(l, 'home_continue'))}: ${esc(style.info?.name || styleText('step_style'))} · ${esc(styleText(`step_${style.step}` as Parameters<typeof styleText>[0]))}</button>` : '';
-    $('#home-recent').innerHTML = `<ul class="recent-list">${list.join('')}</ul>${files.length ? `<details class="recent-files"><summary>Files opened recently in this browser (${files.length})</summary><p class="hint">For safety a browser cannot reopen a file by itself. Choose Open a saved marker and pick it again.</p><ul class="plain-list">${files.map(f => `<li>${esc(f.name)} <span class="chip">${esc(f.kind)}</span> <span class="hint">${esc(new Date(f.at).toLocaleString())}</span></li>`).join('')}</ul></details>` : ''}`;
+    if (style?.doc && style.step) list.unshift(`<li><button type="button" data-go="${STYLE_SCREEN}"><span class="icon-tile">${icon('style')}</span><span><strong>${esc(style.info?.name || styleText('step_style'))}</strong><small>${esc(styleText('nav'))} · ${esc(styleText(`step_${style.step}` as Parameters<typeof styleText>[0]))}</small></span>${icon('chevron-right', 'action-arrow')}</button></li>`);
+    const none = !list.length && !files.length;
+    $('#home-recent').innerHTML = none ? `<p class="home-empty" data-floor-label="home_nothing">${esc(label(l, 'home_nothing' as LabelKey))}</p>` : `<ul class="recent-list">${list.join('')}</ul>${files.length ? `<details class="recent-files"><summary>Files opened recently in this browser (${files.length})</summary><p class="hint">For safety a browser cannot reopen a file by itself. Choose Open a saved marker and pick it again.</p><ul class="plain-list">${files.map(f => `<li>${esc(f.name)} <span class="chip">${esc(f.kind)}</span> <span class="hint">${esc(new Date(f.at).toLocaleString())}</span></li>`).join('')}</ul></details>` : ''}`;
   }
   for (const [selector, kind] of [['#open-file', 'Marker'], ['#pattern-file', 'Pattern'], ['#roll-file', 'Rolls'], ['#compare-file', 'Compare'], ['#digitize-photo', 'Photo']] as const) {
     find<HTMLInputElement>(selector)?.addEventListener('change', event => { const f = (event.target as HTMLInputElement).files?.[0]; if (f) rememberFile(f.name, kind); });
@@ -509,10 +532,15 @@ export function installShell(host: ShellHost) {
 
   // ----- First screen: the address (#/pattern) or Home. Later address changes (Back, Forward, a typed or linked address) follow. -----
   const fromHash = SCREENS.find(s => `#/${s.hash}` === location.hash);
+  const wantsTour = location.hash === '#/tour';
   host.show(fromHash ? fromHash.index : 9);
   if (!fromHash) homeScreen.querySelector<HTMLElement>('h1')?.setAttribute('tabindex', '-1');
   started = true;
+  if (wantsTour) tour.start();
+  // The first screen is in the page: let it paint, then fade out the loading screen from index.html.
+  requestAnimationFrame(() => bootDone());
   const follow = () => {
+    if (location.hash === '#/tour') { tour.start(); return; }
     const target = SCREENS.find(s => `#/${s.hash}` === location.hash);
     if (!target || target.index === current) return;
     fromAddress = true;

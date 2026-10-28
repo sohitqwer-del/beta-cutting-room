@@ -1,0 +1,296 @@
+{
+  "assumptions": [
+    "This compares two BETA engine revisions, not a commercial engine.",
+    "One seed per task does not estimate search variability.",
+    "Folded and tubular garment comparisons need useful yield as well as occupied footprint efficiency; see the report."
+  ],
+  "conditions": {
+    "background_load": "Shared machine; archived conditions.json CPU samples and per-task timestamps document load. No claim of exclusive CPU use.",
+    "budget_label": "60 s",
+    "budget_s": 60.0,
+    "jobs": 4,
+    "machine": "Shared Linux server, AMD Ryzen 9 9900X3D, 12 cores / 24 logical CPUs",
+    "notes": "Same 60-second requested budget, seed 1, four concurrent tasks and three search workers per task in both engines. Effective nice 19 for both (nested nice -n 10), versus historical nice 10. Whole-call wall time can exceed the search budget.",
+    "seeds": [
+      1
+    ],
+    "workers_per_task": 3
+  },
+  "date": "2026-10-28",
+  "groups": [
+    {
+      "attempts": 300,
+      "headline": true,
+      "label": "0.8 minus 0.7 (300 Lectra tasks)",
+      "loss": 66,
+      "mean_diff_pp": -0.01790238050000042,
+      "median_diff_pp": -0.0003578685000000803,
+      "other_failures": 0,
+      "tie": 187,
+      "valid": 300,
+      "win": 47
+    }
+  ],
+  "id": "lectra-08-vs-07",
+  "kind": "other",
+  "order": 5,
+  "reference": {
+    "name": "BETA Cutting Room 0.7.0",
+    "type": "engine-baseline"
+  },
+  "reproduce": {
+    "commands": [
+      "See the paired release protocol in marker/bench/results/2026-10-28-public-0.8.md"
+    ],
+    "doc": "marker/bench/results/2026-10-28-public-0.8.md"
+  },
+  "schema": "beta-site-benchmark/1",
+  "software": {
+    "beta_version": "0.8.0 candidate",
+    "engine_revision": "345f42ee0ed906620e9a11a8e135045f034df553"
+  },
+  "sources": [
+    {
+      "label": "Paired release report",
+      "url": "https://github.com/sohitqwer-del/beta-cutting-room/blob/main/marker/bench/results/2026-10-28-public-0.8.md"
+    }
+  ],
+  "status": "final",
+  "summary_text": "0.8 is slightly worse on this ordinary-open sample. Most pairs tie within 0.1 point. This one-seed run does not establish a durable regression or a broad improvement.",
+  "title": "0.8 vs 0.7, 300 public tasks",
+  "x_release_pair": {
+    "revisions": {
+      "07": "9a852d27ae5471eea1f7dc58e4ccb277f4e4fd88",
+      "08": "345f42ee0ed906620e9a11a8e135045f034df553"
+    },
+    "tie_threshold_pp": 0.1,
+    "timing": [
+      {
+        "ok": true,
+        "stage": "lectra-00",
+        "version": "07",
+        "wall_s": 305.805783936
+      },
+      {
+        "ok": true,
+        "stage": "lectra-00",
+        "version": "08",
+        "wall_s": 305.950449843
+      },
+      {
+        "ok": true,
+        "stage": "lectra-01",
+        "version": "08",
+        "wall_s": 312.441053569
+      },
+      {
+        "ok": true,
+        "stage": "lectra-01",
+        "version": "07",
+        "wall_s": 312.312196656
+      },
+      {
+        "ok": true,
+        "stage": "lectra-02",
+        "version": "07",
+        "wall_s": 308.340998412
+      },
+      {
+        "ok": true,
+        "stage": "lectra-02",
+        "version": "08",
+        "wall_s": 309.126966413
+      },
+      {
+        "ok": true,
+        "stage": "lectra-03",
+        "version": "08",
+        "wall_s": 306.634057047
+      },
+      {
+        "ok": true,
+        "stage": "lectra-03",
+        "version": "07",
+        "wall_s": 306.544812739
+      },
+      {
+        "ok": true,
+        "stage": "lectra-04",
+        "version": "07",
+        "wall_s": 307.713289231
+      },
+      {
+        "ok": true,
+        "stage": "lectra-04",
+        "version": "08",
+        "wall_s": 308.332419378
+      },
+      {
+        "ok": true,
+        "stage": "lectra-05",
+        "version": "08",
+        "wall_s": 305.965345163
+      },
+      {
+        "ok": true,
+        "stage": "lectra-05",
+        "version": "07",
+        "wall_s": 306.844010541
+      },
+      {
+        "ok": true,
+        "stage": "lectra-06",
+        "version": "07",
+        "wall_s": 306.517289704
+      },
+      {
+        "ok": true,
+        "stage": "lectra-06",
+        "version": "08",
+        "wall_s": 306.693145141
+      },
+      {
+        "ok": true,
+        "stage": "lectra-07",
+        "version": "08",
+        "wall_s": 306.148152264
+      },
+      {
+        "ok": true,
+        "stage": "lectra-07",
+        "version": "07",
+        "wall_s": 306.234409856
+      },
+      {
+        "ok": true,
+        "stage": "lectra-08",
+        "version": "07",
+        "wall_s": 309.746310032
+      },
+      {
+        "ok": true,
+        "stage": "lectra-08",
+        "version": "08",
+        "wall_s": 308.306649665
+      },
+      {
+        "ok": true,
+        "stage": "lectra-09",
+        "version": "08",
+        "wall_s": 308.066767354
+      },
+      {
+        "ok": true,
+        "stage": "lectra-09",
+        "version": "07",
+        "wall_s": 309.468355488
+      },
+      {
+        "ok": true,
+        "stage": "lectra-10",
+        "version": "07",
+        "wall_s": 246.006243138
+      },
+      {
+        "ok": true,
+        "stage": "lectra-10",
+        "version": "08",
+        "wall_s": 246.536852308
+      },
+      {
+        "ok": true,
+        "stage": "lectra-11",
+        "version": "08",
+        "wall_s": 309.324280168
+      },
+      {
+        "ok": true,
+        "stage": "lectra-11",
+        "version": "07",
+        "wall_s": 308.540232307
+      },
+      {
+        "ok": true,
+        "stage": "lectra-12",
+        "version": "07",
+        "wall_s": 307.09384844
+      },
+      {
+        "ok": true,
+        "stage": "lectra-12",
+        "version": "08",
+        "wall_s": 306.69082825
+      },
+      {
+        "ok": true,
+        "stage": "lectra-13",
+        "version": "08",
+        "wall_s": 309.087184421
+      },
+      {
+        "ok": true,
+        "stage": "lectra-13",
+        "version": "07",
+        "wall_s": 308.686102859
+      },
+      {
+        "ok": true,
+        "stage": "lectra-14",
+        "version": "07",
+        "wall_s": 319.541992926
+      },
+      {
+        "ok": true,
+        "stage": "lectra-14",
+        "version": "08",
+        "wall_s": 309.182866993
+      },
+      {
+        "ok": true,
+        "stage": "garments",
+        "version": "08",
+        "wall_s": 302.339898534
+      },
+      {
+        "ok": true,
+        "stage": "garments",
+        "version": "07",
+        "wall_s": 301.278256832
+      }
+    ]
+  },
+  "x_runtime": [
+    {
+      "max_s": 73.705617728,
+      "median_s": 60.929474859500004,
+      "runner_wall_s": 4569.395876265,
+      "suite": "Lectra",
+      "sum_s": 17583.186238063,
+      "version": "07"
+    },
+    {
+      "max_s": 65.115264809,
+      "median_s": 60.8587022335,
+      "runner_wall_s": 4558.487017977,
+      "suite": "Lectra",
+      "sum_s": 17534.861956868008,
+      "version": "08"
+    },
+    {
+      "max_s": 61.23287514,
+      "median_s": 60.0319194045,
+      "runner_wall_s": 301.278256832,
+      "suite": "FreeSewing",
+      "sum_s": 1085.1247779649998,
+      "version": "07"
+    },
+    {
+      "max_s": 61.697629544,
+      "median_s": 60.358301384499995,
+      "runner_wall_s": 302.339898534,
+      "suite": "FreeSewing",
+      "sum_s": 1089.042336452,
+      "version": "08"
+    }
+  ]
+}

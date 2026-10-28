@@ -1,0 +1,100 @@
+{
+  "layouts_validated": 20,
+  "maximum_fabric_saved_pct": 3.8560228551602904,
+  "mean_fabric_saved_pct": -0.07826104722527986,
+  "median_fabric_saved_pct": -0.2604150678832129,
+  "minimum_fabric_saved_pct": -2.13219137534848,
+  "note": "Positive means less fabric. Same requested 12-second budget; actual wall time is reported. Small public pilot, not a general result.",
+  "pairs": [
+    {
+      "adaptive_mm": 8285.91589921875,
+      "adaptive_wall_s": 14.9544667,
+      "baseline_mm": 8232.730036718749,
+      "baseline_wall_s": 12.6461536,
+      "case": "hugo-Folded",
+      "fabric_saved_pct": -0.6460294733677152,
+      "seed": 1
+    },
+    {
+      "adaptive_mm": 8345.5216890625,
+      "adaptive_wall_s": 14.6663726,
+      "baseline_mm": 8337.1123046875,
+      "baseline_wall_s": 13.0077671,
+      "case": "hugo-Folded",
+      "fabric_saved_pct": -0.10086687173773701,
+      "seed": 7
+    },
+    {
+      "adaptive_mm": 8358.5523428182,
+      "adaptive_wall_s": 12.1264418,
+      "baseline_mm": 8184.052677475101,
+      "baseline_wall_s": 12.1020996,
+      "case": "simon-front-locked",
+      "fabric_saved_pct": -2.13219137534848,
+      "seed": 1
+    },
+    {
+      "adaptive_mm": 7883.81259765625,
+      "adaptive_wall_s": 12.1287548,
+      "baseline_mm": 8200.006731341458,
+      "baseline_wall_s": 12.0906474,
+      "case": "simon-front-locked",
+      "fabric_saved_pct": 3.8560228551602904,
+      "seed": 7
+    },
+    {
+      "adaptive_mm": 8457.183403125,
+      "adaptive_wall_s": 12.1176463,
+      "baseline_mm": 8400.97393046875,
+      "baseline_wall_s": 12.1158755,
+      "case": "simon-interior",
+      "fabric_saved_pct": -0.6690828125580639,
+      "seed": 1
+    },
+    {
+      "adaptive_mm": 8445.15375078125,
+      "adaptive_wall_s": 12.1233495,
+      "baseline_mm": 8411.57333203125,
+      "baseline_wall_s": 12.1068628,
+      "case": "simon-interior",
+      "fabric_saved_pct": -0.3992168578276001,
+      "seed": 7
+    },
+    {
+      "adaptive_mm": 5810.231548873791,
+      "adaptive_wall_s": 12.0274999,
+      "baseline_mm": 5808.781520944104,
+      "baseline_wall_s": 12.0256283,
+      "case": "teagan-Folded",
+      "fabric_saved_pct": -0.024962686657414856,
+      "seed": 1
+    },
+    {
+      "adaptive_mm": 5808.781520944104,
+      "adaptive_wall_s": 12.0221452,
+      "baseline_mm": 5810.231548873791,
+      "baseline_wall_s": 12.016136,
+      "case": "teagan-Folded",
+      "fabric_saved_pct": 0.024956456855285136,
+      "seed": 7
+    },
+    {
+      "adaptive_mm": 4684.61474609375,
+      "adaptive_wall_s": 12.5283555,
+      "baseline_mm": 4658.08108515625,
+      "baseline_wall_s": 12.3550909,
+      "case": "teagan-browser",
+      "fabric_saved_pct": -0.569626428832537,
+      "seed": 1
+    },
+    {
+      "adaptive_mm": 4671.54345703125,
+      "adaptive_wall_s": 12.3995573,
+      "baseline_mm": 4665.869140625,
+      "baseline_wall_s": 12.4420294,
+      "case": "teagan-browser",
+      "fabric_saved_pct": -0.1216132779388257,
+      "seed": 7
+    }
+  ]
+}

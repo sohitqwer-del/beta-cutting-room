@@ -5,6 +5,15 @@ The [release checklist](RELEASE-CHECKLIST.md) records remaining installation and
 factory-acceptance checks. Publication alone does not complete those checks.
 Nothing here installs a service or publishes a release automatically.
 
+## Browser: no install
+
+Open the [public app](https://sohitqwer-del.github.io/beta-cutting-room/app/).
+It computes locally without a Rust server, including factory exports and
+cutting-room work. The separate board-photo digitizer needs desktop/server.
+After the first successful load/cache, test offline reload before relying on
+it. Save a backup file before clearing browser storage. Start with the
+[10-minute guides](GETTING-STARTED.md).
+
 ## Windows desktop
 
 Use the x64 NSIS installer `BETA-Cutting-Room_0.7.0_x64-setup.exe`. It installs
@@ -42,8 +51,10 @@ The Linux package is the CLI plus static browser assets. The Windows desktop
 installer is separate. A Linux desktop GUI is not part of this release's package
 or permissive-licence claim.
 
-Extract `BETA-Cutting-Room_0.7.0_linux-x86_64.tar.gz`, enter the extracted folder,
-then run:
+The 0.7 release record reports no 0.7 Linux archive; the website retained the
+0.6 Linux package. Check the actual release assets rather than assuming a 0.7
+filename exists. Use matching CLI/web files from an available package, or build
+both from source. For a compatible extracted package, run:
 
 ```sh
 chmod +x ./beta-marker

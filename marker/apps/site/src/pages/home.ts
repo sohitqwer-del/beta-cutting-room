@@ -1,68 +1,73 @@
 import { html, raw, signed, type Raw } from '../html.ts';
 import { ext, section } from '../layout.ts';
-import { factoryDiagram, heroMarker, icon, screenPlaceholder } from '../illustrations.ts';
-import { feedbackLinks, site } from '../config.ts';
+import { factoryDiagram, heroMarker, icon } from '../illustrations.ts';
+import { feedbackLinks, repoLink, site } from '../config.ts';
 import { headlineGroup, type Group, type Run } from '../benchmark.ts';
+import { heroLegend, heroLive, metres } from '../hero-live.ts';
+import { faqList, topFaq } from '../faq.ts';
 import { pick } from './benchmark.ts';
 import type { BuildContext } from './context.ts';
 
-const steps = [
-  { key: 'pattern', title: 'Pattern', text: 'Draft, grade and digitize patterns. Import DXF-AAMA or a supported Seamly2D file.', module: 'BETA Pattern' },
-  { key: 'marker', title: 'Marker', text: 'Nest all pieces on the fabric width with grain, nap, pairs and size ratio. Edit by hand.', module: 'BETA Marker' },
-  { key: 'plan', title: 'Cut plan', text: 'Turn an order into size ratios, ply heights and lay lengths.', module: 'BETA Marker' },
-  { key: 'rolls', title: 'Rolls', text: 'Inspect rolls (4-point), group shade and shrinkage, allocate rolls to lays.', module: 'BETA Marker' },
-  { key: 'spread', title: 'Spread', text: 'Print spreading sheets with roll order, plies, splice zones and end allowances.', module: 'Floor' },
-  { key: 'cut', title: 'Cut', text: 'Plot the marker 1:1 (PLT/HPGL or PDF) or send a cutter file. Track each lay.', module: 'Floor' },
-  { key: 'bundles', title: 'Bundles', text: 'Number plies, make bundles and print QR tickets and stickers. Plan re-cuts.', module: 'Floor' },
-  { key: 'sewing', title: 'Sewing', text: 'Scan bundles out to sewing lines. Export work-in-progress and fabric use.', module: 'Floor' },
+/** Three ways in, by visitor. Each has a real screenshot of the app (sample data) and three plain points. */
+const paths = [
+  {
+    id: 'path-paper', who: 'Small unit with paper patterns', title: 'Photo of your paper patterns', img: 'path-paper', phone: true,
+    alt: 'Photo to marker on a phone: the pieces BETA found in a photo of paper patterns, outlined, with an A4 sheet for scale',
+    points: ['Photograph the paper pieces on a dark cloth, with an A4 sheet beside them for scale.', 'Check one tape measurement, name each part and set its fabric.', 'Get a marker, full-size tiles to print, or a chalk guide. No CAD needed.'],
+    cta: 'Digitize paper patterns', href: 'app/#/quick',
+  },
+  {
+    id: 'path-pattern', who: 'Pattern master', title: 'Make a style from a block', img: 'path-pattern', phone: false,
+    alt: 'Make a style: the T-shirt block on the drafting canvas with front and back pieces, notches and grain lines',
+    points: ['Start from seven basic blocks (T-shirt, shirt, trouser, skirt, kurta, polo, track pant) or a blank sheet.', 'Grade every size from one size chart, with seam checks and a spec sheet.', 'Export DXF-AAMA, plotter PLT and a 1:1 PDF.'],
+    cta: 'Make a style', href: 'app/#/style',
+  },
+  {
+    id: 'path-room', who: 'Cutting room', title: 'From DXF to the cutting floor', img: 'path-marker', phone: false,
+    alt: 'A T-shirt marker in four sizes, every piece labelled with its name and size, all checks passed',
+    points: ['Open DXF-AAMA pieces from your CAD and nest a marker on your fabric width.', 'Plan the cut: lays, plies and fabric for the whole order, and compare widths by cost.', 'Rolls, spreading sheets, bundles, tickets and the sewing hand-off.'],
+    cta: 'Open DXF files', href: 'app/#/marker',
+  },
 ];
 
-const screens: { slot: string; label: string; kind: Parameters<typeof screenPlaceholder>[0]; tab: number; caption: string }[] = [
-  { slot: 'marker-editor', label: 'Marker editor', kind: 'marker', tab: 2, caption: 'Marker editor: nest, bump, compact and check every piece.' },
-  { slot: 'style-pattern', label: 'Style pattern canvas', kind: 'pattern', tab: 0, caption: 'Style: start with a block or blank sheet, then draft, grade and prepare the cut.' },
-  { slot: 'pattern', label: 'Pattern', kind: 'pattern', tab: 0, caption: 'Pattern: draft, grade and check all sizes.' },
-  { slot: 'cut-plan', label: 'Cut plan', kind: 'table', tab: 3, caption: 'Cut plan: ratios, plies and lay lengths for an order.' },
-  { slot: 'rolls', label: 'Rolls', kind: 'rolls', tab: 4, caption: 'Rolls: inspection, shade groups and allocation.' },
-  { slot: 'spreading', label: 'Spreading', kind: 'floor', tab: 6, caption: 'Floor: spreading sheets and lay tracking.' },
-  { slot: 'bundles', label: 'Bundles', kind: 'tickets', tab: 5, caption: 'Bundles: QR tickets, stickers and re-cuts.' },
-];
-
-const features = [
-  { icon: 'pattern', title: 'Pattern making', items: ['Seven editable basic blocks or a blank sheet, with a drafting canvas', 'Size-chart grading, stacked sizes and seam checks', 'Digitize a paper pattern from a photo', 'DXF-AAMA export; Seamly2D file subset import'] },
-  { icon: 'marker', title: 'Marker making', items: ['Automatic nesting with garment rules: grain, one-way nap, left/right pairs, size ratio, gaps', 'Folded and tubular fabric, shade bands, fabric defects', 'Manual editing: bump, compact, swap, sections, marker library', 'Every marker is checked by an independent validator before export'] },
-  { icon: 'plan', title: 'Cut planning and costing', items: ['Size ratios, ply heights and lay lengths from an order', 'Fabric consumption and cost estimates', 'Compare fabric widths (command line)'] },
-  { icon: 'rolls', title: 'Rolls and spreading', items: ['4-point roll inspection and defect maps', 'Shade and shrinkage groups', 'Roll allocation, splice zones and end bits'] },
-  { icon: 'bundles', title: 'Bundles and the floor', items: ['Ply numbering, bundles, QR tickets and stickers', 'Re-cut planning for damaged parts', 'Bundle scan-out to sewing lines with a USB scanner'] },
-  { icon: 'files', title: 'Files and data', items: ['Plot: PLT/HPGL and 1:1 PDF; SVG, DXF, generic ISO cutter file, also in the browser', 'Import orders and rolls from CSV or Excel', 'Export consumption and work-in-progress as CSV'] },
+/** Everything that exists, grouped. "New" marks what 0.8 adds. */
+const groups: { icon: string; title: string; items: [string, boolean?][] }[] = [
+  { icon: 'pattern', title: 'Pattern', items: [
+    ['Seven editable basic blocks or a blank sheet, on a drafting canvas'],
+    ['Size-chart grading, all sizes stacked, seam checks'],
+    ['Spec sheet: points of measure per size (PDF, Excel)'],
+    ['DXF-AAMA, plotter PLT and 1:1 PDF out; DXF-AAMA and a Seamly2D subset in'],
+  ] },
+  { icon: 'marker', title: 'Marker', items: [
+    ['Automatic nesting with grain, one-way nap, left/right pairs, ratios and gaps'],
+    ['The marker improves live on screen; stop and keep the best'],
+    ['Improve one area by hand: preview, apply, undo', true],
+    ['Keeps your previous marker when it is shorter and still valid', true],
+    ['Every marker checked by an independent validator; plotter, DXF, PDF and cutter files'],
+  ] },
+  { icon: 'plan', title: 'Cutting room', items: [
+    ['Cut plans: ratios, plies, passes and fabric for an order'],
+    ['Compare fabric widths, ratios and the cost of the whole order', true],
+    ['Rolls: 4-point inspection, shade and shrinkage groups'],
+    ['Spreading sheets, bundles, QR tickets, re-cuts and the sewing hand-off'],
+  ] },
+  { icon: 'people', title: 'Small factories', items: [
+    ['Photo to marker on a phone, with an A4 sheet as the scale'],
+    ['Reusable paper pattern sets with a tape check', true],
+    ['Fabric groups (main, lining, rib, fusing) with GSM, one marker each', true],
+    ['Full-size tiles, chalk guide and projector mode; works offline as an app'],
+  ] },
 ];
 
 const notYet = [
-  'Basic blocks pass 10,806 automatic checks, but they need sewn samples and a fit review by a pattern master. Extend and trim work between straight lines.',
-  'The browser edition does everything except the board-photo digitizer. Cut planning in the browser runs on one thread, about 2 seconds per marker.',
-  'Quick Marker real-photo accuracy is untested. Check dimensions against the paper before cutting.',
+  'The 0.8 additions (area improvement, order-cost comparison, paper pattern sets) are new and tested only in parts.',
+  'Basic blocks pass 10,806 automatic checks, but they need sewn samples and a fit review by a pattern master.',
+  'Folded and tube lays use more fabric than open lays on many orders. The app shows the real yield so you can see it.',
+  'Real-photo accuracy of Photo to marker is not yet measured in factories. Check sizes against the paper before cutting.',
   'Plotter and cutter profiles are generic. Test them on your machines before production.',
-  'Folded and tubular lays now show real yield and unused copies. Waste fell a lot in 0.7 (shirt test 3.34 to 1.68 m per garment), but folded fabric is still behind open fabric.',
-  'No direct Tally or SAP connector yet. Exchange data with CSV or Excel files.',
-  'Server access is local by default. Factory-network use needs an access token and an HTTPS proxy.',
-  'The Windows installer is not code-signed yet. Windows may show a warning.',
-  'Hindi and Tamil are drafts and need native review.',
+  'The browser plans on one thread (about 2 seconds per marker). Big jobs are much better in the desktop app.',
+  'The Windows installer is not code-signed yet, so Windows may show a warning. Hindi and Tamil are drafts.',
 ];
-
-const audiences = [
-  { icon: 'people', title: 'Garment factories', text: 'Cutting rooms that want control of their own data and no per-seat licence fees. First users are in India.' },
-  { icon: 'marker', title: 'CAD and marker operators', text: 'People who make markers every day and need grain, nap, pairs, ratios, folds and shade rules to be right.' },
-  { icon: 'plan', title: 'Merchandisers and planners', text: 'Fabric consumption, width comparison and cut plans from the same marker the cutting room uses.' },
-  { icon: 'server', title: 'Factory IT', text: 'A Windows installer, a command-line server and plain files. No cloud service to approve.' },
-  { icon: 'code', title: 'Researchers and developers', text: 'Open code, open benchmark and open data formats. Improve the nesting engine and prove it.' },
-];
-
-function slide(ctx: BuildContext, s: (typeof screens)[number], i: number): Raw {
-  const file = `${s.slot}.png`;
-  const media = ctx.screens.has(file)
-    ? html`<img src="assets/screens/${file}" alt="${`Screenshot of the ${s.label} screen in BETA Cutting Room`}" width="1920" height="1200" loading="lazy" decoding="async">`
-    : screenPlaceholder(s.kind, s.label, s.tab);
-  return html`<figure class="slide${i === 0 ? ' is-active' : ''}" id="slide-${s.slot}" data-slide>${media}<figcaption>${s.caption}</figcaption></figure>`;
-}
 
 export function downloadButton(url: string | null, label: string, cls = 'btn btn-primary', sub?: string): Raw {
   return url
@@ -102,13 +107,13 @@ function benchCard(run: Run, title: string, sub: string): Raw {
     <div class="bench-stat"><span class="bench-value${g.median_diff_pp !== null && g.median_diff_pp < 0 ? ' is-neg' : ''}">${g.median_diff_pp === null ? '–' : html`${counter(g.median_diff_pp, 2, signed(g.median_diff_pp), { signed: true })}<small> pp</small>`}</span><span class="bench-label">Median task</span></div>
   </div>
   ${wtlBar(g)}
-  <p class="small muted">${g.valid} of ${g.attempts} BETA layouts passed the independent validator. A tie is within 0.1 points.</p>
+  <p class="small muted">${g.valid} of ${g.attempts} BETA layouts passed the independent validator. A tie is within 0.1 points. Measured ${run.date}.</p>
 </article>`;
 }
 
-/** Benchmark highlight: mean, median and win/tie/loss always together. Wording comes from the data. */
+/** Benchmark highlight: mean, median and win/tie/loss always together, from the data; folded fabric said plainly. */
 function benchmarkHighlight(runs: Run[]): Raw {
-  const lm = pick(runs, 'lectra-matched'); const l60 = pick(runs, 'lectra-60s');
+  const lm = pick(runs, 'lectra-matched'); const l60 = pick(runs, 'lectra-60s-08') ?? pick(runs, 'lectra-60s');
   const shown = [lm, l60].filter((r): r is Run => r !== undefined);
   if (!shown.length) return html``;
   const losesMore = shown.some((r) => { const g = headlineGroup(r); return g.win !== null && g.loss !== null && g.loss + g.too_long_losses > g.win; });
@@ -116,14 +121,18 @@ function benchmarkHighlight(runs: Run[]): Raw {
     ? 'BETA is close to Lectra’s recorded results, but it still loses more tasks than it wins. We publish every number so you can check.'
     : 'BETA is close to Lectra’s recorded results on this sample. This is not a general win. We publish every number so you can check.';
   const cards: Raw[] = [];
-  if (lm) cards.push(benchCard(lm, 'With Lectra’s own time per task', `About 5 minutes per task · ${headlineGroup(lm).attempts} tasks`));
-  if (l60) cards.push(benchCard(l60, 'With 60 seconds per task', `${headlineGroup(l60).attempts} tasks`));
-  return section('benchmark', 'Honest numbers, not big claims', html`
+  if (lm) cards.push(benchCard(lm, 'Historical 20 October: with Lectra’s own time per task', `About 5 minutes per task · ${headlineGroup(lm).attempts} tasks`));
+  if (l60) cards.push(benchCard(l60, '0.8, 28 October: 60 seconds per task', `${headlineGroup(l60).attempts} tasks`));
+  return section('benchmark', 'Honest numbers: mixed, not a win', html`
 <div class="bench-grid">${cards}</div>
 <div class="bench-foot" data-reveal>
   <p><strong>No general win over Lectra.</strong> ${summary} Points (pp) are BETA’s marker efficiency minus Lectra’s; below zero means BETA’s marker was longer.</p>
   <a class="link-arrow" href="benchmark.html">Method, assumptions and all results<span aria-hidden="true"> →</span></a>
-</div>`, { eyebrow: 'Public benchmark', lead: 'We test BETA on the public Lectra dataset: real nesting tasks from fashion companies, with the efficiency that Lectra’s own engine reached on each one.', cls: 'section-alt' });
+</div>
+<div class="callout callout-plain fold-note" data-reveal>
+  <h3>Folded fabric is still behind open fabric</h3>
+  <p>In our 0.7 tests, folded T-shirt orders with odd counts per size needed 23% to 74% more fabric than an open lay, and tubes about 11% to 12% more. 0.8 tries mixed fold choices per piece: in a small pilot on 12 public jobs the change ranged from 1.9% more fabric (folded hoodie) to 5.7% less (shirt with a locked piece); the folded T-shirt did not change. The app shows the real yield and the pieces cut but not used, so you can decide.</p>
+</div>`, { eyebrow: 'Public benchmark', lead: 'We test BETA on the public Lectra dataset: real nesting tasks from fashion companies, with the efficiency Lectra’s own engine reached on each one.', cls: 'section-alt' });
 }
 
 /** "Watch the demo": a self-hosted video with captions, or a poster linking to the video file. */
@@ -154,132 +163,144 @@ export function demoVideo(ctx: BuildContext): Raw {
 </section>`;
 }
 
+/** Hero picture: the recorded live marker from the real app, or the illustration when no recording exists. */
+function heroPicture(ctx: BuildContext): Raw {
+  const h = ctx.hero;
+  if (!h) {
+    return html`<figure class="hero-figure"><div class="hero-card"><div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>Marker · shirt · sizes S, M, L</span><span class="badge">Illustration</span></div><div class="hero-stage is-playing" id="hero-stage">${heroMarker()}</div></div></figure>`;
+  }
+  const first = h.frames[0]!, last = h.frames[h.frames.length - 1]!;
+  return html`<figure class="hero-figure hero-live" data-hero-live data-final="${metres(last.length_mm)}" aria-labelledby="hero-live-cap">
+  <div class="hero-card">
+    <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>Make a style · Sample T-shirt · Marker</span><span class="badge badge-final">Real app</span></div>
+    <div class="hz-stage">${heroLive(h)}</div>
+    <div class="hz-foot">
+      <p class="hz-status" aria-hidden="true"><span class="hz-run"><span class="spinner"></span>Best so far <b data-hz-length>${metres(first.length_mm)}</b></span><span class="hz-done"><span class="tick">✓</span><b>${metres(last.length_mm)}</b>${h.efficiency ? html` · ${h.efficiency}% of the fabric in pieces` : ''} · checked</span></p>
+      ${heroLegend(h)}
+      <button type="button" class="btn-icon hz-toggle" data-hz-toggle hidden aria-pressed="false"><svg class="i-pause" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><svg class="i-play" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M7 4.5v11l9-5.5z" fill="currentColor"/></svg><span class="sr-only" data-hz-label>Pause the animation</span></button>
+    </div>
+  </div>
+  <figcaption id="hero-live-cap">Recorded in the browser app: a T-shirt in sizes ${h.sizes.join(', ')}, 15 seconds of search. The marker got shorter from ${metres(first.length_mm)} to ${metres(last.length_mm)}. Shorter is better.</figcaption>
+</figure>`;
+}
+
+function pathCard(p: (typeof paths)[number], i: number): Raw {
+  const pic = p.phone
+    ? html`<div class="path-phone"><img src="${`assets/screens/${p.img}-390.webp`}" srcset="${`assets/screens/${p.img}-390.webp 390w, assets/screens/${p.img}-600.webp 600w`}" sizes="(max-width: 700px) 60vw, 240px" alt="${p.alt}" width="390" height="700" loading="lazy" decoding="async"></div>`
+    : html`<div class="path-shot"><img src="${`assets/screens/${p.img}-800.webp`}" srcset="${`assets/screens/${p.img}-800.webp 800w, assets/screens/${p.img}-1200.webp 1200w`}" sizes="(max-width: 700px) 92vw, (max-width: 1100px) 46vw, 400px" alt="${p.alt}" width="800" height="500" loading="lazy" decoding="async"></div>`;
+  return html`<article class="path-card${p.phone ? ' path-card-phone' : ''}" id="${p.id}" data-reveal>
+  <div class="path-pic">${pic}</div>
+  <div class="path-copy">
+    <p class="path-who"><span class="path-num">${i + 1}</span>${p.who}</p>
+    <h3>${p.title}</h3>
+    <ul class="check-list">${p.points.map((x) => html`<li>${x}</li>`)}</ul>
+    <a class="btn btn-secondary btn-small" href="${p.href}">${p.cta}<span aria-hidden="true"> →</span></a>
+  </div>
+</article>`;
+}
+
 export function homePage(ctx: BuildContext): Raw {
   const d = site.downloads;
-  const l60 = pick(ctx.runs, 'lectra-60s');
-  const benchTasks = l60 ? headlineGroup(l60).attempts : null;
   return html`
-<div class="hero">
+<div class="hero hero-launch">
   <div class="hero-bg" aria-hidden="true"><span class="blob blob-1"></span><span class="blob blob-2"></span><span class="blob blob-3"></span></div>
   <div class="wrap hero-inner">
     <div class="hero-copy">
-      <p class="hero-pills"><span class="pill">Version ${site.version}</span><span class="pill">Free and open source</span><a class="pill pill-fun" href="#fun"><span aria-hidden="true">✦</span> A fun project, built with modern AI tools</a></p>
-      <h1 class="hero-title"><span class="nowrap">Open-source,</span> <span class="nowrap">self-hosted</span> <span class="hl"><span class="nowrap">cutting-room</span> software</span> for garment factories</h1>
-      <p class="hero-lead">Pattern, marker, cut planning, rolls, spreading and bundles in one program. It runs on your own Windows PC or factory server and works offline. Your patterns never leave your factory.</p>
+      <p class="hero-pills"><span class="pill">Version ${site.version}</span><span class="pill">Free and open source</span><a class="pill pill-fun" href="#help"><span aria-hidden="true">✦</span> A fun project, built with modern AI tools</a></p>
+      <h1 class="hero-title">Free, open-source <span class="hl"><span class="nowrap">cutting-room</span> software</span> for garment factories</h1>
+      <p class="hero-lead">Patterns, markers and cut plans, in your browser. Nothing to install, no account, and your files stay on your device.</p>
       <div class="cta-row">
-        ${site.webAppUrl ? downloadButton(site.webAppUrl, 'Open the app in your browser', 'btn btn-secondary btn-large') : ''}
-        ${downloadButton(d.windows.url, 'Download for Windows', 'btn btn-primary btn-large', `Installer · ${d.windows.size}`)}
-        ${downloadButton(d.portable.url, 'Portable ZIP', 'btn btn-secondary btn-large', `No install · ${d.portable.size}`)}
-        ${downloadButton(d.server.url, 'Linux server', 'btn btn-secondary btn-large', `tar.gz · ${d.server.size}`)}
+        ${site.tourUrl ? downloadButton(site.tourUrl, 'Try it now, no install', 'btn btn-primary btn-large btn-try', 'A 60-second tour on a real T-shirt') : ''}
+        <a class="btn btn-secondary btn-large" href="#download"><span class="btn-label">Download</span><span class="btn-sub">Windows app · Linux server</span></a>
       </div>
-      <p class="small muted">Best for trying and small jobs; for big markers use the desktop app</p>
+      <p class="small muted hero-note">${site.webAppUrl ? html`Or <a href="${site.webAppUrl}">open the app in your browser</a> without the tour. ` : ''}Best for trying and small jobs; for big markers use the desktop app.</p>
       <ul class="trust-list">
-        <li>No account</li><li>No cloud</li><li>No licence fee</li><li>Works offline</li>
+        <li>Free · Apache-2.0</li><li>Runs on your device</li><li>No account</li><li>No tracking</li>
       </ul>
-      <p class="humble"><span class="humble-icon" aria-hidden="true">${icon('heart')}</span><span><strong>BETA is young and not perfect yet.</strong> We need your help to improve it. <a href="#help">Tell us what to fix</a>.</span></p>
     </div>
-    <figure class="hero-figure" data-tilt>
-      <div class="hero-card">
-        <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>Marker · shirt · sizes S, M, L</span><span class="badge">Illustration</span></div>
-        <div class="hero-stage is-playing" id="hero-stage">
-          ${heroMarker()}
-          <p class="hero-status" aria-hidden="true"><span class="st st-1"><span class="spinner"></span>Nesting 18 pieces…</span><span class="st st-2"><span class="tick">✓</span>All pieces placed. Checked by the validator.</span></p>
-        </div>
-        <button type="button" class="replay" data-replay="hero-stage" hidden><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M4 10a6 6 0 1 0 2-4.5M4 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Replay</button>
-      </div>
-      <figcaption>Illustration. A marker places every pattern piece on the fabric so the lay uses as little length as possible.</figcaption>
-    </figure>
+    ${heroPicture(ctx)}
   </div>
 </div>
 
 ${demoVideo(ctx)}
 
-<section class="stats" aria-label="BETA in numbers">
-  <div class="wrap"><ul class="stat-band" data-reveal data-stagger>
-    <li><span class="stat-big">${counter(8, 0, '8')}</span><span class="stat-text">steps from pattern to sewing line, in one program</span></li>
-    ${benchTasks ? html`<li><span class="stat-big">${counter(benchTasks, 0, String(benchTasks))}</span><span class="stat-text">real Lectra nesting tasks in our public benchmark</span></li>` : ''}
-    <li><span class="stat-big">${counter(100, 0, '100')}<small>%</small></span><span class="stat-text">of markers checked by an independent validator before export</span></li>
-    <li><span class="stat-big">0</span><span class="stat-text">accounts, cloud services or licence fees</span></li>
-  </ul></div>
-</section>
+${section('paths', 'Start where you are', html`
+<div class="paths">${paths.map((p, i) => pathCard(p, i))}</div>
+<p class="note">Real screens of the app with sample data. Every path has a sample, so you can try it before you use your own files.</p>`, { eyebrow: 'Three ways in', lead: 'Paper patterns on a phone, a pattern master’s drafting table, or a cutting room with CAD files: each one works in the browser.' })}
 
-${section('workflow', 'From pattern to sewing line', html`
-<div class="flow" data-flow>
-  <div class="flow-track" aria-hidden="true"><span class="flow-fill"></span><span class="flow-runner"></span></div>
-  <ol class="flow-steps">
-    ${steps.map((s, i) => html`<li class="flow-step" data-flow-step><span class="flow-node"><span class="flow-icon">${icon(s.key)}</span></span><span class="step-num">Step ${i + 1}</span><h3>${s.title}</h3><p>${s.text}</p><span class="step-module">${s.module}</span></li>`)}
-  </ol>
-  <button type="button" class="replay replay-inline" data-flow-replay hidden><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M4 10a6 6 0 1 0 2-4.5M4 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Play the steps again</button>
-</div>`, { eyebrow: 'One program', lead: 'One record follows the style through the cutting room. Each step uses the result of the step before, so numbers are not typed twice.' })}
-
-${section('screens', 'See the real app', html`
-<div class="showcase" data-carousel data-reveal>
-  <div class="showcase-frame">
-    <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>BETA Cutting Room ${site.version}</span></div>
-    <div class="slides">${screens.map((s, i) => slide(ctx, s, i))}</div>
-  </div>
-  <div class="showcase-controls">
-    <div class="tabs" data-tablist aria-label="App screens" hidden>${screens.map((s, i) => html`<button type="button" class="tab" id="tab-${s.slot}" data-tab aria-selected="${i === 0 ? 'true' : 'false'}"><span>${s.label}</span><i class="tab-progress" aria-hidden="true"></i></button>`)}</div>
-    <button type="button" class="btn-icon" data-toggle hidden aria-pressed="false"><svg class="i-pause" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><svg class="i-play" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M7 4.5v11l9-5.5z" fill="currentColor"/></svg><span class="sr-only" data-toggle-label>Pause slideshow</span></button>
-  </div>
-</div>
-<p class="note">Real screens from version ${site.version}, with original sample data. No factory data.</p>`, { eyebrow: 'Screenshots', cls: 'section-alt' })}
-
-${benchmarkHighlight(ctx.runs)}
-
-${section('features', 'What it does today', html`
-<div class="card-grid" data-reveal data-stagger>
-  ${features.map((f) => html`<article class="card feature-card"><span class="card-icon">${icon(f.icon)}</span><h3>${f.title}</h3><ul class="check-list">${f.items.map((i) => html`<li>${i}</li>`)}</ul></article>`)}
+${section('features', 'What BETA does today', html`
+<div class="card-grid card-grid-4 feature-groups" data-reveal data-stagger>
+  ${groups.map((g) => html`<article class="card feature-card"><span class="card-icon">${icon(g.icon)}</span><h3>${g.title}</h3><ul class="check-list">${g.items.map(([text, isNew]) => html`<li>${text}${isNew ? html` <span class="new-tag">New in 0.8</span>` : ''}</li>`)}</ul></article>`)}
 </div>
 <div class="callout callout-plain not-yet" data-reveal>
-  <h3>Not yet</h3>
+  <h3>Not yet, or not proven</h3>
   <p>We prefer to tell you before you find out.</p>
   <ul>${notYet.map((n) => html`<li>${n}</li>`)}</ul>
-</div>`, { eyebrow: 'Features', lead: 'Each of these runs on your own computer. The heavy work (nesting, checks, file output) is written in Rust for speed.' })}
+</div>`, { eyebrow: 'Features', lead: 'Everything runs on your own computer. The heavy work (geometry, nesting, checks, files) is written in Rust for speed.', cls: 'section-alt' })}
+
+${benchmarkHighlight(ctx.runs)}
 
 <section class="section section-data" id="privacy" aria-labelledby="privacy-title">
   <div class="wrap split split-even">
     <div data-reveal>
       <p class="eyebrow">Privacy</p>
-      <h2 id="privacy-title">Your data stays in your factory</h2>
-      <p class="lead">BETA runs on computers you control. There is no BETA cloud to send your patterns to.</p>
+      <h2 id="privacy-title">Your files stay on your device</h2>
+      <p class="lead">BETA runs in your browser, in the desktop app, or on a factory server you choose. There is no BETA cloud.</p>
       <ul class="check-list check-list-big">
-        <li>Patterns, markers, orders and roll data stay on your PCs and your server.</li>
-        <li>No account, no tracking, no usage data and no crash reports sent anywhere.</li>
-        <li>Works with no internet. Install and update from a USB drive.</li>
-        <li>The server listens only on its own computer unless you turn on factory network access with a token.</li>
+        <li>Patterns, markers, orders and roll data stay in this browser or on your own PCs and server.</li>
+        <li>No account, no tracking, no usage data and no crash reports sent anywhere. This website has no cookies.</li>
+        <li>Works without internet once installed or opened once. Keep backup files of your work.</li>
+        <li>Feedback is your choice. GitHub issues are public, so do not attach factory files there.</li>
       </ul>
-      <p><a class="link-arrow" href="install.html#privacy">Read about privacy and self-hosting<span aria-hidden="true"> →</span></a></p>
+      <p><a class="link-arrow" href="install.html#privacy">Privacy and self-hosting<span aria-hidden="true"> →</span></a></p>
     </div>
     <div class="factory-wrap" data-reveal>${factoryDiagram()}</div>
   </div>
 </section>
 
-${section('who', 'Who it is for', html`
-<div class="card-grid card-grid-5" data-reveal data-stagger>
-  ${audiences.map((a) => html`<article class="card audience-card"><span class="card-icon card-icon-small">${icon(a.icon)}</span><h3>${a.title}</h3><p>${a.text}</p></article>`)}
-</div>`, { cls: 'section-alt' })}
+<section class="section section-alt" id="help" aria-labelledby="help-title">
+  <div class="wrap fun-grid">
+    <div class="fun-card" data-reveal>
+      <span class="fun-badge"><span aria-hidden="true">✦</span> A fun project</span>
+      <h2 id="help-title">A fun project, built with modern AI tools: we need your help</h2>
+      <p>BETA Cutting Room is a fun project by a small team. We build it with the help of modern AI coding assistants, and we test it like serious software: an independent validator checks every marker before you can export it.</p>
+      <p><strong>BETA is young and not perfect yet.</strong> Try it on a real job and tell us what is wrong, confusing or missing. Pattern masters, cutting masters and developers are all welcome.</p>
+      <div class="contribute-row">
+        ${site.repoUrl ? html`<a class="btn btn-secondary btn-small" href="${site.repoUrl}" rel="noopener noreferrer external">See the code on GitHub<span class="sr-only"> (external site)</span></a>` : ''}
+        ${repoLink('CONTRIBUTING.md') ? html`<a class="btn btn-secondary btn-small" href="${repoLink('CONTRIBUTING.md')!}" rel="noopener noreferrer external">How to contribute<span class="sr-only"> (external site)</span></a>` : ''}
+      </div>
+    </div>
+    <div class="help-block" data-reveal>
+      <h3 class="h-help">Tell us what to fix</h3>
+      <p>A short note is enough, and every report helps.</p>
+      ${helpLinks()}
+      <p class="small muted samples-note"><strong>Have a real job to compare?</strong> Send 3 to 5 styles as DXF-AAMA with the marker your CAD made (width, ratio, length, efficiency) to ${contactLine()}. Your files stay private; we publish nothing without your written permission.</p>
+    </div>
+  </div>
+</section>
+
+${section('faq', 'Questions people ask first', html`${faqList(topFaq(ctx.runs))}<p class="note"><a class="link-arrow" href="docs.html#faq">More questions and the manuals<span aria-hidden="true"> →</span></a></p>`, { eyebrow: 'FAQ' })}
 
 ${section('download', 'Download', html`
 <div class="card-grid card-grid-4" data-reveal data-stagger>
   <article class="card download-card download-main">
-    <span class="card-icon">${icon('download')}</span>
-    <h3>Windows installer</h3>
-    <p>For one PC. Windows 10 or 11, 64-bit. ${d.windows.size}. No administrator rights needed.</p>
-    ${downloadButton(d.windows.url, 'Download installer')}
-    <p class="small muted"><a href="install.html#windows">Installation steps</a></p>
+    <span class="card-icon">${icon('spark')}</span>
+    <h3>Try in the browser</h3>
+    <p>Nothing to install. The 60-second tour shows a real T-shirt from pattern to cut plan, then you can try your own.</p>
+    ${downloadButton(site.tourUrl, 'Start the tour')}
+    <p class="small muted">${site.webAppUrl ? html`<a href="${site.webAppUrl}">Open the app without the tour</a>` : ''}</p>
   </article>
   <article class="card download-card">
-    <span class="card-icon">${icon('zip')}</span>
-    <h3>Portable ZIP</h3>
-    <p>No installation. Unzip, run <code>start-server.cmd</code> and open the app in your browser. ${d.portable.size}.</p>
-    ${downloadButton(d.portable.url, 'Download ZIP', 'btn btn-secondary')}
-    <p class="small muted"><a href="install.html#portable">Portable steps</a></p>
+    <span class="card-icon">${icon('download')}</span>
+    <h3>Windows app</h3>
+    <p>For one PC. Windows 10 or 11, 64-bit. ${d.windows.size}. No administrator rights needed. Or the portable ZIP (${d.portable.size}).</p>
+    ${downloadButton(d.windows.url, 'Download installer', 'btn btn-secondary')}
+    <p class="small muted">${downloadButton(d.portable.url, 'Portable ZIP', 'link-plain')} · <a href="install.html#windows">Installation steps</a></p>
   </article>
   <article class="card download-card">
     <span class="card-icon">${icon('server')}</span>
     <h3>Linux server</h3>
-    <p>The <code>beta-marker serve</code> command runs the same app in a web browser. ${d.server.size}. Needs glibc 2.31 or newer (tested with 2.31 and 2.43).</p>
+    <p>Runs the same app for a whole factory network with <code>beta-marker serve</code>. ${d.server.size}. Needs glibc 2.31 or newer.</p>
     ${downloadButton(d.server.url, 'Download server', 'btn btn-secondary')}
     <p class="small muted"><a href="install.html#server">Server steps</a></p>
   </article>
@@ -290,41 +311,6 @@ ${section('download', 'Download', html`
     ${downloadButton(site.repoUrl, 'View on GitHub', 'btn btn-secondary')}
     <p class="small muted"><a href="open-source.html">Licence and credits</a></p>
   </article>
-</div>`)}
-
-<section class="section section-alt" id="fun" aria-labelledby="fun-title">
-  <div class="wrap fun-grid">
-    <div class="fun-card" data-reveal>
-      <span class="fun-badge"><span aria-hidden="true">✦</span> A fun project</span>
-      <h2 id="fun-title">Built for fun, with the help of modern AI tools</h2>
-      <p>BETA Cutting Room is a fun project by a small team. We build it with the help of modern AI coding assistants, and we test it like serious software: an independent validator checks every marker before you can export it.</p>
-      <p>The code is open. You are welcome to read it, try it and help us make it better.</p>
-      ${site.repoUrl ? ext(site.repoUrl, html`See the code on GitHub<span aria-hidden="true"> →</span>`) : ''}
-    </div>
-    <div class="help-block" id="help" data-reveal>
-      <h2 id="help-title" class="h-help">Help us improve</h2>
-      <p>BETA is young and not perfect yet. We need your help to improve it. A short note is enough, and every report helps.</p>
-      ${helpLinks()}
-    </div>
-  </div>
-</section>
-
-${section('samples', 'Send us your markers', html`
-<div class="split">
-  <div data-reveal>
-    <p>We want to compare BETA with your current CAD on your own styles: same pieces, same fabric width, same rules. You get the results, and they stay private.</p>
-    <h3>What to send</h3>
-    <ol class="plain-steps">
-      <li>3 to 5 real styles exported as <strong>DXF-AAMA or ASTM</strong> from your CAD (for example a shirt, trouser, T-shirt or jeans).</li>
-      <li>For each style, the marker your CAD made: fabric width, size ratio, rules (nap, 0/180, gaps), <strong>marker length and efficiency</strong>, and how long the auto-nest ran.</li>
-      <li>If you can, one plotter file (PLT) from your cutting room, so we can check the plot scale on your plotter.</li>
-    </ol>
-  </div>
-  <aside class="callout callout-accent" aria-label="Privacy promise" data-reveal>
-    <h3>Your files stay private</h3>
-    <p>We never commit, publish or share your patterns or markers without your written permission. Published results name no style, buyer or factory unless you agree.</p>
-    <p><strong>Contact:</strong> ${contactLine()}</p>
-  </aside>
 </div>`)}
 `;
 }

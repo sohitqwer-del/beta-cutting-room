@@ -13,7 +13,7 @@ import { loadEditorCore, type EditorCore } from './editor-core';
 import { cleanSelection } from './editor-state';
 import { installEditorTools } from './editor-tools';
 import { seamlyWarnings, warningsHtml } from './import-warnings';
-import { installShell } from './shell';
+import { installShell, SCREENS } from './shell';
 import { icon } from './icons';
 import { staticMode, installStaticNotices } from './static-mode';
 import { label } from './floor-i18n';
@@ -22,11 +22,15 @@ import './style.css';
 // Screen styles after the design system so they can refine it.
 import './quick/quick.css';
 import './style/style.css';
-import { find, findAll } from './screens';
+import './tour/tour.css';
+import './launch.css';
+import { find, findAll, whenIdle } from './screens';
 import { appUnit, longLength, onUnit, shortLength, shortUnit } from './units-pref';
 import { labelsSvg, placedLabels, prepareLabels } from './marker-labels';
 import { bySize } from './sizes';
+import { bootStep } from './boot';
 
+bootStep(70, 'Starting the app…');
 const app = find<HTMLDivElement>('#app')!;
 const tool = (id: string, name: string, label: string, tip: string, keys = '', extra = ''): string =>
   `<button type="button" id="${id}" class="icon-btn" aria-label="${label}"${keys ? ` aria-keyshortcuts="${keys}"` : ''} data-tip="${tip}" ${extra}>${icon(name)}<span class="btn-label">${label}</span></button>`;
@@ -99,6 +103,7 @@ app.innerHTML = `
 </aside></div>`;
 
 const $ = <T extends Element = HTMLElement>(selector: string): T => find<T>(selector)!;
+$('#warm-start').closest('label')!.insertAdjacentHTML('afterend', `<label class="check"><input id="adaptive-search" type="checkbox" ${staticMode() ? 'disabled' : ''}>Compare search methods (experimental)</label><p class="hint">Strategy comparison needs the desktop app or local server and at least 12 seconds. Ordinary search remains the default.</p>`);
 const canvas = $<SVGSVGElement>('#canvas');
 let state: DocumentState = structuredClone({ job: demoJob, result: demoResult });
 let history = new History(state);
@@ -485,7 +490,8 @@ $('#nest-form').addEventListener('submit', async event => {
     }).catch(() => {});
   }, 500);
   try {
-    const payload = nestPayload(state, { time_limit_s: limit, seed: Number($<HTMLInputElement>('#seed').value), workers: 2, runs }, unlocked, $<HTMLInputElement>('#warm-start').checked);
+    const payload = { ...nestPayload(state, { time_limit_s: limit, seed: Number($<HTMLInputElement>('#seed').value), workers: 2, runs }, unlocked, $<HTMLInputElement>('#warm-start').checked), adaptive: $<HTMLInputElement>('#adaptive-search').checked };
+    if (payload.adaptive && (limit < 12 || (!isDesktop() && !serverOnline))) throw new Error('Strategy comparison needs the desktop app or local server and at least 12 seconds. Use ordinary search here.');
     let result: MarkerResult;
     if (local) {
       if (runs !== 1) throw new Error('Browser nesting uses one run. Set Portfolio runs to 1, or connect the desktop app/server.');
@@ -502,9 +508,12 @@ $('#nest-form').addEventListener('submit', async event => {
       if (!('placements' in decoded)) throw new Error('The server did not return a marker result.');
       result = decoded;
     }
+    const choice = editorCore?.chooseSearch?.(state, result, payload.options.fixed ?? []);
+    const found = result;
+    if (choice) result = choice.result;
     const editCheck = editorCore?.inspect({job:state.job,result});
     if (editCheck && (editCheck.section_violations.length || editCheck.end_violations.length)) throw new Error('The new nest crosses a saved cut line or marker end. The current marker is kept. Adjust the cut lines or table end before nesting again.');
-    nesting = false; commit({ ...state, result }); fit(); message('Nesting finished. Review the validation checks before cutting.');
+    nesting = false; commit({ ...state, result }); fit(); message(choice?.retained ? `Kept the previous marker. It is ${lengthWords(result.length)} long and still passes every check; the new search only found ${lengthWords(found.length)}.` : 'Nesting finished. Review the validation checks before cutting.');
   } catch (error) { message(errorText(error), true); }
   finally {
     window.clearInterval(progressTimer); browserStop = undefined; $('#nest-progress').hidden = true; nesting = false; button.disabled = false; $('#nest .btn-label').textContent = 'Nest marker'; app.removeAttribute('aria-busy');
@@ -630,7 +639,7 @@ $('#colour-mode').addEventListener('change', event => { features?.setColourByBun
   let saved: Record<string, boolean> = {};
   try { saved = JSON.parse(localStorage.getItem(PANELS_KEY) ?? '{}') as Record<string, boolean>; } catch { /* defaults */ }
   setPanel('setup', saved.setup ?? true, false);
-  setPanel('inspector', saved.inspector ?? window.innerWidth >= 1600, false);
+  setPanel('inspector', saved.inspector ?? window.matchMedia('(min-width: 1600px)').matches, false);
   $('#toggle-setup').addEventListener('click', () => setPanel('setup', $('.workspace').classList.contains('hide-setup')));
   $('#toggle-inspector').addEventListener('click', () => setPanel('inspector', $('.workspace').classList.contains('hide-inspector')));
   $('#inspector-close').addEventListener('click', () => { setPanel('inspector', false); $('#toggle-inspector').focus(); });
@@ -638,7 +647,18 @@ $('#colour-mode').addEventListener('change', event => { features?.setColourByBun
 }
 render(true); fit();
 onUnit(() => render(true));
-void loadMarkerCore().then(async loaded => { core = loaded; editorCore = await loadEditorCore(); render(); history = new History(state); }).catch(error => { wasmProblem = `WASM could not load: ${errorText(error)} Build @beta/marker-wasm and reload to enable editing and checks.`; renderStats(); renderSelection(); });
+// The marker engine (1.4 MB compressed) loads when a screen that uses it opens, not on Home: a phone visitor who only
+// looks at Home or takes the sample tour does not download it twice. Desktop and a direct #/marker link load it at once.
+let coreLoading: Promise<void> | undefined;
+function ensureCore(): Promise<void> {
+  return coreLoading ??= loadMarkerCore().then(async loaded => { core = loaded; editorCore = await loadEditorCore(); render(); history = new History(state); }).catch(error => { wasmProblem = `WASM could not load: ${errorText(error)} Build @beta/marker-wasm and reload to enable editing and checks.`; renderStats(); renderSelection(); });
+}
+const LIGHT_SCREENS = new Set([9, 11, 12]);
+if (isDesktop() || !LIGHT_SCREENS.has(SCREENS.find(s => `#/${s.hash}` === location.hash)?.index ?? 9)) void ensureCore();
+else whenIdle(() => void ensureCore());
+window.addEventListener('beta-screen', event => { if (!LIGHT_SCREENS.has((event as CustomEvent<number>).detail)) void ensureCore(); });
+/** A marker length in the app unit, for messages: "3.059 m" or "3.345 yd". */
+function lengthWords(mm: number): string { const v = longLength(mm, appUnit()); return `${v.value} ${v.unit}`; }
 function checkHealth(): void {
   if (staticMode()) { serverOnline = false; browserStatus(); return; }
   void apiFetch('/api/health').then(async response => {

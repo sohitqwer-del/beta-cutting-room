@@ -1,10 +1,10 @@
 //! JSON-in/JSON-out browser bindings. These functions also run in native tests.
-mod nesting;
 mod export;
+mod nesting;
 pub use export::*;
 mod import;
-pub use import::*;
 use beta_marker_core::{Job, MarkerResult, Placement, Pt};
+pub use import::*;
 use serde::{Serialize, de::DeserializeOwned};
 use wasm_bindgen::prelude::*;
 
@@ -33,6 +33,22 @@ pub fn edit(job: &str, result: &str, request: &str) -> Result<String, String> {
         &read_job(job)?,
         &read(result)?,
         read(request)?,
+    )?)
+}
+
+/// Retain the shorter complete marker after fresh search, using current rules and exact locks.
+#[wasm_bindgen]
+pub fn edit_choose_search(
+    job: &str,
+    incumbent: &str,
+    candidate: &str,
+    fixed: &str,
+) -> Result<String, String> {
+    write(&beta_marker_edit::choose_search_result(
+        &read_job(job)?,
+        &read(incumbent)?,
+        &read(candidate)?,
+        &read::<Vec<Placement>>(fixed)?,
     )?)
 }
 /// Return exact overlap areas, gap violations, section checks and missing copies.

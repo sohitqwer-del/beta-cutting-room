@@ -1,6 +1,6 @@
 # Privacy and local data
 
-BETA Cutting Room 0.4.0 is open source and self-hosted. It needs no cloud account,
+BETA Cutting Room is open source and can run locally or be self-hosted. It needs no cloud account,
 analytics, third-party CDN or runtime licence check. BETA's code makes no
 outbound service requests or automatic factory-data uploads. Build tools may download dependencies; administrators
 may separately configure HTTPS certificate services or updates.
@@ -18,6 +18,9 @@ PC makes no network requests. See Microsoft's
   Autosave and the previous good copy can retain earlier work.
 - **Browser:** drafts/settings stay in browser storage, per profile and origin.
   A factory HTTP server is not a shared project library.
+  The static browser edition computes locally without uploading files to an API.
+  Save/restore backup files include cutting-room records; see
+  [browser storage and backup](BROWSER-CUTROOM-API.md#storage-and-backup).
 - **CLI:** inputs and outputs use operator-chosen paths. Persistent queues and
   exports write the files requested by their commands.
 - **Self-hosted API:** uploads travel to the configured factory server for

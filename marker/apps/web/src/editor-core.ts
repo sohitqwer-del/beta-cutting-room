@@ -13,6 +13,8 @@ export interface EditorInspection {
 }
 export interface EditorOutput extends DocumentState { selected: number[]; measurement: number | null; notice: string }
 export interface EditorCore {
+  chooseSearch?(state: DocumentState, candidate: MarkerResult, fixed: Placement[]): {result:MarkerResult;retained:boolean};
+  drawing?(state: DocumentState): { outlines: Pt[][] };
   apply(state: DocumentState, selected: number[], action: Record<string, unknown>): EditorOutput;
   inspect(state: DocumentState): EditorInspection;
   reuse(current: Job, saved: DocumentState): MarkerResult;
@@ -24,10 +26,14 @@ export async function loadEditorCore(): Promise<EditorCore> {
     edit(job: string, result: string, command: string): string;
     edit_inspect(job: string, result: string): string;
     edit_reuse(current: string, job: string, result: string): string;
+    drawing(job: string, placements: string): string;
+    edit_choose_search(job: string, incumbent: string, candidate: string, fixed: string): string;
   };
   await raw.default({ module_or_path: new URL('./beta_marker_wasm_bg.wasm',url) });
   if (typeof raw.edit !== 'function') throw new Error('Rebuild marker WASM to load the editing tools.');
   return {
+    chooseSearch: (state,candidate,fixed) => JSON.parse(raw.edit_choose_search(JSON.stringify(state.job),JSON.stringify(state.result),JSON.stringify(candidate),JSON.stringify(fixed))),
+    drawing: state => JSON.parse(raw.drawing(JSON.stringify(state.job), JSON.stringify(state.result.placements))),
     apply: (state, selected, action) => JSON.parse(raw.edit(JSON.stringify(state.job), JSON.stringify(state.result), JSON.stringify({ selected, ...action }))),
     inspect: state => JSON.parse(raw.edit_inspect(JSON.stringify(state.job), JSON.stringify(state.result))),
     reuse: (current, saved) => JSON.parse(raw.edit_reuse(JSON.stringify(current), JSON.stringify(saved.job), JSON.stringify(saved.result))),

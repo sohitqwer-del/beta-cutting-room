@@ -27,8 +27,8 @@ export function releaseEnvironment(env = process.env, root = workspace, cargoHom
 /** Scan actual executable bytes, including UTF-16 paths, rather than a build log. */
 export function localPathLeaks(bytes, roots = [workspace, process.env.CARGO_HOME || join(homedir(), '.cargo')]) {
   const utf8 = bytes.toString('utf8').toLowerCase();
-  const utf16 = bytes.toString('utf16le').toLowerCase();
-  const utf16Odd = bytes.subarray(1).toString('utf16le').toLowerCase();
+  const utf16 = bytes.subarray(0, bytes.length - bytes.length % 2).toString('utf16le').toLowerCase();
+  const utf16Odd = bytes.subarray(1, 1 + Math.floor((bytes.length - 1) / 2) * 2).toString('utf16le').toLowerCase();
   const needles = ['C:\\Users\\', 'C:/Users/', '/home/', ...roots.flatMap(root => [resolve(root), resolve(root).replaceAll('\\', '/')])];
   return [...new Set(needles)].filter(needle => [utf8, utf16, utf16Odd].some(text => text.includes(needle.toLowerCase())));
 }

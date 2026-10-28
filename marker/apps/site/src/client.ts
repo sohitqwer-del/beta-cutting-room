@@ -183,6 +183,45 @@ function initMotion(): void {
     select(0);
   });
 
+  // Hero: real markers recorded in the app while it searched. The frames play in order (each one shorter), the last one
+  // holds, then the loop starts again. Pausable; it waits while off screen or in a hidden tab. Without motion the
+  // final marker shows by itself (CSS).
+  document.querySelectorAll<HTMLElement>('[data-hero-live]').forEach((fig) => {
+    const frames = Array.from(fig.querySelectorAll<SVGGElement>('.hz-frame'));
+    const length = fig.querySelector<HTMLElement>('[data-hz-length]');
+    const toggle = fig.querySelector<HTMLButtonElement>('[data-hz-toggle]');
+    if (frames.length < 2 || !motionOk()) return;
+    fig.classList.add('is-anim');
+    let at = 0; let timer = 0; let paused = false; let seen = !canObserve;
+    const show = (n: number) => {
+      at = n;
+      frames.forEach((f, k) => f.classList.toggle('is-on', k === n));
+      fig.classList.toggle('is-done', n === frames.length - 1);
+      fig.classList.toggle('is-intro', n === 0);
+      if (length) length.textContent = `${(Number(frames[n]!.dataset.length) / 1000).toFixed(2)} m`;
+    };
+    const wait = (n: number) => (n === 0 ? 2600 : n === frames.length - 1 ? 5200 : 1300);
+    const schedule = () => {
+      window.clearTimeout(timer);
+      if (paused || !seen || document.hidden) return;
+      timer = window.setTimeout(() => { show(wrapIndex(at, 1, frames.length)); schedule(); }, wait(at));
+    };
+    show(0);
+    if (toggle) {
+      toggle.hidden = false;
+      toggle.addEventListener('click', () => {
+        paused = !paused;
+        toggle.setAttribute('aria-pressed', String(paused)); toggle.classList.toggle('is-paused', paused);
+        toggle.querySelector('[data-hz-label]')!.textContent = paused ? 'Play the animation' : 'Pause the animation';
+        if (paused) show(frames.length - 1);
+        schedule();
+      });
+    }
+    if (canObserve) new IntersectionObserver((entries) => { seen = entries.some((e) => e.isIntersecting); schedule(); }, { threshold: 0.25 }).observe(fig);
+    document.addEventListener('visibilitychange', schedule);
+    schedule();
+  });
+
   // A gentle tilt of the hero card that follows the pointer (fine pointers only).
   const tilt = document.querySelector<HTMLElement>('[data-tilt]');
   if (tilt && motionOk() && window.matchMedia('(pointer: fine)').matches) {

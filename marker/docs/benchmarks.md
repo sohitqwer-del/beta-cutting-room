@@ -1,8 +1,49 @@
 # Benchmarking BETA Marker
 
+The headline suite below is dated 20 October 2026 and pins an older engine.
+It is not a rerun of the unreleased 0.8 branch. The later
+[targeted defect study](NESTING-EFFICIENCY-2026-10-24.md),
+[mixed engine pilot](NESTING-THREE-IMPROVEMENTS-2026-10-24.md) and
+[adaptive pilot](WORKFLOW-IMPROVEMENTS-2026-10-25.md) cover selected cases with
+both gains and regressions; they do not replace the public Lectra suite.
+
 We compare fabric use on the same pieces and width. Every scored BETA layout must pass independent validation. The comparisons cover published sparrow instances and Lectra's open client-task dataset. We have no matched public runs from Tukatech, Gerber or Optitex.
 
-## Latest completed public suite: server
+## Paired 0.8 candidate versus 0.7.0: 28 October
+
+The [full paired report](../bench/results/2026-10-28-public-0.8.md) compares
+`345f42e` with `9a852d2` on the exact frozen 300-task public Lectra sample.
+Both use seed 1, 60 seconds requested, the selected 80/20 search profile,
+four concurrent tasks and three search workers per task. All **636 layouts**
+(600 Lectra and 36 garment layouts) passed saved independent validation.
+
+| Comparison | Valid pairs | Mean difference, pp | Median difference, pp | Win / tie / loss |
+|---|---:|---:|---:|---:|
+| 0.8 minus 0.7, 300 Lectra tasks | 300 | -0.0179 | -0.0004 | 47 / 187 / 66 |
+| 0.8 minus Lectra | 300 | -1.3914 | -1.5709 | 77 / 12 / 211 |
+| 0.8 minus 0.7, 18 garment jobs, useful yield | 18 | +3.5692 | +0.0073 | 8 / 7 / 3 |
+
+**0.8 is slightly worse on the ordinary-open Lectra sample in this run.** Most
+pairs tie; one seed cannot establish a durable regression or broad gain.
+Garment gains concentrate in the three open/start-defect jobs. Clean folded
+jobs tie, and Simon clean tubular, folded-with-defect and tubular-with-defect
+regress. The report gives every garment pair, occupied efficiency, useful
+yield, length, surplus copies and actual wall time, plus all 12 Lectra strata.
+Useful yield excludes surplus copies and includes both fabric layers.
+
+Timed Lectra stages took 4569.396 s for 0.7 and 4558.487 s for 0.8; garment
+stages took 301.278 and 302.340 s. Search budgets exclude some overhead.
+Both engines had effective nice 19 because the nice-10 driver also invokes
+`nice -n 10`; the historical run used nice 10. Shared load, wall-clock cutoffs,
+one seed and the unverified source sheet/flip assumptions remain limitations.
+This is not a controlled improvement over the older historical run or a claim
+of commercial parity. The matched-time and academic suites were not rerun.
+
+The website keeps historical data and adds `lectra-60s-08`,
+`lectra-08-vs-07` and `freesewing-08-vs-07`. Engine comparisons use the additive
+`engine-baseline` reference type in schema version 1.
+
+## Historical completed public suite: 20 October
 
 **All 387 layouts passed independent validation:** 300 Lectra tasks at 60 seconds,
 60 at their recorded Lectra durations, 21 academic trials and six FreeSewing
